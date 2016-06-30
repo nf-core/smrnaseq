@@ -2,11 +2,10 @@
 
 /*
 ========================================================================================
-                    R N A - S E Q    T W O    P O I N T    Z E R O
+                                         miRNA 
 ========================================================================================
- New RNA-Seq Best Practice Analysis Pipeline. Started March 2016.
+ miRNA  Analysis Pipeline. Started May 2016.
  @Authors
- Phil Ewels <phil.ewels@scilifelab.se>
  Rickard Hammarén <rickard.hammaren@scilifelab.se>
 ----------------------------------------------------------------------------------------
  Basic command:
@@ -28,9 +27,6 @@
  https://docs.google.com/document/d/1_I4r-yYLl_nA5SzMKtABjDKxQxHSb5N9FMWyomVSWVU/edit#heading=h.uc2543wvne80
 ----------------------------------------------------------------------------------------
 */
-
-
-
 /*
  * SET UP CONFIGURATION VARIABLES
  */
@@ -43,11 +39,11 @@ params.genome = 'GRCh37'
 params.index = params.genomes[ params.genome ].star
 params.gtf   = params.genomes[ params.genome ].gtf
 params.bed12 = params.genomes[ params.genome ].bed12
-
+params.bowtie = params.genomes[ params.genome ].bowtie
 params.name = "miRNA-Seq Best practice"
 
 // Input files
-params.reads = "data/*.fastq.gz"
+params.input = "data/*.fastq.gz"
 
 // Output path
 params.out = "$PWD"
@@ -59,7 +55,7 @@ nxtflow_libs=file(params.rlocation)
 log.info "===================================="
 log.info " RNAbp : miRNA-Seq Best Practice v${version}"
 log.info "===================================="
-log.info "Reads        : ${params.reads}"
+log.info "Reads        : ${params.input}"
 log.info "Genome       : ${params.genome}"
 log.info "Index        : ${params.index}"
 log.info "Annotation   : ${params.gtf}"
@@ -79,36 +75,26 @@ nxtflow_libs.mkdirs()
 index = file(params.index)
 gtf   = file(params.gtf)
 bed12 = file(params.bed12)
+bowtie=file(params.bowtie)
 
 // Validate inputs
 if( !index.exists() ) exit 1, "Missing STAR index: ${index}"
 if( !gtf.exists() )   exit 2, "Missing GTF annotation: ${gtf}"
 if( !bed12.exists() ) exit 2, "Missing BED12 annotation: ${bed12}"
+//if( !bowtie.exists() ) exit 2, "Missing  annotation: ${bowtie}"
 
 //Setting up a directory to save results to 
 results_path = './results'
 
-/*
- * Create a channel for read files 
- */
- 
-Channel
-     .fromPath( params.reads )
-     .ifEmpty { error "Cannot find any reads matching: ${params.reads}" }
-     .map { path ->  
-        def prefix = readPrefix(path, params.reads)
-        tuple(prefix, path)
-     }
-     .groupTuple(sort: true)
-     .set { read_files }
- 
-read_files.into  { read_files_fastqc; read_files_trimming;name_for_star }
+dataset = Channel.fromPath(params.input)
+dataset.into { fastQC_input; trimgalore_input }  
+
 /*
  * STEP 1 - FastQC
  */
 
 process fastqc {
-    tag "reads: $name"
+    tag "reads: $reads"
 
     module 'bioinfo-tools'
     module 'FastQC'
@@ -119,8 +105,7 @@ process fastqc {
     publishDir "$results_path/fastqc"
 
     input:
-    set val(name), file(reads:'*') from read_files_fastqc
-
+    file reads from fastQC_input
     output:
     file '*_fastqc.html' into fastqc_html
     file '*_fastqc.zip' into fastqc_zip
@@ -136,7 +121,7 @@ process fastqc {
  */
 
 process trim_galore {
-    tag "reads: $name"
+    tag "reads: $reads"
 
     module 'bioinfo-tools'
     module 'FastQC'
@@ -150,43 +135,68 @@ process trim_galore {
     publishDir "$results_path/trim_galore"
 
     input:
-    set val(name), file(reads:'*') from read_files_trimming
-    
+    file(reads) from trimgalore_input
 
     output:
-    file '*fq.gz' into trimmed_reads
-    file '*trimming_report.txt' into results
+    file '*fq.gz' into trimmed_reads, trimmed_reads_miRdeep2
+    file '*trimming_report.txt' 
     script:
 
     """
-    trim_galore --gzip --fastqc_args "-q" $reads
-     """
+    trim_galore --gzip --fastqc_args "-q" ${reads}
+    """
 }
 
+/*
+ * STEP 3 - Bowtie
+*/
+
+process bowtie{
+    
+    module 'bioinfo-tools'
+    module 'bowtie'
+    module 'samtools'
+    
+    memory '2 GB'
+    time '6h'
+
+    input:
+    file(reads:'*') from trimmed_reads 
+    
+    output:
+    file '*.bam' into bam 
+   
+    """
+    f='$reads';f=(\$f);f=\${f[0]};f=\${f%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%_val_1};f=\${f%_trimmed};f=\${f%_1}
+    prefix=\$f
+    bowtie -p 2 -t -n 0 -l 15 -e 99999 -k 200 --best -S --chunkmbs 2048 $bowtie $reads | samtools view -bS > \$prefix.Aligned.bam 
+    """
+}
 
 /*
- * STEP 3
+ * STEP 4
  */
-process bowtie{
+ 
+//Under development
+process miRdeep2{
 
     module 'Bioinfo-tools'
-    module 'bowtie'
+    module 'mirdeep2'
 
     cpus 4
     memory '16 GB'
     input:
-    file (reads:'*') from trimmed_reads
+    //file (reads:'*') from trimmed_reads_miRdeep2
     output:
-    file 'out.bam' into bow_out
+    file '*.reads' into mapper_output
     """
-    bowtie -p 4 -S -q -n 1 -e 80 -l 30 -a -m 5 --best --strata ${reads} out.sam
-    samtools view -b -S out.sam | out.bam
+    mapper.pl -e $reads -p params.genome -s ${reads}.reads -t ${reads}.mapping  
     """ 
 }
-
+*/
 
 /*
- * STEP  Feature counts
+ * STEP 5 -  Feature counts
  */
 
 
@@ -200,19 +210,20 @@ process featureCounts {
     
     publishDir "$results_path/featureCounts"
     input:
-    file bam
+    file '*.bam' from bam
     file gtf from gtf
     
     output:
-    file '*_gene.featureCounts.txt' into results
-    file '*_biotype.featureCounts.txt' into results
-    file '*_rRNA_counts.txt' into results
-    file '*.summary' into results
+    file '*_gene.featureCounts.txt' 
+    file '*_biotype.featureCounts.txt' 
+    file '*_rRNA_counts.txt' 
+    file '*.summary' 
     file 'featureCounts.done' into featureCounts_done    
     """
-    featureCounts -a $gtf -g gene_id -o ${bam_featurecounts}_gene.featureCounts.txt -p -s 2 $bam_featurecounts
-    featureCounts -a $gtf -g gene_biotype -o ${bam_featurecounts}_biotype.featureCounts.txt -p -s 2 $bam_featurecounts
-    cut -f 1,7 ${bam_featurecounts}_biotype.featureCounts.txt | sed '1,2d' | grep 'rRNA' > ${bam_featurecounts}_rRNA_counts.txt
+    featureCounts -a $gtf -g gene_id -o ${bam}_gene.featureCounts.txt -p -s 2 $bam_featurecounts
+    featureCounts -a $gtf -g gene_biotype -o ${bam}_biotype.featureCounts.txt -p -s 2 $bam_featurecounts
+    cut -f 1,7 ${bam}_biotype.featureCounts.txt | sed '1,2d' | grep 'rRNA' > ${bam}_rRNA_counts.txt
     echo done >featureCounts.done
     """
 }
+
