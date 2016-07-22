@@ -13,7 +13,7 @@ process {
   memory = '16 GB'
   time = '48h'
   clusterOptions = {
-    '-A b2013064'
+    '-A <PROJECT>'
   }
 }
 
