@@ -1,7 +1,7 @@
-# NGI - Small RNA-BP
-Pipeline for small RNA sequencing best practice analysis at the NGI at SciLifeLab Stockholm, Sweden
+# NGI - Small RNA-seq BP
+Nextflow pipeline for small RNA sequencing best practice analysis at the NGI at SciLifeLab in Stockholm, Sweden
 
-Written by Phil Ewels (@ewels) and Rickard Hammarén (@Hammarn)
+Written by Phil Ewels (@ewels), Rickard Hammarén (@Hammarn) and Chuan Wang (@chuan-wang)
 
 # Under Development!
 > This pipeline is currently being written and is
@@ -83,6 +83,30 @@ The human `GRCh37` genome is set as default.
 ```
 --genome 'GRCm38'
 ```
+
+### Supported genomes
+```
+Parameter     :       Species
+AGPv3         :       Zea mays (Maize)
+BDGP6         :       Drosophila melanogaster (Fruit fly)
+CanFam3.1     :       Canis familiaris (Dog)
+CHIMP2.1.4    :       Pan troglodytes (Chimpanze)
+EquCab2       :       Equus caballus (Horse)
+Galgal4       :       Gallus gallus (Chicken)
+Gm01          :       Glycine max (Soybean)
+GRCh37        :       Homo sapiens (Human)
+GRCm38        :       Mus musculus (Mouse)
+GRCz10        :       Danio rerio (Zebrafish)
+IRGSP-1.0     :       Oryza sativa japonica (Rice)
+Mmul_1        :       Macaca mulatta (Macaque)
+Rnor_6.0      :       Rattus norvegicus (Rat)
+Sbi1          :       Sorghum bicolor (Great millet)
+Sscrofa10.2   :       Sus scrofa (Pig)
+TAIR10        :       Arabidopsis thaliana (Thale cress)
+UMD3.1        :       Bos taurus (Cow)
+WBcel235      :       Caenorhabditis elegans (Nematode)
+```
+
 The `example_uppmax_config` file currently has the location of references for `GRCh37` (Human), `GRCm38` (Mouse)
 and `sacCer2` (Yeast).
 
