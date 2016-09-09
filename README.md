@@ -1,11 +1,8 @@
 # NGI - Small RNA-seq BP
 Nextflow pipeline for small RNA sequencing best practice analysis at the NGI at SciLifeLab in Stockholm, Sweden
 
-Written by Phil Ewels (@ewels), Rickard Hammarén (@Hammarn) and Chuan Wang (@chuan-wang)
+Written by Phil Ewels (@ewels), Chuan Wang (@chuan-wang) and Rickard Hammarén (@Hammarn)
 
-# Under Development!
-> This pipeline is currently being written and is
-> not yet ready for production use.
 
 ## Installation
 ### NextFlow installation
@@ -45,6 +42,17 @@ git clone https://github.com/SciLifeLab/NGI-smRNAseq.git
 nextflow run NGI-smRNAseq/main.nf
 ```
 
+### ~~Installation of the 'ngi_visualizations' module~~
+~~This module needs to be installed locally in order to visualize the statistics from Bowtie2 alignment.~~
+```
+~~pip install -U git+https://github.com/NationalGenomicsInfrastructure/ngi_visualizations.git~~
+```
+
+## IMPORTANT!
+Currently there two steps that require local script files to run:
+1) Trim Galore!: We are using the latest release v0.4.2, in which a bug for small RNA-seq adapter trimming is fixed. This release is not installed in Uppmax yet.
+2) count_biotypes.py from ngi_visualization (https://github.com/NationalGenomicsInfrastructure/ngi_visualizations/tree/master/ngi_visualizations/count_biotypes). Note that some other python packagess HTSeq and pysam are required.
+
 ## Running the pipeline
 The typical command for running the pipeline is as follows:
 ```
@@ -53,7 +61,7 @@ nextflow run SciLifeLab/smNGI-RNAseq --reads '*_R{1,2}.fastq.gz'
 or using a more manual approach (require you to clone the git repository)
 
 ```
-nextflow path_to_NGI-smRNAseq/main.nf -c path_to_your_nextflow_config --reads '*_R{1,2}.fastq.gz' --genome 'GRCm38'
+nextflow path_to_NGI-smRNAseq/main.nf -c path_to_your_nextflow_config --reads '*_R{1,2}.fastq.gz' --genome 'GRCh37'
 ```
 
 Note that the pipeline will create files in your working directory:
@@ -81,7 +89,7 @@ If left unspecified, the pipeline will assume that the data is in a directory ca
 The reference genome to use of the analysis, needs to be one of the genome specified in the config file.
 The human `GRCh37` genome is set as default.
 ```
---genome 'GRCm38'
+--genome 'GRCh37'
 ```
 
 ### Supported genomes
@@ -106,9 +114,6 @@ TAIR10        :       Arabidopsis thaliana (Thale cress)
 UMD3.1        :       Bos taurus (Cow)
 WBcel235      :       Caenorhabditis elegans (Nematode)
 ```
-
-The `example_uppmax_config` file currently has the location of references for `GRCh37` (Human), `GRCm38` (Mouse)
-and `sacCer2` (Yeast).
 
 ### `-c`
 Specify the path to a specific config file (this is a core NextFlow command). Useful if using different UPPMAX
