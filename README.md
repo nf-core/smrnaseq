@@ -44,11 +44,10 @@ nextflow run NGI-smRNAseq/main.nf
 
 ### ~~Installation of the 'ngi_visualizations' module~~
 ~~This module needs to be installed locally in order to visualize the statistics from Bowtie2 alignment.~~
-```
 ~~pip install -U git+https://github.com/NationalGenomicsInfrastructure/ngi_visualizations.git~~
-```
 
-## IMPORTANT!
+
+### IMPORTANT!
 Currently there two steps that require local script files to run:
 1) Trim Galore!: We are using the latest release v0.4.2, in which a bug for small RNA-seq adapter trimming is fixed. This release is not installed in Uppmax yet.
 2) count_biotypes.py from ngi_visualization (https://github.com/NationalGenomicsInfrastructure/ngi_visualizations/tree/master/ngi_visualizations/count_biotypes). Note that some other python packagess HTSeq and pysam are required.
@@ -94,25 +93,26 @@ The human `GRCh37` genome is set as default.
 
 ### Supported genomes
 ```
-Parameter     :       Species
-AGPv3         :       Zea mays (Maize)
-BDGP6         :       Drosophila melanogaster (Fruit fly)
-CanFam3.1     :       Canis familiaris (Dog)
-CHIMP2.1.4    :       Pan troglodytes (Chimpanze)
-EquCab2       :       Equus caballus (Horse)
-Galgal4       :       Gallus gallus (Chicken)
-Gm01          :       Glycine max (Soybean)
-GRCh37        :       Homo sapiens (Human)
-GRCm38        :       Mus musculus (Mouse)
-GRCz10        :       Danio rerio (Zebrafish)
-IRGSP-1.0     :       Oryza sativa japonica (Rice)
-Mmul_1        :       Macaca mulatta (Macaque)
-Rnor_6.0      :       Rattus norvegicus (Rat)
-Sbi1          :       Sorghum bicolor (Great millet)
-Sscrofa10.2   :       Sus scrofa (Pig)
-TAIR10        :       Arabidopsis thaliana (Thale cress)
-UMD3.1        :       Bos taurus (Cow)
-WBcel235      :       Caenorhabditis elegans (Nematode)
+| Parameter     |       Latin Name                 |      Common Name   |
+| :------------ |:-------------------------------- |:------------------ |
+| AGPv3         |       *Zea mays*                 |       Maize        |
+| BDGP6         |       *Drosophila melanogaster*  |       Fruit fly    |
+| CanFam3.1     |       *Canis familiaris*         |       Dog          |
+| CHIMP2.1.4    |       *Pan troglodytes*          |       Chimpanze    |
+| EquCab2       |       *Equus caballus*           |       Horse        |
+| Galgal4       |       *Gallus gallus*            |       Chicken      |
+| Gm01          |       *Glycine max*              |       Soybean      |
+| GRCh37        |       *Homo sapiens*             |       Human        |
+| GRCm38        |       *Mus musculus*             |       Mouse        |
+| GRCz10        |       *Danio rerio*              |       Zebrafish    |
+| IRGSP-1.0     |       *Oryza sativa japonica*    |       Rice         |
+| Mmul_1        |       *Macaca mulatta*           |       Macaque      |
+| Rnor_6.0      |       *Rattus norvegicus*        |       Rat          |
+| Sbi1          |       *Sorghum bicolor*          |       Great millet |
+| Sscrofa10.2   |       *Sus scrofa*               |       Pig          |
+| TAIR10        |       *Arabidopsis thaliana*     |       Thale cress  |
+| UMD3.1        |       *Bos taurus*               |       Cow          |
+| WBcel235      |       *Caenorhabditis elegans*   |       Nematode     |
 ```
 
 ### `-c`
