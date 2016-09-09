@@ -48,9 +48,9 @@ nextflow run NGI-smRNAseq/main.nf
 
 
 ### IMPORTANT!
-Currently there two steps that require local script files to run:
-1) Trim Galore!: We are using the latest release v0.4.2, in which a bug for small RNA-seq adapter trimming is fixed. This release is not installed in Uppmax yet.
-2) count_biotypes.py from ngi_visualization (https://github.com/NationalGenomicsInfrastructure/ngi_visualizations/tree/master/ngi_visualizations/count_biotypes). Note that some other python packagess HTSeq and pysam are required.
+Currently there two steps that require local script files to run:  
+1) Trim Galore!: We are using the latest release v0.4.2, in which a bug for small RNA-seq adapter trimming is fixed. This release is not installed in Uppmax yet.  
+2) count_biotypes.py from ngi_visualization (https://github.com/NationalGenomicsInfrastructure/ngi_visualizations/tree/master/ngi_visualizations/count_biotypes). Note that some other python packagess HTSeq and pysam are required.  
 
 ## Running the pipeline
 The typical command for running the pipeline is as follows:
@@ -91,8 +91,8 @@ The human `GRCh37` genome is set as default.
 --genome 'GRCh37'
 ```
 
-### Supported genomes
-```
+### Supported genomes   
+
 | Parameter     |       Latin Name                 |      Common Name   |
 | :------------ |:-------------------------------- |:------------------ |
 | AGPv3         |       *Zea mays*                 |       Maize        |
@@ -113,7 +113,7 @@ The human `GRCh37` genome is set as default.
 | TAIR10        |       *Arabidopsis thaliana*     |       Thale cress  |
 | UMD3.1        |       *Bos taurus*               |       Cow          |
 | WBcel235      |       *Caenorhabditis elegans*   |       Nematode     |
-```
+
 
 ### `-c`
 Specify the path to a specific config file (this is a core NextFlow command). Useful if using different UPPMAX
