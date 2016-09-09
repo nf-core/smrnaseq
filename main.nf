@@ -9,8 +9,8 @@ vim: syntax=groovy
  small RNA-seq  Analysis Pipeline. Started May 2016.
  @Authors
  Phil Ewels <phil.ewels@scilifelab.se>
- Rickard Hammarén <rickard.hammaren@scilifelab.se>
  Chuan Wang <chuan.wang@scilifelab.se>
+ Rickard Hammarén <rickard.hammaren@scilifelab.se>
 ----------------------------------------------------------------------------------------
  Basic command:
  $ nextflow main.nf
@@ -25,19 +25,24 @@ vim: syntax=groovy
  $ nextflow rnaseq.nf --reads path/to/data/*fq.gz
 ----------------------------------------------------------------------------------------
  Pipeline overview:
- - FastQC - read quility control
- - cutadapt - trimming
- - Bowtie 1 - align against miRBase mature
- - Samtools idxstats - count mature miRBase alignments
- - Bowtie 1 - align against miRBase hairpin (mature unaligned only)
- - Samtools idxstats - count hairpin miRBase alignments
- - Bowtie 2 - align against host whole genome
- - Bamutils - filter alignments by length
- - featureCounts - count alignments
- - edgeR count normalisation and QC
-   - MDS plot clustering samples
-   - Heatmap of sample similarities
- - MultiQC
+ - 1:   FastQC for raw sequencing reads quility control
+ - 2:   Trim Galore! for adapter trimming
+ - 3.1: Bowtie 1 alignment against miRBase mature miRNA
+ - 3.2: Post-alignment processing of miRBase mature miRNA counts
+ - 3.3: edgeR analysis on miRBase mature miRNA counts
+        - TMM normalization and a table of top expression mature miRNA
+        - MDS plot clustering samples
+        - Heatmap of sample similarities
+ - 4.1: Bowtie 1 alignment against miRBase hairpin for the unaligned reads in step 3
+ - 4.2: Post-alignment processing of miRBase hairpin counts
+ - 4.3: edgeR analysis on miRBase hairpin counts
+        - TMM normalization and a table of top expression hairpin
+        - MDS plot clustering samples
+        - Heatmap of sample similarities
+ - 5.1: Bowtie 2 alignment against host reference genome
+ - 5.2: Post-alignment processing of Bowtie 2
+ - 6:   NGI-Visualization of Bowtie 2 alignment statistics
+ - 7:   MultiQC
 ----------------------------------------------------------------------------------------
 */
 
@@ -47,7 +52,7 @@ vim: syntax=groovy
  */
 
 // Pipeline version
-version = 0.2
+version = 1.0
 
 // Reference genome index
 params.genome = 'GRCh37'
@@ -202,7 +207,7 @@ process trim_galore {
 
 
 /*
- * STEP 3 - Bowtie against miRBase mature RNA
+ * STEP 3.1 - Bowtie miRBase mature miRNA
  */
 
 process bowtie_miRBase_mature {
@@ -256,9 +261,177 @@ process bowtie_miRBase_mature {
     }
 }
 
+/*
+ * STEP 3.2 - Bowtie against miRBase mature miRNA post-alignment processing
+ */
+
+process bowtie_miRBase_mature_postalignment {
+
+    tag "$miRBase_mature_sam"
+
+    module 'bioinfo-tools'
+    module 'samtools'
+    module 'BEDTools'
+
+    cpus 2
+    memory { 16.GB * task.attempt }
+    time { 120.h * task.attempt }
+    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
+    maxRetries 3
+    maxErrors '-1'
+
+    publishDir "${params.outdir}/bowtie_miRBase_mature", mode: 'copy'
+
+    input:
+    file miRBase_mature_sam
+
+    output:
+    file '*.sorted.bam' into miRBase_mature_bam
+    file '*.sorted.bam.bai' into miRBase_mature_bai
+    file '*.count' into miRBase_mature_count
+
+    script:
+    """
+    f='$miRBase_mature_sam';f=(\$f);f=\${f[0]};f=\${f%.sam}
+    prefix=\$f
+
+    samtools view -bS \${prefix}.sam > \${prefix}.bam
+    samtools sort \${prefix}.bam \${prefix}.sorted
+    samtools index \${prefix}.sorted.bam
+    samtools idxstats \${prefix}.sorted.bam > \${prefix}.count
+
+    rm \${prefix}.sam
+    rm \${prefix}.bam
+    """
+}
+
 
 /*
- * STEP 4 - Bowtie against miRBase hairpin RNA
+ * STEP 3.3 - edgeR miRBase mature miRNA counts processing
+ */
+
+process edgeR_miRBase_mature {
+
+    module 'bioinfo-tools'
+    module 'R/3.2.3'
+
+    cpus 2
+    memory { 16.GB * task.attempt }
+    time { 120.h * task.attempt }
+    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
+    maxRetries 3
+    maxErrors '-1'
+
+    publishDir "${params.outdir}/bowtie_miRBase_mature/edgeR", mode: 'copy'
+
+    input:
+    file input_files from miRBase_mature_count.toSortedList()
+
+    output:
+    file '*.{txt,pdf}' into edgeR_miRBase_mature_results
+
+    script:
+    """
+    #!/usr/bin/env Rscript
+
+    # Load / install required packages
+    .libPaths( c( "${params.rlocation}", .libPaths() ) )
+    if (!require("limma")){
+        source("http://bioconductor.org/biocLite.R")
+        biocLite("limma", suppressUpdates=TRUE, lib="${params.rlocation}")
+        library("limma")
+    }
+
+    if (!require("edgeR")){
+        source("http://bioconductor.org/biocLite.R")
+        biocLite("edgeR", suppressUpdates=TRUE, lib="${params.rlocation}")
+        library("edgeR")
+    }
+
+    if (!require("statmod")){
+        install.packages("statmod", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
+        library("statmod")
+    }
+
+    if (!require("data.table")){
+        install.packages("data.table", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
+        library("data.table")
+    }
+
+    if (!require("gplots")) {
+        install.packages("gplots", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
+        library("gplots")
+    }
+
+    if (!require("methods")) {
+        install.packages("methods", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
+        library("methods")
+    }
+
+    # Read in files
+    datafiles = c( "${(input_files as List).join('", "')}" )
+
+    # Prepare the combined data frame with gene ID as rownames and sample ID as colname
+    data<-do.call("cbind", lapply(datafiles, fread, header=FALSE, select=c(3)))
+    data<-as.data.frame(data)
+
+    temp <- fread(datafiles[1],header=FALSE, select=c(1))
+    rownames(data)<-temp\$V1
+    colnames(data)<-gsub(".count","",basename(datafiles))
+
+    data<-data[rownames(data)!="*",]
+
+    # Remove genes with 0 reads in all samples
+    row_sub = apply(data, 1, function(row) all(row ==0 ))
+    data<-data[!row_sub,]
+
+    # Normalization
+    dataDGE<-DGEList(counts=data,genes=rownames(data))
+    o <- order(rowSums(dataDGE\$counts), decreasing=TRUE)
+    dataDGE <- dataDGE[o,]
+    dataNorm <- calcNormFactors(dataDGE)
+
+    # Make MDS plot
+    pdf('edgeR_MDS_plot.pdf')
+    MDSdata <- plotMDS(dataNorm)
+    dev.off()
+
+    # Print distance matrix to file
+    write.table(MDSdata\$distance.matrix, 'edgeR_MDS_distance_matrix.txt', quote=FALSE, sep="\\t")
+
+    # Print plot x,y co-ordinates to file
+    MDSxy = MDSdata\$cmdscale.out
+    colnames(MDSxy) = c(paste(MDSdata\$axislabel, '1'), paste(MDSdata\$axislabel, '2'))
+    write.table(MDSxy, 'edgeR_MDS_plot_coordinates.txt', quote=FALSE, sep="\\t")
+
+    # Get the log counts per million values
+    logcpm <- cpm(dataNorm, prior.count=2, log=TRUE)
+
+    # Calculate the euclidean distances between samples
+    dists = dist(t(logcpm))
+
+    # Plot a heatmap of correlations
+    pdf('log2CPM_sample_distances_heatmap.pdf')
+    hmap <- heatmap.2(as.matrix(dists),main="Sample Correlations", key.title="Distance", trace="none",dendrogram="row", margin=c(9, 9))
+    dev.off()
+
+    # Plot the heatmap dendrogram
+    pdf('log2CPM_sample_distances_dendrogram.pdf')
+    plot(hmap\$rowDendrogram, main="Sample Dendrogram")
+    dev.off()
+
+    # Write clustered distance values to file
+    write.table(hmap\$carpet, 'log2CPM_sample_distances.txt', quote=FALSE, sep="\\t")
+
+    file.create("corr.done")
+    #Printing sessioninfo to standard out
+    print("Sample correlation info:")
+    sessionInfo()
+    """
+}
+
+/*
+ * STEP 4.1 - Bowtie against miRBase hairpin
  */
 
 process bowtie_miRBase_hairpin {
@@ -312,38 +485,178 @@ process bowtie_miRBase_hairpin {
     }
 }
 
-
 /*
- * STEP 5 - Samtools idxstats to count bowtie 1 alignments
+ * STEP 4.2 - Bowtie against miRBase hairpin post-alignment processing
  */
-process samtools_idxstats {
+
+process bowtie_miRBase_mature_postalignment {
+
+    tag "$miRBase_hairpin_sam"
 
     module 'bioinfo-tools'
     module 'samtools'
+    module 'BEDTools'
 
-    memory '8 GB'
-    time '6h'
+    cpus 2
+    memory { 16.GB * task.attempt }
+    time { 120.h * task.attempt }
+    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
+    maxRetries 3
+    maxErrors '-1'
+
+    publishDir "${params.outdir}/bowtie_miRBase_hairpin", mode: 'copy'
 
     input:
-    file '*.bam' from miRBase_mature_bam
-    // TODO: WORK OUT HOW TO GET BOTH BOWTIE CHANNELS TO COME HERE
-    // ADD: miRBase_hairpin_bam
+    file miRBase_hairpin_sam
 
     output:
-    file '*.counts.txt' into samtools_counts
-    file '*.sorted.bam'
-    file '*.sorted.bam.bai'
+    file '*.sorted.bam' into miRBase_hairpin_bam
+    file '*.sorted.bam.bai' into miRBase_hairpin_bai
+    file '*.count' into miRBase_hairpin_count
 
     script:
     """
-    samtools sort $miRBase_mature_bam > ${miRBase_mature_bam}.sorted.bam
-    samtools index ${miRBase_mature_bam}.sorted.bam
-    samtools idxstats ${miRBase_mature_bam}.sorted.bam > ${miRBase_mature_bam}_counts.txt
+    f='$miRBase_hairpin_sam';f=(\$f);f=\${f[0]};f=\${f%.sam}
+    prefix=\$f
+
+    samtools view -bS \${prefix}.sam > \${prefix}.bam
+    samtools sort \${prefix}.bam \${prefix}.sorted
+    samtools index \${prefix}.sorted.bam
+    samtools idxstats \${prefix}.sorted.bam > \${prefix}.count
+
+    rm \${prefix}.sam
+    rm \${prefix}.bam
     """
 }
 
+
 /*
- * STEP 6.1 - Bowtie 2 against reference genome
+ * STEP 4.3 - edgeR miRBase hairpin counts processing
+ */
+
+process edgeR_miRBase_hairpin {
+
+    module 'bioinfo-tools'
+    module 'R/3.2.3'
+
+    cpus 2
+    memory { 16.GB * task.attempt }
+    time { 120.h * task.attempt }
+    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
+    maxRetries 3
+    maxErrors '-1'
+
+    publishDir "${params.outdir}/bowtie_miRBase_hairpin/edgeR", mode: 'copy'
+
+    input:
+    file input_files from miRBase_hairpin_count.toSortedList()
+
+    output:
+    file '*.{txt,pdf}' into edgeR_miRBase_hairpin_results
+
+    script:
+    """
+    #!/usr/bin/env Rscript
+
+    # Load / install required packages
+    .libPaths( c( "${params.rlocation}", .libPaths() ) )
+    if (!require("limma")){
+        source("http://bioconductor.org/biocLite.R")
+        biocLite("limma", suppressUpdates=TRUE, lib="${params.rlocation}")
+        library("limma")
+    }
+
+    if (!require("edgeR")){
+        source("http://bioconductor.org/biocLite.R")
+        biocLite("edgeR", suppressUpdates=TRUE, lib="${params.rlocation}")
+        library("edgeR")
+    }
+
+    if (!require("statmod")){
+        install.packages("statmod", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
+        library("statmod")
+    }
+
+    if (!require("data.table")){
+        install.packages("data.table", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
+        library("data.table")
+    }
+
+    if (!require("gplots")) {
+        install.packages("gplots", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
+        library("gplots")
+    }
+
+    if (!require("methods")) {
+        install.packages("methods", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
+        library("methods")
+    }
+
+    # Read in files
+    datafiles = c( "${(input_files as List).join('", "')}" )
+
+    # Prepare the combined data frame with gene ID as rownames and sample ID as colname
+    data<-do.call("cbind", lapply(datafiles, fread, header=FALSE, select=c(3)))
+    data<-as.data.frame(data)
+
+    temp <- fread(datafiles[1],header=FALSE, select=c(1))
+    rownames(data)<-temp\$V1
+    colnames(data)<-gsub(".count","",basename(datafiles))
+
+    data<-data[rownames(data)!="*",]
+
+    # Remove genes with 0 reads in all samples
+    row_sub = apply(data, 1, function(row) all(row ==0 ))
+    data<-data[!row_sub,]
+
+    # Normalization
+    dataDGE<-DGEList(counts=data,genes=rownames(data))
+    o <- order(rowSums(dataDGE\$counts), decreasing=TRUE)
+    dataDGE <- dataDGE[o,]
+    dataNorm <- calcNormFactors(dataDGE)
+
+    # Make MDS plot
+    pdf('edgeR_MDS_plot.pdf')
+    MDSdata <- plotMDS(dataNorm)
+    dev.off()
+
+    # Print distance matrix to file
+    write.table(MDSdata\$distance.matrix, 'edgeR_MDS_distance_matrix.txt', quote=FALSE, sep="\\t")
+
+    # Print plot x,y co-ordinates to file
+    MDSxy = MDSdata\$cmdscale.out
+    colnames(MDSxy) = c(paste(MDSdata\$axislabel, '1'), paste(MDSdata\$axislabel, '2'))
+    write.table(MDSxy, 'edgeR_MDS_plot_coordinates.txt', quote=FALSE, sep="\\t")
+
+    # Get the log counts per million values
+    logcpm <- cpm(dataNorm, prior.count=2, log=TRUE)
+
+    # Calculate the euclidean distances between samples
+    dists = dist(t(logcpm))
+
+    # Plot a heatmap of correlations
+    pdf('log2CPM_sample_distances_heatmap.pdf')
+    hmap <- heatmap.2(as.matrix(dists),main="Sample Correlations", key.title="Distance", trace="none",dendrogram="row", margin=c(9, 9))
+    dev.off()
+
+    # Plot the heatmap dendrogram
+    pdf('log2CPM_sample_distances_dendrogram.pdf')
+    plot(hmap\$rowDendrogram, main="Sample Dendrogram")
+    dev.off()
+
+    # Write clustered distance values to file
+    write.table(hmap\$carpet, 'log2CPM_sample_distances.txt', quote=FALSE, sep="\\t")
+
+    file.create("corr.done")
+    #Printing sessioninfo to standard out
+    print("Sample correlation info:")
+    sessionInfo()
+    """
+}
+
+
+/*
+ * STEP 5.1 - Bowtie 2 against reference genome
  */
 process bowtie2 {
 
@@ -405,11 +718,12 @@ process bowtie2 {
     }
 }
 
+
 /*
- * STEP 6.2 - post-alignment processing
+ * STEP 5.2 - Bowtie 2 post-alignment processing
  */
 
-process samtools {
+process bowtie2_postalignment {
 
     tag "$name"
 
@@ -440,6 +754,7 @@ process samtools {
     """
     f='$bowtie2_sam';f=(\$f);f=\${f[0]};f=\${f%.sam}
     prefix=\$f
+
     samtools view -bT $index \${prefix}.sam > \${prefix}.bam
     samtools sort \${prefix}.bam \${prefix}.sorted
     samtools index \${prefix}.sorted.bam
@@ -450,224 +765,61 @@ process samtools {
 }
 
 
-
-
-
-
 /*
- * Step 7 - Filter aligned reads based on alignment length
+ * STEP 6 - NGI-Visualizations of Bowtie 2 alignment statistics
  */
-process bamutils_filter_length {
 
-    module 'bioinfo-tools'
-    module 'NGSUtils'
+process ngi_visualizations {
 
-    memory '8 GB'
-    time '6h'
+    tag "$bowtie2_bam"
 
-    input:
-    file '*.bam' from bowtie2_bam
-
-    output:
-    file '*_filtered.bam' into bowtie2_bam_16_30nt
-
-    script:
-    """
-    bamutils filter \
-        $bowtie2_bam \
-        ${bowtie2_bam}_filtered.bam \
-        -minlen 16 \
-        -maxlen 30 \
-        -mapped
-    """
-}
-
-/*
- * STEP 8 - Feature counts
- */
-process featureCounts {
-
-    module 'bioinfo-tools'
-    module 'subread'
-
-    memory '4 GB'
-    time '2h'
-
-    publishDir "$results_path/featureCounts"
-    input:
-    file '*.bam' from bowtie2_bam
-    file gtf from gtf
-
-    output:
-    file '*_gene.featureCounts.txt'
-    file '*_biotype.featureCounts.txt'
-    file '*_rRNA_counts.txt'
-    file '*.summary'
-    file 'featureCounts.done' into featureCounts_done
-
-    script:
-    """
-    featureCounts -a $gtf -g gene_id -o ${bam}_gene.featureCounts.txt -p -s 2 $bowtie2_bam
-    featureCounts -a $gtf -g gene_biotype -o ${bam}_biotype.featureCounts.txt -p -s 2 $bowtie2_bam
-    cut -f 1,7 ${bam}_biotype.featureCounts.txt | sed '1,2d' | grep 'rRNA' > ${bam}_rRNA_counts.txt
-    echo done >featureCounts.done
-    """
-}
-
-
-
-
-
-/*
- * STEP 9 - edgeR MDS and heatmap
- */
-/*
-///////////////////////////////////////
-// UNDER DEVELOPMENT
-// Should still work the same as the mRNA pipeline though..?
-///////////////////////////////////////
-
-
-process sample_correlation {
-    module 'bioinfo-tools'
-    module 'R/3.2.3'
-
+    cpus 2
     memory { 16.GB * task.attempt }
-    time { 2.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'finish' }
+    time { 120.h * task.attempt }
+    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
     maxRetries 3
     maxErrors '-1'
 
-    publishDir "${params.outdir}/sample_correlation", mode: 'copy'
+    publishDir "${params.outdir}/bowtie2/ngi_visualizations", mode: 'copy'
+    errorStrategy 'ignore'
 
     input:
-    file input_files from geneCounts.toList()
-    bam_count
+    file bowtie2_bam
 
     output:
-    file '*.{txt,pdf}' into sample_correlation_results
-
-    when:
-    num_bams > 2 && (!params.sampleLevel)
+    file '*.{png,pdf}' into bowtie2_ngi_visualizations
 
     script:
     """
-    #!/usr/bin/env Rscript
-
-    # Load / install required packages
-    .libPaths( c( "${params.rlocation}", .libPaths() ) )
-    if (!require("limma")){
-        source("http://bioconductor.org/biocLite.R")
-        biocLite("limma", suppressUpdates=TRUE, lib="${params.rlocation}")
-        library("limma")
-    }
-
-    if (!require("edgeR")){
-        source("http://bioconductor.org/biocLite.R")
-        biocLite("edgeR", suppressUpdates=TRUE, lib="${params.rlocation}")
-        library("edgeR")
-    }
-
-    if (!require("data.table")){
-        install.packages("data.table", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
-        library("data.table")
-    }
-
-    if (!require("gplots")) {
-        install.packages("gplots", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
-        library("gplots")
-    }
-
-    # Load input counts data
-    datafiles = c( "${(input_files as List).join('", "')}" )
-
-    # Load count column from all files into a list of data frames
-    # Use data.tables fread as much much faster than read.table
-    # Row names are GeneIDs
-    temp <- lapply(datafiles, fread, skip="Geneid", header=TRUE, colClasses=c(NA, rep("NULL", 5), NA))
-
-    # Merge into a single data frame
-    merge.all <- function(x, y) {
-        merge(x, y, all=TRUE, by="Geneid")
-    }
-    data <- data.frame(Reduce(merge.all, temp))
-
-    # Clean sample name headers
-    colnames(data) <- gsub("Aligned.sortedByCoord.out.bam", "", colnames(data))
-
-    # Set GeneID as row name
-    rownames(data) <- data[,1]
-    data[,1] <- NULL
-
-    # Convert data frame to edgeR DGE object
-    dataDGE <- DGEList( counts=data.matrix(data) )
-
-    # Normalise counts
-    dataNorm <- calcNormFactors(dataDGE)
-
-    # Make MDS plot
-    pdf('edgeR_MDS_plot.pdf')
-    MDSdata <- plotMDS(dataNorm)
-    dev.off()
-
-    # Print distance matrix to file
-    write.table(MDSdata\$distance.matrix, 'edgeR_MDS_distance_matrix.txt', quote=FALSE, sep="\t")
-
-    # Print plot x,y co-ordinates to file
-    MDSxy = MDSdata\$cmdscale.out
-    colnames(MDSxy) = c(paste(MDSdata\$axislabel, '1'), paste(MDSdata\$axislabel, '2'))
-    write.table(MDSxy, 'edgeR_MDS_plot_coordinates.txt', quote=FALSE, sep="\t")
-
-    # Get the log counts per million values
-    logcpm <- cpm(dataNorm, prior.count=2, log=TRUE)
-
-    # Calculate the euclidean distances between samples
-    dists = dist(t(logcpm))
-
-    # Plot a heatmap of correlations
-    pdf('log2CPM_sample_distances_heatmap.pdf')
-    hmap <- heatmap.2(as.matrix(dists),
-      main="Sample Correlations", key.title="Distance", trace="none",
-      dendrogram="row", margin=c(9, 9)
-    )
-    dev.off()
-
-    # Plot the heatmap dendrogram
-    pdf('log2CPM_sample_distances_dendrogram.pdf')
-    plot(hmap\$rowDendrogram, main="Sample Dendrogram")
-    dev.off()
-
-    # Write clustered distance values to file
-    write.table(hmap\$carpet, 'log2CPM_sample_distances.txt', quote=FALSE, sep="\t")
-
-    file.create("corr.done")
+    python /home/chuanw/ngi_visualizations/count_biotypes.py -g $gtf $bowtie2_bam
     """
 }
 
 
-*/
-
-
-
 /*
- * STEP 10 - MultiQC
+ * STEP 7 - MultiQC
  */
 
 process multiqc {
-    module 'bioinfo-tools'
 
-    memory '4GB'
-    time '4h'
+    module 'bioinfo-tools'
+    module 'MultiQC'
+
+    cpus 2
+    memory { 16.GB * task.attempt }
+    time { 120.h * task.attempt }
+    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
+    maxRetries 3
+    maxErrors '-1'
 
     publishDir "${params.outdir}/MultiQC", mode: 'copy'
-
     errorStrategy 'ignore'
 
     input:
-    file ('fastqc/*') from fastqc_results.toList()
-    file ('trimgalore/*') from trimgalore_results.toList()
-    file ('featureCounts/*') from featureCounts_logs.toList()
-    file ('sample_correlation_results/*') from sample_correlation_results.toList()
+    file ('fastqc/*') from fastqc_results.toSortedList()
+    file ('trim_galore/*') from trimgalore_results.toSortedList()
+    file ('bowtie_miRBase_mature/edgeR/*') from edgeR_miRBase_mature_results.toSortedList()
+    file ('bowtie_miRBase_hairpin/edgeR/*') from edgeR_miRBase_hairpin_results.toSortedList()
 
     output:
     file '*multiqc_report.html'
