@@ -22,7 +22,11 @@ vim: syntax=groovy
  --reads [path to input files]
 
  For example:
- $ nextflow rnaseq.nf --reads path/to/data/*fq.gz
+ Single-end data
+ $ nextflow main.nf --reads '*.fastq.gz'
+
+ Paired-end data
+$ nextflow main.nf --reads '*{1,2}*.fastq.gz'
 ----------------------------------------------------------------------------------------
  Pipeline overview:
  - 1:   FastQC for raw sequencing reads quility control
