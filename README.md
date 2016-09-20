@@ -42,15 +42,21 @@ git clone https://github.com/SciLifeLab/NGI-smRNAseq.git
 nextflow run NGI-smRNAseq/main.nf
 ```
 
-### ~~Installation of the 'ngi_visualizations' module~~
-~~This module needs to be installed locally in order to visualize the statistics from Bowtie2 alignment.~~
-~~pip install -U git+https://github.com/NationalGenomicsInfrastructure/ngi_visualizations.git~~
+### Installation of the 'ngi_visualizations' module
+This module needs to be installed locally in order to visualize the statistics from Bowtie2 alignment.
+```
+pip install -U git+https://github.com/NationalGenomicsInfrastructure/ngi_visualizations.git
+```
 
+### Installation of the NGI plugin for the'MultiQC' module
+```
+pip install git+https://github.com/ewels/MultiQC_NGI.git
+```
 
 ### IMPORTANT!
 Currently there two steps that require local script files to run:  
 1) Trim Galore!: We are using the latest release v0.4.2, in which a bug for small RNA-seq adapter trimming is fixed. This release is not installed in Uppmax yet.  
-2) count_biotypes.py from ngi_visualization (https://github.com/NationalGenomicsInfrastructure/ngi_visualizations/tree/master/ngi_visualizations/count_biotypes). Note that some other python packagess HTSeq and pysam are required.  
+2) Note that for ngi_visualizations, python packages HTSeq and pysam are required.  
 
 ## Running the pipeline
 The typical command for running the pipeline is as follows:
