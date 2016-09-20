@@ -68,12 +68,12 @@ nextflow run SciLifeLab/smNGI-RNAseq --reads '*.fastq.gz'
 
 Paired-end data:
 ```
-nextflow run SciLifeLab/smNGI-RNAseq --reads '*_R{1,2}.fastq.gz'
+nextflow run SciLifeLab/smNGI-RNAseq --reads '*{1,2}*.fastq.gz'
 ```
 or using a more manual approach (require you to clone the git repository)
 
 ```
-nextflow path_to_NGI-smRNAseq/main.nf -c path_to_your_nextflow_config --reads '*_R{1,2}.fastq.gz' --genome 'GRCh37'
+nextflow path_to_NGI-smRNAseq/main.nf -c path_to_your_nextflow_config --reads '*{1,2}*.fastq.gz' --genome 'GRCh37'
 ```
 
 Note that the pipeline will create files in your working directory:
