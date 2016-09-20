@@ -60,6 +60,13 @@ Currently there two steps that require local script files to run:
 
 ## Running the pipeline
 The typical command for running the pipeline is as follows:
+
+Single-end data:
+```
+nextflow run SciLifeLab/smNGI-RNAseq --reads '*.fastq.gz'
+```
+
+Paired-end data:
 ```
 nextflow run SciLifeLab/smNGI-RNAseq --reads '*_R{1,2}.fastq.gz'
 ```
