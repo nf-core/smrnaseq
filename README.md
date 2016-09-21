@@ -61,20 +61,22 @@ Currently there two steps that require local script files to run:
 ## Running the pipeline
 The typical command for running the pipeline is as follows:
 
-Single-end data:
 ```
 nextflow run SciLifeLab/smNGI-RNAseq --reads '*.fastq.gz'
-```
-
-Paired-end data:
-```
-nextflow run SciLifeLab/smNGI-RNAseq --reads '*{1,2}*.fastq.gz'
 ```
 or using a more manual approach (require you to clone the git repository)
 
 ```
-nextflow path_to_NGI-smRNAseq/main.nf -c path_to_your_nextflow_config --reads '*{1,2}*.fastq.gz' --genome 'GRCh37'
+nextflow path_to_NGI-smRNAseq/main.nf -c path_to_your_nextflow_config --reads '*.fastq.gz' --genome 'GRCh37'
 ```
+
+**NOTE! Paired-end data is NOT supported by this pipeline!**
+For paired-end data, use Read 1 only. For instance:
+
+```
+nextflow run SciLifeLab/smNGI-RNAseq --reads '*.R1.fastq.gz'
+```
+
 
 Note that the pipeline will create files in your working directory:
 ```bash
@@ -87,13 +89,8 @@ results         # Finished results for each sample, one directory per pipeline s
 ### `--reads`
 Location of the input FastQ files:
 ```
- --reads 'path/to/data/sample_*_{1,2}.fastq'
+ --reads 'path/to/data/*.fastq'
 ```
-
-**NB: Must be enclosed in quotes!**
-
-Note that the `{1,2}` parentheses are required to specify paired end data. Running `--reads '*.fastq'` will treat
-all files as single end. The file path should be in quotation marks to prevent shell glob expansion.
 
 If left unspecified, the pipeline will assume that the data is in a directory called `data` in the working directory.
 
