@@ -125,7 +125,7 @@ Channel
     .groupTuple(sort: true)
     .set { read_files }
 
-read_files.into { fastQC_input; trimgalore_input; name_for_bowtie_miRBase_mature; name_for_bowtie_miRBase_hairpin; name_for_bowtie2; name_for_samtools }
+read_files.into { fastQC_input; trimgalore_input; name_for_fastqc; name_for_trimgalore; name_for_bowtie_miRBase_mature; name_for_bowtie_miRBase_hairpin; name_for_bowtie2; name_for_samtools }
 
 
 /*
@@ -148,7 +148,8 @@ process fastqc {
     publishDir "${params.outdir}/fastqc", mode: 'copy'
 
     input:
-    set val(name), file(reads:'*') from fastQC_input
+    set val(name) from name_for_fastqc
+    file reads from fastQC_input
 
     output:
     file '*_fastqc.{zip,html}' into fastqc_results
@@ -183,7 +184,8 @@ process trim_galore {
     publishDir "${params.outdir}/trim_galore", mode: 'copy'
 
     input:
-    set val(name), file(reads:'*') from trimgalore_input
+    set val(name) from name_for_trimgalore
+    file reads from trimgalore_input
 
     output:
     file '*.gz' into trimmed_reads_bowtie, trimmed_reads_bowtie2
@@ -220,7 +222,7 @@ process bowtie_miRBase_mature {
     publishDir "${params.outdir}/bowtie_miRBase_mature", mode: 'copy'
 
     input:
-    file(reads:'*') from trimmed_reads_bowtie
+    file reads from trimmed_reads_bowtie
     set val(name) from name_for_bowtie_miRBase_mature
 
     output:
@@ -231,12 +233,11 @@ process bowtie_miRBase_mature {
     /* Note! Only read 1 is used for alignment. */
 
     """
-    f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-    prefix=\$f
+    f='$reads';f=\${f%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%_trimmed};f=\${f%_1};f=\${f%.R1};f=\${f%_R1}
 
     bowtie \\
       $mature \\
-      -q <(zcat \$input) \\
+      -q <(zcat \$reads) \\
       -p 2 \\
       -t \\
       -n 0 \\
@@ -245,11 +246,11 @@ process bowtie_miRBase_mature {
       -k 10 \\
       --best \\
       --chunkmbs 2048 \\
-      --un \${prefix}.mature_unmapped.fq \\
+      --un \${f}.mature_unmapped.fq \\
       -S \\
-      | samtools view -bS - > \${prefix}.mature.bam
+      | samtools view -bS - > \${f}.mature.bam
 
-    gzip \${prefix}.mature_unmapped.fq
+    gzip \${f}.mature_unmapped.fq
     """
 }
 
@@ -275,7 +276,7 @@ process bowtie_miRBase_hairpin {
     publishDir "${params.outdir}/bowtie_miRBase_hairpin", mode: 'copy'
 
     input:
-    file(reads:'*') from mature_unmapped_reads
+    file reads from mature_unmapped_reads
     set val(name) from name_for_bowtie_miRBase_hairpin
 
     output:
@@ -284,8 +285,7 @@ process bowtie_miRBase_hairpin {
 
     script:
     """
-    f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.mature_unmapped};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-    prefix=\$f
+    f='$reads';f=\${f%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%_trimmed};f=\${f%_1};f=\${f%.R1};f=\${f%_R1}
 
     bowtie \\
       $hairpin \\
@@ -297,12 +297,12 @@ process bowtie_miRBase_hairpin {
       -k 10 \\
       --best \\
       --chunkmbs 2048 \\
-      -q <(zcat \$input) \\
-      --un \${prefix}.hairpin_unmapped.fq \\
+      -q <(zcat \$reads) \\
+      --un \${f}.hairpin_unmapped.fq \\
       -S \\
-      | samtools view -bS - > \${prefix}.hairpin.bam
+      | samtools view -bS - > \${f}.hairpin.bam
 
-    gzip \${prefix}.hairpin_unmapped.fq
+    gzip \${f}.hairpin_unmapped.fq
     """
 }
 
@@ -326,7 +326,7 @@ process miRBasePostAlignment {
     publishDir "${params.outdir}/miRBaseCounts", mode: 'copy'
 
     input:
-    file(input:'*') from miRBase_mature_bam .mix(miRBase_hairpin_bam)
+    file input from miRBase_mature_bam .mix(miRBase_hairpin_bam)
 
     output:
     file '*.count' into miRBase_counts
@@ -334,11 +334,10 @@ process miRBasePostAlignment {
     script:
     """
     f='$input';f=(\$f);f=\${f[0]};f=\${f%.bam}
-    prefix=\$f
 
-    samtools sort \${prefix}.bam \${prefix}.sorted
-    samtools index \${prefix}.sorted.bam
-    samtools idxstats \${prefix}.sorted.bam > \${prefix}.count
+    samtools sort \${f}.bam \${f}.sorted
+    samtools index \${f}.sorted.bam
+    samtools idxstats \${f}.sorted.bam > \${f}.count
     """
 }
 
@@ -501,7 +500,7 @@ process bowtie2 {
     publishDir "${params.outdir}/bowtie2", mode: 'copy'
 
     input:
-    file(reads:'*') from trimmed_reads_bowtie2
+    file reads from trimmed_reads_bowtie2
     set val(name) from name_for_bowtie2
 
     output:
@@ -509,8 +508,7 @@ process bowtie2 {
 
     script:
     """
-    f='$reads';f=(\$f);f=\${f[0]};f=\${f%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-    prefix=\$f
+    f='$reads';f=\${f%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%_trimmed};f=\${f%_1};f=\${f%.R1};f=\${f%_R1}
 
     bowtie2 \\
       -x $index \\
@@ -519,7 +517,7 @@ process bowtie2 {
       --very-sensitive \\
       -p 1 \\
       -t \\
-      | samtools view -bT $index - > \${prefix}.bowtie2.bam
+      | samtools view -bT $index - > \${f}.bowtie2.bam
     """
 }
 
@@ -556,11 +554,10 @@ process bowtie2_postalignment {
     script:
     """
     f='$bowtie2_bam';f=(\$f);f=\${f[0]};f=\${f%.bam}
-    prefix=\$f
 
-    samtools sort \${prefix}.bam \${prefix}.sorted
-    samtools index \${prefix}.sorted.bam
-    rm \${prefix}.bam
+    samtools sort \${f}.bam \${f}.sorted
+    samtools index \${f}.sorted.bam
+    rm \${f}.bam
     """
 }
 
