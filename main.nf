@@ -22,11 +22,12 @@ vim: syntax=groovy
  --reads [path to input files]
 
  For example:
- Single-end data
  $ nextflow main.nf --reads '*.fastq.gz'
 
- Paired-end data
-$ nextflow main.nf --reads '*{1,2}*.fastq.gz'
+ NOTE! Paired-end data is not supported by this pipeline.
+ For paired-end data, use Read 1 only:
+ $ nextflow main.nf --reads '*.R1.fastq.gz'
+
 ----------------------------------------------------------------------------------------
  Pipeline overview:
  - 1:   FastQC for raw sequencing reads quility control
@@ -64,7 +65,7 @@ params.name = "miRNA-Seq Best practice"
 params.outdir = './results'
 
 // Input files
-params.reads = "data/*{1,2}*.fastq.gz"
+params.reads = "data/*.fastq.gz"
 
 // Output path
 params.out = "$PWD"
@@ -191,17 +192,9 @@ process trim_galore {
     script:
     /* Note! Use Trim_Galore Version 0.4.2 (Released 2016-09-07) or newer versions! */
 
-    single = reads instanceof Path
-
-    if(single) {
-      """
-      trim_galore --small_rna --gzip $reads
-      """
-    } else {
-      """
-      trim_galore --paired --small_rna --gzip $reads
-      """
-    }
+    """
+    trim_galore --small_rna --gzip $reads
+    """
 }
 
 
@@ -237,53 +230,27 @@ process bowtie_miRBase_mature {
     script:
     /* Note! Only read 1 is used for alignment. */
 
-    single = reads instanceof Path
+    """
+    f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
+    prefix=\$f
 
-    if(single) {
-      """
-      f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-      prefix=\$f
+    bowtie \\
+      $mature \\
+      -q <(zcat \$input) \\
+      -p 2 \\
+      -t \\
+      -n 0 \\
+      -l 15 \\
+      -e 99999 \\
+      -k 10 \\
+      --best \\
+      --chunkmbs 2048 \\
+      --un \${prefix}.mature_unmapped.fq \\
+      -S \\
+      | samtools view -bS - > \${prefix}.mature.bam
 
-      bowtie \\
-        $mature \\
-        -q <(zcat \$input) \\
-        -p 2 \\
-        -t \\
-        -n 0 \\
-        -l 15 \\
-        -e 99999 \\
-        -k 10 \\
-        --best \\
-        --chunkmbs 2048 \\
-        --un \${prefix}.mature_unmapped.fq \\
-        -S \\
-        | samtools view -bS - > \${prefix}.mature.bam
-
-      gzip \${prefix}.mature_unmapped.fq
-      """
-    } else {
-      """
-      f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-      prefix=\$f
-
-      bowtie \\
-        $mature \\
-        -q <(zcat \$input) \\
-        -p 2 \\
-        -t \\
-        -n 0 \\
-        -l 15 \\
-        -e 99999 \\
-        -k 10 \\
-        --best \\
-        --chunkmbs 2048 \\
-        --un \${prefix}.mature_unmapped.fq \\
-        -S \\
-        | samtools view -bS - > \${prefix}.mature.bam
-
-      gzip \${prefix}.mature_unmapped.fq
-      """
-    }
+    gzip \${prefix}.mature_unmapped.fq
+    """
 }
 
 /*
@@ -316,55 +283,27 @@ process bowtie_miRBase_hairpin {
     file '*.hairpin_unmapped.fq.gz' into hairpin_unmapped_reads
 
     script:
-    /* Note! Only read 1 is used for alignment. */
+    """
+    f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.mature_unmapped};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
+    prefix=\$f
 
-    single = reads instanceof Path
+    bowtie \\
+      $hairpin \\
+      -p 2 \\
+      -t \\
+      -n 1 \\
+      -l 15 \\
+      -e 99999 \\
+      -k 10 \\
+      --best \\
+      --chunkmbs 2048 \\
+      -q <(zcat \$input) \\
+      --un \${prefix}.hairpin_unmapped.fq \\
+      -S \\
+      | samtools view -bS - > \${prefix}.hairpin.bam
 
-    if(single) {
-      """
-      f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.mature_unmapped};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-      prefix=\$f
-
-      bowtie \\
-        $hairpin \\
-        -p 2 \\
-        -t \\
-        -n 1 \\
-        -l 15 \\
-        -e 99999 \\
-        -k 10 \\
-        --best \\
-        --chunkmbs 2048 \\
-        -q <(zcat \$input) \\
-        --un \${prefix}.hairpin_unmapped.fq \\
-        -S \\
-        | samtools view -bS - > \${prefix}.hairpin.bam
-
-      gzip \${prefix}.hairpin_unmapped.fq
-      """
-    } else {
-      """
-      f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.mature_unmapped};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-      prefix=\$f
-
-      bowtie \\
-        $hairpin \\
-        -p 2 \\
-        -t \\
-        -n 1 \\
-        -l 15 \\
-        -e 99999 \\
-        -k 10 \\
-        --best \\
-        --chunkmbs 2048 \\
-        -q <(zcat \$input) \\
-        --un \${prefix}.hairpin_unmapped.fq \\
-        -S \\
-        | samtools view -bS - > \${prefix}.hairpin.bam
-
-      gzip \${prefix}.hairpin_unmapped.fq
-      """
-    }
+    gzip \${prefix}.hairpin_unmapped.fq
+    """
 }
 
 
@@ -569,39 +508,19 @@ process bowtie2 {
     file '*.bowtie2.bam' into bowtie2_bam
 
     script:
-    /* Note! Only read 1 is used for alignment. */
+    """
+    f='$reads';f=(\$f);f=\${f[0]};f=\${f%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
+    prefix=\$f
 
-    single = reads instanceof Path
-
-    if(single) {
-      """
-      f='$reads';f=(\$f);f=\${f[0]};f=\${f%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-      prefix=\$f
-
-      bowtie2 \\
-        -x $index \\
-        -U $reads \\
-        -k 10 \\
-        --very-sensitive \\
-        -p 1 \\
-        -t \\
-        | samtools view -bT $index - > \${prefix}.bowtie2.bam
-      """
-    } else {
-      """
-      f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-      prefix=\$f
-
-      bowtie2 \\
-        -x $index \\
-        -U \$input \\
-        -k 10 \\
-        --very-sensitive \\
-        -p 1 \\
-        -t \\
-        | samtools view -bT $index - > \${prefix}.bowtie2.bam
-      """
-    }
+    bowtie2 \\
+      -x $index \\
+      -U $reads \\
+      -k 10 \\
+      --very-sensitive \\
+      -p 1 \\
+      -t \\
+      | samtools view -bT $index - > \${prefix}.bowtie2.bam
+    """
 }
 
 
