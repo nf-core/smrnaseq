@@ -115,18 +115,11 @@ results_path = './results'
 /*
  * Create a channel for input read files
  */
-Channel
+reads = Channel
     .fromPath( params.reads )
     .ifEmpty { error "Cannot find any reads matching: ${params.reads}" }
-    .map { path ->
-        def prefix = readPrefix(path, params.reads)
-        tuple(prefix, path)
-    }
-    .groupTuple(sort: true)
-    .set { read_files }
 
-read_files.into { fastQC_input; trimgalore_input; name_for_fastqc; name_for_trimgalore; name_for_bowtie_miRBase_mature; name_for_bowtie_miRBase_hairpin; name_for_bowtie2; name_for_samtools }
-
+reads.into { raw_reads_fastqc; raw_reads_trimgalore }
 
 /*
  * STEP 1 - FastQC
@@ -134,7 +127,7 @@ read_files.into { fastQC_input; trimgalore_input; name_for_fastqc; name_for_trim
 
 process fastqc {
 
-    tag "$name"
+    tag "$reads"
 
     module 'bioinfo-tools'
     module 'FastQC'
@@ -148,8 +141,7 @@ process fastqc {
     publishDir "${params.outdir}/fastqc", mode: 'copy'
 
     input:
-    set val(name) from name_for_fastqc
-    file reads from fastQC_input
+    file reads from raw_reads_fastqc
 
     output:
     file '*_fastqc.{zip,html}' into fastqc_results
@@ -167,7 +159,7 @@ process fastqc {
 
 process trim_galore {
 
-    tag "$name"
+    tag "$reads"
 
     module 'bioinfo-tools'
     module 'FastQC'
@@ -184,8 +176,7 @@ process trim_galore {
     publishDir "${params.outdir}/trim_galore", mode: 'copy'
 
     input:
-    set val(name) from name_for_trimgalore
-    file reads from trimgalore_input
+    file reads from raw_reads_trimgalore
 
     output:
     file '*.gz' into trimmed_reads_bowtie, trimmed_reads_bowtie2
@@ -206,7 +197,7 @@ process trim_galore {
 
 process bowtie_miRBase_mature {
 
-    tag "$name"
+    tag "$reads"
 
     module 'bioinfo-tools'
     module 'bowtie'
@@ -223,7 +214,6 @@ process bowtie_miRBase_mature {
 
     input:
     file reads from trimmed_reads_bowtie
-    set val(name) from name_for_bowtie_miRBase_mature
 
     output:
     file '*.mature.bam' into miRBase_mature_bam
@@ -237,7 +227,7 @@ process bowtie_miRBase_mature {
 
     bowtie \\
       $mature \\
-      -q <(zcat \$reads) \\
+      -q <(zcat $reads) \\
       -p 2 \\
       -t \\
       -n 0 \\
@@ -260,7 +250,7 @@ process bowtie_miRBase_mature {
 
 process bowtie_miRBase_hairpin {
 
-    tag "$name"
+    tag "$reads"
 
     module 'bioinfo-tools'
     module 'bowtie'
@@ -277,7 +267,6 @@ process bowtie_miRBase_hairpin {
 
     input:
     file reads from mature_unmapped_reads
-    set val(name) from name_for_bowtie_miRBase_hairpin
 
     output:
     file '*.hairpin.bam' into miRBase_hairpin_bam
@@ -285,7 +274,7 @@ process bowtie_miRBase_hairpin {
 
     script:
     """
-    f='$reads';f=\${f%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%_trimmed};f=\${f%_1};f=\${f%.R1};f=\${f%_R1}
+    f='$reads';f=\${f%.mature_unmapped.fq.gz}
 
     bowtie \\
       $hairpin \\
@@ -297,7 +286,7 @@ process bowtie_miRBase_hairpin {
       -k 10 \\
       --best \\
       --chunkmbs 2048 \\
-      -q <(zcat \$reads) \\
+      -q <(zcat $reads) \\
       --un \${f}.hairpin_unmapped.fq \\
       -S \\
       | samtools view -bS - > \${f}.hairpin.bam
@@ -354,7 +343,7 @@ process edgeR_miRBase_mature {
     cpus 2
     memory { 16.GB * task.attempt }
     time { 12.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
+    errorStrategy { task.exitStatus == 143 ? 'retry' : 'ignore' }
     maxRetries 3
     maxErrors '-1'
 
@@ -484,7 +473,7 @@ process edgeR_miRBase_mature {
  */
 process bowtie2 {
 
-    tag "$name"
+    tag "$reads"
 
     module 'bioinfo-tools'
     module 'bowtie2'
@@ -501,7 +490,6 @@ process bowtie2 {
 
     input:
     file reads from trimmed_reads_bowtie2
-    set val(name) from name_for_bowtie2
 
     output:
     file '*.bowtie2.bam' into bowtie2_bam
@@ -528,7 +516,7 @@ process bowtie2 {
 
 process bowtie2_postalignment {
 
-    tag "$name"
+    tag "$bowtie2_bam"
 
     module 'bioinfo-tools'
     module 'samtools'
@@ -544,7 +532,6 @@ process bowtie2_postalignment {
 
     input:
     file bowtie2_bam
-    set val(name) from name_for_samtools
 
     output:
     file '*.sorted.bam' into bowtie2_bam_sorted
@@ -574,7 +561,7 @@ process ngi_visualizations {
     cpus 2
     memory { 16.GB * task.attempt }
     time { 12.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
+    errorStrategy { task.exitStatus == 143 ? 'retry' : 'ignore' }
     maxRetries 3
     maxErrors '-1'
 
@@ -609,7 +596,7 @@ process multiqc {
     cpus 2
     memory { 16.GB * task.attempt }
     time { 4.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
+    errorStrategy { task.exitStatus == 143 ? 'retry' : 'ignore' }
     maxRetries 3
     maxErrors '-1'
 
@@ -631,45 +618,4 @@ process multiqc {
     type multiqc >/dev/null 2>&1 || { module load multiqc; };
     multiqc -f -t ngi .
     """
-}
-
-
-/*
- * Helper function, given a file Path
- * returns the file name region matching a specified glob pattern
- * starting from the beginning of the name up to last matching group.
- *
- * For example:
- *   readPrefix('/some/data/file_alpha_1.fa', 'file*_1.fa' )
- *
- * Returns:
- *   'file_alpha'
- */
-def readPrefix( Path actual, template ) {
-
-    final fileName = actual.getFileName().toString()
-
-    def filePattern = template.toString()
-    int p = filePattern.lastIndexOf('/')
-    if( p != -1 ) filePattern = filePattern.substring(p+1)
-    if( !filePattern.contains('*') && !filePattern.contains('?') )
-        filePattern = '*' + filePattern
-
-    def regex = filePattern
-        .replace('.','\\.')
-        .replace('*','(.*)')
-        .replace('?','(.?)')
-        .replace('{','(?:')
-        .replace('}',')')
-        .replace(',','|')
-
-    def matcher = (fileName =~ /$regex/)
-    if( matcher.matches() ) {
-        def end = matcher.end(matcher.groupCount() )
-        def prefix = fileName.substring(0,end)
-        while(prefix.endsWith('-') || prefix.endsWith('_') || prefix.endsWith('.') )
-            prefix=prefix[0..-2]
-        return prefix
-    }
-    return fileName
 }
