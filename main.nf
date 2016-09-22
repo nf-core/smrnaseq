@@ -40,8 +40,7 @@ vim: syntax=groovy
           - MDS plot clustering samples
           - Heatmap of sample similarities
  - 7.1: Bowtie 2 alignment against host reference genome
- - 7.2: Post-alignment processing for Bowtie 2
- - 7.3: NGI-Visualization of Bowtie 2 alignment statistics
+ - 7.2: NGI-Visualization of Bowtie 2 alignment statistics
  - 8:   MultiQC
 ----------------------------------------------------------------------------------------
 */
@@ -511,52 +510,12 @@ process bowtie2 {
 
 
 /*
- * STEP 7.2 - Bowtie 2 post-alignment processing
- */
-
-process bowtie2_postalignment {
-
-    tag "$bowtie2_bam"
-
-    module 'bioinfo-tools'
-    module 'samtools'
-
-    cpus 2
-    memory { 16.GB * task.attempt }
-    time { 120.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
-    maxRetries 3
-    maxErrors '-1'
-
-    publishDir "${params.outdir}/bowtie2", mode: 'copy'
-
-    input:
-    file bowtie2_bam
-
-    output:
-    file '*.sorted.bam' into bowtie2_bam_sorted
-    file '*.sorted.bam.bai' into bowtie2_bai
-    stdout into bowtie2_logs
-
-    script:
-    """
-    f='$bowtie2_bam';f=(\$f);f=\${f[0]};f=\${f%.bam}
-
-    samtools sort \${f}.bam \${f}.sorted
-    samtools index \${f}.sorted.bam
-    rm \${f}.bam
-    """
-}
-
-
-
-/*
- * STEP 7.3 - NGI-Visualizations of Bowtie 2 alignment statistics
+ * STEP 7.2 - NGI-Visualizations of Bowtie 2 alignment statistics
  */
 
 process ngi_visualizations {
 
-    tag "$bowtie2_bam_sorted"
+    tag "$bowtie2_bam"
 
     cpus 2
     memory { 16.GB * task.attempt }
@@ -569,7 +528,7 @@ process ngi_visualizations {
     errorStrategy 'ignore'
 
     input:
-    file bowtie2_bam_sorted
+    file bowtie2_bam
 
     output:
     file '*.{png,pdf}' into bowtie2_ngi_visualizations
@@ -579,7 +538,7 @@ process ngi_visualizations {
     """
     #!/usr/bin/env python
     from ngi_visualizations.biotypes import count_biotypes
-    count_biotypes.main('$gtf','$bowtie2_bam_sorted')
+    count_biotypes.main('$gtf','$bowtie2_bam')
     """
 }
 
