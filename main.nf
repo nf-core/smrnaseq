@@ -478,9 +478,9 @@ process bowtie2 {
     module 'bowtie2'
     module 'samtools'
 
-    cpus 4
-    memory { 32.GB * task.attempt }
-    time { 24.h * task.attempt }
+    cpus 8
+    memory { 64.GB * task.attempt }
+    time { 48.h * task.attempt }
     errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
     maxRetries 3
     maxErrors '-1'
