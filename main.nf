@@ -22,11 +22,12 @@ vim: syntax=groovy
  --reads [path to input files]
 
  For example:
- Single-end data
  $ nextflow main.nf --reads '*.fastq.gz'
 
- Paired-end data
-$ nextflow main.nf --reads '*{1,2}*.fastq.gz'
+ NOTE! Paired-end data is not supported by this pipeline.
+ For paired-end data, use Read 1 only:
+ $ nextflow main.nf --reads '*.R1.fastq.gz'
+
 ----------------------------------------------------------------------------------------
  Pipeline overview:
  - 1:   FastQC for raw sequencing reads quility control
@@ -39,8 +40,7 @@ $ nextflow main.nf --reads '*{1,2}*.fastq.gz'
           - MDS plot clustering samples
           - Heatmap of sample similarities
  - 7.1: Bowtie 2 alignment against host reference genome
- - 7.2: Post-alignment processing for Bowtie 2
- - 7.3: NGI-Visualization of Bowtie 2 alignment statistics
+ - 7.2: NGI-Visualization of Bowtie 2 alignment statistics
  - 8:   MultiQC
 ----------------------------------------------------------------------------------------
 */
@@ -64,7 +64,7 @@ params.name = "miRNA-Seq Best practice"
 params.outdir = './results'
 
 // Input files
-params.reads = "data/*{1,2}*.fastq.gz"
+params.reads = "data/*.fastq.gz"
 
 // Output path
 params.out = "$PWD"
@@ -114,18 +114,11 @@ results_path = './results'
 /*
  * Create a channel for input read files
  */
-Channel
+reads = Channel
     .fromPath( params.reads )
     .ifEmpty { error "Cannot find any reads matching: ${params.reads}" }
-    .map { path ->
-        def prefix = readPrefix(path, params.reads)
-        tuple(prefix, path)
-    }
-    .groupTuple(sort: true)
-    .set { read_files }
 
-read_files.into { fastQC_input; trimgalore_input; name_for_bowtie_miRBase_mature; name_for_bowtie_miRBase_hairpin; name_for_bowtie2; name_for_samtools }
-
+reads.into { raw_reads_fastqc; raw_reads_trimgalore }
 
 /*
  * STEP 1 - FastQC
@@ -133,7 +126,7 @@ read_files.into { fastQC_input; trimgalore_input; name_for_bowtie_miRBase_mature
 
 process fastqc {
 
-    tag "$name"
+    tag "$reads"
 
     module 'bioinfo-tools'
     module 'FastQC'
@@ -147,7 +140,7 @@ process fastqc {
     publishDir "${params.outdir}/fastqc", mode: 'copy'
 
     input:
-    set val(name), file(reads:'*') from fastQC_input
+    file reads from raw_reads_fastqc
 
     output:
     file '*_fastqc.{zip,html}' into fastqc_results
@@ -165,7 +158,7 @@ process fastqc {
 
 process trim_galore {
 
-    tag "$name"
+    tag "$reads"
 
     module 'bioinfo-tools'
     module 'FastQC'
@@ -182,7 +175,7 @@ process trim_galore {
     publishDir "${params.outdir}/trim_galore", mode: 'copy'
 
     input:
-    set val(name), file(reads:'*') from trimgalore_input
+    file reads from raw_reads_trimgalore
 
     output:
     file '*.gz' into trimmed_reads_bowtie, trimmed_reads_bowtie2
@@ -191,17 +184,9 @@ process trim_galore {
     script:
     /* Note! Use Trim_Galore Version 0.4.2 (Released 2016-09-07) or newer versions! */
 
-    single = reads instanceof Path
-
-    if(single) {
-      """
-      trim_galore --small_rna --gzip $reads
-      """
-    } else {
-      """
-      trim_galore --paired --small_rna --gzip $reads
-      """
-    }
+    """
+    trim_galore --small_rna --gzip $reads
+    """
 }
 
 
@@ -211,7 +196,7 @@ process trim_galore {
 
 process bowtie_miRBase_mature {
 
-    tag "$name"
+    tag "$reads"
 
     module 'bioinfo-tools'
     module 'bowtie'
@@ -227,8 +212,7 @@ process bowtie_miRBase_mature {
     publishDir "${params.outdir}/bowtie_miRBase_mature", mode: 'copy'
 
     input:
-    file(reads:'*') from trimmed_reads_bowtie
-    set val(name) from name_for_bowtie_miRBase_mature
+    file reads from trimmed_reads_bowtie
 
     output:
     file '*.mature.bam' into miRBase_mature_bam
@@ -237,53 +221,26 @@ process bowtie_miRBase_mature {
     script:
     /* Note! Only read 1 is used for alignment. */
 
-    single = reads instanceof Path
+    """
+    f='$reads';f=\${f%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%_trimmed};f=\${f%_1};f=\${f%.R1};f=\${f%_R1}
 
-    if(single) {
-      """
-      f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-      prefix=\$f
+    bowtie \\
+      $mature \\
+      -q <(zcat $reads) \\
+      -p 2 \\
+      -t \\
+      -n 0 \\
+      -l 15 \\
+      -e 99999 \\
+      -k 10 \\
+      --best \\
+      --chunkmbs 2048 \\
+      --un \${f}.mature_unmapped.fq \\
+      -S \\
+      | samtools view -bS - > \${f}.mature.bam
 
-      bowtie \\
-        $mature \\
-        -q <(zcat \$input) \\
-        -p 2 \\
-        -t \\
-        -n 0 \\
-        -l 15 \\
-        -e 99999 \\
-        -k 10 \\
-        --best \\
-        --chunkmbs 2048 \\
-        --un \${prefix}.mature_unmapped.fq \\
-        -S \\
-        | samtools view -bS - > \${prefix}.mature.bam
-
-      gzip \${prefix}.mature_unmapped.fq
-      """
-    } else {
-      """
-      f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-      prefix=\$f
-
-      bowtie \\
-        $mature \\
-        -q <(zcat \$input) \\
-        -p 2 \\
-        -t \\
-        -n 0 \\
-        -l 15 \\
-        -e 99999 \\
-        -k 10 \\
-        --best \\
-        --chunkmbs 2048 \\
-        --un \${prefix}.mature_unmapped.fq \\
-        -S \\
-        | samtools view -bS - > \${prefix}.mature.bam
-
-      gzip \${prefix}.mature_unmapped.fq
-      """
-    }
+    gzip \${f}.mature_unmapped.fq
+    """
 }
 
 /*
@@ -292,7 +249,7 @@ process bowtie_miRBase_mature {
 
 process bowtie_miRBase_hairpin {
 
-    tag "$name"
+    tag "$reads"
 
     module 'bioinfo-tools'
     module 'bowtie'
@@ -308,63 +265,33 @@ process bowtie_miRBase_hairpin {
     publishDir "${params.outdir}/bowtie_miRBase_hairpin", mode: 'copy'
 
     input:
-    file(reads:'*') from mature_unmapped_reads
-    set val(name) from name_for_bowtie_miRBase_hairpin
+    file reads from mature_unmapped_reads
 
     output:
     file '*.hairpin.bam' into miRBase_hairpin_bam
     file '*.hairpin_unmapped.fq.gz' into hairpin_unmapped_reads
 
     script:
-    /* Note! Only read 1 is used for alignment. */
+    """
+    f='$reads';f=\${f%.mature_unmapped.fq.gz}
 
-    single = reads instanceof Path
+    bowtie \\
+      $hairpin \\
+      -p 2 \\
+      -t \\
+      -n 1 \\
+      -l 15 \\
+      -e 99999 \\
+      -k 10 \\
+      --best \\
+      --chunkmbs 2048 \\
+      -q <(zcat $reads) \\
+      --un \${f}.hairpin_unmapped.fq \\
+      -S \\
+      | samtools view -bS - > \${f}.hairpin.bam
 
-    if(single) {
-      """
-      f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.mature_unmapped};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-      prefix=\$f
-
-      bowtie \\
-        $hairpin \\
-        -p 2 \\
-        -t \\
-        -n 1 \\
-        -l 15 \\
-        -e 99999 \\
-        -k 10 \\
-        --best \\
-        --chunkmbs 2048 \\
-        -q <(zcat \$input) \\
-        --un \${prefix}.hairpin_unmapped.fq \\
-        -S \\
-        | samtools view -bS - > \${prefix}.hairpin.bam
-
-      gzip \${prefix}.hairpin_unmapped.fq
-      """
-    } else {
-      """
-      f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.mature_unmapped};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-      prefix=\$f
-
-      bowtie \\
-        $hairpin \\
-        -p 2 \\
-        -t \\
-        -n 1 \\
-        -l 15 \\
-        -e 99999 \\
-        -k 10 \\
-        --best \\
-        --chunkmbs 2048 \\
-        -q <(zcat \$input) \\
-        --un \${prefix}.hairpin_unmapped.fq \\
-        -S \\
-        | samtools view -bS - > \${prefix}.hairpin.bam
-
-      gzip \${prefix}.hairpin_unmapped.fq
-      """
-    }
+    gzip \${f}.hairpin_unmapped.fq
+    """
 }
 
 
@@ -387,7 +314,7 @@ process miRBasePostAlignment {
     publishDir "${params.outdir}/miRBaseCounts", mode: 'copy'
 
     input:
-    file(input:'*') from miRBase_mature_bam .mix(miRBase_hairpin_bam)
+    file input from miRBase_mature_bam .mix(miRBase_hairpin_bam)
 
     output:
     file '*.count' into miRBase_counts
@@ -395,11 +322,10 @@ process miRBasePostAlignment {
     script:
     """
     f='$input';f=(\$f);f=\${f[0]};f=\${f%.bam}
-    prefix=\$f
 
-    samtools sort \${prefix}.bam \${prefix}.sorted
-    samtools index \${prefix}.sorted.bam
-    samtools idxstats \${prefix}.sorted.bam > \${prefix}.count
+    samtools sort \${f}.bam \${f}.sorted
+    samtools index \${f}.sorted.bam
+    samtools idxstats \${f}.sorted.bam > \${f}.count
     """
 }
 
@@ -416,7 +342,7 @@ process edgeR_miRBase_mature {
     cpus 2
     memory { 16.GB * task.attempt }
     time { 12.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
+    errorStrategy { task.exitStatus == 143 ? 'retry' : 'ignore' }
     maxRetries 3
     maxErrors '-1'
 
@@ -546,15 +472,15 @@ process edgeR_miRBase_mature {
  */
 process bowtie2 {
 
-    tag "$name"
+    tag "$reads"
 
     module 'bioinfo-tools'
     module 'bowtie2'
     module 'samtools'
 
-    cpus 4
-    memory { 32.GB * task.attempt }
-    time { 24.h * task.attempt }
+    cpus 8
+    memory { 64.GB * task.attempt }
+    time { 48.h * task.attempt }
     errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
     maxRetries 3
     maxErrors '-1'
@@ -562,103 +488,39 @@ process bowtie2 {
     publishDir "${params.outdir}/bowtie2", mode: 'copy'
 
     input:
-    file(reads:'*') from trimmed_reads_bowtie2
-    set val(name) from name_for_bowtie2
+    file reads from trimmed_reads_bowtie2
 
     output:
     file '*.bowtie2.bam' into bowtie2_bam
 
     script:
-    /* Note! Only read 1 is used for alignment. */
-
-    single = reads instanceof Path
-
-    if(single) {
-      """
-      f='$reads';f=(\$f);f=\${f[0]};f=\${f%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-      prefix=\$f
-
-      bowtie2 \\
-        -x $index \\
-        -U $reads \\
-        -k 10 \\
-        --very-sensitive \\
-        -p 1 \\
-        -t \\
-        | samtools view -bT $index - > \${prefix}.bowtie2.bam
-      """
-    } else {
-      """
-      f='$reads';f=(\$f);input=\${f[0]};f=\${input%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%.R1_val_1*};f=\${f%.R2_val_2*};f=\${f%_val_1};f=\${f%_val_2};f=\${f%_trimmed};f=\${f%_1}
-      prefix=\$f
-
-      bowtie2 \\
-        -x $index \\
-        -U \$input \\
-        -k 10 \\
-        --very-sensitive \\
-        -p 1 \\
-        -t \\
-        | samtools view -bT $index - > \${prefix}.bowtie2.bam
-      """
-    }
-}
-
-
-/*
- * STEP 7.2 - Bowtie 2 post-alignment processing
- */
-
-process bowtie2_postalignment {
-
-    tag "$name"
-
-    module 'bioinfo-tools'
-    module 'samtools'
-
-    cpus 2
-    memory { 16.GB * task.attempt }
-    time { 120.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
-    maxRetries 3
-    maxErrors '-1'
-
-    publishDir "${params.outdir}/bowtie2", mode: 'copy'
-
-    input:
-    file bowtie2_bam
-    set val(name) from name_for_samtools
-
-    output:
-    file '*.sorted.bam' into bowtie2_bam_sorted
-    file '*.sorted.bam.bai' into bowtie2_bai
-    stdout into bowtie2_logs
-
-    script:
     """
-    f='$bowtie2_bam';f=(\$f);f=\${f[0]};f=\${f%.bam}
-    prefix=\$f
+    f='$reads';f=\${f%.gz};f=\${f%.fastq};f=\${f%.fq};f=\${f%_trimmed};f=\${f%_1};f=\${f%.R1};f=\${f%_R1}
 
-    samtools sort \${prefix}.bam \${prefix}.sorted
-    samtools index \${prefix}.sorted.bam
-    rm \${prefix}.bam
+    bowtie2 \\
+      -x $index \\
+      -U $reads \\
+      -k 10 \\
+      --very-sensitive \\
+      -p 1 \\
+      -t \\
+      | samtools view -bT $index - > \${f}.bowtie2.bam
     """
 }
 
 
-
 /*
- * STEP 7.3 - NGI-Visualizations of Bowtie 2 alignment statistics
+ * STEP 7.2 - NGI-Visualizations of Bowtie 2 alignment statistics
  */
 
 process ngi_visualizations {
 
-    tag "$bowtie2_bam_sorted"
+    tag "$bowtie2_bam"
 
     cpus 2
     memory { 16.GB * task.attempt }
     time { 12.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
+    errorStrategy { task.exitStatus == 143 ? 'retry' : 'ignore' }
     maxRetries 3
     maxErrors '-1'
 
@@ -666,7 +528,7 @@ process ngi_visualizations {
     errorStrategy 'ignore'
 
     input:
-    file bowtie2_bam_sorted
+    file bowtie2_bam
 
     output:
     file '*.{png,pdf}' into bowtie2_ngi_visualizations
@@ -676,7 +538,7 @@ process ngi_visualizations {
     """
     #!/usr/bin/env python
     from ngi_visualizations.biotypes import count_biotypes
-    count_biotypes.main('$gtf','$bowtie2_bam_sorted')
+    count_biotypes.main('$gtf','$bowtie2_bam')
     """
 }
 
@@ -693,7 +555,7 @@ process multiqc {
     cpus 2
     memory { 16.GB * task.attempt }
     time { 4.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
+    errorStrategy { task.exitStatus == 143 ? 'retry' : 'ignore' }
     maxRetries 3
     maxErrors '-1'
 
@@ -715,45 +577,4 @@ process multiqc {
     type multiqc >/dev/null 2>&1 || { module load multiqc; };
     multiqc -f -t ngi .
     """
-}
-
-
-/*
- * Helper function, given a file Path
- * returns the file name region matching a specified glob pattern
- * starting from the beginning of the name up to last matching group.
- *
- * For example:
- *   readPrefix('/some/data/file_alpha_1.fa', 'file*_1.fa' )
- *
- * Returns:
- *   'file_alpha'
- */
-def readPrefix( Path actual, template ) {
-
-    final fileName = actual.getFileName().toString()
-
-    def filePattern = template.toString()
-    int p = filePattern.lastIndexOf('/')
-    if( p != -1 ) filePattern = filePattern.substring(p+1)
-    if( !filePattern.contains('*') && !filePattern.contains('?') )
-        filePattern = '*' + filePattern
-
-    def regex = filePattern
-        .replace('.','\\.')
-        .replace('*','(.*)')
-        .replace('?','(.?)')
-        .replace('{','(?:')
-        .replace('}',')')
-        .replace(',','|')
-
-    def matcher = (fileName =~ /$regex/)
-    if( matcher.matches() ) {
-        def end = matcher.end(matcher.groupCount() )
-        def prefix = fileName.substring(0,end)
-        while(prefix.endsWith('-') || prefix.endsWith('_') || prefix.endsWith('.') )
-            prefix=prefix[0..-2]
-        return prefix
-    }
-    return fileName
 }
