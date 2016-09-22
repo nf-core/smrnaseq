@@ -321,7 +321,7 @@ process miRBasePostAlignment {
 
     script:
     """
-    f='$input';f=(\$f);f=\${f[0]};f=\${f%.bam}
+    f='$input'; f=\${f%.bam}
 
     samtools sort \${f}.bam \${f}.sorted
     samtools index \${f}.sorted.bam
@@ -502,7 +502,7 @@ process bowtie2 {
       -U $reads \\
       -k 10 \\
       --very-sensitive \\
-      -p 1 \\
+      -p 8 \\
       -t \\
       | samtools view -bT $index - > \${f}.bowtie2.bam
     """
