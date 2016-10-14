@@ -467,6 +467,15 @@ process edgeR_miRBase_mature {
       dev.off()
     }
 
+    # Print distance matrix to file
+    write.table(MDSdata\$distance.matrix, paste(header,"_edgeR_MDS_distance_matrix.txt",sep=""), quote=FALSE, sep="\\t")
+
+    # Print plot x,y co-ordinates to file
+    MDSxy = MDSdata\$cmdscale.out
+    colnames(MDSxy) = c(paste(MDSdata\$axislabel, '1'), paste(MDSdata\$axislabel, '2'))
+
+    write.table(MDSxy, paste(header,"_edgeR_MDS_plot_coordinates.txt",sep=""), quote=FALSE, sep="\\t")
+
     # Get the log counts per million values
     logcpm <- cpm(dataNorm, prior.count=2, log=TRUE)
 
@@ -482,6 +491,9 @@ process edgeR_miRBase_mature {
     pdf(paste(header,"_log2CPM_sample_distances_dendrogram.pdf",sep=""))
     plot(hmap\$rowDendrogram, main="Sample Dendrogram")
     dev.off()
+
+    # Write clustered distance values to file
+    write.table(hmap\$carpet, paste(header,"_log2CPM_sample_distances.txt",sep=""), quote=FALSE, sep="\\t")
     }
 
     file.create("corr.done")
