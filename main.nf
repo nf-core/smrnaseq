@@ -78,9 +78,6 @@ params.outdir = './results'
 // Input files
 params.reads = "data/*.fastq.gz"
 
-// Output path
-params.out = "$PWD"
-
 // R library locations
 params.rlocation = "$HOME/R/nxtflow_libs/"
 nxtflow_libs=file(params.rlocation)
@@ -180,8 +177,6 @@ process trim_galore {
     tag "$reads"
 
     module 'bioinfo-tools'
-    module 'FastQC'
-    module 'cutadapt'
     module 'TrimGalore'
 
     cpus 2
@@ -228,7 +223,7 @@ process bowtie_miRBase_mature {
     maxRetries 3
     maxErrors '-1'
 
-    publishDir "${params.outdir}/bowtie_miRBase_mature", mode: 'copy', pattern: '*.mature_unmapped.fq.gz'
+    publishDir "${params.outdir}/bowtie/miRBase_mature", mode: 'copy', pattern: '*.mature_unmapped.fq.gz'
 
     input:
     file reads from trimmed_reads_bowtie
@@ -281,7 +276,7 @@ process bowtie_miRBase_hairpin {
     maxRetries 3
     maxErrors '-1'
 
-    publishDir "${params.outdir}/bowtie_miRBase_hairpin", mode: 'copy', pattern: '*.hairpin_unmapped.fq.gz'
+    publishDir "${params.outdir}/bowtie/miRBase_hairpin", mode: 'copy', pattern: '*.hairpin_unmapped.fq.gz'
 
     input:
     file reads from mature_unmapped_reads
@@ -314,13 +309,15 @@ process bowtie_miRBase_hairpin {
 }
 
 
-def rule_step5(file){
+def wrap_mature_and_hairpin(file){
+
       if ( file.contains("mature") )
-        return "${params.outdir}/bowtie_miRBase_mature/$file"
+        return "miRBase_mature/$file"
 
       if ( file.contains("hairpin") )
-        return "${params.outdir}/bowtie_miRBase_hairpin/$file"
+        return "miRBase_hairpin/$file"
 }
+
 
 /*
  * STEP 5 - Post-alignment processing for miRBase mature and hairpin
@@ -338,7 +335,7 @@ process miRBasePostAlignment {
     maxRetries 3
     maxErrors '-1'
 
-    publishDir "${params.out}", mode: 'copy', saveAs: this.&rule_step5
+    publishDir "${params.outdir}/bowtie", mode: 'copy', saveAs: this.&wrap_mature_and_hairpin
 
     input:
     file input from miRBase_mature_bam .mix(miRBase_hairpin_bam)
@@ -359,14 +356,6 @@ process miRBasePostAlignment {
 }
 
 
-def rule_step6(file){
-      if ( file.contains("mature") )
-        return "${params.outdir}/bowtie_miRBase_mature/edgeR/$file"
-
-      if ( file.contains("hairpin") )
-        return "${params.outdir}/bowtie_miRBase_hairpin/edgeR/$file"
-}
-
 /*
  * STEP 6 - edgeR miRBase mature miRNA counts processing
  */
@@ -383,7 +372,7 @@ process edgeR_miRBase_mature {
     maxRetries 3
     maxErrors '-1'
 
-    publishDir "${params.out}", mode: 'copy', saveAs: this.&rule_step6
+    publishDir "${params.outdir}/edgeR", mode: 'copy', saveAs: this.&wrap_mature_and_hairpin
 
     input:
     file input_files from miRBase_counts.toSortedList()
@@ -478,15 +467,6 @@ process edgeR_miRBase_mature {
       dev.off()
     }
 
-    # Print distance matrix to file
-    # write.table(MDSdata\$distance.matrix, paste(header,"_edgeR_MDS_distance_matrix.txt",sep=""), quote=FALSE, sep="\\t")
-
-    # Print plot x,y co-ordinates to file
-    MDSxy = MDSdata\$cmdscale.out
-    colnames(MDSxy) = c(paste(MDSdata\$axislabel, '1'), paste(MDSdata\$axislabel, '2'))
-
-    # write.table(MDSxy, paste(header,"_edgeR_MDS_plot_coordinates.txt",sep=""), quote=FALSE, sep="\\t")
-
     # Get the log counts per million values
     logcpm <- cpm(dataNorm, prior.count=2, log=TRUE)
 
@@ -502,9 +482,6 @@ process edgeR_miRBase_mature {
     pdf(paste(header,"_log2CPM_sample_distances_dendrogram.pdf",sep=""))
     plot(hmap\$rowDendrogram, main="Sample Dendrogram")
     dev.off()
-
-    # Write clustered distance values to file
-    # write.table(hmap\$carpet, paste(header,"_log2CPM_sample_distances.txt",sep=""), quote=FALSE, sep="\\t")
     }
 
     file.create("corr.done")
@@ -607,7 +584,6 @@ process ngi_visualizations {
 process multiqc {
 
     module 'bioinfo-tools'
-    module 'MultiQC'
 
     cpus 2
     memory { 16.GB * task.attempt }
@@ -625,12 +601,13 @@ process multiqc {
     file ('edgeR/*') from edgeR_miRBase_results.toSortedList()
 
     output:
-    file '*multiqc_report.html'
+    file '*multiqc_report.html' into multiqc_html
+    file '*multiqc_data' into multiqc_data
 
     script:
     """
     # Load MultiQC with environment module if not already in PATH
-    type multiqc >/dev/null 2>&1 || { module load multiqc; };
-    multiqc -f -t ngi .
+    type multiqc >/dev/null 2>&1 || { module load MultiQC; };
+    multiqc -f .
     """
 }
