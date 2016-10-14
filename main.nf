@@ -28,6 +28,10 @@ vim: syntax=groovy
  For paired-end data, use Read 1 only:
  $ nextflow main.nf --reads '*.R1.fastq.gz'
 
+ NOTE! With the option --genome 'ALL', the entire dataset of mature miRNAs and hairpins
+ in miRBase will be used as reference regardless of species. Meanwhile the alignment against
+ host reference genome will be skipped.
+
 ----------------------------------------------------------------------------------------
  Pipeline overview:
  - 1:   FastQC for raw sequencing reads quility control
@@ -39,8 +43,8 @@ vim: syntax=groovy
           - TMM normalization and a table of top expression mature miRNA
           - MDS plot clustering samples
           - Heatmap of sample similarities
- - 7.1: Bowtie 2 alignment against host reference genome
- - 7.2: NGI-Visualization of Bowtie 2 alignment statistics
+ - 7.1: Bowtie 2 alignment against host reference genome (for specified genome only)
+ - 7.2: NGI-Visualization of Bowtie 2 alignment statistics (for specified genome only)
  - 8:   MultiQC
 ----------------------------------------------------------------------------------------
 */
@@ -51,23 +55,28 @@ vim: syntax=groovy
  */
 
 // Pipeline version
-version = 1.1
+version = 1.2
 
 // Reference genome index
-params.genome = 'GRCh37'
-params.gtf   = params.genomes[ params.genome ].gtf
-params.bed12 = params.genomes[ params.genome ].bed12
-params.index = params.genomes[ params.genome ].bowtie2
-params.mature  = params.miRBase_mature[ params.genome ].bowtie
-params.hairpin = params.miRBase_hairpin[ params.genome ].bowtie
+
+if (params.genome != "ALL") {
+  params.genome = 'GRCh37'
+  params.gtf   = params.genomes[ params.genome ].gtf
+  params.bed12 = params.genomes[ params.genome ].bed12
+  params.index = params.genomes[ params.genome ].bowtie2
+  params.mature  = params.miRBase_mature[ params.genome ].bowtie
+  params.hairpin = params.miRBase_hairpin[ params.genome ].bowtie
+}
+else{
+  params.mature  = params.miRBase_mature[ params.genome ].bowtie
+  params.hairpin = params.miRBase_hairpin[ params.genome ].bowtie
+}
+
 params.name = "miRNA-Seq Best practice"
 params.outdir = './results'
 
 // Input files
 params.reads = "data/*.fastq.gz"
-
-// Output path
-params.out = "$PWD"
 
 // R library locations
 params.rlocation = "$HOME/R/nxtflow_libs/"
@@ -95,11 +104,18 @@ log.info "===================================="
 nxtflow_libs.mkdirs()
 
 // Set up nextflow objects
-gtf = file(params.gtf)
-bed12 = file(params.bed12)
-index = file(params.index)
-mature = file(params.mature)
-hairpin = file(params.hairpin)
+
+if (params.genome != "ALL") {
+  gtf = file(params.gtf)
+  bed12 = file(params.bed12)
+  index = file(params.index)
+  mature = file(params.mature)
+  hairpin = file(params.hairpin)
+}
+else{
+  mature = file(params.mature)
+  hairpin = file(params.hairpin)
+}
 
 // Validate inputs(NOT WORKING!!)
 // if( !mature.exists() ) exit 1, "Missing Bowtie 1 miRBase_mature index: ${mature}"
@@ -161,8 +177,6 @@ process trim_galore {
     tag "$reads"
 
     module 'bioinfo-tools'
-    module 'FastQC'
-    module 'cutadapt'
     module 'TrimGalore'
 
     cpus 2
@@ -209,7 +223,7 @@ process bowtie_miRBase_mature {
     maxRetries 3
     maxErrors '-1'
 
-    publishDir "${params.outdir}/bowtie_miRBase_mature", mode: 'copy'
+    publishDir "${params.outdir}/bowtie/miRBase_mature", mode: 'copy', pattern: '*.mature_unmapped.fq.gz'
 
     input:
     file reads from trimmed_reads_bowtie
@@ -262,7 +276,7 @@ process bowtie_miRBase_hairpin {
     maxRetries 3
     maxErrors '-1'
 
-    publishDir "${params.outdir}/bowtie_miRBase_hairpin", mode: 'copy'
+    publishDir "${params.outdir}/bowtie/miRBase_hairpin", mode: 'copy', pattern: '*.hairpin_unmapped.fq.gz'
 
     input:
     file reads from mature_unmapped_reads
@@ -295,6 +309,16 @@ process bowtie_miRBase_hairpin {
 }
 
 
+def wrap_mature_and_hairpin(file){
+
+      if ( file.contains("mature") )
+        return "miRBase_mature/$file"
+
+      if ( file.contains("hairpin") )
+        return "miRBase_hairpin/$file"
+}
+
+
 /*
  * STEP 5 - Post-alignment processing for miRBase mature and hairpin
  */
@@ -311,17 +335,19 @@ process miRBasePostAlignment {
     maxRetries 3
     maxErrors '-1'
 
-    publishDir "${params.outdir}/miRBaseCounts", mode: 'copy'
+    publishDir "${params.outdir}/bowtie", mode: 'copy', saveAs: this.&wrap_mature_and_hairpin
 
     input:
     file input from miRBase_mature_bam .mix(miRBase_hairpin_bam)
 
     output:
     file '*.count' into miRBase_counts
+    file '*.sorted.bam' into miRBase_bam
+    file '*.sorted.bam.bai' into miRBase_bai
 
     script:
     """
-    f='$input';f=(\$f);f=\${f[0]};f=\${f%.bam}
+    f='$input'; f=\${f%.bam}
 
     samtools sort \${f}.bam \${f}.sorted
     samtools index \${f}.sorted.bam
@@ -346,7 +372,7 @@ process edgeR_miRBase_mature {
     maxRetries 3
     maxErrors '-1'
 
-    publishDir "${params.outdir}/edgeR", mode: 'copy'
+    publishDir "${params.outdir}/edgeR", mode: 'copy', saveAs: this.&wrap_mature_and_hairpin
 
     input:
     file input_files from miRBase_counts.toSortedList()
@@ -425,10 +451,21 @@ process edgeR_miRBase_mature {
     dataDGE <- dataDGE[o,]
     dataNorm <- calcNormFactors(dataDGE)
 
-    # Make MDS plot
-    pdf(paste(header,"_edgeR_MDS_plot.pdf",sep=""))
-    MDSdata <- plotMDS(dataNorm)
+    # Print normalized read counts to file
+    dataNorm_df<-as.data.frame(cpm(dataNorm))
+    write.table(dataNorm_df,file=paste(header,"_normalized_CPM.txt",sep=""),sep='\\t',quote=FALSE)
+
+    # Print heatmap based on normalized read counts
+    pdf(paste(header,"_CPM_heatmap.pdf",sep=""))
+    heatmap.2(cpm(dataNorm),col=redgreen(100),key=TRUE,scale="row",density.info="none",trace="none")
     dev.off()
+
+    # Make MDS plot (only perform with 3 or more samples)
+    if (ncol(data)>2){
+      pdf(paste(header,"_edgeR_MDS_plot.pdf",sep=""))
+      MDSdata <- plotMDS(dataNorm)
+      dev.off()
+    }
 
     # Print distance matrix to file
     write.table(MDSdata\$distance.matrix, paste(header,"_edgeR_MDS_distance_matrix.txt",sep=""), quote=FALSE, sep="\\t")
@@ -468,8 +505,15 @@ process edgeR_miRBase_mature {
 
 
 /*
+ * STEP 7.1 and 7.2 FOR SPECIFIED GENOME ONLY!
+ */
+
+if (params.genome != "ALL") {
+
+/*
  * STEP 7.1 - Bowtie 2 against reference genome
  */
+
 process bowtie2 {
 
     tag "$reads"
@@ -502,7 +546,7 @@ process bowtie2 {
       -U $reads \\
       -k 10 \\
       --very-sensitive \\
-      -p 1 \\
+      -p 8 \\
       -t \\
       | samtools view -bT $index - > \${f}.bowtie2.bam
     """
@@ -542,6 +586,8 @@ process ngi_visualizations {
     """
 }
 
+}
+
 
 /*
  * STEP 8 - MultiQC
@@ -550,7 +596,6 @@ process ngi_visualizations {
 process multiqc {
 
     module 'bioinfo-tools'
-    module 'MultiQC'
 
     cpus 2
     memory { 16.GB * task.attempt }
@@ -568,13 +613,13 @@ process multiqc {
     file ('edgeR/*') from edgeR_miRBase_results.toSortedList()
 
     output:
-    file '*multiqc_report.html'
-    file '*multiqc_data'
+    file '*multiqc_report.html' into multiqc_html
+    file '*multiqc_data' into multiqc_data
 
     script:
     """
     # Load MultiQC with environment module if not already in PATH
-    type multiqc >/dev/null 2>&1 || { module load multiqc; };
-    multiqc -f -t ngi .
+    type multiqc >/dev/null 2>&1 || { module load MultiQC; };
+    multiqc -f .
     """
 }

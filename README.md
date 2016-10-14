@@ -125,6 +125,8 @@ The human `GRCh37` genome is set as default.
 | WBcel235      |       *Caenorhabditis elegans*   |       Nematode     |
 
 
+**NOTE! With the option --genome 'ALL', the entire dataset of mature miRNAs and hairpins in miRBase will be used as reference regardless of species. Meanwhile the alignment against host reference genome will be skipped.**
+
 ### `-c`
 Specify the path to a specific config file (this is a core NextFlow command). Useful if using different UPPMAX
 projects or different sets of reference genomes.
