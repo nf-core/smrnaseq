@@ -127,7 +127,7 @@ if( workflow.profile == 'standard' && !params.project ) exit 1, "No UPPMAX proje
  * Create a channel for input read files
  */
 Channel
-    .fromFilePairs( params.reads, size: -1 )
+    .fromPath( params.reads )
     .ifEmpty { error "Cannot find any reads matching: ${params.reads}" }
     .into { raw_reads_fastqc; raw_reads_trimgalore }
 
