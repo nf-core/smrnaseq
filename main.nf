@@ -39,8 +39,8 @@ vim: syntax=groovy
  - 3:   Bowtie 1 alignment against miRBase mature miRNA
  - 4:   Bowtie 1 alignment against miRBase hairpin for the unaligned reads in step 3
  - 5:   Post-alignment processing for miRBase mature and hairpin
- - 6:   edgeR analysis on miRBase mature miRNA counts
-          - TMM normalization and a table of top expression mature miRNA
+ - 6:   edgeR analysis on miRBase counts for both mature miRNA and miRNA precursors (hairpins)
+          - TMM normalization and a table of top expression features
           - MDS plot clustering samples
           - Heatmap of sample similarities
  - 7.1: Bowtie 2 alignment against host reference genome (for specified genome only)
@@ -55,7 +55,7 @@ vim: syntax=groovy
  */
 
 // Pipeline version
-version = 1.2
+version = 1.3
 
 // Reference genome index
 
@@ -73,14 +73,13 @@ else{
 }
 
 params.name = "miRNA-Seq Best practice"
-params.outdir = './results'
-
-// Input files
 params.reads = "data/*.fastq.gz"
+params.outdir = './results'
 
 // R library locations
 params.rlocation = "$HOME/R/nxtflow_libs/"
 nxtflow_libs=file(params.rlocation)
+nxtflow_libs.mkdirs()
 
 log.info "===================================="
 log.info " RNAbp : Small RNA-Seq Best Practice v${version}"
@@ -98,10 +97,8 @@ log.info "R libraries          : ${params.rlocation}"
 log.info "Script dir           : $baseDir"
 log.info "Working dir          : $workDir"
 log.info "Output dir           : ${params.outdir}"
+log.info "Config Profile : ${workflow.profile}"
 log.info "===================================="
-
-// Create R library directories if not already existing
-nxtflow_libs.mkdirs()
 
 // Set up nextflow objects
 
@@ -117,24 +114,23 @@ else{
   hairpin = file(params.hairpin)
 }
 
-// Validate inputs(NOT WORKING!!)
-// if( !mature.exists() ) exit 1, "Missing Bowtie 1 miRBase_mature index: ${mature}"
-// if( !hairpin.exists() ) exit 1, "Missing Bowtie 1 miRBase_hairpin index: ${hairpin}"
-// if( !index.exists() ) exit 1, "Missing Bowtie 2 index: ${index}"
-// if( !gtf.exists() )   exit 2, "Missing GTF annotation: ${gtf}"
-// if( !bed12.exists() ) exit 2, "Missing BED12 annotation: ${bed12}"
+// Validate inputs
+if( !mature.exists() ) exit 1, "Missing Bowtie 1 miRBase_mature index: ${mature}"
+if( !hairpin.exists() ) exit 1, "Missing Bowtie 1 miRBase_hairpin index: ${hairpin}"
+if( !index.exists() ) exit 1, "Missing Bowtie 2 index: ${index}"
+if( !gtf.exists() )   exit 2, "Missing GTF annotation: ${gtf}"
+if( !bed12.exists() ) exit 2, "Missing BED12 annotation: ${bed12}"
+if( workflow.profile == 'standard' && !params.project ) exit 1, "No UPPMAX project ID found! Use --project"
 
-// Setting up a directory to save results to
-results_path = './results'
 
 /*
  * Create a channel for input read files
  */
-reads = Channel
-    .fromPath( params.reads )
+Channel
+    .fromFilePairs( params.reads, size: -1 )
     .ifEmpty { error "Cannot find any reads matching: ${params.reads}" }
+    .into { raw_reads_fastqc; raw_reads_trimgalore }
 
-reads.into { raw_reads_fastqc; raw_reads_trimgalore }
 
 /*
  * STEP 1 - FastQC
@@ -144,15 +140,8 @@ process fastqc {
 
     tag "$reads"
 
-    module 'bioinfo-tools'
-    module 'FastQC'
-
     memory { 2.GB * task.attempt }
     time { 4.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'warning' }
-    maxRetries 3
-    maxErrors '-1'
-
     publishDir "${params.outdir}/fastqc", mode: 'copy'
 
     input:
@@ -176,16 +165,9 @@ process trim_galore {
 
     tag "$reads"
 
-    module 'bioinfo-tools'
-    module 'TrimGalore'
-
     cpus 2
-    memory { 3.GB * task.attempt }
+    memory { 4.GB * task.attempt }
     time { 8.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
-    maxRetries 3
-    maxErrors '-1'
-
     publishDir "${params.outdir}/trim_galore", mode: 'copy'
 
     input:
@@ -196,8 +178,6 @@ process trim_galore {
     file '*trimming_report.txt' into trimgalore_results
 
     script:
-    /* Note! Use Trim_Galore Version 0.4.2 (Released 2016-09-07) or newer versions! */
-
     """
     trim_galore --small_rna --gzip $reads
     """
@@ -212,17 +192,9 @@ process bowtie_miRBase_mature {
 
     tag "$reads"
 
-    module 'bioinfo-tools'
-    module 'bowtie'
-    module 'samtools'
-
     cpus 2
     memory { 16.GB * task.attempt }
     time { 12.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
-    maxRetries 3
-    maxErrors '-1'
-
     publishDir "${params.outdir}/bowtie/miRBase_mature", mode: 'copy', pattern: '*.mature_unmapped.fq.gz'
 
     input:
@@ -265,17 +237,9 @@ process bowtie_miRBase_hairpin {
 
     tag "$reads"
 
-    module 'bioinfo-tools'
-    module 'bowtie'
-    module 'samtools'
-
     cpus 2
     memory { 16.GB * task.attempt }
     time { 12.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
-    maxRetries 3
-    maxErrors '-1'
-
     publishDir "${params.outdir}/bowtie/miRBase_hairpin", mode: 'copy', pattern: '*.hairpin_unmapped.fq.gz'
 
     input:
@@ -325,16 +289,9 @@ def wrap_mature_and_hairpin(file){
 
 process miRBasePostAlignment {
 
-    module 'bioinfo-tools'
-    module 'samtools'
-
     cpus 2
     memory { 16.GB * task.attempt }
     time { 12.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
-    maxRetries 3
-    maxErrors '-1'
-
     publishDir "${params.outdir}/bowtie", mode: 'copy', saveAs: this.&wrap_mature_and_hairpin
 
     input:
@@ -357,21 +314,14 @@ process miRBasePostAlignment {
 
 
 /*
- * STEP 6 - edgeR miRBase mature miRNA counts processing
+ * STEP 6 - edgeR miRBase feature counts processing
  */
 
-process edgeR_miRBase_mature {
-
-    module 'bioinfo-tools'
-    module 'R/3.2.3'
+process edgeR_miRBase {
 
     cpus 2
     memory { 16.GB * task.attempt }
     time { 12.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'ignore' }
-    maxRetries 3
-    maxErrors '-1'
-
     publishDir "${params.outdir}/edgeR", mode: 'copy', saveAs: this.&wrap_mature_and_hairpin
 
     input:
@@ -518,17 +468,9 @@ process bowtie2 {
 
     tag "$reads"
 
-    module 'bioinfo-tools'
-    module 'bowtie2'
-    module 'samtools'
-
     cpus 8
     memory { 64.GB * task.attempt }
     time { 48.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'terminate' }
-    maxRetries 3
-    maxErrors '-1'
-
     publishDir "${params.outdir}/bowtie2", mode: 'copy'
 
     input:
@@ -564,12 +506,7 @@ process ngi_visualizations {
     cpus 2
     memory { 16.GB * task.attempt }
     time { 12.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'ignore' }
-    maxRetries 3
-    maxErrors '-1'
-
     publishDir "${params.outdir}/bowtie2/ngi_visualizations", mode: 'copy'
-    errorStrategy 'ignore'
 
     input:
     file bowtie2_bam
@@ -595,17 +532,11 @@ process ngi_visualizations {
 
 process multiqc {
 
-    module 'bioinfo-tools'
-
     cpus 2
     memory { 16.GB * task.attempt }
     time { 4.h * task.attempt }
-    errorStrategy { task.exitStatus == 143 ? 'retry' : 'ignore' }
-    maxRetries 3
-    maxErrors '-1'
-
     publishDir "${params.outdir}/MultiQC", mode: 'copy'
-    errorStrategy 'ignore'
+
 
     input:
     file ('fastqc/*') from fastqc_results.toSortedList()
