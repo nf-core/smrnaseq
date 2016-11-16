@@ -66,14 +66,14 @@ configuration options can be used by specifying `-profile <name>` when running t
 The typical command for running the pipeline is as follows:
 
 ```
-nextflow run SciLifeLab/smNGI-RNAseq --reads '*.fastq.gz'
+nextflow run SciLifeLab/NGI-smRNAseq --reads '*.fastq.gz'
 ```
 
 **NOTE! Paired-end data is NOT supported by this pipeline!**
 For paired-end data, use Read 1 only. For instance:
 
 ```
-nextflow run SciLifeLab/smNGI-RNAseq --reads '*.R1.fastq.gz'
+nextflow run SciLifeLab/NGI-smRNAseq --reads '*.R1.fastq.gz'
 ```
 
 Note that the pipeline will create files in your working directory:
