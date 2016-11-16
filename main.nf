@@ -115,11 +115,11 @@ else{
 }
 
 // Validate inputs
-if( !mature.exists() ) exit 1, "Missing Bowtie 1 miRBase_mature index: ${mature}"
-if( !hairpin.exists() ) exit 1, "Missing Bowtie 1 miRBase_hairpin index: ${hairpin}"
+//if( !mature.exists() ) exit 1, "Missing Bowtie 1 miRBase_mature index: ${mature}"
+//if( !hairpin.exists() ) exit 1, "Missing Bowtie 1 miRBase_hairpin index: ${hairpin}"
 //if( !index.exists() ) exit 1, "Missing Bowtie 2 index: ${index}"
-if( !gtf.exists() )   exit 2, "Missing GTF annotation: ${gtf}"
-if( !bed12.exists() ) exit 2, "Missing BED12 annotation: ${bed12}"
+//if( !gtf.exists() )   exit 2, "Missing GTF annotation: ${gtf}"
+//if( !bed12.exists() ) exit 2, "Missing BED12 annotation: ${bed12}"
 if( workflow.profile == 'standard' && !params.project ) exit 1, "No UPPMAX project ID found! Use --project"
 
 
