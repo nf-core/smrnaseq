@@ -43,9 +43,9 @@ params.rlocation = "$HOME/R/nxtflow_libs/"
 nxtflow_libs=file(params.rlocation)
 nxtflow_libs.mkdirs()
 
-log.info "===================================="
+log.info "==========================================="
 log.info " RNAbp : Small RNA-Seq Best Practice v${version}"
-log.info "===================================="
+log.info "==========================================="
 log.info "Reads                : ${params.reads}"
 if(params.genome)   log.info "Genome               : ${params.genome}"
 if(params.bt2index) log.info "Bowtie2 Index        : ${params.bt2index}"
@@ -58,26 +58,30 @@ log.info "Script dir           : $baseDir"
 log.info "R libraries          : ${params.rlocation}"
 log.info "Output dir           : ${params.outdir}"
 log.info "Config Profile       : ${workflow.profile}"
-log.info "===================================="
+log.info "==========================================="
 
 // Set up nextflow objects
 
 // Validate inputs
 if( params.mature ){
-    mature = file(params.mature)
-    if( !mature.exists() ) exit 1, "Mature Bowtie 2 index not found: ${params.mature}"
+    mature_index = file("${params.mature}.1.ebwt")
+    mature_indices = Channel.fromPath( "${params.mature}*" ).toList()
+    log.info "MATURE INDEX: "+mature_indices
+    if( !mature_index.exists() ) exit 1, "Mature Bowtie 2 index not found: ${params.mature}"
 }
 if( params.hairpin ){
-    hairpin = file(params.hairpin)
-    if( !hairpin.exists() ) exit 1, "Hairpin Bowtie 2 index not found: ${params.hairpin}"
+    hairpin_index = file("${params.hairpin}.1.ebwt")
+    hairpin_indices = Channel.fromPath( "${params.hairpin}*" ).toList()
+    if( !hairpin_index.exists() ) exit 1, "Hairpin Bowtie 2 index not found: ${params.hairpin}"
 }
 if( params.gtf ){
     gtf = file(params.gtf)
     if( !gtf.exists() ) exit 1, "GTF file not found: ${params.gtf}"
 }
 if( params.bt2index ){
-    bt2index = file(params.bt2index)
-    if( !bt2index.exists() ) exit 1, "Reference genome Bowtie 2 not found: ${params.bt2index}"
+    bt2_index = file("${params.bt2index}.1.bt2")
+    bt2_indices = Channel.fromPath( "${params.bt2index}*" ).toList()
+    if( !bt2_index.exists() ) exit 1, "Reference genome Bowtie 2 not found: ${params.bt2index}"
 }
 if( !params.gtf || !params.bt2index) {
     log.info "No GTF / Bowtie2 index supplied - host reference genome analysis will be skipped."
@@ -144,16 +148,19 @@ process bowtie_miRBase_mature {
 
     input:
     file reads from trimmed_reads_bowtie
+    file index from mature_index
+    file mature_indices
 
     output:
     file '${prefix}.mature.bam' into miRBase_mature_bam
     file '${prefix}.mature_unmapped.fq' into mature_unmapped_reads
 
     script:
+    index_base = index.toString() - '.1.ebwt'
     prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
     """
     bowtie \\
-        $mature \\
+        $index_base \\
         -q <(zcat $reads) \\
         -p 2 \\
         -t \\
@@ -180,16 +187,19 @@ process bowtie_miRBase_hairpin {
 
     input:
     file reads from mature_unmapped_reads
+    file index from hairpin_index
+    file hairpin_indices
 
     output:
     file '${prefix}.hairpin.bam' into miRBase_hairpin_bam
     file '${prefix}.hairpin_unmapped.fq' into hairpin_unmapped_reads
 
     script:
+    index_base = index.toString() - '.1.ebwt'
     prefix = reads.toString() - '.mature_unmapped.fq.gz'
     """
     bowtie \\
-        $hairpin \\
+        $index_base \\
         -p 2 \\
         -t \\
         -n 1 \\
@@ -211,11 +221,15 @@ process bowtie_miRBase_hairpin {
 /*
  * STEP 5 - Post-alignment processing for miRBase mature and hairpin
  */
+def wrap_mature_and_hairpin(file){
+    if ( file.contains("mature") ) return "miRBase_mature/$file"
+    if ( file.contains("hairpin") ) return "miRBase_hairpin/$file"
+}
 process miRBasePostAlignment {
-    publishDir "${params.outdir}/bowtie", mode: 'copy', saveAs: this.contains("mature") ? "miRBase_mature/$this" : "miRBase_hairpin/$this"
+    publishDir "${params.outdir}/bowtie", mode: 'copy', saveAs: this.&wrap_mature_and_hairpin
 
     input:
-    file input from miRBase_mature_bam .mix(miRBase_hairpin_bam)
+    file input from miRBase_mature_bam.mix(miRBase_hairpin_bam)
 
     output:
     file '*.count' into miRBase_counts
@@ -234,9 +248,8 @@ process miRBasePostAlignment {
 /*
  * STEP 6 - edgeR miRBase feature counts processing
  */
-
 process edgeR_miRBase {
-    publishDir "${params.outdir}/edgeR", mode: 'copy', saveAs: this.contains("mature") ? "miRBase_mature/$this" : "miRBase_hairpin/$this"
+    publishDir "${params.outdir}/edgeR", mode: 'copy', saveAs: this.&wrap_mature_and_hairpin
 
     input:
     file input_files from miRBase_counts.toSortedList()
@@ -265,17 +278,19 @@ if( params.gtf && params.bt2index) {
 
         input:
         file reads from trimmed_reads_bowtie2
-        file index from bt2index
+        file index from bt2_index
+        file bt2_indices
 
         output:
         file '*.bowtie2.bam' into bowtie2_bam
-        stdout bowtie2_log
+        stdout into bowtie2_log
 
         script:
+        index_base = index.toString() - '.1.bt2'
         prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
         """
         bowtie2 \\
-            -x $index \\
+            -x $index_base \\
             -U $reads \\
             -k 10 \\
             --very-sensitive \\
@@ -319,12 +334,10 @@ process multiqc {
     publishDir "${params.outdir}/MultiQC", mode: 'copy'
 
     input:
-    file ('fastqc/*') from fastqc_results.toSortedList()
-    file ('trim_galore/*') from trimgalore_results.toSortedList()
-    file ('edgeR/*') from edgeR_miRBase_results.toSortedList()
-    if( params.gtf && params.bt2index) {
-        file ('bowtie2_log/*') from bowtie2_log.toSortedList()
-    }
+    file ('fastqc/*') from fastqc_results.flatten().toList()
+    file ('trim_galore/*') from trimgalore_results.flatten().toList()
+    file ('edgeR/*') from edgeR_miRBase_results.flatten().toList()
+    // if( params.gtf && params.bt2index) file ('bowtie2_log/*') from bowtie2_log.flatten().toList()
 
     output:
     file '*multiqc_report.html' into multiqc_html
