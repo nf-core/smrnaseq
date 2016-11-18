@@ -66,7 +66,6 @@ log.info "==========================================="
 if( params.mature ){
     mature_index = file("${params.mature}.1.ebwt")
     mature_indices = Channel.fromPath( "${params.mature}*" ).toList()
-    log.info "MATURE INDEX: "+mature_indices
     if( !mature_index.exists() ) exit 1, "Mature Bowtie 2 index not found: ${params.mature}"
 }
 if( params.hairpin ){
@@ -152,8 +151,8 @@ process bowtie_miRBase_mature {
     file mature_indices
 
     output:
-    file '${prefix}.mature.bam' into miRBase_mature_bam
-    file '${prefix}.mature_unmapped.fq' into mature_unmapped_reads
+    file '*.mature.bam' into miRBase_mature_bam
+    file '*.mature_unmapped.fq.gz' into mature_unmapped_reads
 
     script:
     index_base = index.toString() - '.1.ebwt'
@@ -191,8 +190,8 @@ process bowtie_miRBase_hairpin {
     file hairpin_indices
 
     output:
-    file '${prefix}.hairpin.bam' into miRBase_hairpin_bam
-    file '${prefix}.hairpin_unmapped.fq' into hairpin_unmapped_reads
+    file '*.hairpin.bam' into miRBase_hairpin_bam
+    file '*.hairpin_unmapped.fq.gz' into hairpin_unmapped_reads
 
     script:
     index_base = index.toString() - '.1.ebwt'
@@ -232,15 +231,15 @@ process miRBasePostAlignment {
     file input from miRBase_mature_bam.mix(miRBase_hairpin_bam)
 
     output:
-    file '*.count' into miRBase_counts
-    file '*.sorted.bam' into miRBase_bam
-    file '*.sorted.bam.bai' into miRBase_bai
+    file '${input.baseName}.count' into miRBase_counts
+    file '${input.baseName}.sorted.bam' into miRBase_bam
+    file '${input.baseName}.sorted.bam.bai' into miRBase_bai
 
     script:
     """
-    samtools sort ${prefix.baseName}.bam ${prefix.baseName}.sorted
-    samtools index ${prefix.baseName}.sorted.bam
-    samtools idxstats ${prefix.baseName}.sorted.bam > ${prefix.baseName}.count
+    samtools sort ${input.baseName}.bam ${input.baseName}.sorted
+    samtools index ${input.baseName}.sorted.bam
+    samtools idxstats ${input.baseName}.sorted.bam > ${input.baseName}.count
     """
 }
 
@@ -296,7 +295,7 @@ if( params.gtf && params.bt2index) {
             --very-sensitive \\
             -p 8 \\
             -t \\
-            | samtools view -bT $index - > ${prefix}.bowtie2.bam
+            | samtools view -bT $index_base - > ${prefix}.bowtie2.bam
         """
     }
 
