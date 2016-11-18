@@ -231,9 +231,9 @@ process miRBasePostAlignment {
     file input from miRBase_mature_bam.mix(miRBase_hairpin_bam)
 
     output:
-    file '${input.baseName}.count' into miRBase_counts
-    file '${input.baseName}.sorted.bam' into miRBase_bam
-    file '${input.baseName}.sorted.bam.bai' into miRBase_bai
+    file "${input.baseName}.count" into miRBase_counts
+    file "${input.baseName}.sorted.bam" into miRBase_bam
+    file "${input.baseName}.sorted.bam.bai" into miRBase_bai
 
     script:
     """
