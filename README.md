@@ -124,10 +124,10 @@ The human `GRCh37` genome is used by default.
 
 **NOTE! With the option --genome 'ALL', the entire dataset of mature miRNAs and hairpins in miRBase will be used as reference regardless of species. Meanwhile the alignment against host reference genome will be skipped.**
 
-### `--index`
+### `--bt2index`
 If you prefer, you can specify the full path to your reference genome when you run the pipeline:
 ```
---index [path to Bowtie2 index]
+--bt2index [path to Bowtie2 index]
 ```
 
 ### `--outdir`
