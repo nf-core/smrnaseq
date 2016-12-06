@@ -220,12 +220,13 @@ process bowtie_miRBase_hairpin {
 /*
  * STEP 5 - Post-alignment processing for miRBase mature and hairpin
  */
-def wrap_mature_and_hairpin(file){
+def wrap_mature_and_hairpin = { file ->
     if ( file.contains("mature") ) return "miRBase_mature/$file"
     if ( file.contains("hairpin") ) return "miRBase_hairpin/$file"
 }
+
 process miRBasePostAlignment {
-    publishDir "${params.outdir}/bowtie", mode: 'copy', saveAs: this.&wrap_mature_and_hairpin
+    publishDir "${params.outdir}/bowtie", mode: 'copy', saveAs: wrap_mature_and_hairpin
 
     input:
     file input from miRBase_mature_bam.mix(miRBase_hairpin_bam)
@@ -248,7 +249,7 @@ process miRBasePostAlignment {
  * STEP 6 - edgeR miRBase feature counts processing
  */
 process edgeR_miRBase {
-    publishDir "${params.outdir}/edgeR", mode: 'copy', saveAs: this.&wrap_mature_and_hairpin
+    publishDir "${params.outdir}/edgeR", mode: 'copy', saveAs: wrap_mature_and_hairpin
 
     input:
     file input_files from miRBase_counts.toSortedList()
