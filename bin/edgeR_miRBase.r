@@ -3,44 +3,48 @@
 # Command line arguments
 args = commandArgs(trailingOnly=TRUE)
 
+R_lib <- as.character(args[1])
+input <- as.character(args[2:length(args)])
+
 # Load / install required packages
-.libPaths( c( "${params.rlocation}", .libPaths() ) )
+.libPaths( c( .libPaths(), R_lib ) )
+
 if (!require("limma")){
     source("http://bioconductor.org/biocLite.R")
-    biocLite("limma", suppressUpdates=TRUE, lib="${params.rlocation}")
+    biocLite("limma", suppressUpdates=TRUE)
     library("limma")
 }
 
 if (!require("edgeR")){
     source("http://bioconductor.org/biocLite.R")
-    biocLite("edgeR", suppressUpdates=TRUE, lib="${params.rlocation}")
+    biocLite("edgeR", suppressUpdates=TRUE)
     library("edgeR")
 }
 
 if (!require("statmod")){
-    install.packages("statmod", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
+    install.packages("statmod", dependencies=TRUE, repos='http://cloud.r-project.org/')
     library("statmod")
 }
 
 if (!require("data.table")){
-    install.packages("data.table", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
+    install.packages("data.table", dependencies=TRUE, repos='http://cloud.r-project.org/')
     library("data.table")
 }
 
 if (!require("gplots")) {
-    install.packages("gplots", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
+    install.packages("gplots", dependencies=TRUE, repos='http://cloud.r-project.org/')
     library("gplots")
 }
 
 if (!require("methods")) {
-    install.packages("methods", dependencies=TRUE, repos='http://cloud.r-project.org/', lib="${params.rlocation}")
+    install.packages("methods", dependencies=TRUE, repos='http://cloud.r-project.org/')
     library("methods")
 }
 
 # Put mature and hairpin count files in separated file lists
 filelist<-list()
-filelist[[1]]<-args[grep(".mature.count",args)]
-filelist[[2]]<-args[grep(".hairpin.count",args)]
+filelist[[1]]<-input[grep(".mature.count",input)]
+filelist[[2]]<-input[grep(".hairpin.count",input)]
 names(filelist)<-c("mature","hairpin")
 
 for (i in 1:2) {

@@ -259,7 +259,7 @@ process edgeR_miRBase {
 
     script:
     """
-    edgeR_miRBase.r $input_files
+    edgeR_miRBase.r $params.rlocation $input_files
     """
 }
 
