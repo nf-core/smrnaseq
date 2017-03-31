@@ -53,16 +53,14 @@ RUN mkdir /opt/TrimGalore && \
 ENV BOWTIE_VERSION="1.2.0"
 ENV BOWTIE_BIN="1.2"
 RUN curl -fsSL https://downloads.sourceforge.net/project/bowtie-bio/bowtie/${BOWTIE_VERSION}/bowtie-${BOWTIE_BIN}-source.zip -o /opt/bowtie-${BOWTIE_BIN}-source.zip && \
-  unzip /opt/bowtie-${BOWTIE_BIN}-source.zip -C /opt/ && \
-  cd /opt/bowtie-${BOWTIE_BIN}; Makefile && \
+  unzip /opt/bowtie-${BOWTIE_BIN}-source.zip -d /opt/bowtie-${BOWTIE_BIN} && \
   ln -s /opt/bowtie-${BOWTIE_BIN}/bowtie /usr/local/bin/bowtie && \
   rm opt/bowtie-${BOWTIE_BIN}-source.zip
 
 # Install Bowtie2
 ENV BOWTIE2_VERSION="2.3.1"
 RUN curl -fsSL https://downloads.sourceforge.net/project/bowtie-bio/bowtie2/${BOWTIE2_VERSION}/bowtie2-${BOWTIE2_VERSION}-source.zip -o /opt/bowtie2-${BOWTIE2_VERSION}-source.zip && \
-  unzip /opt/bowtie2-${BOWTIE2_VERSION}-source.zip -C /opt/ && \
-  cd /opt/bowtie2-${BOWTIE2_VERSION}; Makefile && \
+  unzip /opt/bowtie2-${BOWTIE2_VERSION}-source.zip -d /opt/bowtie2-${BOWTIE2_VERSION} && \
   ln -s /opt/bowtie2-${BOWTIE2_VERSION}/bowtie2 /usr/local/bin/bowtie2 && \
   rm opt/bowtie2-${BOWTIE2_VERSION}-source.zip
 
@@ -93,6 +91,9 @@ RUN echo 'source("https://bioconductor.org/biocLite.R")' > /opt/packages.r && \
     echo 'biocLite(c("limma", "edgeR"))' >> /opt/packages.r && \
     Rscript /opt/packages.r && \
     mkdir /usr/local/lib/R/site-library
+
+# Install NGI Visualizations
+ENV pip install --upgrade git+https://github.com/NationalGenomicsInfrastructure/ngi_visualizations.git
 
 # Install MultiQC
 # ENV MULTIQC_VERSION v0.9
