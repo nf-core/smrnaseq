@@ -66,12 +66,12 @@ log.info "==========================================="
 if( params.mature ){
     mature_index = file("${params.mature}.1.ebwt")
     mature_indices = Channel.fromPath( "${params.mature}*" ).toList()
-    if( !mature_index.exists() ) exit 1, "Mature Bowtie 2 index not found: ${params.mature}"
+    if( !mature_index.exists() ) exit 1, "Mature Bowtie index not found: ${params.mature}"
 }
 if( params.hairpin ){
     hairpin_index = file("${params.hairpin}.1.ebwt")
     hairpin_indices = Channel.fromPath( "${params.hairpin}*" ).toList()
-    if( !hairpin_index.exists() ) exit 1, "Hairpin Bowtie 2 index not found: ${params.hairpin}"
+    if( !hairpin_index.exists() ) exit 1, "Hairpin Bowtie index not found: ${params.hairpin}"
 }
 if( params.gtf ){
     gtf = file(params.gtf)
