@@ -32,7 +32,7 @@ else
     echo "Done"
 fi
 
-nf_cmd="nextflow run $script_path -resume -profile docker --genome GRCh37 --mature ${data_dir}/mature_GRCh37 --hairpin ${data_dir}/hairpin_GRCh37 --bt2index ${data_dir}/genome --gtf ${data_dir}/genes.gtf --reads \"${data_dir}/*.R1.fastq.gz\""
+nf_cmd="nextflow run $script_path -resume -profile docker --mature ${data_dir}/mature_GRCh37 --hairpin ${data_dir}/hairpin_GRCh37 --bt2index ${data_dir}/genome --gtf ${data_dir}/genes.gtf --reads \"${data_dir}/*.R1.fastq.gz\""
 
 echo "Starting nextflow... Command:"
 echo $nf_cmd
