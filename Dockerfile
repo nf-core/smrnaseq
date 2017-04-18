@@ -20,6 +20,7 @@ RUN apt-get update && \
         libpcre3-dev \
         libreadline-dev \
         libssl-dev \
+        libtbb2 \
         make \
         python-dev \
         zlib1g-dev \
@@ -50,19 +51,16 @@ RUN mkdir /opt/TrimGalore && \
     rm /opt/TrimGalore/$TRIMGALORE_BIN
 
 # Install Bowtie
-ENV BOWTIE_VERSION="1.2.0"
-ENV BOWTIE_BIN="1.2"
-RUN curl -fsSL https://downloads.sourceforge.net/project/bowtie-bio/bowtie/${BOWTIE_VERSION}/bowtie-${BOWTIE_BIN}-source.zip -o /opt/bowtie-${BOWTIE_BIN}-source.zip && \
-  unzip /opt/bowtie-${BOWTIE_BIN}-source.zip -d /opt/bowtie-${BOWTIE_BIN} && \
-  ln -s /opt/bowtie-${BOWTIE_BIN}/bowtie /usr/local/bin/bowtie && \
-  rm opt/bowtie-${BOWTIE_BIN}-source.zip
+RUN wget -q -O bowtie.zip https://sourceforge.net/projects/bowtie-bio/files/bowtie/1.2.0/bowtie-1.2-linux-x86_64.zip/download && \
+  unzip bowtie.zip -d /opt/ && \
+  ln -s /opt/bowtie-1.2/bowtie /usr/local/bin/bowtie && \
+  rm bowtie.zip
 
 # Install Bowtie2
-ENV BOWTIE2_VERSION="2.3.1"
-RUN curl -fsSL https://downloads.sourceforge.net/project/bowtie-bio/bowtie2/${BOWTIE2_VERSION}/bowtie2-${BOWTIE2_VERSION}-source.zip -o /opt/bowtie2-${BOWTIE2_VERSION}-source.zip && \
-  unzip /opt/bowtie2-${BOWTIE2_VERSION}-source.zip -d /opt/bowtie2-${BOWTIE2_VERSION} && \
-  ln -s /opt/bowtie2-${BOWTIE2_VERSION}/bowtie2 /usr/local/bin/bowtie2 && \
-  rm opt/bowtie2-${BOWTIE2_VERSION}-source.zip
+RUN wget -q -O bowtie2.zip http://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.3.1/bowtie2-2.3.1-linux-x86_64.zip/download && \
+  unzip bowtie2.zip -d /opt/ && \
+  ln -s /opt/bowtie2-2.3.1/bowtie2 /usr/local/bin/bowtie2 && \
+  rm bowtie2.zip
 
 # Install SAMTools
 ENV SAMTOOLS_VERSON="1.4"
