@@ -30,6 +30,7 @@ params.bt2index = params.genome ? params.genomes[ params.genome ].bowtie2 ?: fal
 params.mature = params.genome ? params.genomes[ params.genome ].mature ?: false : false
 params.hairpin = params.genome ? params.genomes[ params.genome ].hairpin ?: false : false
 params.name = "miRNA-Seq Best practice"
+params.saveReference = false
 params.reads = "data/*.fastq.gz"
 params.outdir = './results'
 
@@ -100,8 +101,9 @@ Channel
  */
 process makeBowtieIndex {
 
-    publishDir "${params.outdir}/bowtie/reference", mode: 'copy'
-
+    publishDir path: { params.saveReference ? "${params.outdir}/bowtie/reference" : params.outdir },
+               saveAs: { params.saveReference ? it : null }, mode: 'copy'
+               
     input:
     file mature from mature
     file hairpin from hairpin
