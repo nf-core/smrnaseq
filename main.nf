@@ -107,17 +107,17 @@ process makeBowtieIndex {
     file hairpin from hairpin
 
     output:
-    file 'mature.*' into mature_index
-    file 'hairpin.*' into hairpin_index
+    file 'mature_idx.*' into mature_index
+    file 'hairpin_idx.*' into hairpin_index
 
     script:
     """
     fasta_formatter -w 0 -i $mature -o mature_igenome.fa
-    fasta_nucleotide_changer -d -i mature_igenome.fa -o mature.fa
-    bowtie-build mature.fa mature
+    fasta_nucleotide_changer -d -i mature_igenome.fa -o mature_idx.fa
+    bowtie-build mature_idx.fa mature_idx
     fasta_formatter -w 0 -i $hairpin -o hairpin_igenome.fa
-    fasta_nucleotide_changer -d -i hairpin_igenome.fa -o hairpin.fa
-    bowtie-build hairpin.fa hairpin
+    fasta_nucleotide_changer -d -i hairpin_igenome.fa -o hairpin_idx.fa
+    bowtie-build hairpin_idx.fa hairpin_idx
     """
 }
 
