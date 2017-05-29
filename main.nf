@@ -21,15 +21,16 @@ vim: syntax=groovy
  */
 
 // Pipeline version
-version = 1.3
+version = 1.4
 
 // Configurable variables
 params.genome = false
 params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
 params.bt2index = params.genome ? params.genomes[ params.genome ].bowtie2 ?: false : false
-params.mature = params.miRBase_mature ? params.miRBase_mature[ params.genome ].bowtie ?: false : false
-params.hairpin = params.miRBase_hairpin ? params.miRBase_hairpin[ params.genome ].bowtie ?: false : false
+params.mature = params.genome ? params.genomes[ params.genome ].mature ?: false : false
+params.hairpin = params.genome ? params.genomes[ params.genome ].hairpin ?: false : false
 params.name = "miRNA-Seq Best practice"
+params.saveReference = false
 params.reads = "data/*.fastq.gz"
 params.outdir = './results'
 
@@ -64,14 +65,12 @@ log.info "==========================================="
 
 // Validate inputs
 if( params.mature ){
-    mature_index = file("${params.mature}.1.ebwt")
-    mature_indices = Channel.fromPath( "${params.mature}*" ).toList()
-    if( !mature_index.exists() ) exit 1, "Mature Bowtie index not found: ${params.mature}"
+    mature = file(params.mature)
+    if( !mature.exists() ) exit 1, "Mature file not found: ${params.mature}"
 }
 if( params.hairpin ){
-    hairpin_index = file("${params.hairpin}.1.ebwt")
-    hairpin_indices = Channel.fromPath( "${params.hairpin}*" ).toList()
-    if( !hairpin_index.exists() ) exit 1, "Hairpin Bowtie index not found: ${params.hairpin}"
+    hairpin = file(params.hairpin)
+    if( !hairpin.exists() ) exit 1, "Hairpin file not found: ${params.hairpin}"
 }
 if( params.gtf ){
     gtf = file(params.gtf)
@@ -95,6 +94,34 @@ Channel
     .fromPath( params.reads )
     .ifEmpty { error "Cannot find any reads matching: ${params.reads}" }
     .into { raw_reads_fastqc; raw_reads_trimgalore }
+
+
+/*
+ * PREPROCESSING - Build Bowtie index for mature and hairpin
+ */
+process makeBowtieIndex {
+
+    publishDir path: { params.saveReference ? "${params.outdir}/bowtie/reference" : params.outdir },
+               saveAs: { params.saveReference ? it : null }, mode: 'copy'
+               
+    input:
+    file mature from mature
+    file hairpin from hairpin
+
+    output:
+    file 'mature_idx.*' into mature_index
+    file 'hairpin_idx.*' into hairpin_index
+
+    script:
+    """
+    fasta_formatter -w 0 -i $mature -o mature_igenome.fa
+    fasta_nucleotide_changer -d -i mature_igenome.fa -o mature_idx.fa
+    bowtie-build mature_idx.fa mature_idx
+    fasta_formatter -w 0 -i $hairpin -o hairpin_igenome.fa
+    fasta_nucleotide_changer -d -i hairpin_igenome.fa -o hairpin_idx.fa
+    bowtie-build hairpin_idx.fa hairpin_idx
+    """
+}
 
 
 /*
@@ -148,14 +175,13 @@ process bowtie_miRBase_mature {
     input:
     file reads from trimmed_reads_bowtie
     file index from mature_index
-    file mature_indices
 
     output:
     file '*.mature.bam' into miRBase_mature_bam
     file '*.mature_unmapped.fq.gz' into mature_unmapped_reads
 
     script:
-    index_base = index.toString() - '.1.ebwt'
+    index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
     """
     bowtie \\
@@ -187,14 +213,13 @@ process bowtie_miRBase_hairpin {
     input:
     file reads from mature_unmapped_reads
     file index from hairpin_index
-    file hairpin_indices
 
     output:
     file '*.hairpin.bam' into miRBase_hairpin_bam
     file '*.hairpin_unmapped.fq.gz' into hairpin_unmapped_reads
 
     script:
-    index_base = index.toString() - '.1.ebwt'
+    index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     prefix = reads.toString() - '.mature_unmapped.fq.gz'
     """
     bowtie \\
