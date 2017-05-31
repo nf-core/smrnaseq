@@ -21,6 +21,7 @@ RUN apt-get update && \
         libreadline-dev \
         libssl-dev \
         libtbb2 \
+        libgtextutils-dev \
         make \
         python-dev \
         zlib1g-dev \
@@ -30,6 +31,13 @@ RUN apt-get update && \
 RUN curl -fsSL https://bootstrap.pypa.io/get-pip.py -o /opt/get-pip.py && \
     python /opt/get-pip.py && \
     rm /opt/get-pip.py
+
+# Install FASTX-Toolkit
+RUN curl -fsSL http://hannonlab.cshl.edu/fastx_toolkit/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2  -o /opt/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2 && \
+    mkdir /opt/fastx_toolkit  && \
+    tar -xjf /opt/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2 -C /opt/fastx_toolkit && \
+    ln -s /opt/fastx_toolkit/bin/*  /usr/local/bin/  && \
+    rm /opt/fastx_toolkit_0.0.13_binaries_Linux_2.6_amd64.tar.bz2
 
 # Install FastQC
 ENV FASTQC_BIN="fastqc_v0.11.5.zip"
@@ -53,7 +61,7 @@ RUN mkdir /opt/TrimGalore && \
 # Install Bowtie
 RUN wget -q -O bowtie.zip https://sourceforge.net/projects/bowtie-bio/files/bowtie/1.2.0/bowtie-1.2-linux-x86_64.zip/download && \
   unzip bowtie.zip -d /opt/ && \
-  ln -s /opt/bowtie-1.2/bowtie /usr/local/bin/bowtie && \
+  ln -s /opt/bowtie-1.2/bowtie* /usr/local/bin/ && \
   rm bowtie.zip
 
 # Install Bowtie2
