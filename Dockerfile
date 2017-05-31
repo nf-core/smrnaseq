@@ -98,6 +98,14 @@ RUN echo 'source("https://bioconductor.org/biocLite.R")' > /opt/packages.r && \
     Rscript /opt/packages.r && \
     mkdir /usr/local/lib/R/site-library
 
+# Install HTSeq
+RUN curl -fsSL https://pypi.python.org/packages/46/f7/6105848893b1d280692eac4f4f3c08ed7f424cec636aeda66b50bbcf217e/HTSeq-0.7.2.tar.gz -o /opt/HTSeq-0.7.2.tar.gz && \
+    tar xvzf /opt/HTSeq-0.7.2.tar.gz -C /opt/ && \
+    cd /opt/HTSeq-0.7.2  && \
+    python setup.py build  && \
+    python setup.py install  && \
+    rm /opt/HTSeq-0.7.2.tar.gz
+
 # Install NGI Visualizations
 ENV pip install --upgrade git+https://github.com/NationalGenomicsInfrastructure/ngi_visualizations.git
 
