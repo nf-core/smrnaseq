@@ -103,7 +103,7 @@ process makeBowtieIndex {
 
     publishDir path: { params.saveReference ? "${params.outdir}/bowtie/reference" : params.outdir },
                saveAs: { params.saveReference ? it : null }, mode: 'copy'
-               
+
     input:
     file mature from mature
     file hairpin from hairpin
@@ -263,7 +263,7 @@ process miRBasePostAlignment {
 
     script:
     """
-    samtools sort ${input.baseName}.bam ${input.baseName}.sorted
+    samtools sort ${input.baseName}.bam -o ${input.baseName}.sorted.bam
     samtools index ${input.baseName}.sorted.bam
     samtools idxstats ${input.baseName}.sorted.bam > ${input.baseName}.count
     """
@@ -334,6 +334,7 @@ if( params.gtf && params.bt2index) {
         publishDir "${params.outdir}/bowtie2/ngi_visualizations", mode: 'copy'
 
         input:
+        file gtf from gtf
         file bowtie2_bam
 
         output:
