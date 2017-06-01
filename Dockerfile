@@ -98,8 +98,11 @@ RUN echo 'source("https://bioconductor.org/biocLite.R")' > /opt/packages.r && \
     Rscript /opt/packages.r && \
     mkdir /usr/local/lib/R/site-library
 
+# Install numpy and HTSeq
+RUN pip install numpy && pip install htseq
+
 # Install NGI Visualizations
-ENV pip install --upgrade git+https://github.com/NationalGenomicsInfrastructure/ngi_visualizations.git
+RUN pip install --upgrade git+https://github.com/NationalGenomicsInfrastructure/ngi_visualizations.git
 
 # Install MultiQC
 # ENV MULTIQC_VERSION v0.9
