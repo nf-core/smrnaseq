@@ -90,6 +90,7 @@ results         # Finished results for each sample, one directory per pipeline s
 # Other nextflow hidden files, eg. history of pipeline runs and old logs.
 ```
 
+## Mandatory parameters
 ### `--reads`
 Location of the input FastQ files:
 ```
@@ -130,26 +131,71 @@ The human `GRCh37` genome is used by default.
 
 **NOTE! With the option --genome 'ALL', the entire dataset of mature miRNAs and hairpins in miRBase will be used as reference regardless of species. Meanwhile the alignment against host reference genome will be skipped.**
 
+
+## Other command line parameters
+### `--outdir`
+The output directory where the results will be saved.
+
+### `--email`
+Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to speicfy this on the command line for every run.
+
+### `--plaintext_email`
+Set to receive plain-text e-mails instead of HTML formatted.
+
+### `-name`
+Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
+
+This is used in the MultiQC report (if not default) and in the summary HTML / e-mail (always).
+
+**NB:** Single hyphen (core Nextflow option)
+
+### `-resume`
+Specify this when restarting a pipeline. Nextflow will used cached results from any pipeline steps where the inputs are the same, continuing from where it got to previously.
+
+You can also supply a run name to resume a specific run: `-resume [run-name]`. Use the `nextflow log` command to show previous run names.
+
+**NB:** Single hyphen (core Nextflow option)
+
+### `-c`
+Specify the path to a specific config file (this is a core NextFlow command). Useful if using different UPPMAX
+projects or different sets of reference genomes. **NOTE! One hyphen only (core Nextflow parameter).**
+
+**NB:** Single hyphen (core Nextflow option)
+
+Note - you can use this to override defaults. For example, we run on UPPMAX but don't want to use the MultiQC
+environment module as is the default. So we specify a config file using `-c` that contains the following:
+
+```groovy
+process.$multiqc.module = []
+```
+
 ### `--bt2index`
 If you prefer, you can specify the full path to your reference genome when you run the pipeline:
 ```
 --bt2index [path to Bowtie2 index]
 ```
 
-### `--outdir`
-The output directory where the results will be saved.
-
 ### `--rlocation`
 Some steps in the pipeline run R with required modules. By default, the pipeline will install
 these modules to `~/R/nxtflow_libs/` if not present. You can specify what path to use with this
 command line flag.
 
-### `-c`
-Specify the path to a specific config file (this is a core NextFlow command). Useful if using different UPPMAX
-projects or different sets of reference genomes. **NOTE! One hyphen only (core Nextflow parameter).**
-
 ### `--saveReference`
 Supply this parameter to save any generated reference genome files to your results folder. These can then be used for future pipeline runs, reducing processing times.
+
+### `--multiqc_config`
+If you would like to supply a custom config file to MultiQC, you can specify a path with `--multiqc_config`. This is used instead of the config file specific to the pipeline.
+
+### `--clusterOptions`
+Submit arbitrary SLURM options (UPPMAX profile only). For instance, you could use `--clusterOptions '-p devcore'`
+to run on the development node (though won't work with default process time requests).
+
+## Stand-alone scripts
+The `bin` directory contains some scripts used by the pipeline which may also be run manually:
+
+* `edgeR_miRBase.r`
+  * R script using for processing reads counts of mature miRNAs and miRNA precursors (hairpins).
+
 
 ## Credits
 These scripts were written for use at the [National Genomics Infrastructure](https://portal.scilifelab.se/genomics/)
