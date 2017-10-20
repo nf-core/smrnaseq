@@ -273,8 +273,8 @@ process insertsize {
     file '*.insertsize' into insertsize_results
 
     script:
-    """
     prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
+    """
     awk 'NR%4 == 2 {lengths[length(\$0)]++} END {for (l in lengths) {print l, lengths[l]}}' <(zcat \$input) >\${prefix}.insertsize
     """
 }
@@ -548,14 +548,15 @@ process multiqc {
     file ('trim_galore/*') from trimgalore_results.flatten().toList()
     file ('trim_galore/*') from trimgalore_fastqc_reports.flatten().toList()
     file ('bowtie/miRBase_mature/*') from bowtie_mature_alignment.flatten().toList()
-    file ('bowtie/miRBase_hairpin/*') from bowtie_haripin_alignment.flatten().toList()
+    file ('bowtie/miRBase_hairpin/*') from bowtie_hairpin_alignment.flatten().toList()
     file ('edgeR/*') from edgeR_miRBase_results.flatten().toList()
-    if( params.gtf && params.bt2index ) file ('bowtie2/*') from bowtie2_alignment.flatten().toList()
+    file ('bowtie2/*') from bowtie2_alignment.flatten().toList()
     file ('software_versions/*') from software_versions_yaml
 
     output:
     file '*multiqc_report.html' into multiqc_html
     file '*multiqc_data' into multiqc_data
+    file '.command.err' into multiqc_stderr
 
     script:
     """
