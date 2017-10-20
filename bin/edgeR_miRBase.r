@@ -53,13 +53,21 @@ for (i in 1:2) {
 
     # Prepare the combined data frame with gene ID as rownames and sample ID as colname
     data<-do.call("cbind", lapply(filelist[[i]], fread, header=FALSE, select=c(3)))
+    unmapped<-do.call("cbind", lapply(filelist[[i]], fread, header=FALSE, select=c(4)))
     data<-as.data.frame(data)
+    unmapped<-as.data.frame(unmapped)
 
     temp <- fread(filelist[[i]][1],header=FALSE, select=c(1))
     rownames(data)<-temp$V1
+    rownames(unmapped)<-temp$V1
     colnames(data)<-gsub(".count","",basename(filelist[[i]]))
-
+    colnames(unmapped)<-gsub(".count","",basename(filelist[[i]]))
+    
     data<-data[rownames(data)!="*",]
+    unmapped<-unmapped[rownames(unmapped)=="*",]
+    
+    # Write the summary table of unmapped reads
+    write.table(unmapped,file=paste(header,"_unmapped_read_counts.txt",sep=""),sep='\\t',quote=FALSE)
 
     # Remove genes with 0 reads in all samples
     row_sub = apply(data, 1, function(row) all(row ==0 ))

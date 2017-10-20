@@ -14,6 +14,27 @@ vim: syntax=groovy
  Chuan Wang <chuan.wang@scilifelab.se>
  Rickard Hammarén <rickard.hammaren@scilifelab.se>
 ----------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------
+ Pipeline overview:
+ - 1:   FastQC for raw sequencing reads quility control
+ - 2:   Trim Galore! for adapter trimming
+ - 3.1: Bowtie 1 alignment against miRBase mature miRNA
+ - 3.2: Post-alignment processing of miRBase mature miRNA counts
+ - 3.3: edgeR analysis on miRBase mature miRNA counts
+        - TMM normalization and a table of top expression mature miRNA
+        - MDS plot clustering samples
+        - Heatmap of sample similarities
+ - 4.1: Bowtie 1 alignment against miRBase hairpin for the unaligned reads in step 3
+ - 4.2: Post-alignment processing of miRBase hairpin counts
+ - 4.3: edgeR analysis on miRBase hairpin counts
+        - TMM normalization and a table of top expression hairpin
+        - MDS plot clustering samples
+        - Heatmap of sample similarities
+ - 5.1: Bowtie 2 alignment against host reference genome
+ - 5.2: Post-alignment processing of Bowtie 2
+ - 6:   NGI-Visualization of Bowtie 2 alignment statistics
+ - 7:   MultiQC
+----------------------------------------------------------------------------------------
 */
 
 def helpMessage() {
@@ -31,6 +52,9 @@ def helpMessage() {
       --reads                       Path to input data (must be surrounded with quotes).
                                     NOTE! Paired-end data is NOT supported by this pipeline! For paired-end data, use Read 1 only.
       --genome                      Name of iGenomes reference
+                                    NOTE! With the option --genome 'ALL', the entire dataset of mature miRNAs and hairpins
+                                    in miRBase will be used as reference regardless of species. Meanwhile the alignment against
+                                    host reference genome will be skipped.
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references.
       --saveReference               Save the generated reference files the the Results directory.
@@ -202,10 +226,12 @@ process fastqc {
 
     output:
     file '*_fastqc.{zip,html}' into fastqc_results
+    file '.command.out' into fastqc_stdout
 
     script:
     """
     fastqc -q $reads
+    fastqc --version
     """
 }
 
@@ -221,12 +247,35 @@ process trim_galore {
     file reads from raw_reads_trimgalore
 
     output:
-    file '*.gz' into trimmed_reads_bowtie, trimmed_reads_bowtie2
-    file '*trimming_report.txt' into trimgalore_results
+    file '*.gz' into trimmed_reads_bowtie, trimmed_reads_bowtie2, trimmed_reads_insertsize
+    file '*trimming_report.txt' into trimgalore_results, trimgalore_logs
+    file "*_fastqc.{zip,html}" into trimgalore_fastqc_reports
 
     script:
     """
-    trim_galore --small_rna --gzip $reads
+    trim_galore --small_rna --gzip $reads --fastqc
+    """
+}
+
+
+/*
+ * STEP 2.1 - Insertsize
+ */
+
+process insertsize {
+    tag "$name"
+    publishDir "${params.outdir}/trim_galore/insertsize", mode: 'copy'
+
+    input:
+    set val(name), file(reads) from trimmed_reads_insertsize
+
+    output:
+    file '*.insertsize' into insertsize_results
+
+    script:
+    """
+    prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
+    awk 'NR%4 == 2 {lengths[length(\$0)]++} END {for (l in lengths) {print l, lengths[l]}}' <(zcat \$input) >\${prefix}.insertsize
     """
 }
 
@@ -245,6 +294,7 @@ process bowtie_miRBase_mature {
     output:
     file '*.mature.bam' into miRBase_mature_bam
     file '*.mature_unmapped.fq.gz' into mature_unmapped_reads
+    file '.command.log' into bowtie_log, bowtie_mature_alignment
 
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
@@ -264,6 +314,7 @@ process bowtie_miRBase_mature {
         --un ${prefix}.mature_unmapped.fq \\
         -S \\
         | samtools view -bS - > ${prefix}.mature.bam
+    bowtie --version
 
     gzip ${prefix}.mature_unmapped.fq
     """
@@ -283,6 +334,7 @@ process bowtie_miRBase_hairpin {
     output:
     file '*.hairpin.bam' into miRBase_hairpin_bam
     file '*.hairpin_unmapped.fq.gz' into hairpin_unmapped_reads
+    file '.command.log' into bowtie_hairpin_alignment
 
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
@@ -317,6 +369,7 @@ def wrap_mature_and_hairpin = { file ->
 }
 
 process miRBasePostAlignment {
+    tag "$input"
     publishDir "${params.outdir}/bowtie", mode: 'copy', saveAs: wrap_mature_and_hairpin
 
     input:
@@ -373,8 +426,8 @@ if( params.gtf && params.bt2index) {
         file bt2_indices
 
         output:
-        file '*.bowtie2.bam' into bowtie2_bam
-        stdout into bowtie2_log
+        file '*.bowtie2.bam' into bowtie2_bam, bowtie2_bam_for_unmapped
+        file '.command.log' into bowtie2_log, bowtie2_alignment
 
         script:
         index_base = index.toString() - '.1.bt2'
@@ -388,12 +441,37 @@ if( params.gtf && params.bt2index) {
             -p 8 \\
             -t \\
             | samtools view -bT $index_base - > ${prefix}.bowtie2.bam
+        bowtie2 --version
+        """
+    }
+
+    /*
+     * STEP 7.2 - Bowtie 2 Statistics about unmapped reads against ref genome
+     */
+
+    process bowtie2_unmapped {
+
+        publishDir "${params.outdir}/bowtie2/unmapped", mode: 'copy'
+
+        input:
+        file input_files from bowtie2_bam_for_unmapped.toSortedList()
+
+        output:
+        file 'unmapped_refgenome.txt' into bowtie2_unmapped
+
+        script:
+        """
+        for i in $input_files
+        do
+          printf "\${i}\t"
+          samtools view -c -f0x4 \${i}
+        done > unmapped_refgenome.txt
         """
     }
 
 
     /*
-     * STEP 7.2 - NGI-Visualizations of Bowtie 2 alignment statistics
+     * STEP 7.3 - NGI-Visualizations of Bowtie 2 alignment statistics
      */
     process ngi_visualizations {
         tag "$bowtie2_bam"
@@ -418,6 +496,46 @@ if( params.gtf && params.bt2index) {
 
 }
 
+/*
+ * Parse software version numbers
+ */
+software_versions = [
+  'FastQC': null, 'Trim Galore!': null, 'Bowtie': null, 'Nextflow': "v$workflow.nextflow.version"
+]
+if( params.gtf && params.bt2index ) software_versions['Bowtie 2'] = null
+
+process get_software_versions {
+    cache false
+    executor 'local'
+
+    input:
+    val fastqc from fastqc_stdout.collect()
+    val trim_galore from trimgalore_logs.collect()
+    val bowtie from bowtie_log.collect()
+    val bowtie2 from bowtie2_log.collect()
+
+    output:
+    file 'software_versions_mqc.yaml' into software_versions_yaml
+
+    exec:
+    software_versions['FastQC'] = fastqc[0].getText().find(/FastQC v(\S+)/) { match, version -> "v$version" }
+    software_versions['Trim Galore!'] = trim_galore[0].getText().find(/Trim Galore version: (\S+)/) {match, version -> "v$version"}
+    software_versions['Bowtie'] = bowtie[0].getText().find(/bowtie-align version (\S+)/) { match, version -> "v$version" }
+    if( software_versions.containsKey('Bowtie') ) software_versions['Bowtie 2'] = bowtie2[0].getText().find(/bowtie2-align-s version (\S+)/) { match, version -> "v$version" }
+
+    def sw_yaml_file = task.workDir.resolve('software_versions_mqc.yaml')
+    sw_yaml_file.text  = """
+    id: 'ngi-smrnaseq'
+    section_name: 'NGI-smRNAseq Software Versions'
+    section_href: 'https://github.com/SciLifeLab/NGI-smRNAseq'
+    plot_type: 'html'
+    description: 'are collected at run time from the software output.'
+    data: |
+        <dl class=\"dl-horizontal\">
+${software_versions.collect{ k,v -> "            <dt>$k</dt><dd>${v ?: '<span style=\"color:#999999;\">N/A</a>'}</dd>" }.join("\n")}
+        </dl>
+    """.stripIndent()
+}
 
 /*
  * STEP 8 - MultiQC
@@ -428,8 +546,12 @@ process multiqc {
     input:
     file ('fastqc/*') from fastqc_results.flatten().toList()
     file ('trim_galore/*') from trimgalore_results.flatten().toList()
+    file ('trim_galore/*') from trimgalore_fastqc_reports.flatten().toList()
+    file ('bowtie/miRBase_mature/*') from bowtie_mature_alignment.flatten().toList()
+    file ('bowtie/miRBase_hairpin/*') from bowtie_haripin_alignment.flatten().toList()
     file ('edgeR/*') from edgeR_miRBase_results.flatten().toList()
-    // if( params.gtf && params.bt2index) file ('bowtie2_log/*') from bowtie2_log.flatten().toList()
+    if( params.gtf && params.bt2index ) file ('bowtie2/*') from bowtie2_alignment.flatten().toList()
+    file ('software_versions/*') from software_versions_yaml
 
     output:
     file '*multiqc_report.html' into multiqc_html
@@ -439,6 +561,9 @@ process multiqc {
     """
     multiqc -f .
     """
+}
+multiqc_stderr.subscribe { stderr ->
+  software_versions['MultiQC'] = stderr.getText().find(/This is MultiQC v(\S+)/) { match, version -> "v$version" }
 }
 
 /*
