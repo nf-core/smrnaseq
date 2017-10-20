@@ -263,11 +263,11 @@ process trim_galore {
  */
 
 process insertsize {
-    tag "$name"
+    tag "$reads"
     publishDir "${params.outdir}/trim_galore/insertsize", mode: 'copy'
 
     input:
-    set val(name), file(reads) from trimmed_reads_insertsize
+    file reads from trimmed_reads_insertsize
 
     output:
     file '*.insertsize' into insertsize_results
@@ -275,7 +275,7 @@ process insertsize {
     script:
     prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
     """
-    awk 'NR%4 == 2 {lengths[length(\$0)]++} END {for (l in lengths) {print l, lengths[l]}}' <(zcat \$input) >\${prefix}.insertsize
+    awk 'NR%4 == 2 {lengths[length(\$0)]++} END {for (l in lengths) {print l, lengths[l]}}' <(zcat $reads) >${prefix}.insertsize
     """
 }
 
