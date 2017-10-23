@@ -294,7 +294,7 @@ process bowtie_miRBase_mature {
     output:
     file '*.mature.bam' into miRBase_mature_bam
     file '*.mature_unmapped.fq.gz' into mature_unmapped_reads
-    file '.command.log' into bowtie_log, bowtie_mature_alignment
+    file '.command.log' into bowtie_log
 
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
@@ -334,7 +334,6 @@ process bowtie_miRBase_hairpin {
     output:
     file '*.hairpin.bam' into miRBase_hairpin_bam
     file '*.hairpin_unmapped.fq.gz' into hairpin_unmapped_reads
-    file '.command.log' into bowtie_hairpin_alignment
 
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
@@ -427,7 +426,7 @@ if( params.gtf && params.bt2index) {
 
         output:
         file '*.bowtie2.bam' into bowtie2_bam, bowtie2_bam_for_unmapped
-        file '.command.log' into bowtie2_log, bowtie2_alignment
+        file '.command.log' into bowtie2_log
 
         script:
         index_base = index.toString() - '.1.bt2'
@@ -547,10 +546,6 @@ process multiqc {
     file ('fastqc/*') from fastqc_results.flatten().toList()
     file ('trim_galore/*') from trimgalore_results.flatten().toList()
     file ('trim_galore/*') from trimgalore_fastqc_reports.flatten().toList()
-    file ('bowtie/miRBase_mature/*') from bowtie_mature_alignment.flatten().toList()
-    file ('bowtie/miRBase_hairpin/*') from bowtie_hairpin_alignment.flatten().toList()
-    file ('edgeR/*') from edgeR_miRBase_results.flatten().toList()
-    file ('bowtie2/*') from bowtie2_alignment.flatten().toList()
     file ('software_versions/*') from software_versions_yaml
 
     output:
