@@ -53,13 +53,21 @@ for (i in 1:2) {
 
     # Prepare the combined data frame with gene ID as rownames and sample ID as colname
     data<-do.call("cbind", lapply(filelist[[i]], fread, header=FALSE, select=c(3)))
+    unmapped<-do.call("cbind", lapply(filelist[[i]], fread, header=FALSE, select=c(4)))
     data<-as.data.frame(data)
+    unmapped<-as.data.frame(unmapped)
 
     temp <- fread(filelist[[i]][1],header=FALSE, select=c(1))
     rownames(data)<-temp$V1
+    rownames(unmapped)<-temp$V1
     colnames(data)<-gsub(".count","",basename(filelist[[i]]))
-
+    colnames(unmapped)<-gsub(".count","",basename(filelist[[i]]))
+    
     data<-data[rownames(data)!="*",]
+    unmapped<-unmapped[rownames(unmapped)=="*",]
+    
+    # Write the summary table of unmapped reads
+    write.table(unmapped,file=paste(header,"_unmapped_read_counts.txt",sep=""),sep='\t',quote=FALSE)
 
     # Remove genes with 0 reads in all samples
     row_sub = apply(data, 1, function(row) all(row ==0 ))
@@ -73,7 +81,7 @@ for (i in 1:2) {
 
     # Print normalized read counts to file
     dataNorm_df<-as.data.frame(cpm(dataNorm))
-    write.table(dataNorm_df,file=paste(header,"_normalized_CPM.txt",sep=""),sep='\\t',quote=FALSE)
+    write.table(dataNorm_df,file=paste(header,"_normalized_CPM.txt",sep=""),sep='\t',quote=FALSE)
 
     # Print heatmap based on normalized read counts
     pdf(paste(header,"_CPM_heatmap.pdf",sep=""))
@@ -88,13 +96,13 @@ for (i in 1:2) {
     }
 
     # Print distance matrix to file
-    write.table(MDSdata$distance.matrix, paste(header,"_edgeR_MDS_distance_matrix.txt",sep=""), quote=FALSE, sep="\\t")
+    write.table(MDSdata$distance.matrix, paste(header,"_edgeR_MDS_distance_matrix.txt",sep=""), quote=FALSE, sep="\t")
 
     # Print plot x,y co-ordinates to file
     MDSxy = MDSdata$cmdscale.out
     colnames(MDSxy) = c(paste(MDSdata$axislabel, '1'), paste(MDSdata$axislabel, '2'))
 
-    write.table(MDSxy, paste(header,"_edgeR_MDS_plot_coordinates.txt",sep=""), quote=FALSE, sep="\\t")
+    write.table(MDSxy, paste(header,"_edgeR_MDS_plot_coordinates.txt",sep=""), quote=FALSE, sep="\t")
 
     # Get the log counts per million values
     logcpm <- cpm(dataNorm, prior.count=2, log=TRUE)
@@ -113,7 +121,7 @@ for (i in 1:2) {
     dev.off()
 
     # Write clustered distance values to file
-    write.table(hmap$carpet, paste(header,"_log2CPM_sample_distances.txt",sep=""), quote=FALSE, sep="\\t")
+    write.table(hmap$carpet, paste(header,"_log2CPM_sample_distances.txt",sep=""), quote=FALSE, sep="\t")
 }
 
 file.create("corr.done")
