@@ -84,6 +84,13 @@ RUN curl -fsSL https://cran.r-project.org/src/base/R-3/${R_VERSION}.tar.gz -o /o
     cd /opt/${R_VERSION};./configure;make;make install && \
     rm /opt/${R_VERSION}.tar.gz
 
+# Install NLopt
+ENV NLOPT_VERSION="2.4.2"
+RUN curl -fsSL http://ab-initio.mit.edu/nlopt/nlopt-${NLOPT_VERSION}.tar.gz -o /opt/nlopt-${NLOPT_VERSION}.tar.gz && \
+    tar xvzf /opt/nlopt-${NLOPT_VERSION}.tar.gz -C /opt/ && \
+    cd /opt/nlopt-${NLOPT_VERSION};./configure;make;make install && \
+    rm /opt/nlopt-${NLOPT_VERSION}.tar.gz
+
 # Install core R dependencies
 RUN echo "r <- getOption('repos'); r['CRAN'] <- 'https://ftp.acc.umu.se/mirror/CRAN/'; options(repos = r);" > ~/.Rprofile && \
     Rscript -e "install.packages('statmod',dependencies=TRUE)" && \
