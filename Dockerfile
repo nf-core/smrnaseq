@@ -65,9 +65,9 @@ RUN wget -q -O bowtie.zip https://sourceforge.net/projects/bowtie-bio/files/bowt
   rm bowtie.zip
 
 # Install Bowtie2
-RUN wget -q -O bowtie2.zip http://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.3.1/bowtie2-2.3.1-linux-x86_64.zip/download && \
+RUN wget -q -O bowtie2.zip http://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.3.2/bowtie2-2.3.2-linux-x86_64.zip/download && \
   unzip bowtie2.zip -d /opt/ && \
-  ln -s /opt/bowtie2-2.3.1/bowtie2 /usr/local/bin/bowtie2 && \
+  ln -s /opt/bowtie2-2.3.2/bowtie2 /usr/local/bin/bowtie2 && \
   rm bowtie2.zip
 
 # Install SAMTools
