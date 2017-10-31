@@ -56,8 +56,13 @@ def helpMessage() {
                                     in miRBase will be used as reference regardless of species. Meanwhile the alignment against
                                     host reference genome will be skipped.
 
-    References                      If not specified in the configuration file or you wish to overwrite any of the references.
+    References
       --saveReference               Save the generated reference files the the Results directory.
+
+    Trimming options
+      --length [int]                Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
+      --clip_R1 [int]               Instructs Trim Galore to remove bp from the 5' end of read 1
+      --three_prime_clip_R1 [int]   Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed
 
     Other options:
       --outdir                      The output directory where the results will be saved
@@ -118,6 +123,16 @@ if (params.rlocation){
     nxtflow_libs.mkdirs()
 }
 
+// Custom trimming options
+params.length = 18
+params.clip_R1 = 0
+params.three_prime_clip_R1 = 0
+
+// Define regular variables so that they can be overwritten
+length = params.length
+clip_R1 = params.clip_R1
+three_prime_clip_R1 = params.three_prime_clip_R1
+
 // Validate inputs
 if( !params.mature || !params.hairpin ){
     exit 1, "Missing mature / hairpin reference indexes! Is --genome specified?"
@@ -167,6 +182,9 @@ def summary = [:]
 summary['Run Name']            = custom_runName ?: workflow.runName
 summary['Reads']               = params.reads
 summary['Genome']              = params.genome
+summary['Trim length cutoff']  = length
+summary['Trim 5' R1']          = clip_R1
+summary["Trim 3' R1"]          = three_prime_clip_R1
 summary['miRBase mature']      = params.mature
 summary['miRBase hairpin']     = params.hairpin
 if(params.bt2index)            summary['Bowtie2 Index'] = params.bt2index
@@ -252,8 +270,11 @@ process trim_galore {
     file "*_fastqc.{zip,html}" into trimgalore_fastqc_reports
 
     script:
+    tg_length = "--length ${params.length}"
+    c_r1 = clip_R1 > 0 ? "--clip_R1 ${clip_R1}" : ''
+    tpc_r1 = three_prime_clip_R1 > 0 ? "--three_prime_clip_R1 ${three_prime_clip_R1}" : ''
     """
-    trim_galore --small_rna --gzip $reads --fastqc
+    trim_galore --small_rna $tg_length $c_r1 $tpc_r1 --gzip $reads --fastqc
     """
 }
 
