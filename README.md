@@ -180,6 +180,11 @@ Some steps in the pipeline run R with required modules. By default, the pipeline
 these modules to `~/R/nxtflow_libs/` if not present. You can specify what path to use with this
 command line flag.
 
+### Trimming options
+`--length [int]`: Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
+`--clip_R1 [int]`: Instructs Trim Galore to remove bp from the 5' end of read 1
+`--three_prime_clip_R1 [int]`: Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed
+
 ### `--saveReference`
 Supply this parameter to save any generated reference genome files to your results folder. These can then be used for future pipeline runs, reducing processing times.
 
