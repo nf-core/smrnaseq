@@ -177,7 +177,7 @@ def summary = [:]
 summary['Run Name']            = custom_runName ?: workflow.runName
 summary['Reads']               = params.reads
 summary['Genome']              = params.genome
-summary['Trim length cutoff']  = params.length
+summary['Trim min length']     = params.length
 summary["Trim 5' R1"]          = params.clip_R1
 summary["Trim 3' R1"]          = params.three_prime_clip_R1
 summary['miRBase mature']      = params.mature
@@ -266,8 +266,8 @@ process trim_galore {
 
     script:
     tg_length = "--length ${params.length}"
-    c_r1 = ${params.clip_R1} > 0 ? "--clip_R1 ${params.clip_R1}" : ''
-    tpc_r1 = ${params.three_prime_clip_R1} > 0 ? "--three_prime_clip_R1 ${params.three_prime_clip_R1}" : ''
+    c_r1 = $params.clip_R1 > 0 ? "--clip_R1 ${params.clip_R1}" : ''
+    tpc_r1 = $params.three_prime_clip_R1 > 0 ? "--three_prime_clip_R1 ${params.three_prime_clip_R1}" : ''
     """
     trim_galore --small_rna $tg_length $c_r1 $tpc_r1 --gzip $reads --fastqc
     """
