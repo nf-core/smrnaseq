@@ -16,7 +16,7 @@ vim: syntax=groovy
 ----------------------------------------------------------------------------------------
 ----------------------------------------------------------------------------------------
  Pipeline overview:
- - 1:   FastQC for raw sequencing reads quility control
+ - 1:   FastQC for raw sequencing reads quality control
  - 2:   Trim Galore! for adapter trimming
  - 3.1: Bowtie 1 alignment against miRBase mature miRNA
  - 3.2: Post-alignment processing of miRBase mature miRNA counts
@@ -128,11 +128,6 @@ params.length = 18
 params.clip_R1 = 0
 params.three_prime_clip_R1 = 0
 
-// Define regular variables so that they can be overwritten
-length = params.length
-clip_R1 = params.clip_R1
-three_prime_clip_R1 = params.three_prime_clip_R1
-
 // Validate inputs
 if( !params.mature || !params.hairpin ){
     exit 1, "Missing mature / hairpin reference indexes! Is --genome specified?"
@@ -182,9 +177,9 @@ def summary = [:]
 summary['Run Name']            = custom_runName ?: workflow.runName
 summary['Reads']               = params.reads
 summary['Genome']              = params.genome
-summary['Trim length cutoff']  = length
-summary["Trim 5' R1"]          = clip_R1
-summary["Trim 3' R1"]          = three_prime_clip_R1
+summary['Trim length cutoff']  = params.length
+summary["Trim 5' R1"]          = params.clip_R1
+summary["Trim 3' R1"]          = params.three_prime_clip_R1
 summary['miRBase mature']      = params.mature
 summary['miRBase hairpin']     = params.hairpin
 if(params.bt2index)            summary['Bowtie2 Index'] = params.bt2index
@@ -271,8 +266,8 @@ process trim_galore {
 
     script:
     tg_length = "--length ${params.length}"
-    c_r1 = clip_R1 > 0 ? "--clip_R1 ${clip_R1}" : ''
-    tpc_r1 = three_prime_clip_R1 > 0 ? "--three_prime_clip_R1 ${three_prime_clip_R1}" : ''
+    c_r1 = ${params.clip_R1} > 0 ? "--clip_R1 ${params.clip_R1}" : ''
+    tpc_r1 = ${params.three_prime_clip_R1} > 0 ? "--three_prime_clip_R1 ${params.three_prime_clip_R1}" : ''
     """
     trim_galore --small_rna $tg_length $c_r1 $tpc_r1 --gzip $reads --fastqc
     """
