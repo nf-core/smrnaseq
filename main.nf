@@ -145,8 +145,8 @@ if( params.gtf ){
     if( !gtf.exists() ) exit 1, "GTF file not found: ${params.gtf}"
 }
 if( params.bt2index ){
-    bt2_index = file("${params.bt2index}.1.bt2")
-    bt2_indices = Channel.fromPath( "${params.bt2index}*" ).toList()
+    bt2_index = file("${params.bt2index}.fa")
+    bt2_indices = Channel.fromPath( "${params.bt2index}*.bt2" ).toList()
     if( !bt2_index.exists() ) exit 1, "Reference genome Bowtie 2 not found: ${params.bt2index}"
 }
 if( !params.gtf || !params.bt2index) {
@@ -445,7 +445,7 @@ if( params.gtf && params.bt2index) {
         file '.command.log' into bowtie2_log
 
         script:
-        index_base = index.toString() - '.1.bt2'
+        index_base = index.toString() - '.fa'
         prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
         """
         bowtie2 \\
