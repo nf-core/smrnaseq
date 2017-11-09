@@ -7,7 +7,7 @@ R_lib <- as.character(args[1])
 input <- as.character(args[2:length(args)])
 
 # Load / install required packages
-.libPaths( c( .libPaths(), R_lib ) )
+.libPaths( c( R_lib, .libPaths() ) )
 
 if (!require("limma")){
     source("http://bioconductor.org/biocLite.R")
