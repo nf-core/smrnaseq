@@ -536,7 +536,7 @@ process get_software_versions {
     software_versions['FastQC'] = fastqc[0].getText().find(/FastQC v(\S+)/) { match, version -> "v$version" }
     software_versions['Trim Galore!'] = trim_galore[0].getText().find(/Trim Galore version: (\S+)/) {match, version -> "v$version"}
     software_versions['Bowtie'] = bowtie[0].getText().find(/bowtie-align version (\S+)/) { match, version -> "v$version" }
-    if( software_versions.containsKey('Bowtie') ) software_versions['Bowtie 2'] = bowtie2[0].getText().find(/bowtie2-align-s version (\S+)/) { match, version -> "v$version" }
+    if( software_versions.containsKey('Bowtie 2') ) software_versions['Bowtie 2'] = bowtie2[0].getText().find(/bowtie2-align-s version (\S+)/) { match, version -> "v$version" }
 
     def sw_yaml_file = task.workDir.resolve('software_versions_mqc.yaml')
     sw_yaml_file.text  = """
