@@ -239,12 +239,10 @@ process fastqc {
 
     output:
     file '*_fastqc.{zip,html}' into fastqc_results
-    file '.command.out' into fastqc_stdout
 
     script:
     """
     fastqc -q $reads
-    fastqc --version
     """
 }
 
@@ -261,7 +259,7 @@ process trim_galore {
 
     output:
     file '*.gz' into trimmed_reads_bowtie, trimmed_reads_bowtie2, trimmed_reads_insertsize
-    file '*trimming_report.txt' into trimgalore_results, trimgalore_logs
+    file '*trimming_report.txt' into trimgalore_results
     file "*_fastqc.{zip,html}" into trimgalore_fastqc_reports
 
     script:
@@ -310,7 +308,6 @@ process bowtie_miRBase_mature {
     output:
     file '*.mature.bam' into miRBase_mature_bam
     file '*.mature_unmapped.fq.gz' into mature_unmapped_reads
-    file '.command.log' into bowtie_log
 
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
@@ -442,7 +439,6 @@ if( params.gtf && params.bt2index) {
 
         output:
         file '*.bowtie2.bam' into bowtie2_bam, bowtie2_bam_for_unmapped
-        file '.command.log' into bowtie2_log
 
         script:
         index_base = index.toString() - '.fa'
@@ -465,7 +461,7 @@ if( params.gtf && params.bt2index) {
      */
 
     process bowtie2_unmapped {
-
+        tag "${input_files[0].baseName}"
         publishDir "${params.outdir}/bowtie2/unmapped", mode: 'copy'
 
         input:
@@ -514,42 +510,24 @@ if( params.gtf && params.bt2index) {
 /*
  * Parse software version numbers
  */
-software_versions = [
-  'FastQC': null, 'Trim Galore!': null, 'Bowtie': null, 'Nextflow': "v$workflow.nextflow.version"
-]
-if( params.gtf && params.bt2index ) software_versions['Bowtie 2'] = null
-
 process get_software_versions {
-    cache false
-    executor 'local'
-
-    input:
-    val fastqc from fastqc_stdout.collect()
-    val trim_galore from trimgalore_logs.collect()
-    val bowtie from bowtie_log.collect()
-    val bowtie2 from bowtie2_log.collect()
 
     output:
     file 'software_versions_mqc.yaml' into software_versions_yaml
 
-    exec:
-    software_versions['FastQC'] = fastqc[0].getText().find(/FastQC v(\S+)/) { match, version -> "v$version" }
-    software_versions['Trim Galore!'] = trim_galore[0].getText().find(/Trim Galore version: (\S+)/) {match, version -> "v$version"}
-    software_versions['Bowtie'] = bowtie[0].getText().find(/bowtie-align version (\S+)/) { match, version -> "v$version" }
-    if( software_versions.containsKey('Bowtie 2') ) software_versions['Bowtie 2'] = bowtie2[0].getText().find(/bowtie2-align-s version (\S+)/) { match, version -> "v$version" }
-
-    def sw_yaml_file = task.workDir.resolve('software_versions_mqc.yaml')
-    sw_yaml_file.text  = """
-    id: 'ngi-smrnaseq'
-    section_name: 'NGI-smRNAseq Software Versions'
-    section_href: 'https://github.com/SciLifeLab/NGI-smRNAseq'
-    plot_type: 'html'
-    description: 'are collected at run time from the software output.'
-    data: |
-        <dl class=\"dl-horizontal\">
-${software_versions.collect{ k,v -> "            <dt>$k</dt><dd>${v ?: '<span style=\"color:#999999;\">N/A</a>'}</dd>" }.join("\n")}
-        </dl>
-    """.stripIndent()
+    script:
+    """
+    echo $version > v_ngi_smrnaseq.txt
+    echo $workflow.nextflow.version > v_nextflow.txt
+    fastqc --version > v_fastqc.txt
+    trim_galore --version > v_trim_galore.txt
+    bowtie --version > v_bowtie.txt
+    bowtie2 --version > v_bowtie2.txt
+    samtools --version > v_samtools.txt
+    fasta_formatter -h > v_fastx.txt
+    multiqc --version > v_multiqc.txt
+    scrape_software_versions.py > software_versions_mqc.yaml
+    """
 }
 
 /*
@@ -573,9 +551,6 @@ process multiqc {
     """
     multiqc -f .
     """
-}
-multiqc_stderr.subscribe { stderr ->
-  software_versions['MultiQC'] = stderr.getText().find(/This is MultiQC v(\S+)/) { match, version -> "v$version" }
 }
 
 /*
@@ -602,15 +577,15 @@ workflow.onComplete {
     email_fields['summary'] = summary
     email_fields['summary']['Date Started'] = workflow.start
     email_fields['summary']['Date Completed'] = workflow.complete
+    email_fields['summary']['Nextflow Version'] = workflow.nextflow.version
+    email_fields['summary']['Nextflow Build'] = workflow.nextflow.build
+    email_fields['summary']['Nextflow Compile Timestamp'] = workflow.nextflow.timestamp
     email_fields['summary']['Pipeline script file path'] = workflow.scriptFile
     email_fields['summary']['Pipeline script hash ID'] = workflow.scriptId
     if(workflow.repository) email_fields['summary']['Pipeline repository Git URL'] = workflow.repository
     if(workflow.commitId) email_fields['summary']['Pipeline repository Git Commit'] = workflow.commitId
     if(workflow.revision) email_fields['summary']['Pipeline Git branch/tag'] = workflow.revision
     if(workflow.container) email_fields['summary']['Docker image'] = workflow.container
-    email_fields['software_versions'] = software_versions
-    email_fields['software_versions']['Nextflow Build'] = workflow.nextflow.build
-    email_fields['software_versions']['Nextflow Compile Timestamp'] = workflow.nextflow.timestamp
 
     // Render the TXT template
     def engine = new groovy.text.GStringTemplateEngine()
