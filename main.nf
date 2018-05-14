@@ -318,11 +318,11 @@ process bowtie_miRBase_mature {
         -q <(zcat $reads) \\
         -p 2 \\
         -t \\
-        -n 0 \\
-        -l 15 \\
-        -e 99999 \\
-        -k 10 \\
+        -k 1 \\
+        -m 1 \\
         --best \\
+        --strata \\
+        -e 99999 \\
         --chunkmbs 2048 \\
         --un ${prefix}.mature_unmapped.fq \\
         -S \\
@@ -356,11 +356,11 @@ process bowtie_miRBase_hairpin {
         $index_base \\
         -p 2 \\
         -t \\
-        -n 1 \\
-        -l 15 \\
-        -e 99999 \\
-        -k 10 \\
+        -k 1 \\
+        -m 1 \\
         --best \\
+        --strata \\
+        -e 99999 \\
         --chunkmbs 2048 \\
         -q <(zcat $reads) \\
         --un ${prefix}.hairpin_unmapped.fq \\
