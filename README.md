@@ -1,4 +1,4 @@
-# ![NGI-smRNAseq](docs/images/NGI-smRNAseq_logo.png)
+# ![NGI-smRNAseq](docs/images/smrnaseq_logo.png)
 
 [![Build Status](https://travis-ci.org/SciLifeLab/NGI-smRNAseq.svg?branch=master)](https://travis-ci.org/SciLifeLab/NGI-smRNAseq)
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A50.22.2-brightgreen.svg)](https://www.nextflow.io/)

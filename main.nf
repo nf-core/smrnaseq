@@ -619,7 +619,7 @@ workflow.onComplete {
     }
 
     // Switch the embedded MIME images with base64 encoded src
-    ngismrnaseqlogo = new File("$baseDir/assets/NGI-smRNAseq_logo.png").bytes.encodeBase64().toString()
+    ngismrnaseqlogo = new File("$baseDir/assets/smrnaseq_logo.png").bytes.encodeBase64().toString()
     scilifelablogo = new File("$baseDir/assets/SciLifeLab_logo.png").bytes.encodeBase64().toString()
     ngilogo = new File("$baseDir/assets/NGI_logo.png").bytes.encodeBase64().toString()
     email_html = email_html.replaceAll(~/cid:ngismrnaseqlogo/, "data:image/png;base64,$ngismrnaseqlogo")
