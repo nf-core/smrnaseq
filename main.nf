@@ -8,7 +8,7 @@ vim: syntax=groovy
 ========================================================================================
  Small-RNA-Seq Best Practice Analysis Pipeline. Started May 2016.
  #### Homepage / Documentation
- https://github.com/SciLifeLab/NGI-smRNAseq
+ https://github.com/nf-core/smrnaseq
  #### Authors
  Phil Ewels <phil.ewels@scilifelab.se>
  Chuan Wang <chuan.wang@scilifelab.se>
@@ -40,13 +40,13 @@ vim: syntax=groovy
 def helpMessage() {
     log.info"""
     =========================================
-     NGI-smRNAseq : smRNA-Seq Best Practice v${version}
+     nf-core/smrnaseq : smRNA-Seq Best Practice v${version}
     =========================================
     Usage:
 
     The typical command for running the pipeline is as follows:
 
-    nextflow run SciLifeLab/NGI-smRNAseq --reads '*.fastq.gz' --genome GRCh37
+    nextflow run nf-core/smrnaseq --reads '*.fastq.gz' --genome GRCh37
 
     Mandatory arguments:
       --reads                       Path to input data (must be surrounded with quotes).
@@ -171,7 +171,7 @@ Channel
 
 // Header log info
 log.info "==========================================="
-log.info " NGI-smRNAseq : Small RNA-Seq Best Practice v${version}"
+log.info " nf-core/smrnaseq : Small RNA-Seq Best Practice v${version}"
 log.info "==========================================="
 def summary = [:]
 summary['Run Name']            = custom_runName ?: workflow.runName
@@ -559,9 +559,9 @@ process multiqc {
 workflow.onComplete {
 
     // Set up the e-mail variables
-    def subject = "[NGI-smRNAseq] Successful: $workflow.runName"
+    def subject = "[nf-core/smrnaseq] Successful: $workflow.runName"
     if(!workflow.success){
-      subject = "[NGI-smRNAseq] FAILED: $workflow.runName"
+      subject = "[nf-core/smrnaseq] FAILED: $workflow.runName"
     }
     def email_fields = [:]
     email_fields['version'] = version
@@ -610,11 +610,11 @@ workflow.onComplete {
           if( params.plaintext_email ){ throw GroovyException('Send plaintext e-mail, not HTML') }
           // Try to send HTML e-mail using sendmail
           [ 'sendmail', '-t' ].execute() << sendmail_html
-          log.info "[NGI-smRNAseq] Sent summary e-mail to $params.email (sendmail)"
+          log.info "[nf-core/smrnaseq] Sent summary e-mail to $params.email (sendmail)"
         } catch (all) {
           // Catch failures and try with plaintext
           [ 'mail', '-s', subject, params.email ].execute() << email_txt
-          log.info "[NGI-smRNAseq] Sent summary e-mail to $params.email (mail)"
+          log.info "[nf-core/smrnaseq] Sent summary e-mail to $params.email (mail)"
         }
     }
 
@@ -636,6 +636,6 @@ workflow.onComplete {
     def output_tf = new File( output_d, "pipeline_report.txt" )
     output_tf.withWriter { w -> w << email_txt }
 
-    log.info "[NGI-smRNAseq] Pipeline Complete"
+    log.info "[nf-core/smrnaseq] Pipeline Complete"
 
 }

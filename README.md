@@ -1,9 +1,9 @@
-# ![NGI-smRNAseq](docs/images/smrnaseq_logo.png)
+# ![nf-core/smrnaseq](docs/images/smrnaseq_logo.png)
 
-[![Build Status](https://travis-ci.org/SciLifeLab/NGI-smRNAseq.svg?branch=master)](https://travis-ci.org/SciLifeLab/NGI-smRNAseq)
+[![Build Status](https://travis-ci.org/nf-core/smrnaseq.svg?branch=master)](https://travis-ci.org/nf-core/smrnaseq)
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A50.22.2-brightgreen.svg)](https://www.nextflow.io/)
 
-**NGI-smRNAseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data at the [National Genomics Infastructure](https://ngisweden.scilifelab.se/)
+**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data at the [National Genomics Infastructure](https://ngisweden.scilifelab.se/)
 at [SciLifeLab Stockholm](https://www.scilifelab.se/platforms/ngi/), Sweden.
 
 The pipeline uses [Nextflow](https://www.nextflow.io), a bioinformatics workflow tool. It pre-processes raw data from FastQ inputs, aligns the reads and performs extensive quality-control on the results.
@@ -17,12 +17,12 @@ Nextflow.
 
 ### Pipeline installation
 This pipeline itself needs no installation - NextFlow will automatically fetch it from GitHub when run if
-`SciLifeLab/NGI-smRNAseq` is specified as the pipeline name.
+`nf-core/smrnaseq` is specified as the pipeline name.
 
 If you prefer, you can download the files yourself from GitHub and run them directly:
 ```
-git clone https://github.com/SciLifeLab/NGI-smRNAseq.git
-nextflow run NGI-smRNAseq/main.nf
+git clone https://github.com/nf-core/smrnaseq.git
+nextflow run nf-core/smrnaseq/main.nf
 ```
 
 ### Installation of the 'ngi_visualizations' module
@@ -72,14 +72,14 @@ configuration options can be used by specifying `-profile <name>` when running t
 The typical command for running the pipeline is as follows:
 
 ```
-nextflow run SciLifeLab/NGI-smRNAseq --reads '*.fastq.gz'
+nextflow run nf-core/smrnaseq --reads '*.fastq.gz'
 ```
 
 **NOTE! Paired-end data is NOT supported by this pipeline!**
 For paired-end data, use Read 1 only. For instance:
 
 ```
-nextflow run SciLifeLab/NGI-smRNAseq --reads '*.R1.fastq.gz'
+nextflow run nf-core/smrnaseq --reads '*.R1.fastq.gz'
 ```
 
 Note that the pipeline will create files in your working directory:

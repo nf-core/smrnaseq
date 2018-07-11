@@ -1,7 +1,7 @@
 FROM openjdk:8
 
 LABEL author="Phil Ewels" \
-    description="Docker image containing all requirements for NGI-smRNAseq pipeline" \
+    description="Docker image containing all requirements for nf-core/smrnaseq pipeline" \
     maintainer="phil.ewels@scilifelab.se"
 
 # Install container-wide requrements gcc, pip, zlib, libssl, make, libncurses, fortran77, g++, R
