@@ -11,7 +11,7 @@ $email_html
 --ngimimeboundary
 Content-Type: image/png;name="smrnaseq_logo.png"
 Content-Transfer-Encoding: base64
-Content-ID: <ngismrnaseqlogo>
+Content-ID: <smrnaseqlogo>
 Content-Disposition: inline; filename="smrnaseq_logo.png"
 
 <% out << new File("$baseDir/assets/smrnaseq_logo.png").

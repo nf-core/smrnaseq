@@ -55,7 +55,7 @@ the command line flag `--project <project_ID>`.
 To avoid having to specify this every time you run Nextflow, you can add it to your
 personal Nextflow config file instead. Add this line to `~/.nextflow/config`:
 
-```groovy
+```nextflow
 params.project = 'project_ID'
 ```
 
@@ -174,7 +174,7 @@ projects or different sets of reference genomes. **NOTE! One hyphen only (core N
 Note - you can use this to override defaults. For example, we run on UPPMAX but don't want to use the MultiQC
 environment module as is the default. So we specify a config file using `-c` that contains the following:
 
-```groovy
+```nextflow
 process.$multiqc.module = []
 ```
 

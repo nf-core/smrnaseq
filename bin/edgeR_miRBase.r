@@ -3,12 +3,9 @@
 # Command line arguments
 args = commandArgs(trailingOnly=TRUE)
 
-R_lib <- as.character(args[1])
-input <- as.character(args[2:length(args)])
+input <- as.character(args[1:length(args)])
 
 # Load / install required packages
-.libPaths( c( R_lib, .libPaths() ) )
-
 if (!require("limma")){
     source("http://bioconductor.org/biocLite.R")
     biocLite("limma", suppressUpdates=TRUE)
@@ -62,10 +59,10 @@ for (i in 1:2) {
     rownames(unmapped)<-temp$V1
     colnames(data)<-gsub(".count","",basename(filelist[[i]]))
     colnames(unmapped)<-gsub(".count","",basename(filelist[[i]]))
-    
+
     data<-data[rownames(data)!="*",]
     unmapped<-unmapped[rownames(unmapped)=="*",]
-    
+
     # Write the summary table of unmapped reads
     write.table(unmapped,file=paste(header,"_unmapped_read_counts.txt",sep=""),sep='\t',quote=FALSE)
 

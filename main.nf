@@ -1,10 +1,8 @@
 #!/usr/bin/env nextflow
 
 /*
-vim: syntax=groovy
--*- mode: groovy;-*-
 ========================================================================================
-          N G I    S M A L L    R N A - S E Q    B E S T    P R A C T I C E
+               S M A L L    R N A - S E Q    B E S T    P R A C T I C E
 ========================================================================================
  Small-RNA-Seq Best Practice Analysis Pipeline. Started May 2016.
  #### Homepage / Documentation
@@ -40,7 +38,7 @@ vim: syntax=groovy
 def helpMessage() {
     log.info"""
     =========================================
-     nf-core/smrnaseq : smRNA-Seq Best Practice v${version}
+     nf-core/smrnaseq : smRNA-Seq Best Practice v${params.version}
     =========================================
     Usage:
 
@@ -67,7 +65,6 @@ def helpMessage() {
     Other options:
       --outdir                      The output directory where the results will be saved
       --email                       Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
-      --rlocation                   Location to save R-libraries used in the pipeline. Default value is ~/R/nxtflow_libs/
       --clusterOptions              Extra SLURM options, used in conjunction with Uppmax.config
       -name                         Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
     """.stripIndent()
@@ -77,56 +74,12 @@ def helpMessage() {
  * SET UP CONFIGURATION VARIABLES
  */
 
-// Pipeline version
-version = 1.5
-
 // Show help emssage
 params.help = false
 if (params.help){
     helpMessage()
     exit 0
 }
-
-// Check that Nextflow version is up to date enough
-// try / throw / catch works for NF versions < 0.25 when this was implemented
-nf_required_version = '0.25.0'
-try {
-    if( ! nextflow.version.matches(">= $nf_required_version") ){
-        throw GroovyException('Nextflow version too old')
-    }
-} catch (all) {
-    log.error "====================================================\n" +
-              "  Nextflow version $nf_required_version required! You are running v$workflow.nextflow.version.\n" +
-              "  Pipeline execution will continue, but things may break.\n" +
-              "  Please run `nextflow self-update` to update Nextflow.\n" +
-              "============================================================"
-}
-
-// Configurable variables
-params.name = false
-params.project = false
-params.genome = false
-params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
-params.bt2index = params.genome ? params.genomes[ params.genome ].bowtie2 ?: false : false
-params.mature = params.genome ? params.genomes[ params.genome ].mature ?: false : false
-params.hairpin = params.genome ? params.genomes[ params.genome ].hairpin ?: false : false
-params.saveReference = false
-params.reads = "data/*.fastq.gz"
-params.outdir = './results'
-params.email = false
-params.plaintext_email = false
-
-// R library locations
-params.rlocation = false
-if (params.rlocation){
-    nxtflow_libs = file(params.rlocation)
-    nxtflow_libs.mkdirs()
-}
-
-// Custom trimming options
-params.length = 18
-params.clip_R1 = 0
-params.three_prime_clip_R1 = 0
 
 // Validate inputs
 if( !params.mature || !params.hairpin ){
@@ -170,9 +123,15 @@ Channel
     .into { raw_reads_fastqc; raw_reads_trimgalore }
 
 // Header log info
-log.info "==========================================="
-log.info " nf-core/smrnaseq : Small RNA-Seq Best Practice v${version}"
-log.info "==========================================="
+log.info """=======================================================
+                                          ,--./,-.
+          ___     __   __   __   ___     /,-._.--~\'
+    |\\ | |__  __ /  ` /  \\ |__) |__         }  {
+    | \\| |       \\__, \\__/ |  \\ |___     \\`-._,-`-,
+                                          `._,._,\'
+
+nf-core/smrnas : Small RNA-Seq Best Practice v${params.version}
+======================================================="""
 def summary = [:]
 summary['Run Name']            = custom_runName ?: workflow.runName
 summary['Reads']               = params.reads
@@ -190,13 +149,38 @@ summary['Working dir']         = workflow.workDir
 summary['Current home']        = "$HOME"
 summary['Current user']        = "$USER"
 summary['Current path']        = "$PWD"
-summary['R libraries']         = params.rlocation
 summary['Script dir']          = workflow.projectDir
 summary['Config Profile'] = (workflow.profile == 'standard' ? 'UPPMAX' : workflow.profile)
 if(params.project) summary['UPPMAX Project'] = params.project
 if(params.email) summary['E-mail Address'] = params.email
 log.info summary.collect { k,v -> "${k.padRight(15)}: $v" }.join("\n")
 log.info "==========================================="
+
+// Check that Nextflow version is up to date enough
+// try / throw / catch works for NF versions < 0.25 when this was implemented
+try {
+    if( ! nextflow.version.matches(">= $nf_required_version") ){
+        throw GroovyException('Nextflow version too old')
+    }
+} catch (all) {
+    log.error "====================================================\n" +
+              "  Nextflow version $nf_required_version required! You are running v$workflow.nextflow.version.\n" +
+              "  Pipeline execution will continue, but things may break.\n" +
+              "  Please run `nextflow self-update` to update Nextflow.\n" +
+              "============================================================"
+}
+// Show a big error message if we're running on the base config and an uppmax cluster
+if( workflow.profile == 'standard'){
+    if ( "hostname".execute().text.contains('.uppmax.uu.se') ) {
+        log.error "====================================================\n" +
+                  "  WARNING! You are running with the default 'standard'\n" +
+                  "  pipeline config profile, which runs on the head node\n" +
+                  "  and assumes all software is on the PATH.\n" +
+                  "  ALL JOBS ARE RUNNING LOCALLY and stuff will probably break.\n" +
+                  "  Please use `-profile uppmax` to run on UPPMAX clusters.\n" +
+                  "============================================================"
+    }
+}
 
 
 /*
@@ -327,7 +311,6 @@ process bowtie_miRBase_mature {
         --un ${prefix}.mature_unmapped.fq \\
         -S \\
         | samtools view -bS - > ${prefix}.mature.bam
-    bowtie --version
 
     gzip ${prefix}.mature_unmapped.fq
     """
@@ -415,7 +398,7 @@ process edgeR_miRBase {
 
     script:
     """
-    edgeR_miRBase.r $params.rlocation $input_files
+    edgeR_miRBase.r $input_files
     """
 }
 
@@ -452,7 +435,6 @@ if( params.gtf && params.bt2index) {
             -p 8 \\
             -t \\
             | samtools view -bT $index_base - > ${prefix}.bowtie2.bam
-        bowtie2 --version
         """
     }
 
@@ -517,7 +499,7 @@ process get_software_versions {
 
     script:
     """
-    echo $version > v_ngi_smrnaseq.txt
+    echo $version > v_nfcore_smrnaseq.txt
     echo $workflow.nextflow.version > v_nextflow.txt
     fastqc --version > v_fastqc.txt
     trim_galore --version > v_trim_galore.txt
@@ -564,7 +546,7 @@ workflow.onComplete {
       subject = "[nf-core/smrnaseq] FAILED: $workflow.runName"
     }
     def email_fields = [:]
-    email_fields['version'] = version
+    email_fields['version'] = params.version
     email_fields['runName'] = custom_runName ?: workflow.runName
     email_fields['success'] = workflow.success
     email_fields['dateComplete'] = workflow.complete
@@ -619,10 +601,10 @@ workflow.onComplete {
     }
 
     // Switch the embedded MIME images with base64 encoded src
-    ngismrnaseqlogo = new File("$baseDir/assets/smrnaseq_logo.png").bytes.encodeBase64().toString()
+    smrnaseqlogo = new File("$baseDir/assets/smrnaseq_logo.png").bytes.encodeBase64().toString()
     scilifelablogo = new File("$baseDir/assets/SciLifeLab_logo.png").bytes.encodeBase64().toString()
     ngilogo = new File("$baseDir/assets/NGI_logo.png").bytes.encodeBase64().toString()
-    email_html = email_html.replaceAll(~/cid:ngismrnaseqlogo/, "data:image/png;base64,$ngismrnaseqlogo")
+    email_html = email_html.replaceAll(~/cid:smrnaseqlogo/, "data:image/png;base64,$smrnaseqlogo")
     email_html = email_html.replaceAll(~/cid:scilifelablogo/, "data:image/png;base64,$scilifelablogo")
     email_html = email_html.replaceAll(~/cid:ngilogo/, "data:image/png;base64,$ngilogo")
 

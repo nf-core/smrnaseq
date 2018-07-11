@@ -4,7 +4,7 @@ from collections import OrderedDict
 import re
 
 regexes = {
-    'nf-core/smrnaseq': ['v_ngi_smrnaseq.txt', r"(\S+)"],
+    'nf-core/smrnaseq': ['v_nfcore_smrnaseq.txt', r"(\S+)"],
     'Nextflow': ['v_nextflow.txt', r"(\S+)"],
     'FastQC': ['v_fastqc.txt', r"FastQC v(\S+)"],
     'Trim Galore!': ['v_trim_galore.txt', r"version (\S+)"],
