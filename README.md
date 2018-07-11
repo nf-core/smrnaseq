@@ -3,6 +3,15 @@
 [![Build Status](https://travis-ci.org/nf-core/smrnaseq.svg?branch=master)](https://travis-ci.org/nf-core/smrnaseq)
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A50.22.2-brightgreen.svg)](https://www.nextflow.io/)
 
+----
+
+# UNDER DEVELOPMENT!
+This pipeline has recently been moved to nf-core and is still under heavy development. It does not yet meet all of the requirements for nf-core pipelines.
+
+Use with caution!
+
+----
+
 **nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data at the [National Genomics Infastructure](https://ngisweden.scilifelab.se/)
 at [SciLifeLab Stockholm](https://www.scilifelab.se/platforms/ngi/), Sweden.
 
