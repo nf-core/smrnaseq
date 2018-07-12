@@ -14,7 +14,7 @@ dependencies:
   - bowtie2=2.3.4.1
   - multiqc=1.5
   - bioconductor-edger=3.20.7
-  - bioconductor-limma=3.28.21
+  - bioconductor-limma=3.34.9
   - conda-forge::r-statmod=1.4.30
   - conda-forge::r-data.table=1.11.4
   - conda-forge::r-gplots=3.0.1
@@ -24,4 +24,4 @@ dependencies:
   # Install NGI Visualizations
   # TODO: Replace dependency / conda-ise somehow
   - pip:
-     - "--editable=git+https://github.com/NationalGenomicsInfrastructure/ngi_visualizations.git"
+     - "--editable=git+https://github.com/NationalGenomicsInfrastructure/ngi_visualizations.git#egg=ngi_visualizations"

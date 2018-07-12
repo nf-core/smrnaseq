@@ -101,6 +101,8 @@ if( params.bt2index ){
     bt2_index = file("${params.bt2index}.fa")
     bt2_indices = Channel.fromPath( "${params.bt2index}*.bt2" ).toList()
     if( !bt2_index.exists() ) exit 1, "Reference genome Bowtie 2 not found: ${params.bt2index}"
+} else if( params.bt2indices ){
+    bt2_indices = Channel.from(params.readPaths).map{ file(it) }.toList()
 }
 if( !params.gtf || !params.bt2index) {
     log.info "No GTF / Bowtie2 index supplied - host reference genome analysis will be skipped."
@@ -117,10 +119,19 @@ if( !(workflow.runName ==~ /[a-z]+_[a-z]+/) ){
 /*
  * Create a channel for input read files
  */
-Channel
-    .fromPath( params.reads )
-    .ifEmpty { error "Cannot find any reads matching: ${params.reads}" }
-    .into { raw_reads_fastqc; raw_reads_trimgalore }
+if(params.readPaths){
+    Channel
+        .from(params.readPaths)
+        .map { file(it) }
+        .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
+        .into { raw_reads_fastqc; raw_reads_trimgalore }
+} else {
+    Channel
+        .fromPath( params.reads )
+        .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}" }
+        .into { raw_reads_fastqc; raw_reads_trimgalore }
+}
+
 
 // Header log info
 log.info """=======================================================
@@ -159,12 +170,12 @@ log.info "==========================================="
 // Check that Nextflow version is up to date enough
 // try / throw / catch works for NF versions < 0.25 when this was implemented
 try {
-    if( ! nextflow.version.matches(">= $nf_required_version") ){
+    if( ! nextflow.version.matches(">= $params.nf_required_version") ){
         throw GroovyException('Nextflow version too old')
     }
 } catch (all) {
     log.error "====================================================\n" +
-              "  Nextflow version $nf_required_version required! You are running v$workflow.nextflow.version.\n" +
+              "  Nextflow version $params.nf_required_version required! You are running v$workflow.nextflow.version.\n" +
               "  Pipeline execution will continue, but things may break.\n" +
               "  Please run `nextflow self-update` to update Nextflow.\n" +
               "============================================================"
@@ -417,14 +428,13 @@ if( params.gtf && params.bt2index) {
 
         input:
         file reads from trimmed_reads_bowtie2
-        file index from bt2_index
         file bt2_indices
 
         output:
         file '*.bowtie2.bam' into bowtie2_bam, bowtie2_bam_for_unmapped
 
         script:
-        index_base = index.toString() - '.fa'
+        index_base = bt2_indices[0].toString()  - ~/\.\d+\.bt2/
         prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
         """
         bowtie2 \\
@@ -499,7 +509,7 @@ process get_software_versions {
 
     script:
     """
-    echo $version > v_nfcore_smrnaseq.txt
+    echo $params.version > v_nfcore_smrnaseq.txt
     echo $workflow.nextflow.version > v_nextflow.txt
     fastqc --version > v_fastqc.txt
     trim_galore --version > v_trim_galore.txt
