@@ -4,7 +4,7 @@ Bootstrap:docker
 %labels
     MAINTAINER Alexander Peltzer <alex.peltzer@gmail.com>
     DESCRIPTION Container image containing all requirements for the nf-core/smrnaseq pipeline
-    VERSION 1.0dev
+    VERSION 0.2dev
 
 %files
     environment.yml /
