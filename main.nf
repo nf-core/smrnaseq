@@ -107,7 +107,7 @@ if( params.bt2index ){
 if( !params.gtf || !params.bt2index) {
     log.info "No GTF / Bowtie2 index supplied - host reference genome analysis will be skipped."
 }
-if( workflow.profile == 'standard' && !params.project ) exit 1, "No UPPMAX project ID found! Use --project"
+multiqc_config = file(params.multiqc_config)
 
 // Has the run name been specified by the user?
 //  this has the bonus effect of catching both -name and --name
@@ -141,7 +141,7 @@ log.info """=======================================================
     | \\| |       \\__, \\__/ |  \\ |___     \\`-._,-`-,
                                           `._,._,\'
 
-nf-core/smrnas : Small RNA-Seq Best Practice v${params.version}
+nf-core/smrnaseq : Small RNA-Seq Best Practice v${params.version}
 ======================================================="""
 def summary = [:]
 summary['Run Name']            = custom_runName ?: workflow.runName
@@ -509,8 +509,8 @@ process get_software_versions {
 
     script:
     """
-    echo $params.version > v_nfcore_smrnaseq.txt
-    echo $workflow.nextflow.version > v_nextflow.txt
+    echo "$params.version" > v_nfcore_smrnaseq.txt
+    echo "$workflow.nextflow.version" > v_nextflow.txt
     fastqc --version > v_fastqc.txt
     trim_galore --version > v_trim_galore.txt
     bowtie --version > v_bowtie.txt
@@ -529,19 +529,19 @@ process multiqc {
     publishDir "${params.outdir}/MultiQC", mode: 'copy'
 
     input:
-    file ('fastqc/*') from fastqc_results.flatten().toList()
-    file ('trim_galore/*') from trimgalore_results.flatten().toList()
-    file ('trim_galore/*') from trimgalore_fastqc_reports.flatten().toList()
-    file ('software_versions/*') from software_versions_yaml
+    file ('fastqc/*') from fastqc_results.toList()
+    file ('trim_galore/*') from trimgalore_results.toList()
+    file ('software_versions/*') from software_versions_yaml.toList()
 
     output:
     file '*multiqc_report.html' into multiqc_html
     file '*multiqc_data' into multiqc_data
-    file '.command.err' into multiqc_stderr
 
     script:
+    rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
+    rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
     """
-    multiqc -f .
+    multiqc -f $rtitle $rfilename --config $multiqc_config .
     """
 }
 
