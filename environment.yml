@@ -1,0 +1,27 @@
+# You can use this file to create a conda environment for this pipeline:
+#   conda env create -f environment.yml
+name: nfcore-smrnaseq-1.0
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  # bismark
+  - conda-forge::openjdk=8.0.144 # Needed for FastQC - conda build hangs without this
+  - fastqc=0.11.7
+  - trim-galore=0.4.5
+  - samtools=1.8
+  - bowtie=1.2.2
+  - bowtie2=2.3.4.1
+  - multiqc=1.5
+  - bioconductor-edger=3.20.7
+  - bioconductor-limma=3.28.21
+  - conda-forge::r-statmod=1.4.30
+  - conda-forge::r-data.table=1.11.4
+  - conda-forge::r-gplots=3.0.1
+  - conda-forge::r-r.methodss3=1.7.1
+  - htseq=0.9.1
+  - fastx_toolkit=0.0.14
+
+#Missing NGI-visualizations? Do we need this or is this something that can go? 
+  
