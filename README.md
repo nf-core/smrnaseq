@@ -18,8 +18,7 @@ Use with caution!
 
 ----
 
-**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data at the [National Genomics Infastructure](https://ngisweden.scilifelab.se/)
-at [SciLifeLab Stockholm](https://www.scilifelab.se/platforms/ngi/), Sweden.
+**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data. It is developed at the [National Genomics Infastructure](https://ngisweden.scilifelab.se/) at [SciLifeLab Stockholm](https://www.scilifelab.se/platforms/ngi/), Sweden.
 
 The pipeline uses [Nextflow](https://www.nextflow.io), a bioinformatics workflow tool. It pre-processes raw data from FastQ inputs, aligns the reads and performs extensive quality-control on the results.
 
@@ -27,7 +26,7 @@ This pipeline is primarily used with a SLURM cluster on the Swedish [UPPMAX syst
 
 ## Installation
 ### NextFlow installation
-See https://github.com/SciLifeLab/NGI-NextflowDocs for instructions on how to install and configure
+See https://www.nextflow.io for instructions on how to install and configure
 Nextflow.
 
 ### Pipeline installation
@@ -40,23 +39,8 @@ git clone https://github.com/nf-core/smrnaseq.git
 nextflow run nf-core/smrnaseq/main.nf
 ```
 
-### Installation of the 'ngi_visualizations' module
-This module needs to be installed locally in order to visualize the statistics from Bowtie2 alignment.
-```
-pip install -U git+https://github.com/NationalGenomicsInfrastructure/ngi_visualizations.git
-```
-Note that for ngi_visualizations, python packages HTSeq and pysam are required.
-
-### Installation of the NGI plugin for the'MultiQC' module
-```
-pip install git+https://github.com/ewels/MultiQC_NGI.git
-```
-
 ## Configuration
-By default, the pipeline is configured to run on the Swedish UPPMAX cluster (milou / irma).
-
-You will need to specify your UPPMAX project ID when running a pipeline. To do this, use
-the command line flag `--project <project_ID>`.
+For running this pipeline on the the Swedish UPPMAX cluster, command line flag `--project <project_ID>`.
 
 To avoid having to specify this every time you run Nextflow, you can add it to your
 personal Nextflow config file instead. Add this line to `~/.nextflow/config`:
@@ -144,8 +128,6 @@ The human `GRCh37` genome is used by default.
 | UMD3.1        |       *Bos taurus*               |       Cow          |
 | WBcel235      |       *Caenorhabditis elegans*   |       Nematode     |
 
-**NOTE! With the option --genome 'ALL', the entire dataset of mature miRNAs and hairpins in miRBase will be used as reference regardless of species. Meanwhile the alignment against host reference genome will be skipped.**
-
 
 ## Other command line parameters
 ### `--outdir`
@@ -184,10 +166,10 @@ environment module as is the default. So we specify a config file using `-c` tha
 process.$multiqc.module = []
 ```
 
-### `--bt2index`
+### `--bt_index`
 If you prefer, you can specify the full path to your reference genome when you run the pipeline:
 ```
---bt2index [path to Bowtie2 index]
+--bt_index [path to Bowtie 1 index]
 ```
 
 ### `--rlocation`

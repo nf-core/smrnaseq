@@ -28,9 +28,9 @@
         - TMM normalization and a table of top expression hairpin
         - MDS plot clustering samples
         - Heatmap of sample similarities
- - 5.1: Bowtie 2 alignment against host reference genome
- - 5.2: Post-alignment processing of Bowtie 2
- - 6:   NGI-Visualization of Bowtie 2 alignment statistics
+ - 5.1: Bowtie 1 alignment against host reference genome
+ - 5.2: Post-alignment processing of Bowtie 1 alignment against host reference genome
+ - 6:   NGI-Visualization of Bowtie alignment statistics
  - 7:   MultiQC
 ----------------------------------------------------------------------------------------
 */
@@ -48,14 +48,12 @@ def helpMessage() {
 
     Mandatory arguments:
       --reads                       Path to input data (must be surrounded with quotes).
-                                    NOTE! Paired-end data is NOT supported by this pipeline! For paired-end data, use Read 1 only.
+                                    NOTE! Paired-end data is NOT supported by this pipeline! For paired-end data, use Read 1 only
       --genome                      Name of iGenomes reference
-                                    NOTE! With the option --genome 'ALL', the entire dataset of mature miRNAs and hairpins
-                                    in miRBase will be used as reference regardless of species. Meanwhile the alignment against
-                                    host reference genome will be skipped.
 
     References
-      --saveReference               Save the generated reference files the the Results directory.
+      --saveReference               Save the generated reference files the the Results directory
+      --bt_index                    Path to the bowtie 1 index files of the host reference genome
 
     Trimming options
       --length [int]                Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
@@ -66,7 +64,8 @@ def helpMessage() {
       --outdir                      The output directory where the results will be saved
       --email                       Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
       --clusterOptions              Extra SLURM options, used in conjunction with Uppmax.config
-      -name                         Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
+      -name                         Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic
+      --seqCenter                   Text about sequencing center which will be added in the header of output bam files
     """.stripIndent()
 }
 
@@ -80,6 +79,8 @@ if (params.help){
     helpMessage()
     exit 0
 }
+
+params.seqCenter = false
 
 // Validate inputs
 if( !params.mature || !params.hairpin ){
@@ -97,15 +98,15 @@ if( params.gtf ){
     gtf = file(params.gtf)
     if( !gtf.exists() ) exit 1, "GTF file not found: ${params.gtf}"
 }
-if( params.bt2index ){
-    bt2_index = file("${params.bt2index}.fa")
-    bt2_indices = Channel.fromPath( "${params.bt2index}*.bt2" ).toList()
-    if( !bt2_index.exists() ) exit 1, "Reference genome Bowtie 2 not found: ${params.bt2index}"
-} else if( params.bt2indices ){
-    bt2_indices = Channel.from(params.readPaths).map{ file(it) }.toList()
+if( params.bt_index ){
+    bt_index = file("${params.bt_index}.fa")
+    bt_indices = Channel.fromPath( "${params.bt_index}*.ebwt" ).toList()
+    if( !bt_index.exists() ) exit 1, "Reference genome for Bowtie 1 not found: ${params.bt_index}"
+} else if( params.bt_indices ){
+    bt_indices = Channel.from(params.readPaths).map{ file(it) }.toList()
 }
-if( !params.gtf || !params.bt2index) {
-    log.info "No GTF / Bowtie2 index supplied - host reference genome analysis will be skipped."
+if( !params.gtf || !params.bt_index) {
+    log.info "No GTF / Bowtie 1 index supplied - host reference genome analysis will be skipped."
 }
 multiqc_config = file(params.multiqc_config)
 
@@ -152,7 +153,7 @@ summary["Trim 5' R1"]          = params.clip_R1
 summary["Trim 3' R1"]          = params.three_prime_clip_R1
 summary['miRBase mature']      = params.mature
 summary['miRBase hairpin']     = params.hairpin
-if(params.bt2index)            summary['Bowtie2 Index'] = params.bt2index
+if(params.bt_index)            summary['Bowtie Index for Ref'] = params.bt_index
 if(params.gtf)                 summary['GTF Annotation'] = params.gtf
 summary['Save Reference']      = params.saveReference ? 'Yes' : 'No'
 summary['Output dir']          = params.outdir
@@ -163,6 +164,7 @@ summary['Current path']        = "$PWD"
 summary['Script dir']          = workflow.projectDir
 summary['Config Profile'] = (workflow.profile == 'standard' ? 'UPPMAX' : workflow.profile)
 if(params.project) summary['UPPMAX Project'] = params.project
+if(params.seqCenter) summary['Seq Center'] = params.seqCenter
 if(params.email) summary['E-mail Address'] = params.email
 log.info summary.collect { k,v -> "${k.padRight(15)}: $v" }.join("\n")
 log.info "==========================================="
@@ -253,7 +255,7 @@ process trim_galore {
     file reads from raw_reads_trimgalore
 
     output:
-    file '*.gz' into trimmed_reads_bowtie, trimmed_reads_bowtie2, trimmed_reads_insertsize
+    file '*.gz' into trimmed_reads_bowtie, trimmed_reads_bowtie_ref, trimmed_reads_insertsize
     file '*trimming_report.txt' into trimgalore_results
     file "*_fastqc.{zip,html}" into trimgalore_fastqc_reports
 
@@ -307,6 +309,7 @@ process bowtie_miRBase_mature {
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
+    seqCenter = params.seqCenter ? '--sam-RG "ID:prefix" --sam-RG "CN:${params.seqCenter}"' : ''
     """
     bowtie \\
         $index_base \\
@@ -319,6 +322,7 @@ process bowtie_miRBase_mature {
         --strata \\
         -e 99999 \\
         --chunkmbs 2048 \\
+        seqCenter \\
         --un ${prefix}.mature_unmapped.fq \\
         -S \\
         | samtools view -bS - > ${prefix}.mature.bam
@@ -345,6 +349,7 @@ process bowtie_miRBase_hairpin {
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     prefix = reads.toString() - '.mature_unmapped.fq.gz'
+    seqCenter = params.seqCenter ? '--sam-RG "ID:prefix" --sam-RG "CN:${params.seqCenter}"' : ''
     """
     bowtie \\
         $index_base \\
@@ -357,6 +362,7 @@ process bowtie_miRBase_hairpin {
         -e 99999 \\
         --chunkmbs 2048 \\
         -q <(zcat $reads) \\
+        seqCenter \\
         --un ${prefix}.hairpin_unmapped.fq \\
         -S \\
         | samtools view -bS - > ${prefix}.hairpin.bam
@@ -417,50 +423,57 @@ process edgeR_miRBase {
 /*
  * STEP 7.1 and 7.2 IF A GENOME SPECIFIED ONLY!
  */
-if( params.gtf && params.bt2index) {
+if( params.gtf && params.bt_index) {
 
     /*
-     * STEP 7.1 - Bowtie 2 against reference genome
+     * STEP 7.1 - Bowtie 1 against reference genome
      */
-    process bowtie2 {
+    process bowtie_ref {
         tag "$reads"
-        publishDir "${params.outdir}/bowtie2", mode: 'copy'
+        publishDir "${params.outdir}/bowtie_ref", mode: 'copy'
 
         input:
-        file reads from trimmed_reads_bowtie2
-        file bt2_indices
+        file reads from trimmed_reads_bowtie_ref
+        file bt_indices
 
         output:
-        file '*.bowtie2.bam' into bowtie2_bam, bowtie2_bam_for_unmapped
+        file '*.bowtie.bam' into bowtie_bam, bowtie_bam_for_unmapped
 
         script:
-        index_base = bt2_indices[0].toString()  - ~/\.\d+\.bt2/
+        index_base = bt_indices[0].toString()  - ~/\.\d+\.ebwt/
         prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
+        seqCenter = params.seqCenter ? '--sam-RG "ID:prefix" --sam-RG "CN:${params.seqCenter}"' : ''
         """
-        bowtie2 \\
-            -x $index_base \\
-            -U $reads \\
-            -k 10 \\
-            --very-sensitive \\
+        bowtie \\
+            $index_base \\
+            -q <(zcat $reads) \\
             -p 8 \\
             -t \\
-            | samtools view -bT $index_base - > ${prefix}.bowtie2.bam
+            -k 10 \\
+            -m 1 \\
+            --best \\
+            --strata \\
+            -e 99999 \\
+            --chunkmbs 2048 \\
+            seqCenter \\
+            -S \\
+            | samtools view -bS - > ${prefix}.bowtie.bam
         """
     }
 
     /*
-     * STEP 7.2 - Bowtie 2 Statistics about unmapped reads against ref genome
+     * STEP 7.2 - Statistics about unmapped reads against ref genome
      */
 
-    process bowtie2_unmapped {
+    process bowtie_unmapped {
         tag "${input_files[0].baseName}"
-        publishDir "${params.outdir}/bowtie2/unmapped", mode: 'copy'
+        publishDir "${params.outdir}/bowtie_ref/unmapped", mode: 'copy'
 
         input:
-        file input_files from bowtie2_bam_for_unmapped.toSortedList()
+        file input_files from bowtie_bam_for_unmapped.toSortedList()
 
         output:
-        file 'unmapped_refgenome.txt' into bowtie2_unmapped
+        file 'unmapped_refgenome.txt' into bowtie_unmapped
 
         script:
         """
@@ -474,18 +487,18 @@ if( params.gtf && params.bt2index) {
 
 
     /*
-     * STEP 7.3 - NGI-Visualizations of Bowtie 2 alignment statistics
+     * STEP 7.3 - NGI-Visualizations of Bowtie 1 alignment against host reference genome
      */
     process ngi_visualizations {
-        tag "$bowtie2_bam"
-        publishDir "${params.outdir}/bowtie2/ngi_visualizations", mode: 'copy'
+        tag "$bowtie_bam"
+        publishDir "${params.outdir}/bowtie_ref/ngi_visualizations", mode: 'copy'
 
         input:
         file gtf from gtf
-        file bowtie2_bam
+        file bowtie_bam
 
         output:
-        file '*.{png,pdf}' into bowtie2_ngi_visualizations
+        file '*.{png,pdf}' into bowtie_ngi_visualizations
 
         script:
         // Note! ngi_visualizations needs to be installed!
@@ -493,7 +506,7 @@ if( params.gtf && params.bt2index) {
         """
         #!/usr/bin/env python
         from ngi_visualizations.biotypes import count_biotypes
-        count_biotypes.main('$gtf','$bowtie2_bam')
+        count_biotypes.main('$gtf','$bowtie_bam')
         """
     }
 
@@ -514,7 +527,6 @@ process get_software_versions {
     fastqc --version > v_fastqc.txt
     trim_galore --version > v_trim_galore.txt
     bowtie --version > v_bowtie.txt
-    bowtie2 --version > v_bowtie2.txt
     samtools --version > v_samtools.txt
     fasta_formatter -h > v_fastx.txt
     multiqc --version > v_multiqc.txt

@@ -1,6 +1,6 @@
 # nf-core/smrnaseq Output
 
-**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data analysis at the [National Genomics Infastructure](https://ngisweden.scilifelab.se/) at [SciLifeLab Stockholm](https://www.scilifelab.se/platforms/ngi/), Sweden.
+**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data analysis. It is developed at the [National Genomics Infastructure](https://ngisweden.scilifelab.se/) at [SciLifeLab Stockholm](https://www.scilifelab.se/platforms/ngi/), Sweden.
 
 This document describes the output produced by the pipeline.
 
@@ -13,8 +13,8 @@ and processes data using the following steps:
 * [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
 * [SAMtools](#samtools) - alignment result processing and feature counting
 * [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
-* [Bowtie2](#bowtie2) - alignment against reference genome for QC purpose
-* [NGI-Visualizations](#ngi_visualizations) - summary of biotypes based on Bowtie2 alignment results
+* [Bowtie](#bowtie) - alignment against reference genome for QC purpose
+* [NGI-Visualizations](#ngi_visualizations) - summary of biotypes based on results from Bowtie alignment to reference genome
 * [MultiQC](#multiqc) - aggregate report, describing results of the whole pipeline
 
 ## FastQC
@@ -102,26 +102,26 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 **Example**: Heatmap of tumor and normal samples based on the top differentially expressed mature miRNAs.
 ![edgeR](images/Example_heatmap.png)
 
-## Bowtie2
-[Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) is used for mapping adapter trimmed reads against the reference genome for quality control purposes.
+## Bowtie
+[Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the reference genome for quality control purposes.
 
-**Output directory: `results/bowtie2`**
+**Output directory: `results/bowtie_ref`**
 
-* `sample.bowite2.bam`
+* `sample.bowtie.bam`
   * The aligned BAM file of alignment against reference genome
 
 ## NGI-Visualizations
 [NGI-Visualizations](https://github.com/NationalGenomicsInfrastructure/ngi_visualizations) takes the aligned BAM file against reference genome as input, and counts the overlaps with different biotype flags within a GTF annotation file.
 
-**Output directory: `results/bowtie2/ngi_visualizations`**
+**Output directory: `results/bowtie_ref/ngi_visualizations`**
 
-* `sample.bowite2_biotypeCounts.pdf/png`
+* `sample.bowite_biotypeCounts.pdf/png`
   * Summary of annotation categories of aligned reads
-* `sample.bowite2_biotypeCounts_log.pdf/png`
+* `sample.bowite_biotypeCounts_log.pdf/png`
   * Summary of annotation categories of aligned reads in logarithm scale
-* `sample.bowite2_biotypeLengths.pdf/png`
+* `sample.bowite_biotypeLengths.pdf/png`
   * Stacked bar plot of annotations of aligned reads with different read lengths  
-* `sample.bowite2_biotypeLengthPercentages.pdf/png`
+* `sample.bowite_biotypeLengthPercentages.pdf/png`
   * Stacked bar plot of annotation percentage of aligned reads with different read lengths  
 
 **Example**: Summary of annotation categories of aligned reads

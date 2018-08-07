@@ -4,4 +4,4 @@ LABEL authors="alex.peltzer@gmail.com" \
     description="Docker image containing all requirements for nf-core/smrnaseq pipeline"
 
 COPY environment.yml /
-RUN conda env update -n root -f /environment.yml && conda clean -a 
+RUN conda env update -n root -f /environment.yml && conda clean -a
