@@ -67,6 +67,9 @@ def helpMessage() {
       --email                       Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
       --clusterOptions              Extra SLURM options, used in conjunction with Uppmax.config
       -name                         Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
+      --skip_qc                     Skip all QC steps aside from MultiQC
+      --skip_fastqc                 Skip FastQC
+      --skip_multiqc                Skip MultiQC
     """.stripIndent()
 }
 
@@ -228,6 +231,9 @@ process makeBowtieIndex {
 process fastqc {
     tag "$reads"
     publishDir "${params.outdir}/fastqc", mode: 'copy'
+
+    when:
+    !params.skip_qc && !params.skip_fastqc
 
     input:
     file reads from raw_reads_fastqc
@@ -527,6 +533,9 @@ process get_software_versions {
  */
 process multiqc {
     publishDir "${params.outdir}/MultiQC", mode: 'copy'
+
+    when:
+    !params.skip_qc && !params.skip_multiqc
 
     input:
     file ('fastqc/*') from fastqc_results.toList()
