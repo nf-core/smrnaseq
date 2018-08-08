@@ -94,8 +94,6 @@ params.hairpin = params.genome ? params.genomes[ params.genome ].hairpin ?: fals
 params.saveReference = false
 params.reads = "data/*.fastq.gz"
 params.readPaths = null
-params.outdir = './results'
-multiqc_config = "$baseDir/conf/multiqc_config.yaml"
 params.email = false
 params.plaintext_email = false
 params.seqCenter = false
@@ -332,7 +330,7 @@ process bowtie_miRBase_mature {
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
-    seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG CN:${params.seqCenter}" : ''
+    seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seqCenter}'" : ''
     """
     bowtie \\
         $index_base \\
@@ -372,7 +370,7 @@ process bowtie_miRBase_hairpin {
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     prefix = reads.toString() - '.mature_unmapped.fq.gz'
-    seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG CN:${params.seqCenter}" : ''
+    seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seqCenter}'" : ''
     """
     bowtie \\
         $index_base \\
@@ -463,9 +461,9 @@ if( params.gtf && params.bt_index) {
         file '*.bowtie.bam' into bowtie_bam, bowtie_bam_for_unmapped
 
         script:
-        index_base = bt_indices[0].toString()  - ~/\.\d+\.ebwt/
+        index_base = bt_indices[0].toString().tokenize(' ')[0].tokenize('.')[0]
         prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
-        seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG CN:${params.seqCenter}" : ''
+        seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seqCenter}'" : ''
         """
         bowtie \\
             $index_base \\
