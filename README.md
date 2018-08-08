@@ -146,6 +146,9 @@ This is used in the MultiQC report (if not default) and in the summary HTML / e-
 
 **NB:** Single hyphen (core Nextflow option)
 
+### `--seqCenter`
+Text about sequencing center which will be added in the header of output bam files. Note that no blank is allowed!
+
 ### `-resume`
 Specify this when restarting a pipeline. Nextflow will used cached results from any pipeline steps where the inputs are the same, continuing from where it got to previously.
 
@@ -164,6 +167,18 @@ environment module as is the default. So we specify a config file using `-c` tha
 
 ```nextflow
 process.$multiqc.module = []
+```
+
+### `--mature`
+If you prefer, you can specify the full path to the FASTA file of mature miRNAs when you run the pipeline:
+```
+--mature [path to the FASTA file of mature miRNAs]
+```
+
+### `--hairpin`
+If you prefer, you can specify the full path to the FASTA file of miRNA precursors when you run the pipeline:
+```
+--hairpin [path to the FASTA file of miRNA precursors]
 ```
 
 ### `--bt_index`

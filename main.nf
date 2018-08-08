@@ -53,6 +53,8 @@ def helpMessage() {
 
     References
       --saveReference               Save the generated reference files the the Results directory
+      --mature                      Path to the FASTA file of mature miRNAs
+      --hairpin                     Path to the FASTA file of miRNA precursors
       --bt_index                    Path to the bowtie 1 index files of the host reference genome
 
     Trimming options
@@ -65,7 +67,7 @@ def helpMessage() {
       --email                       Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
       --clusterOptions              Extra SLURM options, used in conjunction with Uppmax.config
       -name                         Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic
-      --seqCenter                   Text about sequencing center which will be added in the header of output bam files
+      --seqCenter                   Text about sequencing center which will be added in the header of output bam files (Note that no blank is allowed!)
     """.stripIndent()
 }
 
@@ -79,8 +81,6 @@ if (params.help){
     helpMessage()
     exit 0
 }
-
-params.seqCenter = false
 
 // Validate inputs
 if( !params.mature || !params.hairpin ){
@@ -309,7 +309,7 @@ process bowtie_miRBase_mature {
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
-    seqCenter = params.seqCenter ? '--sam-RG "ID:prefix" --sam-RG "CN:${params.seqCenter}"' : ''
+    seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG CN:${params.seqCenter}" : ''
     """
     bowtie \\
         $index_base \\
@@ -322,7 +322,7 @@ process bowtie_miRBase_mature {
         --strata \\
         -e 99999 \\
         --chunkmbs 2048 \\
-        seqCenter \\
+        $seqCenter \\
         --un ${prefix}.mature_unmapped.fq \\
         -S \\
         | samtools view -bS - > ${prefix}.mature.bam
@@ -349,7 +349,7 @@ process bowtie_miRBase_hairpin {
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     prefix = reads.toString() - '.mature_unmapped.fq.gz'
-    seqCenter = params.seqCenter ? '--sam-RG "ID:prefix" --sam-RG "CN:${params.seqCenter}"' : ''
+    seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG CN:${params.seqCenter}" : ''
     """
     bowtie \\
         $index_base \\
@@ -362,7 +362,7 @@ process bowtie_miRBase_hairpin {
         -e 99999 \\
         --chunkmbs 2048 \\
         -q <(zcat $reads) \\
-        seqCenter \\
+        $seqCenter \\
         --un ${prefix}.hairpin_unmapped.fq \\
         -S \\
         | samtools view -bS - > ${prefix}.hairpin.bam
@@ -442,7 +442,7 @@ if( params.gtf && params.bt_index) {
         script:
         index_base = bt_indices[0].toString()  - ~/\.\d+\.ebwt/
         prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
-        seqCenter = params.seqCenter ? '--sam-RG "ID:prefix" --sam-RG "CN:${params.seqCenter}"' : ''
+        seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG CN:${params.seqCenter}" : ''
         """
         bowtie \\
             $index_base \\
@@ -455,7 +455,7 @@ if( params.gtf && params.bt_index) {
             --strata \\
             -e 99999 \\
             --chunkmbs 2048 \\
-            seqCenter \\
+            $seqCenter \\
             -S \\
             | samtools view -bS - > ${prefix}.bowtie.bam
         """
