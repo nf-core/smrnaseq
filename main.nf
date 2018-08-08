@@ -82,6 +82,29 @@ if (params.help){
     exit 0
 }
 
+// Pipeline options
+params.name = false
+params.project = false
+params.genome = false
+params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
+params.bt_index = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
+params.bt_indices = null
+params.mature = params.genome ? params.genomes[ params.genome ].mature ?: false : false
+params.hairpin = params.genome ? params.genomes[ params.genome ].hairpin ?: false : false
+params.saveReference = false
+params.reads = "data/*.fastq.gz"
+params.readPaths = null
+params.outdir = './results'
+multiqc_config = "$baseDir/conf/multiqc_config.yaml"
+params.email = false
+params.plaintext_email = false
+params.seqCenter = false
+
+// Custom trimming options
+params.length = 18
+params.clip_R1 = 0
+params.three_prime_clip_R1 = 0
+
 // Validate inputs
 if( !params.mature || !params.hairpin ){
     exit 1, "Missing mature / hairpin reference indexes! Is --genome specified?"
