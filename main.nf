@@ -68,6 +68,9 @@ def helpMessage() {
       --clusterOptions              Extra SLURM options, used in conjunction with Uppmax.config
       -name                         Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic
       --seqCenter                   Text about sequencing center which will be added in the header of output bam files (Note that no blank is allowed!)
+      --skip_qc                     Skip all QC steps aside from MultiQC
+      --skip_fastqc                 Skip FastQC
+      --skip_multiqc                Skip MultiQC
     """.stripIndent()
 }
 
@@ -97,6 +100,10 @@ params.readPaths = null
 params.email = false
 params.plaintext_email = false
 params.seqCenter = false
+params.plaintext_email = false
+params.skip_qc = false
+params.skip_fastqc = false
+params.skip_multiqc = false
 
 // Custom trimming options
 params.length = 18
@@ -251,6 +258,9 @@ process makeBowtieIndex {
 process fastqc {
     tag "$reads"
     publishDir "${params.outdir}/fastqc", mode: 'copy'
+
+    when:
+    !params.skip_qc && !params.skip_fastqc
 
     input:
     file reads from raw_reads_fastqc
@@ -560,6 +570,9 @@ process get_software_versions {
  */
 process multiqc {
     publishDir "${params.outdir}/MultiQC", mode: 'copy'
+
+    when:
+    !params.skip_qc && !params.skip_multiqc
 
     input:
     file ('fastqc/*') from fastqc_results.toList()
