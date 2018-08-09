@@ -1,6 +1,6 @@
 # nf-core/smrnaseq Output
 
-**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data analysis. It is developed at the [National Genomics Infastructure](https://ngisweden.scilifelab.se/) at [SciLifeLab Stockholm](https://www.scilifelab.se/platforms/ngi/), Sweden.
+**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data analysis.
 
 This document describes the output produced by the pipeline.
 
@@ -115,13 +115,13 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 
 **Output directory: `results/bowtie_ref/ngi_visualizations`**
 
-* `sample.bowite_biotypeCounts.pdf/png`
+* `sample.bowtie_biotypeCounts.pdf/png`
   * Summary of annotation categories of aligned reads
-* `sample.bowite_biotypeCounts_log.pdf/png`
+* `sample.bowtie_biotypeCounts_log.pdf/png`
   * Summary of annotation categories of aligned reads in logarithm scale
-* `sample.bowite_biotypeLengths.pdf/png`
+* `sample.bowtie_biotypeLengths.pdf/png`
   * Stacked bar plot of annotations of aligned reads with different read lengths  
-* `sample.bowite_biotypeLengthPercentages.pdf/png`
+* `sample.bowtie_biotypeLengthPercentages.pdf/png`
   * Stacked bar plot of annotation percentage of aligned reads with different read lengths  
 
 **Example**: Summary of annotation categories of aligned reads

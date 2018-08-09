@@ -11,7 +11,7 @@
 
 ### Introduction
 
-**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data. It is developed at the [National Genomics Infastructure](https://ngisweden.scilifelab.se/) at [SciLifeLab Stockholm](https://www.scilifelab.se/platforms/ngi/), Sweden.
+**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data.
 
 The pipeline uses [Nextflow](https://www.nextflow.io), a bioinformatics workflow tool. It pre-processes raw data from FastQ inputs, aligns the reads and performs extensive quality-control on the results.
 

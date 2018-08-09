@@ -119,7 +119,7 @@ This is used in the MultiQC report (if not default) and in the summary HTML / e-
 **NB:** Single hyphen (core Nextflow option)
 
 ### `--seqCenter`
-Text about sequencing center which will be added in the header of output bam files. Note that no blank is allowed!
+Text about sequencing center which will be added in the header of output bam files.
 
 ### `-resume`
 Specify this when restarting a pipeline. Nextflow will used cached results from any pipeline steps where the inputs are the same, continuing from where it got to previously.

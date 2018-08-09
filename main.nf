@@ -67,7 +67,7 @@ def helpMessage() {
       --email                       Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
       --clusterOptions              Extra SLURM options, used in conjunction with Uppmax.config
       -name                         Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic
-      --seqCenter                   Text about sequencing center which will be added in the header of output bam files (Note that no blank is allowed!)
+      --seqCenter                   Text about sequencing center which will be added in the header of output bam files
       --skip_qc                     Skip all QC steps aside from MultiQC
       --skip_fastqc                 Skip FastQC
       --skip_multiqc                Skip MultiQC
@@ -84,31 +84,6 @@ if (params.help){
     helpMessage()
     exit 0
 }
-
-// Pipeline options
-params.name = false
-params.project = false
-params.genome = false
-params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
-params.bt_index = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
-params.bt_indices = null
-params.mature = params.genome ? params.genomes[ params.genome ].mature ?: false : false
-params.hairpin = params.genome ? params.genomes[ params.genome ].hairpin ?: false : false
-params.saveReference = false
-params.reads = "data/*.fastq.gz"
-params.readPaths = null
-params.email = false
-params.plaintext_email = false
-params.seqCenter = false
-params.plaintext_email = false
-params.skip_qc = false
-params.skip_fastqc = false
-params.skip_multiqc = false
-
-// Custom trimming options
-params.length = 18
-params.clip_R1 = 0
-params.three_prime_clip_R1 = 0
 
 // Validate inputs
 if( !params.mature || !params.hairpin ){
@@ -353,9 +328,8 @@ process bowtie_miRBase_mature {
         --strata \\
         -e 99999 \\
         --chunkmbs 2048 \\
-        $seqCenter \\
         --un ${prefix}.mature_unmapped.fq \\
-        -S \\
+        -S $seqCenter \\
         | samtools view -bS - > ${prefix}.mature.bam
 
     gzip ${prefix}.mature_unmapped.fq
@@ -393,9 +367,8 @@ process bowtie_miRBase_hairpin {
         -e 99999 \\
         --chunkmbs 2048 \\
         -q <(zcat $reads) \\
-        $seqCenter \\
         --un ${prefix}.hairpin_unmapped.fq \\
-        -S \\
+        -S $seqCenter \\
         | samtools view -bS - > ${prefix}.hairpin.bam
 
     gzip ${prefix}.hairpin_unmapped.fq
@@ -486,8 +459,7 @@ if( params.gtf && params.bt_index) {
             --strata \\
             -e 99999 \\
             --chunkmbs 2048 \\
-            $seqCenter \\
-            -S \\
+            -S $seqCenter \\
             | samtools view -bS - > ${prefix}.bowtie.bam
         """
     }
