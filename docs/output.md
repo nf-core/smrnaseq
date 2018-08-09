@@ -141,9 +141,3 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
   * Directory containing parsed statistics from the different tools used in the pipeline
 
 For more information about how to use MultiQC reports, see http://multiqc.info
-
------------------------------------------------------------------------------------------
-
-<p align="center"><a href="http://www.scilifelab.se/" target="_blank"><img src="images/SciLifeLab_logo.png" title="SciLifeLab"></a>
-<a href="https://ngisweden.scilifelab.se/" target= _blank><img src="images/NGI-final-small.png" title="NGI" style="height:100px;"></a>
-</p>
