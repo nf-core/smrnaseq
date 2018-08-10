@@ -8,10 +8,10 @@ channels:
 dependencies:
   - conda-forge::openjdk=8.0.144 # Needed for FastQC - conda build hangs without this
   - fastqc=0.11.7
-  - trim-galore=0.4.5
-  - samtools=1.8
+  - trim-galore=0.5.0
+  - samtools=1.9
   - bowtie=1.2.2
-  - multiqc=1.5
+  - multiqc=1.6
   - bioconductor-edger=3.20.7
   - bioconductor-limma=3.34.9
   - conda-forge::r-statmod=1.4.30
