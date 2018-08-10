@@ -85,6 +85,14 @@ if (params.help){
     exit 0
 }
 
+// Genome options
+params.genome = false
+params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
+params.bt_index = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
+params.bt_indices = null
+params.mature = params.genome ? params.genomes[ params.genome ].mature ?: false : false
+params.hairpin = params.genome ? params.genomes[ params.genome ].hairpin ?: false : false
+
 // Validate inputs
 if( !params.mature || !params.hairpin ){
     exit 1, "Missing mature / hairpin reference indexes! Is --genome specified?"
