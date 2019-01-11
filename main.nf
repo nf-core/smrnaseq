@@ -31,7 +31,8 @@
  - 5.1: Bowtie 1 alignment against host reference genome
  - 5.2: Post-alignment processing of Bowtie 1 alignment against host reference genome
  - 6:   NGI-Visualization of Bowtie alignment statistics
- - 7:   MultiQC
+ - 7:   miRTrace for quality control
+ - 8:   MultiQC
 ----------------------------------------------------------------------------------------
 */
 
@@ -56,6 +57,7 @@ def helpMessage() {
       --mature                      Path to the FASTA file of mature miRNAs
       --hairpin                     Path to the FASTA file of miRNA precursors
       --bt_index                    Path to the bowtie 1 index files of the host reference genome
+      --mirtrace_species            Species for miRTrace. Pre-defined when '--genome' is specified
 
     Trimming options
       --length [int]                Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
@@ -68,6 +70,8 @@ def helpMessage() {
       --clusterOptions              Extra SLURM options, used in conjunction with Uppmax.config
       -name                         Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic
       --seqCenter                   Text about sequencing center which will be added in the header of output bam files
+      --protocol                    Library preparation protocol. Default: "illumina". Can be set as "illumina", "nextflex", "qiaseq" or "cats"
+      --three_prime_adapter         3’ Adapter to trim. Default: None
       --skip_qc                     Skip all QC steps aside from MultiQC
       --skip_fastqc                 Skip FastQC
       --skip_multiqc                Skip MultiQC
@@ -92,6 +96,35 @@ params.bt_index = params.genome ? params.genomes[ params.genome ].bowtie ?: fals
 params.bt_indices = null
 params.mature = params.genome ? params.genomes[ params.genome ].mature ?: false : false
 params.hairpin = params.genome ? params.genomes[ params.genome ].hairpin ?: false : false
+params.mirtrace_species = params.genome ? params.genomes[ params.genome ].mirtrace_species ?: false : false
+
+
+// Define regular variables so that they can be overwritten
+clip_R1 = params.clip_R1
+three_prime_clip_R1 = params.three_prime_clip_R1
+three_prime_adapter = params.three_prime_adapter
+
+// Presets
+if (params.protocol == "illumina"){
+    clip_R1 = 0
+    three_prime_clip_R1 = 0
+    three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"
+} else if (params.protocol == "nextflex"){
+    clip_R1 = 4
+    three_prime_clip_R1 = 4
+    three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"
+} else if (params.protocol == "qiaseq"){
+    clip_R1 = 0
+    three_prime_clip_R1 = 0
+    three_prime_adapter = "AACTGTAGGCACCATCAAT"
+} else if (params.protocol == "cats"){
+    clip_R1 = 3
+    three_prime_clip_R1 = 0
+    three_prime_adapter = "GATCGGAAGAGCACACGTCTG"
+} else {
+    exit 1, "Invalid library preparation protocol!"
+}
+
 
 // Validate inputs
 if( !params.mature || !params.hairpin ){
@@ -119,6 +152,9 @@ if( params.bt_index ){
 if( !params.gtf || !params.bt_index) {
     log.info "No GTF / Bowtie 1 index supplied - host reference genome analysis will be skipped."
 }
+if( !params.mirtrace_species ){
+    exit 1, "Reference species for miRTrace is not defined."
+}
 multiqc_config = file(params.multiqc_config)
 
 // Has the run name been specified by the user?
@@ -136,12 +172,12 @@ if(params.readPaths){
         .from(params.readPaths)
         .map { file(it) }
         .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
-        .into { raw_reads_fastqc; raw_reads_trimgalore }
+        .into { raw_reads_fastqc; raw_reads_trimgalore; raw_reads_mirtrace }
 } else {
     Channel
         .fromPath( params.reads )
         .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}" }
-        .into { raw_reads_fastqc; raw_reads_trimgalore }
+        .into { raw_reads_fastqc; raw_reads_trimgalore; raw_reads_mirtrace }
 }
 
 
@@ -160,13 +196,16 @@ summary['Run Name']            = custom_runName ?: workflow.runName
 summary['Reads']               = params.reads
 summary['Genome']              = params.genome
 summary['Trim min length']     = params.length
-summary["Trim 5' R1"]          = params.clip_R1
-summary["Trim 3' R1"]          = params.three_prime_clip_R1
+summary["Trim 5' R1"]          = clip_R1
+summary["Trim 3' R1"]          = three_prime_clip_R1
 summary['miRBase mature']      = params.mature
 summary['miRBase hairpin']     = params.hairpin
 if(params.bt_index)            summary['Bowtie Index for Ref'] = params.bt_index
 if(params.gtf)                 summary['GTF Annotation'] = params.gtf
 summary['Save Reference']      = params.saveReference ? 'Yes' : 'No'
+summary['Protocol']            = params.protocol
+summary['miRTrace species']    = params.mirtrace_species
+summary["3' adapter"]          = three_prime_adapter
 summary['Output dir']          = params.outdir
 summary['Working dir']         = workflow.workDir
 summary['Current home']        = "$HOME"
@@ -275,10 +314,11 @@ process trim_galore {
 
     script:
     tg_length = "--length ${params.length}"
-    c_r1 = params.clip_R1 > 0 ? "--clip_R1 ${params.clip_R1}" : ''
-    tpc_r1 = params.three_prime_clip_R1 > 0 ? "--three_prime_clip_R1 ${params.three_prime_clip_R1}" : ''
+    c_r1 = clip_R1 > 0 ? "--clip_R1 ${clip_R1}" : ''
+    tpc_r1 = three_prime_clip_R1 > 0 ? "--three_prime_clip_R1 ${three_prime_clip_R1}" : ''
+    tpa = (params.protocol == "qiaseq" | params.protocol == "cats") ? "--adapter ${three_prime_adapter}" : '--small_rna'
     """
-    trim_galore --small_rna $tg_length $c_r1 $tpc_r1 --gzip $reads --fastqc
+    trim_galore $tpa $tg_length $c_r1 $tpc_r1 --gzip $reads --fastqc
     """
 }
 
@@ -385,7 +425,7 @@ process bowtie_miRBase_hairpin {
 
 
 /*
- * STEP 5 - Post-alignment processing for miRBase mature and hairpin
+ * STEP 5.1 - Post-alignment processing for miRBase mature and hairpin
  */
 def wrap_mature_and_hairpin = { file ->
     if ( file.contains("mature") ) return "miRBase_mature/$file"
@@ -414,7 +454,7 @@ process miRBasePostAlignment {
 
 
 /*
- * STEP 6 - edgeR miRBase feature counts processing
+ * STEP 5.2 - edgeR miRBase feature counts processing
  */
 process edgeR_miRBase {
     publishDir "${params.outdir}/edgeR", mode: 'copy', saveAs: wrap_mature_and_hairpin
@@ -433,12 +473,12 @@ process edgeR_miRBase {
 
 
 /*
- * STEP 7.1 and 7.2 IF A GENOME SPECIFIED ONLY!
+ * STEP 6.1 and 6.2 IF A GENOME SPECIFIED ONLY!
  */
 if( params.gtf && params.bt_index) {
 
     /*
-     * STEP 7.1 - Bowtie 1 against reference genome
+     * STEP 6.1 - Bowtie 1 against reference genome
      */
     process bowtie_ref {
         tag "$reads"
@@ -473,7 +513,7 @@ if( params.gtf && params.bt_index) {
     }
 
     /*
-     * STEP 7.2 - Statistics about unmapped reads against ref genome
+     * STEP 6.2 - Statistics about unmapped reads against ref genome
      */
 
     process bowtie_unmapped {
@@ -498,7 +538,7 @@ if( params.gtf && params.bt_index) {
 
 
     /*
-     * STEP 7.3 - NGI-Visualizations of Bowtie 1 alignment against host reference genome
+     * STEP 6.3 - NGI-Visualizations of Bowtie 1 alignment against host reference genome
      */
     process ngi_visualizations {
         tag "$bowtie_bam"
@@ -523,6 +563,48 @@ if( params.gtf && params.bt_index) {
 
 }
 
+
+/*
+ * STEP 7 IF A GENOME SPECIFIED ONLY!
+ */
+if( params.mirtrace_species ) {
+
+    /*
+     * STEP 7 - miRTrace
+     */
+    process mirtrace {
+        tag "$reads"
+        publishDir "${params.outdir}/miRTrace", mode: 'copy'
+
+         input:
+         file reads from raw_reads_mirtrace.collect()
+
+         output:
+         file '*mirtrace' into mirtrace_results
+
+         script:
+         """
+         for i in $reads
+         do
+             path=\$(realpath \${i})
+             prefix=\$(echo \${i} | sed -e "s/.gz//" -e "s/.fastq//" -e "s/.fq//" -e "s/_val_1//" -e "s/_trimmed//" -e "s/_R1//" -e "s/.R1//")
+             echo \$path","\$prefix
+         done > mirtrace_config
+
+         mirtrace qc \\
+             --species $params.mirtrace_species \\
+             --adapter $three_prime_adapter \\
+             --protocol $params.protocol \\
+             --config mirtrace_config \\
+             --write-fasta \\
+             --output-dir mirtrace \\
+             --force
+         """
+     }
+
+}
+
+
 /*
  * Parse software version numbers
  */
@@ -540,6 +622,7 @@ process get_software_versions {
     bowtie --version > v_bowtie.txt
     samtools --version > v_samtools.txt
     fasta_formatter -h > v_fastx.txt
+    mirtrace --version > v_mirtrace.txt
     multiqc --version > v_multiqc.txt
     scrape_software_versions.py > software_versions_mqc.yaml
     """
@@ -557,6 +640,7 @@ process multiqc {
     input:
     file ('fastqc/*') from fastqc_results.toList()
     file ('trim_galore/*') from trimgalore_results.toList()
+    file ('mirtrace/*') from mirtrace_results.toList()
     file ('software_versions/*') from software_versions_yaml.toList()
 
     output:

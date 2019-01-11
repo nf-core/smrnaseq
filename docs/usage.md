@@ -159,6 +159,19 @@ If you prefer, you can specify the full path to your reference genome when you r
 --bt_index [path to Bowtie 1 index]
 ```
 
+### `--protocol`
+Protocol for constructing smRNA-seq libraries. Note that trimming parameters and 3' adapter sequence are pre-defined with a specified protocol.
+Default: "illumina"
+```
+--protocol [one protocol listed in the table below]
+```
+| Protocol      | Library Prep Kit                        | Trimming Parameter                   | 3' Adapter Sequence   |
+| :------------ | :-------------------------------------- | :----------------------------------- | :-------------------  |
+| illumina      | Illumina TruSeq Small RNA               | clip_R1 = 0; three_prime_clip_R1 = 0 | TGGAATTCTCGGGTGCCAAGG |
+| nextflex      | BIOO SCIENTIFIC  NEXTFLEX Small RNA-Seq | clip_R1 = 4; three_prime_clip_R1 = 4 | TGGAATTCTCGGGTGCCAAGG |
+| qiaseq        | QIAGEN QIAseq miRNA                     | clip_R1 = 0; three_prime_clip_R1 = 0 | AACTGTAGGCACCATCAAT   |
+| cats          | Diagenode CATS Small RNA-seq            | clip_R1 = 3; three_prime_clip_R1 = 0 | GATCGGAAGAGCACACGTCTG |
+
 ### `--rlocation`
 Some steps in the pipeline run R with required modules. By default, the pipeline will install
 these modules to `~/R/nxtflow_libs/` if not present. You can specify what path to use with this
@@ -168,6 +181,7 @@ command line flag.
 `--length [int]`: Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
 `--clip_R1 [int]`: Instructs Trim Galore to remove bp from the 5' end of read 1
 `--three_prime_clip_R1 [int]`: Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed
+`--three_prime_adapter [sequence]` : Instructs Trim Galore to remove 3' adapters which are typically used in smRNA-seq library preparation
 
 ### `--saveReference`
 Supply this parameter to save any generated reference genome files to your results folder. These can then be used for future pipeline runs, reducing processing times.

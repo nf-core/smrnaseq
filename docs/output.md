@@ -15,6 +15,7 @@ and processes data using the following steps:
 * [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
 * [Bowtie](#bowtie) - alignment against reference genome for QC purpose
 * [NGI-Visualizations](#ngi_visualizations) - summary of biotypes based on results from Bowtie alignment to reference genome
+* [miRTrace](#mirtrace) - a comprehensive tool for QC purpose
 * [MultiQC](#multiqc) - aggregate report, describing results of the whole pipeline
 
 ## FastQC
@@ -129,6 +130,13 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 
 **Example**: Stacked bar plot of annotations of aligned reads with different read lengths
 ![NGI-Visualizations](images/NGI-Visualizations_example2.png)
+
+## miRTrace
+[miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts).
+
+**Output directory: `results/miRTrace`**
+
+Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/manual.pdf) for specifications about output files.
 
 ## MultiQC
 [MultiQC](http://multiqc.info) is a visualisation tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in within the report data directory.

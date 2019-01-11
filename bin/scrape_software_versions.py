@@ -11,6 +11,7 @@ regexes = {
     'Bowtie': ['v_bowtie.txt', r"version (\S+)"],
     'Samtools': ['v_samtools.txt', r"samtools (\S+)"],
     'FASTX': ['v_fastx.txt', r"Toolkit (\S+)"],
+    'miRTrace': ['v_mirtrace.txt', r"mirtrace, version (\S+)"],
     'MultiQC': ['v_multiqc.txt', r"multiqc, version (\S+)"],
 }
 results = OrderedDict()
@@ -21,7 +22,9 @@ results['Trim Galore!'] = '<span style="color:#999999;\">N/A</span>'
 results['Bowtie'] = '<span style="color:#999999;\">N/A</span>'
 results['Samtools'] = '<span style="color:#999999;\">N/A</span>'
 results['FASTX'] = '<span style="color:#999999;\">N/A</span>'
+results['miRTrace'] = '<span style="color:#999999;\">N/A</span>'
 results['MultiQC'] = '<span style="color:#999999;\">N/A</span>'
+
 
 # Search each file using its regex
 for k, v in regexes.items():
