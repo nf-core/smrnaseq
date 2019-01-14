@@ -136,7 +136,18 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 
 **Output directory: `results/miRTrace`**
 
-Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/manual.pdf) for specifications about output files.
+* `mirtrace-report.html`
+  * An interactive HTML report summarizing all output statistics from miRTrace
+* `mirtrace-results.json`
+  * A JSON file with all output statistics from miRTrace
+* `mirtrace-stats-*.tsv`
+  * Tab-separated statistics files
+* `qc_passed_reads.all.collapsed`
+  * FASTA file per sample with sequence reads that passed QC in miRTrace
+* `qc_passed_reads.rnatype_unknown.collapsed`
+  * FASTA file per sample with unknown reads in the RNA type analysis
+
+Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/manual.pdf) for detailed specifications about output files.
 
 ## MultiQC
 [MultiQC](http://multiqc.info) is a visualisation tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in within the report data directory.

@@ -21,14 +21,14 @@ This pipeline is primarily used with a SLURM cluster on the Swedish [UPPMAX syst
 The nfcore/smrnaseq pipeline comes with documentation about the pipeline, found in the `docs/` directory:
 
 
-1. [Installation](installation.md)
+1. [Installation](docs/installation.md)
 2. Pipeline configuration
-    * [Local installation](configuration/local.md)
-    * [Swedish UPPMAX clusters](configuration/uppmax.md)
-    * [Adding your own system](configuration/adding_your_own.md)
-3. [Running the pipeline](usage.md)
-4. [Output and how to interpret the results](output.md)
-5. [Troubleshooting](troubleshooting.md)
+    * [Local installation](docs/configuration/local.md)
+    * [Swedish UPPMAX clusters](docs/configuration/uppmax.md)
+    * [Adding your own system](docs/configuration/adding_your_own.md)
+3. [Running the pipeline](docs/usage.md)
+4. [Output and how to interpret the results](docs/output.md)
+5. [Troubleshooting](docs/troubleshooting.md)
 
 ### Credits
 These scripts were originally written for use at the [National Genomics Infrastructure](https://portal.scilifelab.se/genomics/) at [SciLifeLab](http://www.scilifelab.se/) in Stockholm, Sweden, by Phil Ewels (@ewels), Chuan Wang (@chuan-wang) and Rickard Hammarén (@Hammarn)
