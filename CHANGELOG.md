@@ -1,4 +1,19 @@
-# nf-core/smrnaseq
+# nf-core/smrnaseq: Changelog
+
+## v1.0dev - 2019-05-23
+* Update tools and Dockerfile/Singularity to match current template 
+
+#### Dependency Updates
+* openjdk 8.0.144 -> 11.0.1
+* fastqc 0.11.7 -> 0.11.8
+* trim-galore 0.5.0 -> 0.6.2
+* bioconductor-edger 3.20.7 -> 3.26.0
+* bioconductor-limma 3.34.9 -> 3.40.0
+* conda-forge::r-data.table 1.11.4 -> 1.12.2
+* conda-forge::r-gplots 3.0.1 -> 3.0.1.1
+* conda-forge::r-r.methodss3 1.7.1 -> 1.7.1
+* htseq 0.9.1 -> 0.11.2
+* r-markdown 0.9
 
 ## [1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.0) - 2019-01-10
 * Add "protocol" with pre-defined settings
