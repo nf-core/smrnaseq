@@ -1,4 +1,7 @@
-# nf-core/smrnaseq
+# nf-core/smrnaseq: Changelog
+
+## v1.0dev - [date]
+Initial release of nf-core/smrnaseq, created with the [nf-core](http://nf-co.re/) template.
 
 ## [1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.0) - 2019-01-10
 * Add "protocol" with pre-defined settings

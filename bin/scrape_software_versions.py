@@ -4,7 +4,7 @@ from collections import OrderedDict
 import re
 
 regexes = {
-    'nf-core/smrnaseq': ['v_nfcore_smrnaseq.txt', r"(\S+)"],
+    'nf-core/smrnaseq': ['v_pipeline.txt', r"(\S+)"],
     'Nextflow': ['v_nextflow.txt', r"(\S+)"],
     'FastQC': ['v_fastqc.txt', r"FastQC v(\S+)"],
     'Trim Galore!': ['v_trim_galore.txt', r"version (\S+)"],
@@ -34,6 +34,11 @@ for k, v in regexes.items():
         if match:
             results[k] = "v{}".format(match.group(1))
 
+# Remove software set to false in results
+for k in results:
+    if not results[k]:
+        del(results[k])
+
 # Dump to YAML
 print ('''
 id: 'software_versions'
@@ -45,5 +50,10 @@ data: |
     <dl class="dl-horizontal">
 ''')
 for k,v in results.items():
-    print("        <dt>{}</dt><dd>{}</dd>".format(k,v))
+    print("        <dt>{}</dt><dd><samp>{}</samp></dd>".format(k,v))
 print ("    </dl>")
+
+# Write out regexes as csv file:
+with open('software_versions.csv', 'w') as f:
+    for k,v in results.items():
+        f.write("{}\t{}\n".format(k,v))

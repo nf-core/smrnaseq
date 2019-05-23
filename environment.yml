@@ -1,24 +1,24 @@
 # You can use this file to create a conda environment for this pipeline:
 #   conda env create -f environment.yml
-name: nfcore-smrnaseq-1.0
+name: nf-core-smrnaseq-1.0dev
 channels:
-  - bioconda
   - conda-forge
+  - bioconda
   - defaults
 dependencies:
-  - conda-forge::openjdk=8.0.144 # Needed for FastQC - conda build hangs without this
-  - fastqc=0.11.7
-  - trim-galore=0.5.0
+  - conda-forge::openjdk=11.0.1 # Needed for FastQC - conda build hangs without this
+  - fastqc=0.11.8
+  - trim-galore=0.6.2
   - samtools=1.9
   - bowtie=1.2.2
   - multiqc=1.7
-  - bioconductor-edger=3.20.7
-  - bioconductor-limma=3.34.9
+  - bioconductor-edger=3.26.0
+  - bioconductor-limma=3.40.0
   - conda-forge::r-statmod=1.4.30
-  - conda-forge::r-data.table=1.11.4
-  - conda-forge::r-gplots=3.0.1
+  - conda-forge::r-data.table=1.12.2
+  - conda-forge::r-gplots=3.0.1.1
   - conda-forge::r-r.methodss3=1.7.1
-  - htseq=0.9.1
+  - htseq=0.11.2
   - fastx_toolkit=0.0.14
   - mirtrace=1.0.0
   # Install NGI Visualizations
