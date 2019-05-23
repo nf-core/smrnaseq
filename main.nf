@@ -1,4 +1,5 @@
 #!/usr/bin/env nextflow
+/*
 ========================================================================================
                S M A L L    R N A - S E Q    B E S T    P R A C T I C E
 ========================================================================================
@@ -31,22 +32,6 @@
  - 6:   NGI-Visualization of Bowtie alignment statistics
  - 7:   miRTrace for quality control
  - 8:   MultiQC
-----------------------------------------------------------------------------------------
-*/
-
-def helpMessage() {
-    log.info"""
-    =========================================
-     nf-core/smrnaseq : smRNA-Seq Best Practice v${params.version}
-    =========================================
-=======
-/*
-========================================================================================
-                         nf-core/smrnaseq
-========================================================================================
- nf-core/smrnaseq Analysis Pipeline.
- #### Homepage / Documentation
- https://github.com/nf-core/smrnaseq
 ----------------------------------------------------------------------------------------
 */
 
@@ -264,29 +249,6 @@ if(params.email) {
 }
 log.info summary.collect { k,v -> "${k.padRight(18)}: $v" }.join("\n")
 log.info "\033[2m----------------------------------------------------\033[0m"
-
-// Check the hostnames against configured profiles
-checkHostname()
-
-def create_workflow_summary(summary) {
-    def yaml_file = workDir.resolve('workflow_summary_mqc.yaml')
-    yaml_file.text  = """
-    id: 'nf-core-smrnaseq-summary'
-    description: " - this information is collected when the pipeline is started."
-    section_name: 'nf-core/smrnaseq Workflow Summary'
-    section_href: 'https://github.com/nf-core/smrnaseq'
-    plot_type: 'html'
-    data: |
-        <dl class=\"dl-horizontal\">
-${summary.collect { k,v -> "            <dt>$k</dt><dd><samp>${v ?: '<span style=\"color:#999999;\">N/A</a>'}</samp></dd>" }.join("\n")}
-        </dl>
-    """.stripIndent()
-
-   return yaml_file
-
-log.info summary.collect { k,v -> "${k.padRight(15)}: $v" }.join("\n")
-log.info "\033[2m----------------------------------------------------\033[0m"
-
 
 // Check the hostnames against configured profiles
 checkHostname()
@@ -875,16 +837,15 @@ def nfcoreHeader(){
     c_purple = params.monochrome_logs ? '' : "\033[0;35m";
     c_cyan = params.monochrome_logs ? '' : "\033[0;36m";
     c_white = params.monochrome_logs ? '' : "\033[0;37m";
-
     return """    ${c_dim}----------------------------------------------------${c_reset}
                                             ${c_green},--.${c_black}/${c_green},-.${c_reset}
     ${c_blue}        ___     __   __   __   ___     ${c_green}/,-._.--~\'${c_reset}
     ${c_blue}  |\\ | |__  __ /  ` /  \\ |__) |__         ${c_yellow}}  {${c_reset}
     ${c_blue}  | \\| |       \\__, \\__/ |  \\ |___     ${c_green}\\`-._,-`-,${c_reset}
                                             ${c_green}`._,._,\'${c_reset}
-    ${c_purple}  nf-core/smrnaseq v${workflow.manifest.version}${c_reset}
+    ${c_purple}  nf-core/rnaseq v${workflow.manifest.version}${c_reset}
     ${c_dim}----------------------------------------------------${c_reset}
-    """.stripIndent()
+    """.stripIndent()    
 }
 
 def checkHostname(){
