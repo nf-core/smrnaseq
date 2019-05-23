@@ -668,21 +668,22 @@ process multiqc {
     !params.skip_qc && !params.skip_multiqc
 
     input:
+    file multiqc_config from ch_multiqc_config
     file ('fastqc/*') from fastqc_results.toList()
     file ('trim_galore/*') from trimgalore_results.toList()
     file ('mirtrace/*') from mirtrace_results.toList()
     file ('software_versions/*') from software_versions_yaml.toList()
+    file workflow_summary from create_workflow_summary(summary)
 
     output:
     file "*multiqc_report.html" into multiqc_report
     file "*_data"
-    file "multiqc_plots"
 
     script:
     rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
     rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
     """
-    multiqc -f $rtitle $rfilename --config $multiqc_config  -m trim_galore -m fastqc -m mirtrace -m custom_content.
+    multiqc . -f $rtitle $rfilename --config $multiqc_config -m adapterRemoval -m fastqc -m custom_content
     """
 }
 
