@@ -30,4 +30,6 @@ The nf-core/smrnaseq pipeline comes with documentation about the pipeline, found
 5. [Troubleshooting](https://nf-co.re/usage/troubleshooting)
 
 ## Credits
-nf-core/smrnaseq was originally written for use at the [National Genomics Infrastructure](https://portal.scilifelab.se/genomics/) at [SciLifeLab](http://www.scilifelab.se/) in Stockholm, Sweden, by Phil Ewels (@ewels), Chuan Wang (@chuan-wang) and Rickard Hammarén (@Hammarn)
+nf-core/smrnaseq was originally written for use at the [National Genomics Infrastructure](https://portal.scilifelab.se/genomics/) at [SciLifeLab](http://www.scilifelab.se/) in Stockholm, Sweden, by Phil Ewels (@ewels), Chuan Wang (@chuan-wang) and Rickard Hammarén (@Hammarn).
+
+It is been updated by Lorena Pantano (@lpantano).
