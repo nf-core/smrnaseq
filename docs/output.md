@@ -49,7 +49,7 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 * `sample_trimmed_fastqc.zip`
   * FastQC report for trimmed reads
 
-## Bowtie
+## Bowtie - miRNAs
 [Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) in [miRBase](http://www.mirbase.org/).
 
 **Output directory: `results/bowtie`**
@@ -103,7 +103,7 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 **Example**: Heatmap of tumor and normal samples based on the top differentially expressed mature miRNAs.
 ![edgeR](images/Example_heatmap.png)
 
-## Bowtie
+## Bowtie - QC
 [Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the reference genome for quality control purposes.
 
 **Output directory: `results/bowtie_ref`**

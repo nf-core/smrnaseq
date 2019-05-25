@@ -2,7 +2,7 @@
 
 ## v1.0dev - 2019-05-23
 * Adapt code and docs to [nf-core](http://nf-co.re/) template.
-* Update tools and Dockerfile/Singularity to match current template 
+* Update tools and Dockerfile/Singularity to match current template
 
 #### Dependency Updates
 * openjdk 8.0.144 -> 11.0.1

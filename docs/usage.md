@@ -103,7 +103,8 @@ If `-profile` is not specified at all the pipeline will be run locally and expec
 
 ### `--reads`
 Location of the input FastQ files:
-```
+
+```bash
  --reads 'path/to/data/*.fastq.gz'
 ```
 
@@ -120,11 +121,12 @@ The pipeline config files come bundled with paths to the illumina iGenomes refer
 
 The reference genome to use of the analysis, needs to be one of the genome specified in the config file.
 The human `GRCh37` genome is used by default.
-```
+
+```bash
 --genome 'GRCh37'
 ```
 
-### Supported genomes   
+### Supported genomes
 
 | Parameter     |       Latin Name                 |      Common Name   |
 | :------------ |:-------------------------------- |:------------------ |
@@ -253,28 +255,33 @@ process.$multiqc.module = []
 
 ### `--mature`
 If you prefer, you can specify the full path to the FASTA file of mature miRNAs when you run the pipeline:
-```
+
+```bash
 --mature [path to the FASTA file of mature miRNAs]
 ```
 
 ### `--hairpin`
 If you prefer, you can specify the full path to the FASTA file of miRNA precursors when you run the pipeline:
-```
+
+```bash
 --hairpin [path to the FASTA file of miRNA precursors]
 ```
 
 ### `--bt_index`
 If you prefer, you can specify the full path to your reference genome when you run the pipeline:
-```
+
+```bash
 --bt_index [path to Bowtie 1 index]
 ```
 
 ### `--protocol`
 Protocol for constructing smRNA-seq libraries. Note that trimming parameters and 3' adapter sequence are pre-defined with a specified protocol.
 Default: "illumina"
-```
+
+```bash
 --protocol [one protocol listed in the table below]
 ```
+
 | Protocol      | Library Prep Kit                        | Trimming Parameter                   | 3' Adapter Sequence   |
 | :------------ | :-------------------------------------- | :----------------------------------- | :-------------------  |
 | illumina      | Illumina TruSeq Small RNA               | clip_R1 = 0; three_prime_clip_R1 = 0 | TGGAATTCTCGGGTGCCAAGG |
