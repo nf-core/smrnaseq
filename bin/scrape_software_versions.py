@@ -5,11 +5,13 @@ import re
 
 regexes = {
     'nf-core/smrnaseq': ['v_pipeline.txt', r"(\S+)"],
+    'R': ['v_R.txt', r"R version (\S+)"],
     'Nextflow': ['v_nextflow.txt', r"(\S+)"],
     'FastQC': ['v_fastqc.txt', r"FastQC v(\S+)"],
     'Trim Galore!': ['v_trim_galore.txt', r"version (\S+)"],
     'Bowtie': ['v_bowtie.txt', r"version (\S+)"],
     'Samtools': ['v_samtools.txt', r"samtools (\S+)"],
+    'Htseq': ['v_htseq.txt', r"version (\S+)"],
     'FASTX': ['v_fastx.txt', r"Toolkit (\S+)"],
     'miRTrace': ['v_mirtrace.txt', r"mirtrace, version (\S+)"],
     'MultiQC': ['v_multiqc.txt', r"multiqc, version (\S+)"],
@@ -17,10 +19,12 @@ regexes = {
 results = OrderedDict()
 results['nf-core/smrnaseq'] = '<span style="color:#999999;\">N/A</span>'
 results['Nextflow'] = '<span style="color:#999999;\">N/A</span>'
+results['R'] = '<span style="color:#999999;\">N/A</span>'
 results['FastQC'] = '<span style="color:#999999;\">N/A</span>'
 results['Trim Galore!'] = '<span style="color:#999999;\">N/A</span>'
 results['Bowtie'] = '<span style="color:#999999;\">N/A</span>'
 results['Samtools'] = '<span style="color:#999999;\">N/A</span>'
+results['Htseq'] = '<span style="color:#999999;\">N/A</span>'
 results['FASTX'] = '<span style="color:#999999;\">N/A</span>'
 results['miRTrace'] = '<span style="color:#999999;\">N/A</span>'
 results['MultiQC'] = '<span style="color:#999999;\">N/A</span>'

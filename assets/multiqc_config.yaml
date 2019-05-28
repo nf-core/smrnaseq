@@ -5,5 +5,5 @@ report_comment: >
 report_section_order:
     software_versions:
         order: -1000
-    nf-core/smrnaseq-software-versions:
+    nf-core-srnaseq-summary:
         order: -1100

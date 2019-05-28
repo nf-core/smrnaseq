@@ -26,8 +26,19 @@
   * [`--outdir`](#--outdir)
   * [`--email`](#--email)
   * [`-name`](#-name)
+  * [`--seqCenter`](#--seqCenter)
   * [`-resume`](#-resume)
   * [`-c`](#-c)
+  * [`--mature`](#--mature)
+  * [`--hairpin`](#--hairpin)
+  * [`--bt_index`](#--bt_index)
+  * [`--protocol`](#--protocol)
+  * [`--rlocation`](#--rlocation)
+  * [Trimming options](#Trimming options)
+  * [`--saveReference`](#--saveReference)
+  * [`--skipQC`](#--skipQC)
+  * [`--skipFastqc`](#--skipFastqc)
+  * [`--skipMultiqc`](#--skipMultiqc)
   * [`--custom_config_version`](#--custom_config_version)
   * [`--custom_config_base`](#--custom_config_base)
   * [`--max_memory`](#--max_memory)
@@ -230,7 +241,7 @@ This is used in the MultiQC report (if not default) and in the summary HTML / e-
 
 **NB:** Single hyphen (core Nextflow option)
 
-### `--seqCenter`
+### `--seq_center`
 Text about sequencing center which will be added in the header of output bam files.
 
 ### `-resume`
@@ -295,7 +306,7 @@ these modules to `~/R/nxtflow_libs/` if not present. You can specify what path t
 command line flag.
 
 ### Trimming options
-`--length [int]`: Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
+`--min_length [int]`: Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
 `--clip_R1 [int]`: Instructs Trim Galore to remove bp from the 5' end of read 1
 `--three_prime_clip_R1 [int]`: Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed
 `--three_prime_adapter [sequence]` : Instructs Trim Galore to remove 3' adapters which are typically used in smRNA-seq library preparation
@@ -303,20 +314,13 @@ command line flag.
 ### `--saveReference`
 Supply this parameter to save any generated reference genome files to your results folder. These can then be used for future pipeline runs, reducing processing times.
 
-### `--multiqc_config`
-If you would like to supply a custom config file to MultiQC, you can specify a path with `--multiqc_config`. This is used instead of the config file specific to the pipeline.
-
-### `--clusterOptions`
-Submit arbitrary SLURM options (UPPMAX profile only). For instance, you could use `--clusterOptions '-p devcore'`
-to run on the development node (though won't work with default process time requests).
-
-### `--skip_qc`
+### `--skipQC`
 Skip all QC steps aside from MultiQC
 
-### `--skip_fastqc`
+### `--skipFastqc`
 Skip FastQC
 
-### `--skip_multiqc`
+### `--skipMultiqc`
 Skip MultiQC
 
 ## Stand-alone scripts
