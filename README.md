@@ -29,18 +29,18 @@ The pipeline is built using Nextflow, a workflow tool to run tasks across multip
          * Heatmap of sample similarities
 5. Alignment against host reference genome ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
     1. Post-alignment processing of alignment against host reference genome ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-6.   Visualization of alignment statistics ([`NGI-Visualization`](https://github.com/NationalGenomicsInfrastructure/ngi_visualizations))
-7.   miRNA quality control ([`mirtrace`](https://github.com/friedlanderlab/mirtrace))
-8.  Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
+6. Visualization of alignment statistics ([`NGI-Visualization`](https://github.com/NationalGenomicsInfrastructure/ngi_visualizations))
+7. miRNA quality control ([`mirtrace`](https://github.com/friedlanderlab/mirtrace))
+8. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
 
 ### Documentation
 The nf-core/smrnaseq pipeline comes with documentation about the pipeline, found in the `docs/` directory:
 
 1. [Installation](https://nf-co.re/usage/installation)
 2. Pipeline configuration
-    - [Local installation](https://nf-co.re/usage/local_installation)
-    - [Adding your own system config](https://nf-co.re/usage/adding_own_config)
-    - [Reference genomes](https://nf-co.re/usage/reference_genomes)
+    * [Local installation](https://nf-co.re/usage/local_installation)
+    * [Adding your own system config](https://nf-co.re/usage/adding_own_config)
+    * [Reference genomes](https://nf-co.re/usage/reference_genomes)
 3. [Running the pipeline](docs/usage.md)
 4. [Output and how to interpret the results](docs/output.md)
 5. [Troubleshooting](https://nf-co.re/usage/troubleshooting)
