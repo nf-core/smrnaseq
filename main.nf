@@ -486,6 +486,7 @@ process miRBasePostAlignment {
  */
 process edgeR_miRBase {
     label 'process_low'
+    label 'process_ignore'
     publishDir "${params.outdir}/edgeR", mode: 'copy', saveAs: wrap_mature_and_hairpin
 
     input:
@@ -510,6 +511,7 @@ if( params.gtf && params.bt_index) {
      * STEP 6.1 - Bowtie 1 against reference genome
      */
     process bowtie_ref {
+        label 'process_high'
         tag "$reads"
         publishDir "${params.outdir}/bowtie_ref", mode: 'copy'
 
@@ -546,6 +548,8 @@ if( params.gtf && params.bt_index) {
      */
 
     process bowtie_unmapped {
+        label 'process_ignore'
+        label 'process_medium'
         tag "${input_files[0].baseName}"
         publishDir "${params.outdir}/bowtie_ref/unmapped", mode: 'copy'
 
@@ -571,6 +575,7 @@ if( params.gtf && params.bt_index) {
      */
     process ngi_visualizations {
         label 'process_low'
+        label 'process_ignore'
         tag "$bowtie_bam"
         publishDir "${params.outdir}/bowtie_ref/ngi_visualizations", mode: 'copy'
 
