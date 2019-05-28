@@ -9,13 +9,28 @@
 * [Running the pipeline](#running-the-pipeline)
   * [Updating the pipeline](#updating-the-pipeline)
   * [Reproducibility](#reproducibility)
-* [Main arguments](#main-arguments)
+* [Main Arguments](#main-arguments)
   * [`-profile`](#-profile)
   * [`--reads`](#--reads)
+  * [`--protocol`](#--protocol)
 * [Reference genomes](#reference-genomes)
   * [`--genome` (using iGenomes)](#--genome-using-igenomes)
+  * [Supported genomes](#supported-genomes)
+  * [`--saveReference`](#--savereference)
   * [`--fasta`](#--fasta)
   * [`--igenomesIgnore`](#--igenomesignore)
+  * [`--mature`](#--mature)
+  * [`--hairpin`](#--hairpin)
+  * [`--bt_index`](#--bt_index)
+* [Trimming options](#trimming-options)
+  * [`--min_length [int]`](#--min_length-int)
+  * [`--clip_R1 [int]`](#--clip_r1-int)
+  * [`--three_prime_clip_R1 [int]`](#--three_prime_clip_r1-int)
+  * [`--three_prime_adapter [sequence]`](#--three_prime_adapter-sequence)
+* [Skipping QC steps](#skipping-qc-steps)
+  * [`--skipQC`](#--skipqc)
+  * [`--skipFastqc`](#--skipfastqc)
+  * [`--skipMultiqc`](#--skipmultiqc)
 * [Job resources](#job-resources)
   * [Automatic resubmission](#automatic-resubmission)
   * [Custom resource requests](#custom-resource-requests)
@@ -26,19 +41,11 @@
   * [`--outdir`](#--outdir)
   * [`--email`](#--email)
   * [`-name`](#-name)
-  * [`--seqCenter`](#--seqCenter)
+  * [`--seq_center`](#--seq_center)
   * [`-resume`](#-resume)
   * [`-c`](#-c)
-  * [`--mature`](#--mature)
-  * [`--hairpin`](#--hairpin)
-  * [`--bt_index`](#--bt_index)
-  * [`--protocol`](#--protocol)
   * [`--rlocation`](#--rlocation)
-  * [Trimming options](#Trimming options)
-  * [`--saveReference`](#--saveReference)
-  * [`--skipQC`](#--skipQC)
-  * [`--skipFastqc`](#--skipFastqc)
-  * [`--skipMultiqc`](#--skipMultiqc)
+* [Stand-alone scripts](#stand-alone-scripts)
   * [`--custom_config_version`](#--custom_config_version)
   * [`--custom_config_base`](#--custom_config_base)
   * [`--max_memory`](#--max_memory)
@@ -124,6 +131,21 @@ Please note the following requirements:
 1. The path must be enclosed in quotes
 2. The path must have at least one `*` wildcard character
 
+### `--protocol`
+Protocol for constructing smRNA-seq libraries. Note that trimming parameters and 3' adapter sequence are pre-defined with a specified protocol.
+Default: "illumina"
+
+```bash
+--protocol [one protocol listed in the table below]
+```
+
+| Protocol      | Library Prep Kit                        | Trimming Parameter                   | 3' Adapter Sequence   |
+| :------------ | :-------------------------------------- | :----------------------------------- | :-------------------  |
+| illumina      | Illumina TruSeq Small RNA               | clip_R1 = 0; three_prime_clip_R1 = 0 | TGGAATTCTCGGGTGCCAAGG |
+| nextflex      | BIOO SCIENTIFIC  NEXTFLEX Small RNA-Seq | clip_R1 = 4; three_prime_clip_R1 = 4 | TGGAATTCTCGGGTGCCAAGG |
+| qiaseq        | QIAGEN QIAseq miRNA                     | clip_R1 = 0; three_prime_clip_R1 = 0 | AACTGTAGGCACCATCAAT   |
+| cats          | Diagenode CATS Small RNA-seq            | clip_R1 = 3; three_prime_clip_R1 = 0 | GATCGGAAGAGCACACGTCTG |
+
 ## Reference genomes
 
 The pipeline config files come bundled with paths to the illumina iGenomes reference index files. If running with docker or AWS, the configuration is set up to use the [AWS-iGenomes](https://ewels.github.io/AWS-iGenomes/) resource.
@@ -196,6 +218,8 @@ params {
 }
 ```
 
+### `--saveReference`
+Supply this parameter to save any generated reference genome files to your results folder. These can then be used for future pipeline runs, reducing processing times.
 
 ### `--fasta`
 If you prefer, you can specify the full path to your reference genome when you run the pipeline:
@@ -206,6 +230,48 @@ If you prefer, you can specify the full path to your reference genome when you r
 
 ### `--igenomesIgnore`
 Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`.
+
+### `--mature`
+If you prefer, you can specify the full path to the FASTA file of mature miRNAs when you run the pipeline:
+
+```bash
+--mature [path to the FASTA file of mature miRNAs]
+```
+
+### `--hairpin`
+If you prefer, you can specify the full path to the FASTA file of miRNA precursors when you run the pipeline:
+
+```bash
+--hairpin [path to the FASTA file of miRNA precursors]
+```
+
+### `--bt_index`
+If you prefer, you can specify the full path to your reference genome when you run the pipeline:
+
+```bash
+--bt_index [path to Bowtie 1 index]
+```
+
+## Trimming options
+### `--min_length [int]`
+Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
+### `--clip_R1 [int]`
+Instructs Trim Galore to remove bp from the 5' end of read 1
+### `--three_prime_clip_R1 [int]`
+Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed
+### `--three_prime_adapter [sequence]`
+Instructs Trim Galore to remove 3' adapters which are typically used in smRNA-seq library preparation
+
+## Skipping QC steps
+### `--skipQC`
+Skip all QC steps aside from MultiQC
+
+### `--skipFastqc`
+Skip FastQC
+
+### `--skipMultiqc`
+Skip MultiQC
+
 
 ## Job resources
 ### Automatic resubmission
@@ -264,64 +330,10 @@ environment module as is the default. So we specify a config file using `-c` tha
 process.$multiqc.module = []
 ```
 
-### `--mature`
-If you prefer, you can specify the full path to the FASTA file of mature miRNAs when you run the pipeline:
-
-```bash
---mature [path to the FASTA file of mature miRNAs]
-```
-
-### `--hairpin`
-If you prefer, you can specify the full path to the FASTA file of miRNA precursors when you run the pipeline:
-
-```bash
---hairpin [path to the FASTA file of miRNA precursors]
-```
-
-### `--bt_index`
-If you prefer, you can specify the full path to your reference genome when you run the pipeline:
-
-```bash
---bt_index [path to Bowtie 1 index]
-```
-
-### `--protocol`
-Protocol for constructing smRNA-seq libraries. Note that trimming parameters and 3' adapter sequence are pre-defined with a specified protocol.
-Default: "illumina"
-
-```bash
---protocol [one protocol listed in the table below]
-```
-
-| Protocol      | Library Prep Kit                        | Trimming Parameter                   | 3' Adapter Sequence   |
-| :------------ | :-------------------------------------- | :----------------------------------- | :-------------------  |
-| illumina      | Illumina TruSeq Small RNA               | clip_R1 = 0; three_prime_clip_R1 = 0 | TGGAATTCTCGGGTGCCAAGG |
-| nextflex      | BIOO SCIENTIFIC  NEXTFLEX Small RNA-Seq | clip_R1 = 4; three_prime_clip_R1 = 4 | TGGAATTCTCGGGTGCCAAGG |
-| qiaseq        | QIAGEN QIAseq miRNA                     | clip_R1 = 0; three_prime_clip_R1 = 0 | AACTGTAGGCACCATCAAT   |
-| cats          | Diagenode CATS Small RNA-seq            | clip_R1 = 3; three_prime_clip_R1 = 0 | GATCGGAAGAGCACACGTCTG |
-
 ### `--rlocation`
 Some steps in the pipeline run R with required modules. By default, the pipeline will install
 these modules to `~/R/nxtflow_libs/` if not present. You can specify what path to use with this
 command line flag.
-
-### Trimming options
-`--min_length [int]`: Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
-`--clip_R1 [int]`: Instructs Trim Galore to remove bp from the 5' end of read 1
-`--three_prime_clip_R1 [int]`: Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed
-`--three_prime_adapter [sequence]` : Instructs Trim Galore to remove 3' adapters which are typically used in smRNA-seq library preparation
-
-### `--saveReference`
-Supply this parameter to save any generated reference genome files to your results folder. These can then be used for future pipeline runs, reducing processing times.
-
-### `--skipQC`
-Skip all QC steps aside from MultiQC
-
-### `--skipFastqc`
-Skip FastQC
-
-### `--skipMultiqc`
-Skip MultiQC
 
 ## Stand-alone scripts
 The `bin` directory contains some scripts used by the pipeline which may also be run manually:
