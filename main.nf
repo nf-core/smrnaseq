@@ -117,7 +117,7 @@ if (params.mature) { mature = file(params.mature, checkIfExists: true) } else { 
 
 if (params.hairpin) { hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
 
-if (params.gtf) { gtf = file(params.gtf, checkIfExists: true) } else { exit 1, "GTF annotation file not specified!" }
+if (params.gtf) { gtf = file(params.gtf, checkIfExists: true) }
 
 if( params.bt_index ){
     bt_index = file("${params.bt_index}.fa")
