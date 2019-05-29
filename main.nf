@@ -132,7 +132,7 @@ if( !params.gtf || !params.bt_index) {
 if( !params.mirtrace_species ){
     exit 1, "Reference species for miRTrace is not defined."
 }
-multiqc_config = file(params.multiqc_config)
+multiqc_config = file(params.multiqc_config, checkIfExists: true)
 
 // Has the run name been specified by the user?
 //  this has the bonus effect of catching both -name and --name
@@ -153,7 +153,7 @@ if( workflow.profile == 'awsbatch') {
 
 // Stage config files
 ch_multiqc_config = Channel.fromPath(params.multiqc_config, checkIfExists: true)
-ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
+ch_output_docs = Channel.fromPath("$baseDir/docs/output.md", checkIfExists: true)
 
 /*
  * Create a channel for input read files
