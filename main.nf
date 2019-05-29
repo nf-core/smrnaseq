@@ -152,7 +152,7 @@ if( workflow.profile == 'awsbatch') {
 }
 
 // Stage config files
-ch_multiqc_config = Channel.fromPath(params.multiqc_config)
+ch_multiqc_config = Channel.fromPath(params.multiqc_config, checkIfExists: true)
 ch_output_docs = Channel.fromPath("$baseDir/docs/output.md")
 
 /*
