@@ -330,11 +330,6 @@ environment module as is the default. So we specify a config file using `-c` tha
 process.$multiqc.module = []
 ```
 
-### `--rlocation`
-Some steps in the pipeline run R with required modules. By default, the pipeline will install
-these modules to `~/R/nxtflow_libs/` if not present. You can specify what path to use with this
-command line flag.
-
 ## Stand-alone scripts
 The `bin` directory contains some scripts used by the pipeline which may also be run manually:
 

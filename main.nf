@@ -303,7 +303,7 @@ process fastqc {
     publishDir "${params.outdir}/fastqc", mode: 'copy'
 
     when:
-    !params.skip_qc && !params.skip_fastqc
+    !params.skipQC && !params.skipFastqc
 
     input:
     file reads from raw_reads_fastqc
@@ -388,7 +388,7 @@ process bowtie_miRBase_mature {
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
-    seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seqCenter}'" : ''
+    seq_center = params.seq_center ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seq_center}'" : ''
     """
     bowtie \\
         $index_base \\
@@ -402,7 +402,7 @@ process bowtie_miRBase_mature {
         -e 99999 \\
         --chunkmbs 2048 \\
         --un ${prefix}.mature_unmapped.fq \\
-        -S $seqCenter \\
+        -S $seq_center \\
         | samtools view -bS - > ${prefix}.mature.bam
 
     gzip ${prefix}.mature_unmapped.fq
@@ -428,7 +428,7 @@ process bowtie_miRBase_hairpin {
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     prefix = reads.toString() - '.mature_unmapped.fq.gz'
-    seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seqCenter}'" : ''
+    seq_center = params.seq_center ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seq_center}'" : ''
     """
     bowtie \\
         $index_base \\
@@ -442,7 +442,7 @@ process bowtie_miRBase_hairpin {
         --chunkmbs 2048 \\
         -q <(zcat $reads) \\
         --un ${prefix}.hairpin_unmapped.fq \\
-        -S $seqCenter \\
+        -S $seq_center \\
         | samtools view -bS - > ${prefix}.hairpin.bam
 
     gzip ${prefix}.hairpin_unmapped.fq
@@ -525,7 +525,7 @@ if( params.gtf && params.bt_index) {
         script:
         index_base = bt_indices[0].toString().tokenize(' ')[0].tokenize('.')[0]
         prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
-        seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seqCenter}'" : ''
+        seq_center = params.seq_center ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seq_center}'" : ''
         """
         bowtie \\
             $index_base \\
@@ -538,7 +538,7 @@ if( params.gtf && params.bt_index) {
             --strata \\
             -e 99999 \\
             --chunkmbs 2048 \\
-            -S $seqCenter \\
+            -S $seq_center \\
             | samtools view -bS - > ${prefix}.bowtie.bam
         """
     }
@@ -646,7 +646,7 @@ process multiqc {
     publishDir "${params.outdir}/MultiQC", mode: 'copy'
 
     when:
-    !params.skip_qc && !params.skip_multiqc
+    !params.skipQC && !params.skipMultiqc
 
     input:
     file multiqc_config from ch_multiqc_config
