@@ -1,5 +1,5 @@
 ========================================
- nf-core/smrnaseq: small RNA-Seq Best Practice v${version}
+ nf-core/smrnaseq v${version}
 ========================================
 Run Name: $runName
 
@@ -15,6 +15,7 @@ The full error message was:
 ${errorReport}
 """
 } %>
+
 
 The workflow was completed at $dateComplete (duration: $duration)
 

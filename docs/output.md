@@ -2,9 +2,9 @@
 
 **nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data analysis.
 
-This document describes the output produced by the pipeline.
+This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
 
-## Pipeline overview:
+## Pipeline overview
 The pipeline is built using [Nextflow](https://www.nextflow.io/)
 and processes data using the following steps:
 
@@ -49,7 +49,7 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 * `sample_trimmed_fastqc.zip`
   * FastQC report for trimmed reads
 
-## Bowtie
+## Bowtie - miRNAs
 [Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) in [miRBase](http://www.mirbase.org/).
 
 **Output directory: `results/bowtie`**
@@ -103,7 +103,7 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 **Example**: Heatmap of tumor and normal samples based on the top differentially expressed mature miRNAs.
 ![edgeR](images/Example_heatmap.png)
 
-## Bowtie
+## Bowtie - QC
 [Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the reference genome for quality control purposes.
 
 **Output directory: `results/bowtie_ref`**
@@ -152,11 +152,13 @@ Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/maste
 ## MultiQC
 [MultiQC](http://multiqc.info) is a visualisation tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in within the report data directory.
 
-**Output directory: `results/MultiQC`**
+The pipeline has special steps which allow the software versions used to be reported in the MultiQC output for future traceability.
 
-* `multiqc_report.html`
+**Output directory: `results/multiqc`**
+
+* `Project_multiqc_report.html`
   * MultiQC report - a standalone HTML file that can be viewed in your web browser
-* `multiqc_data/`
+* `Project_multiqc_data/`
   * Directory containing parsed statistics from the different tools used in the pipeline
 
-For more information about how to use MultiQC reports, see http://multiqc.info
+For more information about how to use MultiQC reports, see [http://multiqc.info](http://multiqc.info)

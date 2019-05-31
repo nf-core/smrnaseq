@@ -1,56 +1,30 @@
 #!/usr/bin/env nextflow
-
 /*
 ========================================================================================
-               S M A L L    R N A - S E Q    B E S T    P R A C T I C E
+                         nf-core/smrnaseq
 ========================================================================================
- Small-RNA-Seq Best Practice Analysis Pipeline. Started May 2016.
+ nf-core/smrnaseq Analysis Pipeline.
  #### Homepage / Documentation
  https://github.com/nf-core/smrnaseq
- #### Authors
- Phil Ewels <phil.ewels@scilifelab.se>
- Chuan Wang <chuan.wang@scilifelab.se>
- Rickard Hammarén <rickard.hammaren@scilifelab.se>
-----------------------------------------------------------------------------------------
-----------------------------------------------------------------------------------------
- Pipeline overview:
- - 1:   FastQC for raw sequencing reads quality control
- - 2:   Trim Galore! for adapter trimming
- - 3.1: Bowtie 1 alignment against miRBase mature miRNA
- - 3.2: Post-alignment processing of miRBase mature miRNA counts
- - 3.3: edgeR analysis on miRBase mature miRNA counts
-        - TMM normalization and a table of top expression mature miRNA
-        - MDS plot clustering samples
-        - Heatmap of sample similarities
- - 4.1: Bowtie 1 alignment against miRBase hairpin for the unaligned reads in step 3
- - 4.2: Post-alignment processing of miRBase hairpin counts
- - 4.3: edgeR analysis on miRBase hairpin counts
-        - TMM normalization and a table of top expression hairpin
-        - MDS plot clustering samples
-        - Heatmap of sample similarities
- - 5.1: Bowtie 1 alignment against host reference genome
- - 5.2: Post-alignment processing of Bowtie 1 alignment against host reference genome
- - 6:   NGI-Visualization of Bowtie alignment statistics
- - 7:   miRTrace for quality control
- - 8:   MultiQC
 ----------------------------------------------------------------------------------------
 */
 
 def helpMessage() {
+    log.info nfcoreHeader()
     log.info"""
-    =========================================
-     nf-core/smrnaseq : smRNA-Seq Best Practice v${params.version}
-    =========================================
+
     Usage:
 
     The typical command for running the pipeline is as follows:
 
-    nextflow run nf-core/smrnaseq --reads '*.fastq.gz' --genome GRCh37
+    nextflow run nf-core/smrnaseq --reads '*.fastq.gz' --genome GRCh37 -profile docker
 
     Mandatory arguments:
       --reads                       Path to input data (must be surrounded with quotes).
                                     NOTE! Paired-end data is NOT supported by this pipeline! For paired-end data, use Read 1 only
       --genome                      Name of iGenomes reference
+      --protocol                    Library preparation protocol. Default: "illumina". Can be set as "illumina", "nextflex", "qiaseq" or "cats"
+
 
     References
       --saveReference               Save the generated reference files the the Results directory
@@ -60,21 +34,28 @@ def helpMessage() {
       --mirtrace_species            Species for miRTrace. Pre-defined when '--genome' is specified
 
     Trimming options
-      --length [int]                Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
+      --three_prime_adapter         3’ Adapter to trim. Default: None
+      --min_length [int]            Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
       --clip_R1 [int]               Instructs Trim Galore to remove bp from the 5' end of read 1
       --three_prime_clip_R1 [int]   Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed
 
-    Other options:
+    QC
+      --skipQC                     Skip all QC steps aside from MultiQC
+      --skipFastqc                 Skip FastQC
+      --skipMultiqc                Skip MultiQC
+
+    Other options
       --outdir                      The output directory where the results will be saved
       --email                       Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits
-      --clusterOptions              Extra SLURM options, used in conjunction with Uppmax.config
       -name                         Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic
-      --seqCenter                   Text about sequencing center which will be added in the header of output bam files
-      --protocol                    Library preparation protocol. Default: "illumina". Can be set as "illumina", "nextflex", "qiaseq" or "cats"
-      --three_prime_adapter         3’ Adapter to trim. Default: None
-      --skip_qc                     Skip all QC steps aside from MultiQC
-      --skip_fastqc                 Skip FastQC
-      --skip_multiqc                Skip MultiQC
+      --seq_center                   Text about sequencing center which will be added in the header of output bam files
+      --maxMultiqcEmailFileSize     Theshold size for MultiQC report to be attached in notification email. If file generated by pipeline exceeds the threshold, it will not be attached (Default: 25MB)
+      -name                         Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
+
+    AWSBatch options:
+      --awsqueue                    The AWSBatch JobQueue that needs to be set when running on AWSBatch
+      --awsregion                   The AWS Region for your AWS Batch job to run on
+
     """.stripIndent()
 }
 
@@ -82,15 +63,19 @@ def helpMessage() {
  * SET UP CONFIGURATION VARIABLES
  */
 
-// Show help emssage
-params.help = false
+// Show help message
 if (params.help){
     helpMessage()
     exit 0
 }
 
+
+// Check if genome exists in the config file
+if (params.genomes && params.genome && !params.genomes.containsKey(params.genome)) {
+    exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
+}
+
 // Genome options
-params.genome = false
 params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
 params.bt_index = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
 params.bt_indices = null
@@ -130,18 +115,13 @@ if (params.protocol == "illumina"){
 if( !params.mature || !params.hairpin ){
     exit 1, "Missing mature / hairpin reference indexes! Is --genome specified?"
 }
-if( params.mature ){
-    mature = file(params.mature)
-    if( !mature.exists() ) exit 1, "Mature file not found: ${params.mature}"
-}
-if( params.hairpin ){
-    hairpin = file(params.hairpin)
-    if( !hairpin.exists() ) exit 1, "Hairpin file not found: ${params.hairpin}"
-}
-if( params.gtf ){
-    gtf = file(params.gtf)
-    if( !gtf.exists() ) exit 1, "GTF file not found: ${params.gtf}"
-}
+
+if (params.mature) { mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
+
+if (params.hairpin) { hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
+
+if (params.gtf) { gtf = file(params.gtf, checkIfExists: true) }
+
 if( params.bt_index ){
     bt_index = file("${params.bt_index}.fa")
     bt_indices = Channel.fromPath( "${params.bt_index}*.ebwt" ).toList()
@@ -155,7 +135,6 @@ if( !params.gtf || !params.bt_index) {
 if( !params.mirtrace_species ){
     exit 1, "Reference species for miRTrace is not defined."
 }
-multiqc_config = file(params.multiqc_config)
 
 // Has the run name been specified by the user?
 //  this has the bonus effect of catching both -name and --name
@@ -163,6 +142,20 @@ custom_runName = params.name
 if( !(workflow.runName ==~ /[a-z]+_[a-z]+/) ){
   custom_runName = workflow.runName
 }
+
+if( workflow.profile == 'awsbatch') {
+  // AWSBatch sanity checking
+  if (!params.awsqueue || !params.awsregion) exit 1, "Specify correct --awsqueue and --awsregion parameters on AWSBatch!"
+  // Check outdir paths to be S3 buckets if running on AWSBatch
+  // related: https://github.com/nextflow-io/nextflow/issues/813
+  if (!params.outdir.startsWith('s3:')) exit 1, "Outdir not on S3 - specify S3 Bucket to run on AWSBatch!"
+  // Prevent trace files to be stored on S3 since S3 does not support rolling files.
+  if (workflow.tracedir.startsWith('s3:')) exit 1, "Specify a local tracedir or run without trace! S3 cannot be used for tracefiles."
+}
+
+// Stage config files
+ch_multiqc_config = Channel.fromPath(params.multiqc_config, checkIfExists: true)
+ch_output_docs = Channel.fromPath("$baseDir/docs/output.md", checkIfExists: true)
 
 /*
  * Create a channel for input read files
@@ -180,22 +173,14 @@ if(params.readPaths){
         .into { raw_reads_fastqc; raw_reads_trimgalore; raw_reads_mirtrace }
 }
 
-
 // Header log info
-log.info """=======================================================
-                                          ,--./,-.
-          ___     __   __   __   ___     /,-._.--~\'
-    |\\ | |__  __ /  ` /  \\ |__) |__         }  {
-    | \\| |       \\__, \\__/ |  \\ |___     \\`-._,-`-,
-                                          `._,._,\'
-
-nf-core/smrnaseq : Small RNA-Seq Best Practice v${params.version}
-======================================================="""
+log.info nfcoreHeader()
+if(workflow.revision) summary['Pipeline Release'] = workflow.revision
 def summary = [:]
 summary['Run Name']            = custom_runName ?: workflow.runName
 summary['Reads']               = params.reads
 summary['Genome']              = params.genome
-summary['Trim min length']     = params.length
+summary['Min Trimmed Length']     = params.min_length
 summary["Trim 5' R1"]          = clip_R1
 summary["Trim 3' R1"]          = three_prime_clip_R1
 summary['miRBase mature']      = params.mature
@@ -207,50 +192,88 @@ summary['Protocol']            = params.protocol
 summary['miRTrace species']    = params.mirtrace_species
 summary["3' adapter"]          = three_prime_adapter
 summary['Output dir']          = params.outdir
-summary['Working dir']         = workflow.workDir
+summary['Launch dir']       = workflow.launchDir
+summary['Working dir']      = workflow.workDir
 summary['Current home']        = "$HOME"
 summary['Current user']        = "$USER"
 summary['Current path']        = "$PWD"
 summary['Script dir']          = workflow.projectDir
 summary['Config Profile'] = (workflow.profile == 'standard' ? 'UPPMAX' : workflow.profile)
-if(params.project) summary['UPPMAX Project'] = params.project
-if(params.seqCenter) summary['Seq Center'] = params.seqCenter
-if(params.email) summary['E-mail Address'] = params.email
-log.info summary.collect { k,v -> "${k.padRight(15)}: $v" }.join("\n")
-log.info "==========================================="
-
-// Check that Nextflow version is up to date enough
-// try / throw / catch works for NF versions < 0.25 when this was implemented
-try {
-    if( ! nextflow.version.matches(">= $params.nf_required_version") ){
-        throw GroovyException('Nextflow version too old')
-    }
-} catch (all) {
-    log.error "====================================================\n" +
-              "  Nextflow version $params.nf_required_version required! You are running v$workflow.nextflow.version.\n" +
-              "  Pipeline execution will continue, but things may break.\n" +
-              "  Please run `nextflow self-update` to update Nextflow.\n" +
-              "============================================================"
+summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
+if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
+summary['Script dir']       = workflow.projectDir
+summary['User']             = workflow.userName
+if(workflow.profile == 'awsbatch'){
+   summary['AWS Region']    = params.awsregion
+   summary['AWS Queue']     = params.awsqueue
 }
-// Show a big error message if we're running on the base config and an uppmax cluster
-if( workflow.profile == 'standard'){
-    if ( "hostname".execute().text.contains('.uppmax.uu.se') ) {
-        log.error "====================================================\n" +
-                  "  WARNING! You are running with the default 'standard'\n" +
-                  "  pipeline config profile, which runs on the head node\n" +
-                  "  and assumes all software is on the PATH.\n" +
-                  "  ALL JOBS ARE RUNNING LOCALLY and stuff will probably break.\n" +
-                  "  Please use `-profile uppmax` to run on UPPMAX clusters.\n" +
-                  "============================================================"
-    }
+summary['Config Profile'] = workflow.profile
+if(params.config_profile_description) summary['Config Description'] = params.config_profile_description
+if(params.config_profile_contact)     summary['Config Contact']     = params.config_profile_contact
+if(params.config_profile_url)         summary['Config URL']         = params.config_profile_url
+if(params.email) {
+  summary['E-mail Address']  = params.email
+  summary['MultiQC maxsize'] = params.maxMultiqcEmailFileSize
+}
+log.info summary.collect { k,v -> "${k.padRight(18)}: $v" }.join("\n")
+log.info "\033[2m----------------------------------------------------\033[0m"
+
+// Check the hostnames against configured profiles
+checkHostname()
+
+def create_workflow_summary(summary) {
+    def yaml_file = workDir.resolve('workflow_summary_mqc.yaml')
+    yaml_file.text  = """
+    id: 'nf-core-smrnaseq-summary'
+    description: " - this information is collected when the pipeline is started."
+    section_name: 'nf-core/smrnaseq Workflow Summary'
+    section_href: 'https://github.com/nf-core/smrnaseq'
+    plot_type: 'html'
+    data: |
+        <dl class=\"dl-horizontal\">
+${summary.collect { k,v -> "            <dt>$k</dt><dd><samp>${v ?: '<span style=\"color:#999999;\">N/A</a>'}</samp></dd>" }.join("\n")}
+        </dl>
+    """.stripIndent()
+
+   return yaml_file
 }
 
+/*
+* Parse software version numbers
+*/
+process get_software_versions {
+   publishDir "${params.outdir}/pipeline_info", mode: 'copy',
+   saveAs: {filename ->
+       if (filename.indexOf(".csv") > 0) filename
+       else null
+   }
+
+   output:
+   file 'software_versions_mqc.yaml' into software_versions_yaml
+   file "software_versions.csv"
+
+   script:
+   """
+   echo $workflow.manifest.version > v_pipeline.txt
+   echo $workflow.nextflow.version > v_nextflow.txt
+   echo \$(R --version 2>&1) > v_R.txt
+   fastqc --version > v_fastqc.txt
+   trim_galore --version > v_trim_galore.txt
+   bowtie --version > v_bowtie.txt
+   samtools --version > v_samtools.txt
+   htseq-count -h > v_htseq.txt
+   fasta_formatter -h > v_fastx.txt
+   mirtrace --version > v_mirtrace.txt
+   multiqc --version > v_multiqc.txt
+   scrape_software_versions.py > software_versions_mqc.yaml
+   """
+}
 
 /*
  * PREPROCESSING - Build Bowtie index for mature and hairpin
  */
 process makeBowtieIndex {
-
+    label 'process_medium'
     publishDir path: { params.saveReference ? "${params.outdir}/bowtie/reference" : params.outdir },
                saveAs: { params.saveReference ? it : null }, mode: 'copy'
 
@@ -273,16 +296,16 @@ process makeBowtieIndex {
     """
 }
 
-
 /*
  * STEP 1 - FastQC
  */
 process fastqc {
+    label 'process_low'
     tag "$reads"
     publishDir "${params.outdir}/fastqc", mode: 'copy'
 
     when:
-    !params.skip_qc && !params.skip_fastqc
+    !params.skipQC && !params.skipFastqc
 
     input:
     file reads from raw_reads_fastqc
@@ -301,6 +324,7 @@ process fastqc {
  * STEP 2 - Trim Galore!
  */
 process trim_galore {
+    label 'process_low'
     tag "$reads"
     publishDir "${params.outdir}/trim_galore", mode: 'copy'
 
@@ -313,7 +337,7 @@ process trim_galore {
     file "*_fastqc.{zip,html}" into trimgalore_fastqc_reports
 
     script:
-    tg_length = "--length ${params.length}"
+    tg_length = "--length ${params.min_length}"
     c_r1 = clip_R1 > 0 ? "--clip_R1 ${clip_R1}" : ''
     tpc_r1 = three_prime_clip_R1 > 0 ? "--three_prime_clip_R1 ${three_prime_clip_R1}" : ''
     tpa = (params.protocol == "qiaseq" | params.protocol == "cats") ? "--adapter ${three_prime_adapter}" : '--small_rna'
@@ -323,11 +347,13 @@ process trim_galore {
 }
 
 
+
 /*
  * STEP 2.1 - Insertsize
  */
 
 process insertsize {
+    label 'process_low'
     tag "$reads"
     publishDir "${params.outdir}/trim_galore/insertsize", mode: 'copy'
 
@@ -349,6 +375,7 @@ process insertsize {
  * STEP 3 - Bowtie miRBase mature miRNA
  */
 process bowtie_miRBase_mature {
+    label 'process_medium'
     tag "$reads"
     publishDir "${params.outdir}/bowtie/miRBase_mature", mode: 'copy', pattern: '*.mature_unmapped.fq.gz'
 
@@ -363,7 +390,7 @@ process bowtie_miRBase_mature {
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
-    seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seqCenter}'" : ''
+    seq_center = params.seq_center ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seq_center}'" : ''
     """
     bowtie \\
         $index_base \\
@@ -377,7 +404,7 @@ process bowtie_miRBase_mature {
         -e 99999 \\
         --chunkmbs 2048 \\
         --un ${prefix}.mature_unmapped.fq \\
-        -S $seqCenter \\
+        -S $seq_center \\
         | samtools view -bS - > ${prefix}.mature.bam
 
     gzip ${prefix}.mature_unmapped.fq
@@ -388,6 +415,7 @@ process bowtie_miRBase_mature {
  * STEP 4 - Bowtie against miRBase hairpin
  */
 process bowtie_miRBase_hairpin {
+    label 'process_medium'
     tag "$reads"
     publishDir "${params.outdir}/bowtie/miRBase_hairpin", mode: 'copy', pattern: '*.hairpin_unmapped.fq.gz'
 
@@ -402,7 +430,7 @@ process bowtie_miRBase_hairpin {
     script:
     index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     prefix = reads.toString() - '.mature_unmapped.fq.gz'
-    seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seqCenter}'" : ''
+    seq_center = params.seq_center ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seq_center}'" : ''
     """
     bowtie \\
         $index_base \\
@@ -416,12 +444,13 @@ process bowtie_miRBase_hairpin {
         --chunkmbs 2048 \\
         -q <(zcat $reads) \\
         --un ${prefix}.hairpin_unmapped.fq \\
-        -S $seqCenter \\
+        -S $seq_center \\
         | samtools view -bS - > ${prefix}.hairpin.bam
 
     gzip ${prefix}.hairpin_unmapped.fq
     """
 }
+
 
 
 /*
@@ -433,6 +462,7 @@ def wrap_mature_and_hairpin = { file ->
 }
 
 process miRBasePostAlignment {
+    label 'process_medium'
     tag "$input"
     publishDir "${params.outdir}/bowtie", mode: 'copy', saveAs: wrap_mature_and_hairpin
 
@@ -457,6 +487,8 @@ process miRBasePostAlignment {
  * STEP 5.2 - edgeR miRBase feature counts processing
  */
 process edgeR_miRBase {
+    label 'process_low'
+    label 'process_ignore'
     publishDir "${params.outdir}/edgeR", mode: 'copy', saveAs: wrap_mature_and_hairpin
 
     input:
@@ -481,6 +513,7 @@ if( params.gtf && params.bt_index) {
      * STEP 6.1 - Bowtie 1 against reference genome
      */
     process bowtie_ref {
+        label 'process_high'
         tag "$reads"
         publishDir "${params.outdir}/bowtie_ref", mode: 'copy'
 
@@ -494,7 +527,7 @@ if( params.gtf && params.bt_index) {
         script:
         index_base = bt_indices[0].toString().tokenize(' ')[0].tokenize('.')[0]
         prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
-        seqCenter = params.seqCenter ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seqCenter}'" : ''
+        seq_center = params.seq_center ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seq_center}'" : ''
         """
         bowtie \\
             $index_base \\
@@ -507,7 +540,7 @@ if( params.gtf && params.bt_index) {
             --strata \\
             -e 99999 \\
             --chunkmbs 2048 \\
-            -S $seqCenter \\
+            -S $seq_center \\
             | samtools view -bS - > ${prefix}.bowtie.bam
         """
     }
@@ -517,6 +550,8 @@ if( params.gtf && params.bt_index) {
      */
 
     process bowtie_unmapped {
+        label 'process_ignore'
+        label 'process_medium'
         tag "${input_files[0].baseName}"
         publishDir "${params.outdir}/bowtie_ref/unmapped", mode: 'copy'
 
@@ -541,6 +576,8 @@ if( params.gtf && params.bt_index) {
      * STEP 6.3 - NGI-Visualizations of Bowtie 1 alignment against host reference genome
      */
     process ngi_visualizations {
+        label 'process_low'
+        label 'process_ignore'
         tag "$bowtie_bam"
         publishDir "${params.outdir}/bowtie_ref/ngi_visualizations", mode: 'copy'
 
@@ -604,30 +641,6 @@ if( params.mirtrace_species ) {
 
 }
 
-
-/*
- * Parse software version numbers
- */
-process get_software_versions {
-
-    output:
-    file 'software_versions_mqc.yaml' into software_versions_yaml
-
-    script:
-    """
-    echo "$params.version" > v_nfcore_smrnaseq.txt
-    echo "$workflow.nextflow.version" > v_nextflow.txt
-    fastqc --version > v_fastqc.txt
-    trim_galore --version > v_trim_galore.txt
-    bowtie --version > v_bowtie.txt
-    samtools --version > v_samtools.txt
-    fasta_formatter -h > v_fastx.txt
-    mirtrace --version > v_mirtrace.txt
-    multiqc --version > v_multiqc.txt
-    scrape_software_versions.py > software_versions_mqc.yaml
-    """
-}
-
 /*
  * STEP 8 - MultiQC
  */
@@ -635,25 +648,49 @@ process multiqc {
     publishDir "${params.outdir}/MultiQC", mode: 'copy'
 
     when:
-    !params.skip_qc && !params.skip_multiqc
+    !params.skipQC && !params.skipMultiqc
 
     input:
+    file multiqc_config from ch_multiqc_config
     file ('fastqc/*') from fastqc_results.toList()
     file ('trim_galore/*') from trimgalore_results.toList()
     file ('mirtrace/*') from mirtrace_results.toList()
     file ('software_versions/*') from software_versions_yaml.toList()
+    file workflow_summary from create_workflow_summary(summary)
 
     output:
-    file '*multiqc_report.html' into multiqc_html
-    file '*multiqc_data' into multiqc_data
+    file "*multiqc_report.html" into multiqc_report
+    file "*_data"
 
     script:
     rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
     rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
     """
-    multiqc -f $rtitle $rfilename --config $multiqc_config .
+    multiqc . -f $rtitle $rfilename --config $multiqc_config -m adapterRemoval -m fastqc -m custom_content
     """
 }
+
+
+/*
+ * STEP 9 - Output Description HTML
+ */
+process output_documentation {
+    publishDir "${params.outdir}/pipeline_info", mode: 'copy'
+
+    input:
+    file output_docs from ch_output_docs
+
+    output:
+    file "results_description.html"
+
+    script:
+    """
+    markdown_to_html.r $output_docs results_description.html
+    """
+}
+
+
+
 
 /*
  * Completion e-mail notification
@@ -666,7 +703,7 @@ workflow.onComplete {
       subject = "[nf-core/smrnaseq] FAILED: $workflow.runName"
     }
     def email_fields = [:]
-    email_fields['version'] = params.version
+    email_fields['version'] = workflow.manifest.version
     email_fields['runName'] = custom_runName ?: workflow.runName
     email_fields['success'] = workflow.success
     email_fields['dateComplete'] = workflow.complete
@@ -679,15 +716,29 @@ workflow.onComplete {
     email_fields['summary'] = summary
     email_fields['summary']['Date Started'] = workflow.start
     email_fields['summary']['Date Completed'] = workflow.complete
-    email_fields['summary']['Nextflow Version'] = workflow.nextflow.version
-    email_fields['summary']['Nextflow Build'] = workflow.nextflow.build
-    email_fields['summary']['Nextflow Compile Timestamp'] = workflow.nextflow.timestamp
     email_fields['summary']['Pipeline script file path'] = workflow.scriptFile
     email_fields['summary']['Pipeline script hash ID'] = workflow.scriptId
     if(workflow.repository) email_fields['summary']['Pipeline repository Git URL'] = workflow.repository
     if(workflow.commitId) email_fields['summary']['Pipeline repository Git Commit'] = workflow.commitId
     if(workflow.revision) email_fields['summary']['Pipeline Git branch/tag'] = workflow.revision
     if(workflow.container) email_fields['summary']['Docker image'] = workflow.container
+    email_fields['summary']['Nextflow Version'] = workflow.nextflow.version
+    email_fields['summary']['Nextflow Build'] = workflow.nextflow.build
+    email_fields['summary']['Nextflow Compile Timestamp'] = workflow.nextflow.timestamp
+
+    // On success try attach the multiqc report
+    def mqc_report = null
+    try {
+        if (workflow.success) {
+            mqc_report = multiqc_report.getVal()
+            if (mqc_report.getClass() == ArrayList){
+                log.warn "[nf-core/smrnaseq] Found multiple reports from process 'multiqc', will use only one"
+                mqc_report = mqc_report[0]
+            }
+        }
+    } catch (all) {
+        log.warn "[nf-core/smrnaseq] Could not attach MultiQC report to summary email"
+    }
 
     // Render the TXT template
     def engine = new groovy.text.GStringTemplateEngine()
@@ -701,7 +752,7 @@ workflow.onComplete {
     def email_html = html_template.toString()
 
     // Render the sendmail template
-    def smail_fields = [ email: params.email, subject: subject, email_txt: email_txt, email_html: email_html, baseDir: "$baseDir" ]
+    def smail_fields = [ email: params.email, subject: subject, email_txt: email_txt, email_html: email_html, baseDir: "$baseDir", mqcFile: mqc_report, mqcMaxSize: params.maxMultiqcEmailFileSize.toBytes() ]
     def sf = new File("$baseDir/assets/sendmail_template.txt")
     def sendmail_template = engine.createTemplate(sf).make(smail_fields)
     def sendmail_html = sendmail_template.toString()
@@ -729,7 +780,7 @@ workflow.onComplete {
     email_html = email_html.replaceAll(~/cid:ngilogo/, "data:image/png;base64,$ngilogo")
 
     // Write summary e-mail HTML to a file
-    def output_d = new File( "${params.outdir}/Documentation/" )
+    def output_d = new File( "${params.outdir}/pipeline_info/" )
     if( !output_d.exists() ) {
       output_d.mkdirs()
     }
@@ -738,6 +789,66 @@ workflow.onComplete {
     def output_tf = new File( output_d, "pipeline_report.txt" )
     output_tf.withWriter { w -> w << email_txt }
 
-    log.info "[nf-core/smrnaseq] Pipeline Complete"
+    c_reset = params.monochrome_logs ? '' : "\033[0m";
+    c_purple = params.monochrome_logs ? '' : "\033[0;35m";
+    c_green = params.monochrome_logs ? '' : "\033[0;32m";
+    c_red = params.monochrome_logs ? '' : "\033[0;31m";
 
+    if (workflow.stats.ignoredCount > 0 && workflow.success) {
+      log.info "${c_purple}Warning, pipeline completed, but with errored process(es) ${c_reset}"
+      log.info "${c_red}Number of ignored errored process(es) : ${workflow.stats.ignoredCount} ${c_reset}"
+      log.info "${c_green}Number of successfully ran process(es) : ${workflow.stats.succeedCount} ${c_reset}"
+    }
+
+    if(workflow.success){
+        log.info "${c_purple}[nf-core/smrnaseq]${c_green} Pipeline completed successfully${c_reset}"
+    } else {
+        checkHostname()
+        log.info "${c_purple}[nf-core/smrnaseq]${c_red} Pipeline completed with errors${c_reset}"
+    }
+
+}
+
+
+def nfcoreHeader(){
+    // Log colors ANSI codes
+    c_reset = params.monochrome_logs ? '' : "\033[0m";
+    c_dim = params.monochrome_logs ? '' : "\033[2m";
+    c_black = params.monochrome_logs ? '' : "\033[0;30m";
+    c_green = params.monochrome_logs ? '' : "\033[0;32m";
+    c_yellow = params.monochrome_logs ? '' : "\033[0;33m";
+    c_blue = params.monochrome_logs ? '' : "\033[0;34m";
+    c_purple = params.monochrome_logs ? '' : "\033[0;35m";
+    c_cyan = params.monochrome_logs ? '' : "\033[0;36m";
+    c_white = params.monochrome_logs ? '' : "\033[0;37m";
+    return """    ${c_dim}----------------------------------------------------${c_reset}
+                                            ${c_green},--.${c_black}/${c_green},-.${c_reset}
+    ${c_blue}        ___     __   __   __   ___     ${c_green}/,-._.--~\'${c_reset}
+    ${c_blue}  |\\ | |__  __ /  ` /  \\ |__) |__         ${c_yellow}}  {${c_reset}
+    ${c_blue}  | \\| |       \\__, \\__/ |  \\ |___     ${c_green}\\`-._,-`-,${c_reset}
+                                            ${c_green}`._,._,\'${c_reset}
+    ${c_purple}  nf-core/rnaseq v${workflow.manifest.version}${c_reset}
+    ${c_dim}----------------------------------------------------${c_reset}
+    """.stripIndent()    
+}
+
+def checkHostname(){
+    def c_reset = params.monochrome_logs ? '' : "\033[0m"
+    def c_white = params.monochrome_logs ? '' : "\033[0;37m"
+    def c_red = params.monochrome_logs ? '' : "\033[1;91m"
+    def c_yellow_bold = params.monochrome_logs ? '' : "\033[1;93m"
+    if(params.hostnames){
+        def hostname = "hostname".execute().text.trim()
+        params.hostnames.each { prof, hnames ->
+            hnames.each { hname ->
+                if(hostname.contains(hname) && !workflow.profile.contains(prof)){
+                    log.error "====================================================\n" +
+                            "  ${c_red}WARNING!${c_reset} You are running with `-profile $workflow.profile`\n" +
+                            "  but your machine hostname is ${c_white}'$hostname'${c_reset}\n" +
+                            "  ${c_yellow_bold}It's highly recommended that you use `-profile $prof${c_reset}`\n" +
+                            "============================================================"
+                }
+            }
+        }
+    }
 }
