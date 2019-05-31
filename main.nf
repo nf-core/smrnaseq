@@ -135,7 +135,6 @@ if( !params.gtf || !params.bt_index) {
 if( !params.mirtrace_species ){
     exit 1, "Reference species for miRTrace is not defined."
 }
-multiqc_config = file(params.multiqc_config, checkIfExists: true)
 
 // Has the run name been specified by the user?
 //  this has the bonus effect of catching both -name and --name
