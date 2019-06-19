@@ -12,6 +12,8 @@ dependencies:
   - samtools=1.9
   - bowtie=1.2.2
   - multiqc=1.7
+  - mirtop=0.4.18a
+  - razers3=3.5.3
   - bioconductor-edger=3.26.0
   - bioconductor-limma=3.40.0
   - conda-forge::r-statmod=1.4.30
