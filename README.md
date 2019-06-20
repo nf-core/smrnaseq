@@ -1,6 +1,6 @@
 # nf-core/smrnaseq
 
-**Small-RNA-Seq Best Practice Analysis Pipeline. Started May 2016.**.
+**Small-RNA-Seq Best Practice Analysis Pipeline**.
 
 [![Build Status](https://travis-ci.com/nf-core/smrnaseq.svg?branch=master)](https://travis-ci.com/nf-core/smrnaseq)
 [![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A50.32.0-brightgreen.svg)](https://www.nextflow.io/)
@@ -27,4 +27,6 @@ The nf-core/smrnaseq pipeline comes with documentation about the pipeline, found
 <!-- TODO nf-core: Add a brief overview of what the pipeline does and how it works -->
 
 ## Credits
-nf-core/smrnaseq was originally written by Phil Ewels <phil.ewels@scilifelab.se>, Chuan Wang <chuan.wang@scilifelab.se>, Rickard Hammarén <rickard.hammaren@scilifelab.se>
+nf-core/smrnaseq was originally written for use at the [National Genomics Infrastructure](https://portal.scilifelab.se/genomics/) at [SciLifeLab](http://www.scilifelab.se/) in Stockholm, Sweden, by Phil Ewels (@ewels), Chuan Wang (@chuan-wang) and Rickard Hammarén (@Hammarn).
+
+It is been updated by Lorena Pantano (@lpantano).
