@@ -1,5 +1,5 @@
 FROM nfcore/base
-LABEL authors="Phil Ewels <phil.ewels@scilifelab.se>" \
+LABEL authors="Alexander Peltzer <alex.peltzer@gmail.com>" \
       description="Docker image containing all requirements for nf-core/smrnaseq pipeline"
 
 COPY environment.yml /
