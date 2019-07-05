@@ -21,6 +21,7 @@ dependencies:
   - conda-forge::r-gplots=3.0.1.1
   - conda-forge::r-r.methodss3=1.7.1
   - conda-forge::r-markdown=0.9
+  - conda-forge::matplotlib=3.0.3
   - htseq=0.11.2
   - fastx_toolkit=0.0.14
   - mirtrace=1.0.0

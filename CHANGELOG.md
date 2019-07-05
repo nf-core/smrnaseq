@@ -1,6 +1,7 @@
 # nf-core/smrnaseq: Changelog
 
 ## v1.0dev - 2019-06-19
+* Add matplotlib to avoid multiqc error
 * Add mirtop and razers tools
 * Adapt code and docs to [nf-core](http://nf-co.re/) template
 * Update tools and Dockerfile/Singularity to match current template
@@ -18,6 +19,7 @@
 * r-markdown 0.9
 * Added mirtop 0.4.18a
 * Added rzers3 3.5.3
+* Added matplotlib 3.0.3
 
 ## [1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.0) - 2019-01-10
 * Add "protocol" with pre-defined settings
