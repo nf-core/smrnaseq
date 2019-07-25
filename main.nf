@@ -30,8 +30,9 @@ def helpMessage() {
       --saveReference               Save the generated reference files the the Results directory
       --mature                      Path to the FASTA file of mature miRNAs
       --hairpin                     Path to the FASTA file of miRNA precursors
+      --mirna_gtf                   GFF/GTF file with coordinates positions of precursor and miRNAs. See: ftp://mirbase.org/pub/mirbase/CURRENT/genomes/hsa.gff3
       --bt_index                    Path to the bowtie 1 index files of the host reference genome
-      --mirtrace_species            Species for miRTrace. Pre-defined when '--genome' is specified
+      --mirtrace_species            Species for miRTrace. Pre-defined when '--genome' is specified. (hsa, mmu ...)
 
     Trimming options
       --three_prime_adapter         3’ Adapter to trim. Default: None
@@ -88,7 +89,7 @@ params.mirtrace_species = params.genome ? params.genomes[ params.genome ].mirtra
 clip_R1 = params.clip_R1
 three_prime_clip_R1 = params.three_prime_clip_R1
 three_prime_adapter = params.three_prime_adapter
-
+protocol = params.protocol
 // Presets
 if (params.protocol == "illumina"){
     clip_R1 = 0
@@ -105,11 +106,21 @@ if (params.protocol == "illumina"){
 } else if (params.protocol == "cats"){
     clip_R1 = 3
     three_prime_clip_R1 = 0
-    three_prime_adapter = "GATCGGAAGAGCACACGTCTG"
+    // three_prime_adapter = "GATCGGAAGAGCACACGTCTG"
+    three_prime_adapter = "AAAAAAAA"
 } else {
-    exit 1, "Invalid library preparation protocol!"
+    //custom protocol 
+    clip_R1 = params.clip_R1
+    three_prime_clip_R1 = params.three_prime_clip_R1
+    three_prime_adapter = params.three_prime_adapter
+    protocol = params.protocol
 }
 
+if (!params.mirna_gtf && params.mirtrace_species){
+    mirna_gtf = file("ftp://mirbase.org/pub/mirbase/CURRENT/genomes/${params.mirtrace_species}.gff3", checkIfExists: true)
+}else{
+    mirna_gtf = None
+}
 
 // Validate inputs
 if( !params.mature || !params.hairpin ){
@@ -284,14 +295,20 @@ process makeBowtieIndex {
     output:
     file 'mature_idx.*' into mature_index
     file 'hairpin_idx.*' into hairpin_index
+    file 'hairpin_idx.fa' into hairpin_mirtop
 
     script:
     """
-    fasta_formatter -w 0 -i $mature -o mature_igenome.fa
-    fasta_nucleotide_changer -d -i mature_igenome.fa -o mature_idx.fa
+    seqkit grep -r --pattern \".*${params.mirtrace_species}-.*\" $mature > mature_sps.fa
+    seqkit seq --rna2dna mature_sps.fa > mature_igenome.fa
+    fasta_formatter -w 0 -i mature_igenome.fa -o mature_idx.fa
+    # fasta_nucleotide_changer -d -i mature_igenome.fa -o mature_idx.fa
     bowtie-build mature_idx.fa mature_idx
-    fasta_formatter -w 0 -i $hairpin -o hairpin_igenome.fa
-    fasta_nucleotide_changer -d -i hairpin_igenome.fa -o hairpin_idx.fa
+
+    seqkit grep -r --pattern \".*${params.mirtrace_species}-.*\" $hairpin > hairpin_sps.fa
+    seqkit seq --rna2dna hairpin_sps.fa > hairpin_igenome.fa
+    # fasta_nucleotide_changer -d -i hairpin_igenome.fa -o hairpin_idx.fa
+    fasta_formatter -w 0 -i hairpin_igenome.fa -o hairpin_idx.fa
     bowtie-build hairpin_idx.fa hairpin_idx
     """
 }
@@ -332,7 +349,7 @@ process trim_galore {
     file reads from raw_reads_trimgalore
 
     output:
-    file '*.gz' into trimmed_reads_bowtie, trimmed_reads_bowtie_ref, trimmed_reads_insertsize
+    file '*.gz' into trimmed_reads_bowtie, trimmed_reads_collapse, trimmed_reads_bowtie_ref, trimmed_reads_insertsize
     file '*trimming_report.txt' into trimgalore_results
     file "*_fastqc.{zip,html}" into trimgalore_fastqc_reports
 
@@ -340,18 +357,16 @@ process trim_galore {
     tg_length = "--length ${params.min_length}"
     c_r1 = clip_R1 > 0 ? "--clip_R1 ${clip_R1}" : ''
     tpc_r1 = three_prime_clip_R1 > 0 ? "--three_prime_clip_R1 ${three_prime_clip_R1}" : ''
-    tpa = (params.protocol == "qiaseq" | params.protocol == "cats") ? "--adapter ${three_prime_adapter}" : '--small_rna'
+    tpa = (protocol == "qiaseq" | protocol == "cats") ? "--adapter ${three_prime_adapter}" : '--small_rna'
     """
-    trim_galore $tpa $tg_length $c_r1 $tpc_r1 --gzip $reads --fastqc
+    trim_galore --adapter ${three_prime_adapter} $tg_length $c_r1 $tpc_r1 --max_length 40 --gzip $reads --fastqc
     """
 }
-
 
 
 /*
  * STEP 2.1 - Insertsize
  */
-
 process insertsize {
     label 'process_low'
     tag "$reads"
@@ -367,6 +382,27 @@ process insertsize {
     prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
     """
     awk 'NR%4 == 2 {lengths[length(\$0)]++} END {for (l in lengths) {print l, lengths[l]}}' <(zcat $reads) >${prefix}.insertsize
+    """
+}
+
+/*
+ * STEP 2.2 - Collapse
+ */
+process collapse {
+    label 'process_medium'
+    tag "$reads"
+    
+    input:
+    file reads from trimmed_reads_collapse
+
+    output:
+    file 'collapsed/*.fastq' into collapsed_fasta
+
+    script:
+    prefix = reads.toString() - '_trimmed.fq.gz'
+    """
+    seqcluster collapse -f $reads -m 1 --min_size 15 -o collapsed
+    mv collapsed/${prefix}_trimmed_trimmed.fastq collapsed/${prefix}.fastq
     """
 }
 
@@ -424,7 +460,7 @@ process bowtie_miRBase_hairpin {
     file index from hairpin_index
 
     output:
-    file '*.hairpin.bam' into miRBase_hairpin_bam
+    file '*.hairpin.bam' into miRBase_hairpin_bam, miRBase_hairpin_bam_mirtop
     file '*.hairpin_unmapped.fq.gz' into hairpin_unmapped_reads
 
     script:
@@ -451,6 +487,39 @@ process bowtie_miRBase_hairpin {
     """
 }
 
+/*
+ * STEP 4.1 - Bowtie against miRBase hairpin with collapsed reads
+ */
+process bowtie_miRBase_hairpin_collapsed {
+    label 'process_medium'
+    tag "$reads"
+    
+    input:
+    file reads from collapsed_fasta
+    file index from hairpin_index
+
+    output:
+    file '*.bam' into miRBase_hairpin_collapse_bam
+
+    script:
+    index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
+    prefix = reads.baseName
+    seq_center = params.seq_center ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seq_center}'" : ''
+    """
+    bowtie \\
+        $index_base \\
+        -p 2 \\
+        -t \\
+        -a \\
+        --best \\
+        --strata \\
+        -e 99999 \\
+        --chunkmbs 2048 \\
+        -q <(cat $reads) \\
+        -S $seq_center \\
+        | samtools view -bS - > ${prefix}.bam
+    """
+}
 
 
 /*
@@ -470,7 +539,7 @@ process miRBasePostAlignment {
     file input from miRBase_mature_bam.mix(miRBase_hairpin_bam)
 
     output:
-    file "${input.baseName}.count" into miRBase_counts
+    file "${input.baseName}.stats" into miRBase_counts
     file "${input.baseName}.sorted.bam" into miRBase_bam
     file "${input.baseName}.sorted.bam.bai" into miRBase_bai
 
@@ -478,10 +547,9 @@ process miRBasePostAlignment {
     """
     samtools sort ${input.baseName}.bam -o ${input.baseName}.sorted.bam
     samtools index ${input.baseName}.sorted.bam
-    samtools idxstats ${input.baseName}.sorted.bam > ${input.baseName}.count
+    samtools idxstats ${input.baseName}.sorted.bam > ${input.baseName}.stats
     """
 }
-
 
 /*
  * STEP 5.2 - edgeR miRBase feature counts processing
@@ -501,6 +569,33 @@ process edgeR_miRBase {
     """
     edgeR_miRBase.r $input_files
     """
+}
+
+/*
+ * STEP 5.3 - miRNA format conversion to mirGFF3
+ */
+process mirtop_bam_hairpin {
+    label 'process_medium'
+    tag "$input"
+    publishDir "${params.outdir}", mode: 'copy'
+    
+    when:
+    mirna_gtf
+    
+    input:
+    file input from miRBase_hairpin_collapse_bam.collect()
+    file hairpin from hairpin_mirtop
+    file gtf from mirna_gtf
+    
+    output:
+    file "mirtop/mirtop.gff" into mirtop_gff
+    file "mirtop/mirtop.tsv" into mirtop_tsv
+    
+    script:
+    """
+    mirtop gff --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species $input
+    mirtop counts --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species --add-extra --gff mirtop/mirtop.gff
+    """   
 }
 
 
@@ -571,75 +666,43 @@ if( params.gtf && params.bt_index) {
         """
     }
 
-
-    /*
-     * STEP 6.3 - NGI-Visualizations of Bowtie 1 alignment against host reference genome
-     */
-    process ngi_visualizations {
-        label 'process_low'
-        label 'process_ignore'
-        tag "$bowtie_bam"
-        publishDir "${params.outdir}/bowtie_ref/ngi_visualizations", mode: 'copy'
-
-        input:
-        file gtf from gtf
-        file bowtie_bam
-
-        output:
-        file '*.{png,pdf}' into bowtie_ngi_visualizations
-
-        script:
-        // Note! ngi_visualizations needs to be installed!
-        // See https://github.com/NationalGenomicsInfrastructure/ngi_visualizations
-        """
-        #!/usr/bin/env python
-        from ngi_visualizations.biotypes import count_biotypes
-        count_biotypes.main('$gtf','$bowtie_bam')
-        """
-    }
-
 }
 
 
 /*
- * STEP 7 IF A GENOME SPECIFIED ONLY!
+ * STEP 7 - miRTrace
  */
-if( params.mirtrace_species ) {
+process mirtrace {
+     tag "$reads"
+     publishDir "${params.outdir}/miRTrace", mode: 'copy'
+      
+     input:
+     file reads from raw_reads_mirtrace.collect()
 
-    /*
-     * STEP 7 - miRTrace
-     */
-    process mirtrace {
-        tag "$reads"
-        publishDir "${params.outdir}/miRTrace", mode: 'copy'
+     output:
+     file '*mirtrace' into mirtrace_results
 
-         input:
-         file reads from raw_reads_mirtrace.collect()
+     script:
+     primer = (protocol=="cats") ? " " : " --adapter $three_prime_adapter "
+     """
+     for i in $reads
+     do
+         path=\$(realpath \${i})
+         prefix=\$(echo \${i} | sed -e "s/.gz//" -e "s/.fastq//" -e "s/.fq//" -e "s/_val_1//" -e "s/_trimmed//" -e "s/_R1//" -e "s/.R1//")
+         echo \$path","\$prefix
+     done > mirtrace_config
 
-         output:
-         file '*mirtrace' into mirtrace_results
+     mirtrace qc \\
+         --species $params.mirtrace_species \\
+         $primer \\
+         --protocol $protocol \\
+         --config mirtrace_config \\
+         --write-fasta \\
+         --output-dir mirtrace \\
+         --force
+     """
+ }
 
-         script:
-         """
-         for i in $reads
-         do
-             path=\$(realpath \${i})
-             prefix=\$(echo \${i} | sed -e "s/.gz//" -e "s/.fastq//" -e "s/.fq//" -e "s/_val_1//" -e "s/_trimmed//" -e "s/_R1//" -e "s/.R1//")
-             echo \$path","\$prefix
-         done > mirtrace_config
-
-         mirtrace qc \\
-             --species $params.mirtrace_species \\
-             --adapter $three_prime_adapter \\
-             --protocol $params.protocol \\
-             --config mirtrace_config \\
-             --write-fasta \\
-             --output-dir mirtrace \\
-             --force
-         """
-     }
-
-}
 
 /*
  * STEP 8 - MultiQC
@@ -652,10 +715,10 @@ process multiqc {
 
     input:
     file multiqc_config from ch_multiqc_config
-    file ('fastqc/*') from fastqc_results.toList()
-    file ('trim_galore/*') from trimgalore_results.toList()
-    file ('mirtrace/*') from mirtrace_results.toList()
-    file ('software_versions/*') from software_versions_yaml.toList()
+    file ('fastqc/*') from fastqc_results.collect()
+    file ('trim_galore/*') from trimgalore_results.collect()
+    file ('mirtrace/*') from mirtrace_results.collect()
+    file ('software_versions/*') from software_versions_yaml.collect()
     file workflow_summary from create_workflow_summary(summary)
 
     output:
