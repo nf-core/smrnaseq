@@ -119,7 +119,7 @@ if (params.protocol == "illumina"){
 if (!params.mirna_gtf && params.mirtrace_species){
     mirna_gtf = file("ftp://mirbase.org/pub/mirbase/CURRENT/genomes/${params.mirtrace_species}.gff3", checkIfExists: true)
 }else{
-    mirna_gtf = None
+    mirna_gtf = false
 }
 
 // Validate inputs
@@ -431,10 +431,9 @@ process bowtie_miRBase_mature {
     bowtie \\
         $index_base \\
         -q <(zcat $reads) \\
-        -p 2 \\
+        -p ${task.cpus} \\
         -t \\
-        -k 1 \\
-        -m 1 \\
+        -k 50 \\
         --best \\
         --strata \\
         -e 99999 \\
@@ -470,10 +469,9 @@ process bowtie_miRBase_hairpin {
     """
     bowtie \\
         $index_base \\
-        -p 2 \\
+        -p ${task.cpus} \\
         -t \\
-        -k 1 \\
-        -m 1 \\
+        -a \\
         --best \\
         --strata \\
         -e 99999 \\
@@ -508,8 +506,9 @@ process bowtie_miRBase_hairpin_collapsed {
     """
     bowtie \\
         $index_base \\
-        -p 2 \\
+        -p ${task.cpus} \\
         -t \\
+        -k 50 \\
         -a \\
         --best \\
         --strata \\
@@ -520,7 +519,6 @@ process bowtie_miRBase_hairpin_collapsed {
         | samtools view -bS - > ${prefix}.bam
     """
 }
-
 
 /*
  * STEP 5.1 - Post-alignment processing for miRBase mature and hairpin
@@ -602,7 +600,7 @@ process mirtop_bam_hairpin {
 /*
  * STEP 6.1 and 6.2 IF A GENOME SPECIFIED ONLY!
  */
-if( params.gtf && params.bt_index) {
+if( params.gtf && params.bt_index ) {
 
     /*
      * STEP 6.1 - Bowtie 1 against reference genome
@@ -627,10 +625,9 @@ if( params.gtf && params.bt_index) {
         bowtie \\
             $index_base \\
             -q <(zcat $reads) \\
-            -p 8 \\
+            -p ${task.cpus} \\
             -t \\
-            -k 10 \\
-            -m 1 \\
+            -k 50 \\
             --best \\
             --strata \\
             -e 99999 \\
@@ -836,11 +833,7 @@ workflow.onComplete {
 
     // Switch the embedded MIME images with base64 encoded src
     smrnaseqlogo = new File("$baseDir/assets/smrnaseq_logo.png").bytes.encodeBase64().toString()
-    scilifelablogo = new File("$baseDir/assets/SciLifeLab_logo.png").bytes.encodeBase64().toString()
-    ngilogo = new File("$baseDir/assets/NGI_logo.png").bytes.encodeBase64().toString()
     email_html = email_html.replaceAll(~/cid:smrnaseqlogo/, "data:image/png;base64,$smrnaseqlogo")
-    email_html = email_html.replaceAll(~/cid:scilifelablogo/, "data:image/png;base64,$scilifelablogo")
-    email_html = email_html.replaceAll(~/cid:ngilogo/, "data:image/png;base64,$ngilogo")
 
     // Write summary e-mail HTML to a file
     def output_d = new File( "${params.outdir}/pipeline_info/" )

@@ -26,7 +26,7 @@ dependencies:
   - seqcluster=1.2.5
   - htseq=0.11.2
   - fastx_toolkit=0.0.14
-  - seqkit
+  - seqkit=0.10.1
   - mirtrace=1.0.0
   - bioconductor-edger=3.26.0
   - bioconductor-limma=3.40.0
