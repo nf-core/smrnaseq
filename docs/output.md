@@ -68,13 +68,13 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 
 **Output directory: `results/bowtie`**
 
-* `miRBase_mature/sample.mature.count`
+* `miRBase_mature/sample.mature.stats`
   * Raw mapped read counts of mature miRNAs
 * `miRBase_mature/sample.mature.sorted.bam`
   * The sorted BAM file of alignment against mature miRNAs
 * `miRBase_mature/sample.mature.sorted.bam.bai`
   * The index file of alignment against mature miRNAs
-* `miRBase_hairpin/sample.hairpin.count`
+* `miRBase_hairpin/sample.hairpin.statas`
   * Raw mapped read counts of miRNA precursors (hairpins)
 * `miRBase_hairpin/sample.hairpin.sorted.bam`
   * The sorted BAM file of alignment against miRNA precursors (hairpins)
