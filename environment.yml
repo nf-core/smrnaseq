@@ -7,26 +7,26 @@ channels:
   - defaults
 dependencies:
  ## conda-forge packages
-  - conda-forge::r-base=3.5.1
+  - conda-forge::r-base=3.6.1
   - conda-forge::openjdk=11.0.1 # Needed for FastQC - conda build hangs without this
-  - conda-forge::r-statmod=1.4.30
+  - conda-forge::r-statmod=1.4.32
   - conda-forge::r-data.table=1.12.2
   - conda-forge::r-gplots=3.0.1.1
   - conda-forge::r-r.methodss3=1.7.1
-  - conda-forge::r-markdown=0.9
+  - conda-forge::r-markdown=1.0
   - conda-forge::matplotlib=3.0.3 # Current 3.1.0 build incompatible with multiqc=1.7
 
   ## bioconda packages
   - fastqc=0.11.8
-  - trim-galore=0.6.2
+  - trim-galore=0.6.3
   - samtools=1.9
   - bowtie=1.2.2
   - multiqc=1.7
-  - mirtop=0.4.18a
+  - mirtop=0.4.20
   - seqcluster=1.2.5
   - htseq=0.11.2
   - fastx_toolkit=0.0.14
   - seqkit=0.10.1
   - mirtrace=1.0.0
-  - bioconductor-edger=3.26.0
-  - bioconductor-limma=3.40.0
+  - bioconductor-edger=3.26.5
+  - bioconductor-limma=3.40.2
