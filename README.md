@@ -15,21 +15,24 @@ The pipeline is built using Nextflow, a workflow tool to run tasks across multip
 
 1. Raw read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. Adapter trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
-3. Alignment against miRBase mature miRNA ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
-    1. Post-alignment processing of miRBase mature miRNA counts ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-    2. Analysis on miRBase mature miRNA counts ([`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html))
-         * TMM normalization and a table of top expression mature miRNA
-         * MDS plot clustering samples
-         * Heatmap of sample similarities
-4. Alignment against miRBase hairpin for the unaligned reads in step 3 ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
-    1. Post-alignment processing of miRBase hairpin counts ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-    2. Analysis on miRBase hairpin counts  ([`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html))
-         * TMM normalization and a table of top expression hairpin
-         * MDS plot clustering samples
-         * Heatmap of sample similarities
-5. Alignment against host reference genome ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
+3. Basic annotation
+    3.1 Alignment against miRBase mature miRNA ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
+        1. Post-alignment processing of miRBase mature miRNA counts ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
+        2. Analysis on miRBase mature miRNA counts ([`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html))
+            * TMM normalization and a table of top expression mature miRNA
+            * MDS plot clustering samples
+            * Heatmap of sample similarities
+    3.2 Alignment against miRBase hairpin for the unaligned reads in step 3 ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
+        1. Post-alignment processing of miRBase hairpin counts ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
+        2. Analysis on miRBase hairpin counts  ([`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html))
+            * TMM normalization and a table of top expression hairpin
+            * MDS plot clustering samples
+            * Heatmap of sample similarities
+3.3 Alignment against host reference genome ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
     1. Post-alignment processing of alignment against host reference genome ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-6. Visualization of alignment statistics ([`NGI-Visualization`](https://github.com/NationalGenomicsInfrastructure/ngi_visualizations))
+4. Collapse reads ([`seqcsluter`](https://seqcluster.readthedocs.io/mirna_annotation.html#processing-of-reads))
+5. Alignment agains miRBase hairpin ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
+6. miRNA and isomiR annotation using the previous alignment ([`mirtop`](https://github.com/miRTop/mirtop))
 7. miRNA quality control ([`mirtrace`](https://github.com/friedlanderlab/mirtrace))
 8. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
 
