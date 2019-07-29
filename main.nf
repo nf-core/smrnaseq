@@ -118,6 +118,8 @@ if (params.protocol == "illumina"){
 
 if (!params.mirna_gtf && params.mirtrace_species){
     mirna_gtf = file("ftp://mirbase.org/pub/mirbase/CURRENT/genomes/${params.mirtrace_species}.gff3", checkIfExists: true)
+}else if (params.mirna_gtf) {
+    mirna_gtf = file(params.mirna_gtf, checkIfExists: true)
 }else{
     mirna_gtf = false
 }
