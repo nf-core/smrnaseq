@@ -112,13 +112,14 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
   * The aligned BAM file of alignment against reference genome
 
 ## mirtop
-
 [mirtop](https://github.com/miRTop/mirtop) is used to parse the BAM files from `bowtie` alignment, and produce a [mirgff3](https://github.com/miRTop/mirGFF3) file with information about miRNAs and isomirs.
 
 ** Output directory: `results/mirtop` **
 
 * `mirtop.gff`: [mirgff3](https://github.com/miRTop/mirGFF3) file
-* `mirtop.tsv`: tabular file of the previous file for easy integration with downstream analysis
+* `mirtop.tsv`: tabular file of the previous file for easy integration with downstream analysis.
+* `mirtop_rawData.tsv`: File compatible with [isomiRs](http://lpantano.github.io/isomiRs/reference/IsomirDataSeqFromMirtop.html) Bioconductor package to perform isomiRs analysis.
+* `mirna.tsv`: tabular file with miRNA counts after summarizing unique isomiRs for each miRNA
 
 ## miRTrace
 [miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts).

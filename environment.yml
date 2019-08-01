@@ -22,7 +22,7 @@ dependencies:
   - samtools=1.9
   - bowtie=1.2.2
   - multiqc=1.7
-  - mirtop=0.4.20
+  - mirtop=0.4.21
   - seqcluster=1.2.5
   - htseq=0.11.2
   - fastx_toolkit=0.0.14

@@ -590,11 +590,15 @@ process mirtop_bam_hairpin {
     output:
     file "mirtop/mirtop.gff" into mirtop_gff
     file "mirtop/mirtop.tsv" into mirtop_tsv
+    file "mirtop/mirna.tsv" into mirna_tsv
+    file "mirtop/mirtop_rawData.tsv" into isomir_tsv
     
     script:
     """
     mirtop gff --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species $input
     mirtop counts --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species --add-extra --gff mirtop/mirtop.gff
+    mirtop export --format isomir --hairpin $hairpin --gtf $gtf --sps $params.mirtrace_species -o mirtop mirtop/mirtop.gff
+    collapse_mirtop.r mirtop/mirtop.tsv 
     """   
 }
 
