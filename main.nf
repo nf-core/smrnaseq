@@ -186,6 +186,7 @@ if(params.readPaths){
         .into { raw_reads_fastqc; raw_reads_trimgalore; raw_reads_mirtrace }
 }
 
+
 // Header log info
 log.info nfcoreHeader()
 if(workflow.revision) summary['Pipeline Release'] = workflow.revision
