@@ -7,3 +7,6 @@ report_section_order:
         order: -1000
     nf-core-smrnaseq-summary:
         order: -1100
+sp:
+    cutadapt:
+        contents: 'Cutadapt version'
