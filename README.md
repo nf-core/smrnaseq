@@ -16,25 +16,20 @@ The pipeline is built using Nextflow, a workflow tool to run tasks across multip
 1. Raw read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. Adapter trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
 3. Basic annotation
-    3.1 Alignment against miRBase mature miRNA ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
-        1. Post-alignment processing of miRBase mature miRNA counts ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-        2. Analysis on miRBase mature miRNA counts ([`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html))
-            * TMM normalization and a table of top expression mature miRNA
-            * MDS plot clustering samples
-            * Heatmap of sample similarities
-    3.2 Alignment against miRBase hairpin for the unaligned reads in step 3 ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
-        1. Post-alignment processing of miRBase hairpin counts ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-        2. Analysis on miRBase hairpin counts  ([`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html))
-            * TMM normalization and a table of top expression hairpin
-            * MDS plot clustering samples
-            * Heatmap of sample similarities
-3.3 Alignment against host reference genome ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
-    1. Post-alignment processing of alignment against host reference genome ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-4. Collapse reads ([`seqcsluter`](https://seqcluster.readthedocs.io/mirna_annotation.html#processing-of-reads))
-5. Alignment agains miRBase hairpin ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
-6. miRNA and isomiR annotation using the previous alignment ([`mirtop`](https://github.com/miRTop/mirtop))
-7. miRNA quality control ([`mirtrace`](https://github.com/friedlanderlab/mirtrace))
-8. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
+    * Alignment against miRBase mature miRNA ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
+      * Post-alignment processing of miRBase mature miRNA counts ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
+      * Analysis on miRBase mature miRNA counts ([`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html))
+    * Alignment against miRBase hairpin for the unaligned reads in step 3 ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
+       * Post-alignment processing of miRBase hairpin counts ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
+       * Analysis on miRBase hairpin counts  ([`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html))
+
+4. Alignment against host reference genome ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
+    * Post-alignment processing of alignment against host reference genome ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
+5. Collapse reads ([`seqcsluter`](https://seqcluster.readthedocs.io/mirna_annotation.html#processing-of-reads))
+6. Alignment agains miRBase hairpin ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
+7. miRNA and isomiR annotation using the previous alignment ([`mirtop`](https://github.com/miRTop/mirtop))
+8. miRNA quality control ([`mirtrace`](https://github.com/friedlanderlab/mirtrace))
+9. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
 
 ### Documentation
 The nf-core/smrnaseq pipeline comes with documentation about the pipeline, found in the `docs/` directory:
@@ -49,6 +44,8 @@ The nf-core/smrnaseq pipeline comes with documentation about the pipeline, found
 5. [Troubleshooting](https://nf-co.re/usage/troubleshooting)
 
 ## Credits
-nf-core/smrnaseq was originally written for use at the [National Genomics Infrastructure](https://portal.scilifelab.se/genomics/) at [SciLifeLab](http://www.scilifelab.se/) in Stockholm, Sweden, by Phil Ewels (@ewels), Chuan Wang (@chuan-wang) and Rickard Hammarén (@Hammarn).
+nf-core/smrnaseq was originally written for use at the [National Genomics Infrastructure](https://portal.scilifelab.se/genomics/) at [SciLifeLab](http://www.scilifelab.se/) in Stockholm, Sweden, by Phil Ewels (@ewels), Chuan Wang (@chuan-wang) and Rickard Hammarén (@Hammarn). Updated by Lorena Pantano (@lpantano).
 
-It is been updated by Lorena Pantano (@lpantano).
+## Citation
+You can cite the `nf-core` pre-print as follows:  
+Ewels PA, Peltzer A, Fillinger S, Alneberg JA, Patel H, Wilm A, Garcia MU, Di Tommaso P, Nahnsen S. **nf-core: Community curated bioinformatics pipelines**. *bioRxiv*. 2019. p. 610741. [doi: 10.1101/610741](https://www.biorxiv.org/content/10.1101/610741v1).

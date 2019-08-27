@@ -193,7 +193,7 @@ def summary = [:]
 summary['Run Name']            = custom_runName ?: workflow.runName
 summary['Reads']               = params.reads
 summary['Genome']              = params.genome
-summary['Min Trimmed Length']     = params.min_length
+summary['Min Trimmed Length']  = params.min_length
 summary["Trim 5' R1"]          = clip_R1
 summary["Trim 3' R1"]          = three_prime_clip_R1
 summary['miRBase mature']      = params.mature
@@ -205,20 +205,20 @@ summary['Protocol']            = params.protocol
 summary['miRTrace species']    = params.mirtrace_species
 summary["3' adapter"]          = three_prime_adapter
 summary['Output dir']          = params.outdir
-summary['Launch dir']       = workflow.launchDir
-summary['Working dir']      = workflow.workDir
+summary['Launch dir']          = workflow.launchDir
+summary['Working dir']         = workflow.workDir
 summary['Current home']        = "$HOME"
 summary['Current user']        = "$USER"
 summary['Current path']        = "$PWD"
 summary['Script dir']          = workflow.projectDir
-summary['Config Profile'] = (workflow.profile == 'standard' ? 'UPPMAX' : workflow.profile)
-summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
+summary['Config Profile']      = (workflow.profile == 'standard' ? 'UPPMAX' : workflow.profile)
+summary['Max Resources']       = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
 if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
-summary['Script dir']       = workflow.projectDir
-summary['User']             = workflow.userName
+summary['Script dir']          = workflow.projectDir
+summary['User']                = workflow.userName
 if(workflow.profile == 'awsbatch'){
-   summary['AWS Region']    = params.awsregion
-   summary['AWS Queue']     = params.awsqueue
+   summary['AWS Region']       = params.awsregion
+   summary['AWS Queue']        = params.awsqueue
 }
 summary['Config Profile'] = workflow.profile
 if(params.config_profile_description) summary['Config Description'] = params.config_profile_description
