@@ -28,7 +28,7 @@ The pipeline is built using Nextflow, a workflow tool to run tasks across multip
          * TMM normalization and a table of top expression hairpin
          * MDS plot clustering samples
          * Heatmap of sample similarities
-    2. miRNA and isomiR annotation from step 4.1 ([`mirtop`](https://github.com/miRTop/mirtop))
+    3. miRNA and isomiR annotation from step 4.1 ([`mirtop`](https://github.com/miRTop/mirtop))
 6. Alignment against host reference genome ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
     1. Post-alignment processing of alignment against host reference genome ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
 7. miRNA quality control ([`mirtrace`](https://github.com/friedlanderlab/mirtrace))
