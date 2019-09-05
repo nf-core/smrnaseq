@@ -5,5 +5,8 @@ report_comment: >
 report_section_order:
     software_versions:
         order: -1000
-    nf-core-srnaseq-summary:
+    nf-core-smrnaseq-summary:
         order: -1100
+sp:
+    cutadapt:
+        contents: 'Cutadapt version'

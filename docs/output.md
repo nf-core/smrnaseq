@@ -14,7 +14,7 @@ and processes data using the following steps:
 * [SAMtools](#samtools) - alignment result processing and feature counting
 * [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
 * [Bowtie](#bowtie) - alignment against reference genome for QC purpose
-* [NGI-Visualizations](#ngi_visualizations) - summary of biotypes based on results from Bowtie alignment to reference genome
+* [mirtop](#mirtop) - miRNA and isomiR annotation
 * [miRTrace](#mirtrace) - a comprehensive tool for QC purpose
 * [MultiQC](#multiqc) - aggregate report, describing results of the whole pipeline
 
@@ -68,13 +68,13 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 
 **Output directory: `results/bowtie`**
 
-* `miRBase_mature/sample.mature.count`
+* `miRBase_mature/sample.mature.stats`
   * Raw mapped read counts of mature miRNAs
 * `miRBase_mature/sample.mature.sorted.bam`
   * The sorted BAM file of alignment against mature miRNAs
 * `miRBase_mature/sample.mature.sorted.bam.bai`
   * The index file of alignment against mature miRNAs
-* `miRBase_hairpin/sample.hairpin.count`
+* `miRBase_hairpin/sample.hairpin.statas`
   * Raw mapped read counts of miRNA precursors (hairpins)
 * `miRBase_hairpin/sample.hairpin.sorted.bam`
   * The sorted BAM file of alignment against miRNA precursors (hairpins)
@@ -111,25 +111,15 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 * `sample.bowtie.bam`
   * The aligned BAM file of alignment against reference genome
 
-## NGI-Visualizations
-[NGI-Visualizations](https://github.com/NationalGenomicsInfrastructure/ngi_visualizations) takes the aligned BAM file against reference genome as input, and counts the overlaps with different biotype flags within a GTF annotation file.
+## mirtop
+[mirtop](https://github.com/miRTop/mirtop) is used to parse the BAM files from `bowtie` alignment, and produce a [mirgff3](https://github.com/miRTop/mirGFF3) file with information about miRNAs and isomirs.
 
-**Output directory: `results/bowtie_ref/ngi_visualizations`**
+** Output directory: `results/mirtop` **
 
-* `sample.bowtie_biotypeCounts.pdf/png`
-  * Summary of annotation categories of aligned reads
-* `sample.bowtie_biotypeCounts_log.pdf/png`
-  * Summary of annotation categories of aligned reads in logarithm scale
-* `sample.bowtie_biotypeLengths.pdf/png`
-  * Stacked bar plot of annotations of aligned reads with different read lengths  
-* `sample.bowtie_biotypeLengthPercentages.pdf/png`
-  * Stacked bar plot of annotation percentage of aligned reads with different read lengths  
-
-**Example**: Summary of annotation categories of aligned reads
-![NGI-Visualizations](images/NGI-Visualizations_example1.png)
-
-**Example**: Stacked bar plot of annotations of aligned reads with different read lengths
-![NGI-Visualizations](images/NGI-Visualizations_example2.png)
+* `mirtop.gff`: [mirgff3](https://github.com/miRTop/mirGFF3) file
+* `mirtop.tsv`: tabular file of the previous file for easy integration with downstream analysis.
+* `mirtop_rawData.tsv`: File compatible with [isomiRs](http://lpantano.github.io/isomiRs/reference/IsomirDataSeqFromMirtop.html) Bioconductor package to perform isomiRs analysis.
+* `mirna.tsv`: tabular file with miRNA counts after summarizing unique isomiRs for each miRNA
 
 ## miRTrace
 [miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts).
