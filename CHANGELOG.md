@@ -1,6 +1,6 @@
 # nf-core/smrnaseq: Changelog
 
-## v1.0dev - 2019-07-29
+## v1.0.0 - 2019-09-09
 * Add seqkit and remove razers
 * Add mirtop and razers tools
 * Adapt code and docs to [nf-core](http://nf-co.re/) template
