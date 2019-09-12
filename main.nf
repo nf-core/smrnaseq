@@ -22,7 +22,7 @@ def helpMessage() {
     Mandatory arguments:
       --reads                       Path to input data (must be surrounded with quotes).
                                     NOTE! Paired-end data is NOT supported by this pipeline! For paired-end data, use Read 1 only
-      --genome                      Name of iGenomes reference
+      --genome                      Name of iGenomes reference. Not needed if the --mature, --hairpin, --mirtrace_species is giving.
       --protocol                    Library preparation protocol. Default: "illumina". Can be set as "illumina", "nextflex", "qiaseq" or "cats"
 
 
@@ -31,7 +31,7 @@ def helpMessage() {
       --mature                      Path to the FASTA file of mature miRNAs
       --hairpin                     Path to the FASTA file of miRNA precursors
       --mirna_gtf                   GFF/GTF file with coordinates positions of precursor and miRNAs. See: ftp://mirbase.org/pub/mirbase/CURRENT/genomes/hsa.gff3
-      --bt_index                    Path to the bowtie 1 index files of the host reference genome
+      --bt_index                    Path to the bowtie 1 index files of the host reference genome. Optional.
       --mirtrace_species            Species for miRTrace. Pre-defined when '--genome' is specified. (hsa, mmu ...)
 
     Trimming options
@@ -135,11 +135,12 @@ if (params.hairpin) { hairpin = file(params.hairpin, checkIfExists: true) } else
 if (params.gtf) { gtf = file(params.gtf, checkIfExists: true) }
 
 if( params.bt_index ){
-    bt_index = file("${params.bt_index}.fa")
-    bt_indices = Channel.fromPath( "${params.bt_index}*.ebwt" ).toList()
-    if( !bt_index.exists() ) exit 1, "Reference genome for Bowtie 1 not found: ${params.bt_index}"
-} else if( params.bt_indices ){
-    bt_indices = Channel.from(params.readPaths).map{ file(it) }.toList()
+    lastPath = params.bt_index.lastIndexOf(File.separator)
+    bt_dir = params.bt_index.substring(0,lastPath+1)
+    bt_base = params.bt_index.substring(lastPath+1)
+    bt_indeces = Channel
+        .fromPath(bt_dir, checkIfExists: true)
+        .ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_dir}" }
 }
 if( !params.gtf || !params.bt_index) {
     log.info "No GTF / Bowtie 1 index supplied - host reference genome analysis will be skipped."
@@ -540,6 +541,7 @@ process miRBasePostAlignment {
 
     output:
     file "${input.baseName}.stats" into miRBase_counts
+    file "*.{flagstat,idxstats,stats}" into ch_sort_bam_flagstat_mqc
     file "${input.baseName}.sorted.bam" into miRBase_bam
     file "${input.baseName}.sorted.bam.bai" into miRBase_bai
 
@@ -548,6 +550,8 @@ process miRBasePostAlignment {
     samtools sort ${input.baseName}.bam -o ${input.baseName}.sorted.bam
     samtools index ${input.baseName}.sorted.bam
     samtools idxstats ${input.baseName}.sorted.bam > ${input.baseName}.stats
+    samtools flagstat ${input.baseName}.sorted.bam > ${input.baseName}.sorted.bam.flagstat
+    samtools stats ${input.baseName}.sorted.bam > ${input.baseName}.sorted.bam.stats
     """
 }
 
@@ -721,6 +725,7 @@ process multiqc {
     file ('fastqc/*') from fastqc_results.collect()
     file ('trim_galore/*') from trimgalore_results.collect()
     file ('mirtrace/*') from mirtrace_results.collect()
+    file ('samtools/*') from ch_sort_bam_flagstat_mqc.collect()
     file ('software_versions/*') from software_versions_yaml.collect()
     file workflow_summary from create_workflow_summary(summary)
 
@@ -732,7 +737,7 @@ process multiqc {
     rtitle = custom_runName ? "--title \"$custom_runName\"" : ''
     rfilename = custom_runName ? "--filename " + custom_runName.replaceAll('\\W','_').replaceAll('_+','_') + "_multiqc_report" : ''
     """
-    multiqc . -f $rtitle $rfilename --config $multiqc_config -m cutadapt -m fastqc -m custom_content
+    multiqc . -f $rtitle $rfilename --config $multiqc_config -m bowtie1 -m samtools -m cutadapt -m fastqc -m custom_content
     """
 }
 
@@ -889,7 +894,7 @@ def nfcoreHeader(){
     ${c_blue}  |\\ | |__  __ /  ` /  \\ |__) |__         ${c_yellow}}  {${c_reset}
     ${c_blue}  | \\| |       \\__, \\__/ |  \\ |___     ${c_green}\\`-._,-`-,${c_reset}
                                             ${c_green}`._,._,\'${c_reset}
-    ${c_purple}  nf-core/rnaseq v${workflow.manifest.version}${c_reset}
+    ${c_purple}  nf-core/smrnaseq v${workflow.manifest.version}${c_reset}
     ${c_dim}----------------------------------------------------${c_reset}
     """.stripIndent()    
 }
