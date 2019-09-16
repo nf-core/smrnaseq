@@ -135,12 +135,11 @@ if (params.hairpin) { hairpin = file(params.hairpin, checkIfExists: true) } else
 if (params.gtf) { gtf = file(params.gtf, checkIfExists: true) }
 
 if( params.bt_index ){
-    lastPath = params.bt_index.lastIndexOf(File.separator)
-    bt_dir = params.bt_index.substring(0,lastPath+1)
-    bt_base = params.bt_index.substring(lastPath+1)
-    bt_indeces = Channel
-        .fromPath(bt_dir, checkIfExists: true)
+    bt_indices = Channel
+        .fromPath("${params.bt_index}*", checkIfExists: true)
         .ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_dir}" }
+} else if( params.bt2indices ){
+    bt2_indices = Channel.from(params.readPaths).map{ file(it) }.toList()
 }
 if( !params.gtf || !params.bt_index) {
     log.info "No GTF / Bowtie 1 index supplied - host reference genome analysis will be skipped."
@@ -200,7 +199,6 @@ summary["Trim 3' R1"]          = three_prime_clip_R1
 summary['miRBase mature']      = params.mature
 summary['miRBase hairpin']     = params.hairpin
 if(params.bt_index)            summary['Bowtie Index for Ref'] = params.bt_index
-if(params.gtf)                 summary['GTF Annotation'] = params.gtf
 summary['Save Reference']      = params.saveReference ? 'Yes' : 'No'
 summary['Protocol']            = params.protocol
 summary['miRTrace species']    = params.mirtrace_species
@@ -286,7 +284,7 @@ process get_software_versions {
 /*
  * PREPROCESSING - Build Bowtie index for mature and hairpin
  */
-process makeBowtieIndex {
+process make_bowtie_index {
     label 'process_medium'
     publishDir path: { params.saveReference ? "${params.outdir}/bowtie/reference" : params.outdir },
                saveAs: { params.saveReference ? it : null }, mode: 'copy'
@@ -531,7 +529,7 @@ def wrap_mature_and_hairpin = { file ->
     if ( file.contains("hairpin") ) return "miRBase_hairpin/$file"
 }
 
-process miRBasePostAlignment {
+process mirna_post_alignment {
     label 'process_medium'
     tag "$input"
     publishDir "${params.outdir}/bowtie", mode: 'copy', saveAs: wrap_mature_and_hairpin
@@ -558,7 +556,7 @@ process miRBasePostAlignment {
 /*
  * STEP 5.2 - edgeR miRBase feature counts processing
  */
-process edgeR_miRBase {
+process edgeR_mirna {
     label 'process_low'
     label 'process_ignore'
     publishDir "${params.outdir}/edgeR", mode: 'copy', saveAs: wrap_mature_and_hairpin
@@ -610,7 +608,7 @@ process mirtop_bam_hairpin {
 /*
  * STEP 6.1 and 6.2 IF A GENOME SPECIFIED ONLY!
  */
-if( params.gtf && params.bt_index ) {
+if( params.bt_index ) {
 
     /*
      * STEP 6.1 - Bowtie 1 against reference genome
@@ -622,13 +620,13 @@ if( params.gtf && params.bt_index ) {
 
         input:
         file reads from trimmed_reads_bowtie_ref
-        file bt_indices
+        file indices from bt_indices.collect()
 
         output:
-        file '*.bowtie.bam' into bowtie_bam, bowtie_bam_for_unmapped
+        file '*.genome.bam' into bowtie_bam, bowtie_bam_for_unmapped
 
         script:
-        index_base = bt_indices[0].toString().tokenize(' ')[0].tokenize('.')[0]
+        index_base = indices[0].toString() - ~/.rev.\d.ebwt?/ - ~/.\d.ebwt?/
         prefix = reads.toString() - ~/(.R1)?(_R1)?(_trimmed)?(\.fq)?(\.fastq)?(\.gz)?$/
         seq_center = params.seq_center ? "--sam-RG ID:${prefix} --sam-RG 'CN:${params.seq_center}'" : ''
         """
@@ -643,7 +641,28 @@ if( params.gtf && params.bt_index ) {
             -e 99999 \\
             --chunkmbs 2048 \\
             -S $seq_center \\
-            | samtools view -bS - > ${prefix}.bowtie.bam
+            | samtools view -bS - > ${prefix}.genome.bam
+        """
+    }
+
+    process genome_post_alignment  {
+        label 'process_low'
+        tag "$input"
+        publishDir "${params.outdir}/bowtie_ref", mode: 'copy'
+
+        input: 
+        file input from bowtie_bam
+
+        output:
+        file "*.{flagstat,idxstats,stats}" into ch_genome_bam_flagstat_mqc
+
+        script:
+        """
+        samtools sort ${input.baseName}.bam -o ${input.baseName}.sorted.bam
+        samtools index ${input.baseName}.sorted.bam
+        samtools idxstats ${input.baseName}.sorted.bam > ${input.baseName}.stats
+        samtools flagstat ${input.baseName}.sorted.bam > ${input.baseName}.sorted.bam.flagstat
+        samtools stats ${input.baseName}.sorted.bam > ${input.baseName}.sorted.bam.stats
         """
     }
 
@@ -673,6 +692,8 @@ if( params.gtf && params.bt_index ) {
         """
     }
 
+} else{
+    ch_genome_bam_flagstat_mqc = Channel.empty()
 }
 
 
@@ -726,6 +747,7 @@ process multiqc {
     file ('trim_galore/*') from trimgalore_results.collect()
     file ('mirtrace/*') from mirtrace_results.collect()
     file ('samtools/*') from ch_sort_bam_flagstat_mqc.collect()
+    file ('samtools_genome/*') from ch_genome_bam_flagstat_mqc.collect()
     file ('software_versions/*') from software_versions_yaml.collect()
     file workflow_summary from create_workflow_summary(summary)
 
