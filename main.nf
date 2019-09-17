@@ -76,7 +76,6 @@ if (params.genomes && params.genome && !params.genomes.containsKey(params.genome
 }
 
 // Genome options
-params.gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
 params.bt_index = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
 params.bt_indices = null
 params.mature = params.genome ? params.genomes[ params.genome ].mature ?: false : false
@@ -138,10 +137,10 @@ if( params.bt_index ){
     bt_indices = Channel
         .fromPath("${params.bt_index}*", checkIfExists: true)
         .ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_dir}" }
-} else if( params.bt2indices ){
-    bt2_indices = Channel.from(params.readPaths).map{ file(it) }.toList()
+} else if( params.bt_indices ){
+    bt_indices = Channel.from(params.readPaths).map{ file(it) }.toList()
 }
-if( !params.gtf || !params.bt_index) {
+if( !params.bt_index) {
     log.info "No GTF / Bowtie 1 index supplied - host reference genome analysis will be skipped."
 }
 if( !params.mirtrace_species ){
@@ -747,7 +746,7 @@ process multiqc {
     file ('trim_galore/*') from trimgalore_results.collect()
     file ('mirtrace/*') from mirtrace_results.collect()
     file ('samtools/*') from ch_sort_bam_flagstat_mqc.collect()
-    file ('samtools_genome/*') from ch_genome_bam_flagstat_mqc.collect()
+    file ('samtools_genome/*') from ch_genome_bam_flagstat_mqc.collect().ifEmpty([])
     file ('software_versions/*') from software_versions_yaml.collect()
     file workflow_summary from create_workflow_summary(summary)
 
