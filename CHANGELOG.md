@@ -1,6 +1,8 @@
 # nf-core/smrnaseq: Changelog
 
-## v1.0.0 - 2019-09-09
+## v1.0.0 - 2019-09-19
+* Add figures to output documentation
+* Add samtools stats for genome alignments
 * Add seqkit and remove razers
 * Add mirtop and razers tools
 * Adapt code and docs to [nf-core](http://nf-co.re/) template
@@ -25,7 +27,7 @@
 * conda-forge::r-statmod=1.4.30 -> 1.4.32
 * conda-forge::r-markdown=0.9 -> 1.0
 * trim-galore=0.6.2 -> 0.6.3
-* mirtop=0.4.18a -> 0.4.21
+* mirtop=0.4.18a -> 0.4.22
 * bioconductor-edger=3.26.0 -> 3.26.5
 * bioconductor-limma=3.40.0 -> 3.40.2
 
