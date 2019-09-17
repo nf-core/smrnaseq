@@ -49,6 +49,10 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 * `sample_trimmed_fastqc.zip`
   * FastQC report for trimmed reads
 
+This is an example of the output we can get:
+
+![cutadapt](images/cutadapt_plot.png)
+
 ## Bowtie - miRNAs
 [Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) in [miRBase](http://www.mirbase.org/).
 
@@ -68,18 +72,20 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 
 **Output directory: `results/bowtie`**
 
-* `miRBase_mature/sample.mature.stats`
-  * Raw mapped read counts of mature miRNAs
+* `miRBase_mature/sample.mature.stats|idxstats|flagstat`
+  * Raw mapped read counts and stats of mature miRNAs
 * `miRBase_mature/sample.mature.sorted.bam`
   * The sorted BAM file of alignment against mature miRNAs
 * `miRBase_mature/sample.mature.sorted.bam.bai`
   * The index file of alignment against mature miRNAs
-* `miRBase_hairpin/sample.hairpin.statas`
-  * Raw mapped read counts of miRNA precursors (hairpins)
+* `miRBase_hairpin/sample.hairpin.stats|idxstats|flagstat`
+  * Raw mapped read counts and stats of miRNA precursors (hairpins)
 * `miRBase_hairpin/sample.hairpin.sorted.bam`
   * The sorted BAM file of alignment against miRNA precursors (hairpins)
 * `miRBase_hairpin/sample.hairpin.sorted.bam.bai`
   * The index file of alignment against miRNA precursors (hairpins)
+
+![samtools](images/samtools_alignment_plot.png)
 
 ## edgeR
 [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html) is an R package used for differential expression analysis of RNA-seq expression profiles.
@@ -100,6 +106,7 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 **Example**: MDS plot of 10 samples based on their expression profiles of mature miRNAs. Here we can see that samples cluster based on different sample types and library preparation kits.
 ![edgeR](images/Example_MDS_plot.png)
 
+
 **Example**: Heatmap of tumor and normal samples based on the top differentially expressed mature miRNAs.
 ![edgeR](images/Example_heatmap.png)
 
@@ -108,8 +115,10 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 
 **Output directory: `results/bowtie_ref`**
 
-* `sample.bowtie.bam`
-  * The aligned BAM file of alignment against reference genome
+* `sample.genome.bam`
+  * The aligned BAM file against reference genome
+* `sample.genome.stats|idxstats|flagstat`
+  * Raw mapped read counts and stats of mature miRNAs
 
 ## mirtop
 [mirtop](https://github.com/miRTop/mirtop) is used to parse the BAM files from `bowtie` alignment, and produce a [mirgff3](https://github.com/miRTop/mirGFF3) file with information about miRNAs and isomirs.
@@ -137,7 +146,10 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 * `qc_passed_reads.rnatype_unknown.collapsed`
   * FASTA file per sample with unknown reads in the RNA type analysis
 
-Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/manual.pdf) for detailed specifications about output files.
+Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/manual.pdf) for detailed specifications about output files. Here is an example of the RNA types plot that you will see:
+
+![mirtrace](images/mirtrace_plot.png)
+
 
 ## MultiQC
 [MultiQC](http://multiqc.info) is a visualisation tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in within the report data directory.
