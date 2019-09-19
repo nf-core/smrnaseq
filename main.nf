@@ -22,7 +22,7 @@ def helpMessage() {
     Mandatory arguments:
       --reads                       Path to input data (must be surrounded with quotes).
                                     NOTE! Paired-end data is NOT supported by this pipeline! For paired-end data, use Read 1 only
-      --genome                      Name of iGenomes reference. Not needed if the --mature, --hairpin, --mirtrace_species is giving.
+      --genome                      Name of iGenomes reference. Not needed if --mature, --hairpin, --mirtrace_species are provided.
       --protocol                    Library preparation protocol. Default: "illumina". Can be set as "illumina", "nextflex", "qiaseq" or "cats"
 
 
@@ -187,8 +187,8 @@ if(params.readPaths){
 
 // Header log info
 log.info nfcoreHeader()
-if(workflow.revision) summary['Pipeline Release'] = workflow.revision
 def summary = [:]
+if(workflow.revision)          summary['Pipeline Release'] = workflow.revision
 summary['Run Name']            = custom_runName ?: workflow.runName
 summary['Reads']               = params.reads
 summary['Genome']              = params.genome
@@ -211,7 +211,7 @@ summary['Current path']        = "$PWD"
 summary['Script dir']          = workflow.projectDir
 summary['Config Profile']      = (workflow.profile == 'standard' ? 'UPPMAX' : workflow.profile)
 summary['Max Resources']       = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
-if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
+if(workflow.containerEngine)   summary['Container'] = "$workflow.containerEngine - $workflow.container"
 summary['Script dir']          = workflow.projectDir
 summary['User']                = workflow.userName
 if(workflow.profile == 'awsbatch'){
@@ -223,8 +223,8 @@ if(params.config_profile_description) summary['Config Description'] = params.con
 if(params.config_profile_contact)     summary['Config Contact']     = params.config_profile_contact
 if(params.config_profile_url)         summary['Config URL']         = params.config_profile_url
 if(params.email) {
-  summary['E-mail Address']  = params.email
-  summary['MultiQC maxsize'] = params.maxMultiqcEmailFileSize
+  summary['E-mail Address']    = params.email
+  summary['MultiQC maxsize']   = params.maxMultiqcEmailFileSize
 }
 log.info summary.collect { k,v -> "${k.padRight(18)}: $v" }.join("\n")
 log.info "\033[2m----------------------------------------------------\033[0m"
