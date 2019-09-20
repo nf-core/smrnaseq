@@ -4,26 +4,31 @@ from collections import OrderedDict
 import re
 
 regexes = {
-    'nf-core/smrnaseq': ['v_nfcore_smrnaseq.txt', r"(\S+)"],
+    'nf-core/smrnaseq': ['v_pipeline.txt', r"(\S+)"],
+    'R': ['v_R.txt', r"R version (\S+)"],
     'Nextflow': ['v_nextflow.txt', r"(\S+)"],
     'FastQC': ['v_fastqc.txt', r"FastQC v(\S+)"],
     'Trim Galore!': ['v_trim_galore.txt', r"version (\S+)"],
     'Bowtie': ['v_bowtie.txt', r"version (\S+)"],
-    'Bowtie 2': ['v_bowtie2.txt', r"version (\S+)"],
     'Samtools': ['v_samtools.txt', r"samtools (\S+)"],
+    'Htseq': ['v_htseq.txt', r"version (\S+)"],
     'FASTX': ['v_fastx.txt', r"Toolkit (\S+)"],
+    'miRTrace': ['v_mirtrace.txt', r"mirtrace, version (\S+)"],
     'MultiQC': ['v_multiqc.txt', r"multiqc, version (\S+)"],
 }
 results = OrderedDict()
 results['nf-core/smrnaseq'] = '<span style="color:#999999;\">N/A</span>'
 results['Nextflow'] = '<span style="color:#999999;\">N/A</span>'
+results['R'] = '<span style="color:#999999;\">N/A</span>'
 results['FastQC'] = '<span style="color:#999999;\">N/A</span>'
 results['Trim Galore!'] = '<span style="color:#999999;\">N/A</span>'
 results['Bowtie'] = '<span style="color:#999999;\">N/A</span>'
-results['Bowtie 2'] = '<span style="color:#999999;\">N/A</span>'
 results['Samtools'] = '<span style="color:#999999;\">N/A</span>'
+results['Htseq'] = '<span style="color:#999999;\">N/A</span>'
 results['FASTX'] = '<span style="color:#999999;\">N/A</span>'
+results['miRTrace'] = '<span style="color:#999999;\">N/A</span>'
 results['MultiQC'] = '<span style="color:#999999;\">N/A</span>'
+
 
 # Search each file using its regex
 for k, v in regexes.items():
@@ -32,6 +37,11 @@ for k, v in regexes.items():
         match = re.search(v[1], versions)
         if match:
             results[k] = "v{}".format(match.group(1))
+
+# Remove software set to false in results
+for k in results:
+    if not results[k]:
+        del(results[k])
 
 # Dump to YAML
 print ('''
@@ -44,5 +54,10 @@ data: |
     <dl class="dl-horizontal">
 ''')
 for k,v in results.items():
-    print("        <dt>{}</dt><dd>{}</dd>".format(k,v))
+    print("        <dt>{}</dt><dd><samp>{}</samp></dd>".format(k,v))
 print ("    </dl>")
+
+# Write out regexes as csv file:
+with open('software_versions.csv', 'w') as f:
+    for k,v in results.items():
+        f.write("{}\t{}\n".format(k,v))

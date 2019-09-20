@@ -1,10 +1,10 @@
 # nf-core/smrnaseq Output
 
-**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data analysis at the [National Genomics Infastructure](https://ngisweden.scilifelab.se/) at [SciLifeLab Stockholm](https://www.scilifelab.se/platforms/ngi/), Sweden.
+**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data analysis.
 
-This document describes the output produced by the pipeline.
+This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
 
-## Pipeline overview:
+## Pipeline overview
 The pipeline is built using [Nextflow](https://www.nextflow.io/)
 and processes data using the following steps:
 
@@ -13,8 +13,9 @@ and processes data using the following steps:
 * [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
 * [SAMtools](#samtools) - alignment result processing and feature counting
 * [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
-* [Bowtie2](#bowtie2) - alignment against reference genome for QC purpose
-* [NGI-Visualizations](#ngi_visualizations) - summary of biotypes based on Bowtie2 alignment results
+* [Bowtie](#bowtie) - alignment against reference genome for QC purpose
+* [mirtop](#mirtop) - miRNA and isomiR annotation
+* [miRTrace](#mirtrace) - a comprehensive tool for QC purpose
 * [MultiQC](#multiqc) - aggregate report, describing results of the whole pipeline
 
 ## FastQC
@@ -48,7 +49,11 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 * `sample_trimmed_fastqc.zip`
   * FastQC report for trimmed reads
 
-## Bowtie
+This is an example of the output we can get:
+
+![cutadapt](images/cutadapt_plot.png)
+
+## Bowtie - miRNAs
 [Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) in [miRBase](http://www.mirbase.org/).
 
 **Output directory: `results/bowtie`**
@@ -67,18 +72,20 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 
 **Output directory: `results/bowtie`**
 
-* `miRBase_mature/sample.mature.count`
-  * Raw mapped read counts of mature miRNAs
+* `miRBase_mature/sample.mature.stats|idxstats|flagstat`
+  * Raw mapped read counts and stats of mature miRNAs
 * `miRBase_mature/sample.mature.sorted.bam`
   * The sorted BAM file of alignment against mature miRNAs
 * `miRBase_mature/sample.mature.sorted.bam.bai`
   * The index file of alignment against mature miRNAs
-* `miRBase_hairpin/sample.hairpin.count`
-  * Raw mapped read counts of miRNA precursors (hairpins)
+* `miRBase_hairpin/sample.hairpin.stats|idxstats|flagstat`
+  * Raw mapped read counts and stats of miRNA precursors (hairpins)
 * `miRBase_hairpin/sample.hairpin.sorted.bam`
   * The sorted BAM file of alignment against miRNA precursors (hairpins)
 * `miRBase_hairpin/sample.hairpin.sorted.bam.bai`
   * The index file of alignment against miRNA precursors (hairpins)
+
+![samtools](images/samtools_alignment_plot.png)
 
 ## edgeR
 [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html) is an R package used for differential expression analysis of RNA-seq expression profiles.
@@ -99,51 +106,61 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 **Example**: MDS plot of 10 samples based on their expression profiles of mature miRNAs. Here we can see that samples cluster based on different sample types and library preparation kits.
 ![edgeR](images/Example_MDS_plot.png)
 
+
 **Example**: Heatmap of tumor and normal samples based on the top differentially expressed mature miRNAs.
 ![edgeR](images/Example_heatmap.png)
 
-## Bowtie2
-[Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) is used for mapping adapter trimmed reads against the reference genome for quality control purposes.
+## Bowtie - QC
+[Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the reference genome for quality control purposes.
 
-**Output directory: `results/bowtie2`**
+**Output directory: `results/bowtie_ref`**
 
-* `sample.bowite2.bam`
-  * The aligned BAM file of alignment against reference genome
+* `sample.genome.bam`
+  * The aligned BAM file against reference genome
+* `sample.genome.stats|idxstats|flagstat`
+  * Raw mapped read counts and stats of mature miRNAs
 
-## NGI-Visualizations
-[NGI-Visualizations](https://github.com/NationalGenomicsInfrastructure/ngi_visualizations) takes the aligned BAM file against reference genome as input, and counts the overlaps with different biotype flags within a GTF annotation file.
+## mirtop
+[mirtop](https://github.com/miRTop/mirtop) is used to parse the BAM files from `bowtie` alignment, and produce a [mirgff3](https://github.com/miRTop/mirGFF3) file with information about miRNAs and isomirs.
 
-**Output directory: `results/bowtie2/ngi_visualizations`**
+** Output directory: `results/mirtop` **
 
-* `sample.bowite2_biotypeCounts.pdf/png`
-  * Summary of annotation categories of aligned reads
-* `sample.bowite2_biotypeCounts_log.pdf/png`
-  * Summary of annotation categories of aligned reads in logarithm scale
-* `sample.bowite2_biotypeLengths.pdf/png`
-  * Stacked bar plot of annotations of aligned reads with different read lengths  
-* `sample.bowite2_biotypeLengthPercentages.pdf/png`
-  * Stacked bar plot of annotation percentage of aligned reads with different read lengths  
+* `mirtop.gff`: [mirgff3](https://github.com/miRTop/mirGFF3) file
+* `mirtop.tsv`: tabular file of the previous file for easy integration with downstream analysis.
+* `mirtop_rawData.tsv`: File compatible with [isomiRs](http://lpantano.github.io/isomiRs/reference/IsomirDataSeqFromMirtop.html) Bioconductor package to perform isomiRs analysis.
+* `mirna.tsv`: tabular file with miRNA counts after summarizing unique isomiRs for each miRNA
 
-**Example**: Summary of annotation categories of aligned reads
-![NGI-Visualizations](images/NGI-Visualizations_example1.png)
+## miRTrace
+[miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts).
 
-**Example**: Stacked bar plot of annotations of aligned reads with different read lengths
-![NGI-Visualizations](images/NGI-Visualizations_example2.png)
+**Output directory: `results/miRTrace`**
+
+* `mirtrace-report.html`
+  * An interactive HTML report summarizing all output statistics from miRTrace
+* `mirtrace-results.json`
+  * A JSON file with all output statistics from miRTrace
+* `mirtrace-stats-*.tsv`
+  * Tab-separated statistics files
+* `qc_passed_reads.all.collapsed`
+  * FASTA file per sample with sequence reads that passed QC in miRTrace
+* `qc_passed_reads.rnatype_unknown.collapsed`
+  * FASTA file per sample with unknown reads in the RNA type analysis
+
+Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/manual.pdf) for detailed specifications about output files. Here is an example of the RNA types plot that you will see:
+
+![mirtrace](images/mirtrace_plot.png)
+
 
 ## MultiQC
 [MultiQC](http://multiqc.info) is a visualisation tool that generates a single HTML report summarising all samples in your project. Most of the pipeline QC results are visualised in the report and further statistics are available in within the report data directory.
 
-**Output directory: `results/MultiQC`**
+The pipeline has special steps which allow the software versions used to be reported in the MultiQC output for future traceability.
 
-* `multiqc_report.html`
+**Output directory: `results/multiqc`**
+
+* `Project_multiqc_report.html`
   * MultiQC report - a standalone HTML file that can be viewed in your web browser
-* `multiqc_data/`
+* `Project_multiqc_data/`
   * Directory containing parsed statistics from the different tools used in the pipeline
 
-For more information about how to use MultiQC reports, see http://multiqc.info
-
------------------------------------------------------------------------------------------
-
-<p align="center"><a href="http://www.scilifelab.se/" target="_blank"><img src="images/SciLifeLab_logo.png" title="SciLifeLab"></a>
-<a href="https://ngisweden.scilifelab.se/" target= _blank><img src="images/NGI-final-small.png" title="NGI" style="height:100px;"></a>
-</p>
+For more information about how to use MultiQC reports, see [http://multiqc.info](http://multiqc.info)

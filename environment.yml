@@ -1,27 +1,32 @@
 # You can use this file to create a conda environment for this pipeline:
 #   conda env create -f environment.yml
-name: nfcore-smrnaseq-0.2dev
+name: nf-core-smrnaseq-1.0.0
 channels:
-  - bioconda
   - conda-forge
+  - bioconda
   - defaults
 dependencies:
-  - conda-forge::openjdk=8.0.144 # Needed for FastQC - conda build hangs without this
-  - fastqc=0.11.7
-  - trim-galore=0.4.5
-  - samtools=1.8
-  - bowtie=1.2.2
-  - bowtie2=2.3.4.1
-  - multiqc=1.5
-  - bioconductor-edger=3.20.7
-  - bioconductor-limma=3.34.9
-  - conda-forge::r-statmod=1.4.30
-  - conda-forge::r-data.table=1.11.4
-  - conda-forge::r-gplots=3.0.1
+ ## conda-forge packages
+  - conda-forge::r-base=3.6.1
+  - conda-forge::openjdk=11.0.1 # Needed for FastQC - conda build hangs without this
+  - conda-forge::r-statmod=1.4.32
+  - conda-forge::r-data.table=1.12.2
+  - conda-forge::r-gplots=3.0.1.1
   - conda-forge::r-r.methodss3=1.7.1
-  - htseq=0.9.1
+  - conda-forge::r-markdown=1.0
+  - conda-forge::matplotlib=3.0.3 # Current 3.1.0 build incompatible with multiqc=1.7
+
+  ## bioconda packages
+  - fastqc=0.11.8
+  - trim-galore=0.6.3
+  - samtools=1.9
+  - bowtie=1.2.2
+  - multiqc=1.7
+  - mirtop=0.4.22
+  - seqcluster=1.2.5
+  - htseq=0.11.2
   - fastx_toolkit=0.0.14
-  # Install NGI Visualizations
-  # TODO: Replace dependency / conda-ise somehow
-  - pip:
-     - "--editable=git+https://github.com/NationalGenomicsInfrastructure/ngi_visualizations.git#egg=ngi_visualizations"
+  - seqkit=0.10.1
+  - mirtrace=1.0.0
+  - bioconductor-edger=3.26.5
+  - bioconductor-limma=3.40.2
