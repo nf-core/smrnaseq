@@ -40,12 +40,12 @@ if (!require("methods")) {
 
 # Put mature and hairpin count files in separated file lists
 filelist<-list()
-filelist[[1]]<-input[grep(".mature.count",input)]
-filelist[[2]]<-input[grep(".hairpin.count",input)]
+filelist[[1]]<-input[grep(".mature.stats",input)]
+filelist[[2]]<-input[grep(".hairpin.stats",input)]
 names(filelist)<-c("mature","hairpin")
+print(filelist)
 
 for (i in 1:2) {
-
     header<-names(filelist)[i]
 
     # Prepare the combined data frame with gene ID as rownames and sample ID as colname
@@ -57,8 +57,8 @@ for (i in 1:2) {
     temp <- fread(filelist[[i]][1],header=FALSE, select=c(1))
     rownames(data)<-temp$V1
     rownames(unmapped)<-temp$V1
-    colnames(data)<-gsub(".count","",basename(filelist[[i]]))
-    colnames(unmapped)<-gsub(".count","",basename(filelist[[i]]))
+    colnames(data)<-gsub(".stats","",basename(filelist[[i]]))
+    colnames(unmapped)<-gsub(".stats","",basename(filelist[[i]]))
 
     data<-data[rownames(data)!="*",]
     unmapped<-unmapped[rownames(unmapped)=="*",]
@@ -90,35 +90,35 @@ for (i in 1:2) {
         pdf(paste(header,"_edgeR_MDS_plot.pdf",sep=""))
         MDSdata <- plotMDS(dataNorm)
         dev.off()
+
+        # Print distance matrix to file
+        write.table(MDSdata$distance.matrix, paste(header,"_edgeR_MDS_distance_matrix.txt",sep=""), quote=FALSE, sep="\t")
+
+        # Print plot x,y co-ordinates to file
+        MDSxy = MDSdata$cmdscale.out
+        colnames(MDSxy) = c(paste(MDSdata$axislabel, '1'), paste(MDSdata$axislabel, '2'))
+
+        write.table(MDSxy, paste(header,"_edgeR_MDS_plot_coordinates.txt",sep=""), quote=FALSE, sep="\t")
+
+        # Get the log counts per million values
+        logcpm <- cpm(dataNorm, prior.count=2, log=TRUE)
+
+        # Calculate the euclidean distances between samples
+        dists = dist(t(logcpm))
+
+        # Plot a heatmap of correlations
+        pdf(paste(header,"_log2CPM_sample_distances_heatmap.pdf",sep=""))
+        hmap <- heatmap.2(as.matrix(dists),main="Sample Correlations", key.title="Distance", trace="none",dendrogram="row", margin=c(9, 9))
+        dev.off()
+
+        # Plot the heatmap dendrogram
+        pdf(paste(header,"_log2CPM_sample_distances_dendrogram.pdf",sep=""))
+        plot(hmap$rowDendrogram, main="Sample Dendrogram")
+        dev.off()
+
+        # Write clustered distance values to file
+        write.table(hmap$carpet, paste(header,"_log2CPM_sample_distances.txt",sep=""), quote=FALSE, sep="\t")
     }
-
-    # Print distance matrix to file
-    write.table(MDSdata$distance.matrix, paste(header,"_edgeR_MDS_distance_matrix.txt",sep=""), quote=FALSE, sep="\t")
-
-    # Print plot x,y co-ordinates to file
-    MDSxy = MDSdata$cmdscale.out
-    colnames(MDSxy) = c(paste(MDSdata$axislabel, '1'), paste(MDSdata$axislabel, '2'))
-
-    write.table(MDSxy, paste(header,"_edgeR_MDS_plot_coordinates.txt",sep=""), quote=FALSE, sep="\t")
-
-    # Get the log counts per million values
-    logcpm <- cpm(dataNorm, prior.count=2, log=TRUE)
-
-    # Calculate the euclidean distances between samples
-    dists = dist(t(logcpm))
-
-    # Plot a heatmap of correlations
-    pdf(paste(header,"_log2CPM_sample_distances_heatmap.pdf",sep=""))
-    hmap <- heatmap.2(as.matrix(dists),main="Sample Correlations", key.title="Distance", trace="none",dendrogram="row", margin=c(9, 9))
-    dev.off()
-
-    # Plot the heatmap dendrogram
-    pdf(paste(header,"_log2CPM_sample_distances_dendrogram.pdf",sep=""))
-    plot(hmap$rowDendrogram, main="Sample Dendrogram")
-    dev.off()
-
-    # Write clustered distance values to file
-    write.table(hmap$carpet, paste(header,"_log2CPM_sample_distances.txt",sep=""), quote=FALSE, sep="\t")
 }
 
 file.create("corr.done")

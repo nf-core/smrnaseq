@@ -1,94 +1,190 @@
-# nf-core/smrnaseq Usage
+# nf-core/smrnaseq: Usage
 
 ## Table of contents
 
+<!-- Install Atom plugin markdown-toc-auto for this ToC to auto-update on save -->
+<!-- TOC START min:2 max:3 link:true asterisk:true update:true -->
+* [Table of contents](#table-of-contents)
+* [Introduction](#introduction)
 * [Running the pipeline](#running-the-pipeline)
-* [Inputs and outputs](#inputs-and-outputs)
-    * [`--reads`](#--reads)
-    * [`--outdir`](#--outdir)
-* [Software](#software)
-    * [`-with-singularity`](#-with-singularity)
-    * [`-with-docker`](#-with-docker)
-* [Reference Genomes](#reference-genomes)
-    * [`--genome`](#--genome)
-    * [Supplying reference indices](#supplying-reference-indices)
-    * [`--saveReference`](#--savereference)
-* [Adapter Trimming](#adapter-trimming)
-* [Preset configurations](#preset-configurations)
-    * [`-profile`](#-profile)
-* [Additional parameters](#additional-parameters)
-    * [`--saveTrimmed`](#--savetrimmed)
-    * [`--saveAlignedIntermediates`](#--savealignedintermediates)
-* [Job Resources](#job-resources)
-    * [Automatic resubmission](#automatic-resubmission)
-    * [Maximum resource requests](#maximum-resource-requests)
+  * [Updating the pipeline](#updating-the-pipeline)
+  * [Reproducibility](#reproducibility)
+* [Main Arguments](#main-arguments)
+  * [`-profile`](#-profile)
+  * [`--reads`](#--reads)
+  * [`--protocol`](#--protocol)
+* [Reference genomes](#reference-genomes)
+  * [`--genome` (using iGenomes)](#--genome-using-igenomes)
+  * [Supported genomes](#supported-genomes)
+  * [`--saveReference`](#--savereference)
+  * [`--fasta`](#--fasta)
+  * [`--igenomesIgnore`](#--igenomesignore)
+  * [`--mature`](#--mature)
+  * [`--hairpin`](#--hairpin)
+  * [`--bt_index`](#--bt_index)
+* [Trimming options](#trimming-options)
+  * [`--min_length [int]`](#--min_length-int)
+  * [`--clip_R1 [int]`](#--clip_r1-int)
+  * [`--three_prime_clip_R1 [int]`](#--three_prime_clip_r1-int)
+  * [`--three_prime_adapter [sequence]`](#--three_prime_adapter-sequence)
+* [Skipping QC steps](#skipping-qc-steps)
+  * [`--skipQC`](#--skipqc)
+  * [`--skipFastqc`](#--skipfastqc)
+  * [`--skipMultiqc`](#--skipmultiqc)
+* [Job resources](#job-resources)
+  * [Automatic resubmission](#automatic-resubmission)
+  * [Custom resource requests](#custom-resource-requests)
+* [AWS Batch specific parameters](#aws-batch-specific-parameters)
+  * [`--awsqueue`](#--awsqueue)
+  * [`--awsregion`](#--awsregion)
 * [Other command line parameters](#other-command-line-parameters)
-    * [`-name`](#-name-single-dash)
-    * [`-resume`](#-resume-single-dash)
-    * [`--email`](#--email)
-    * [`--plaintext_email`](#--plaintext_email)
-    * [`-c`](#-c-single-dash)
-    * [`--multiqc_config`](#--multiqc_config)
-    * [`--project`](#--project)
-    * [`--clusterOptions`](#--clusteroptions)
+  * [`--outdir`](#--outdir)
+  * [`--email`](#--email)
+  * [`-name`](#-name)
+  * [`--seq_center`](#--seq_center)
+  * [`-resume`](#-resume)
+  * [`-c`](#-c)
+  * [`--rlocation`](#--rlocation)
+* [Stand-alone scripts](#stand-alone-scripts)
+  * [`--custom_config_version`](#--custom_config_version)
+  * [`--custom_config_base`](#--custom_config_base)
+  * [`--max_memory`](#--max_memory)
+  * [`--max_time`](#--max_time)
+  * [`--max_cpus`](#--max_cpus)
+  * [`--plaintext_email`](#--plaintext_email)
+  * [`--monochrome_logs`](#--monochrome_logs)
+  * [`--multiqc_config`](#--multiqc_config)
+<!-- TOC END -->
 
+
+## Introduction
+Nextflow handles job submissions on SLURM or other environments, and supervises running the jobs. Thus the Nextflow process must run until the pipeline is finished. We recommend that you put the process running in the background through `screen` / `tmux` or similar tool. Alternatively you can run nextflow within a cluster job submitted your job scheduler.
+
+It is recommended to limit the Nextflow Java virtual machines memory. We recommend adding the following line to your environment (typically in `~/.bashrc` or `~./bash_profile`):
+
+```bash
+NXF_OPTS='-Xms1g -Xmx4g'
+```
 
 ## Running the pipeline
-The main command for running the pipeline is as follows:
+The typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/smrnaseq [parameters]
+nextflow run nf-core/smrnaseq --reads '*.fastq.gz' -profile docker
 ```
 
-Note that the pipeline will create files in your working directory:
+This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
+
+Note that the pipeline will create the following files in your working directory:
 
 ```bash
-work/           # Directory containing the nextflow working files
-results/        # Finished results (configurable, see below)
+work            # Directory containing the nextflow working files
+results         # Finished results (configurable, see below)
 .nextflow_log   # Log file from Nextflow
-.nextflow/      # Nextflow cache and history information
+# Other nextflow hidden files, eg. history of pipeline runs and old logs.
 ```
 
+### Updating the pipeline
+When you run the above command, Nextflow automatically pulls the pipeline code from GitHub and stores it as a cached version. When running the pipeline after this, it will always use the cached version if available - even if the pipeline has been updated since. To make sure that you're running the latest version of the pipeline, make sure that you regularly update the cached version of the pipeline:
 
-## Inputs and outputs
+```bash
+nextflow pull nf-core/smrnaseq
+```
+
+### Reproducibility
+It's a good idea to specify a pipeline version when running the pipeline on your data. This ensures that a specific version of the pipeline code and software are used when you run your pipeline. If you keep using the same tag, you'll be running the same version of the pipeline, even if there have been changes to the code since.
+
+First, go to the [nf-core/smrnaseq releases page](https://github.com/nf-core/smrnaseq/releases) and find the latest version number - numeric only (eg. `1.3.1`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.3.1`.
+
+This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future.
+
+## Main Arguments
+### `-profile`
+Use this parameter to choose a configuration profile. Profiles can give configuration presets for different compute environments. Note that multiple profiles can be loaded, for example: `-profile docker` - the order of arguments is important!
+
+If `-profile` is not specified at all the pipeline will be run locally and expects all software to be installed and available on the `PATH`.
+
+* `awsbatch`
+  * A generic configuration profile to be used with AWS Batch.
+* `conda`
+  * A generic configuration profile to be used with [conda](https://conda.io/docs/)
+  * Pulls most software from [Bioconda](https://bioconda.github.io/)
+* `docker`
+  * A generic configuration profile to be used with [Docker](http://docker.com/)
+  * Pulls software from dockerhub: [`nfcore/smrnaseq`](http://hub.docker.com/r/nfcore/smrnaseq/)
+* `singularity`
+  * A generic configuration profile to be used with [Singularity](http://singularity.lbl.gov/)
+  * Pulls software from DockerHub: [`nfcore/smrnaseq`](http://hub.docker.com/r/nfcore/smrnaseq/)
+* `test`
+  * A profile with a complete configuration for automated testing
+  * Includes links to test data so needs no other parameters
 
 ### `--reads`
 Location of the input FastQ files:
 
 ```bash
- --reads 'path/to/data/sample_*_{1,2}.fastq'
+ --reads 'path/to/data/*.fastq.gz'
 ```
 
-**NB: Must be enclosed in quotes!**
+Please note the following requirements:
 
-The file path should be in quotation marks to prevent shell glob expansion.
+1. The path must be enclosed in quotes
+2. The path must have at least one `*` wildcard character
 
-If left unspecified, the pipeline will assume that the data is in a directory called `data` in the working directory (`data/*.fastq.gz`).
+### `--protocol`
+Protocol for constructing smRNA-seq libraries. Note that trimming parameters and 3' adapter sequence are pre-defined with a specified protocol.
+Default: "illumina"
 
-### `--outdir`
-The output directory where the results will be saved.
+```bash
+--protocol [one protocol listed in the table below]
+```
 
-## Software
-There are different ways to provide the required software dependencies for the pipeline. The recommended method is to use either Docker or Singularity. The command line flags below are only needed if you are using the `standard` config profile (see below). It is not required with the the other profiles.
+| Protocol      | Library Prep Kit                        | Trimming Parameter                   | 3' Adapter Sequence   |
+| :------------ | :-------------------------------------- | :----------------------------------- | :-------------------  |
+| illumina      | Illumina TruSeq Small RNA               | clip_R1 = 0; three_prime_clip_R1 = 0 | TGGAATTCTCGGGTGCCAAGG |
+| nextflex      | BIOO SCIENTIFIC  NEXTFLEX Small RNA-Seq | clip_R1 = 4; three_prime_clip_R1 = 4 | TGGAATTCTCGGGTGCCAAGG |
+| qiaseq        | QIAGEN QIAseq miRNA                     | clip_R1 = 0; three_prime_clip_R1 = 0 | AACTGTAGGCACCATCAAT   |
+| cats          | Diagenode CATS Small RNA-seq            | clip_R1 = 3; three_prime_clip_R1 = 0 | GATCGGAAGAGCACACGTCTG |
 
-If using Bioconda or manual installation, no command line option is required.
+## Reference genomes
 
-### `-with-singularity`
-Flag to enable use of singularity. The image will automatically be pulled from the internet. If running offline, follow the option with the path to the image file.
+The pipeline config files come bundled with paths to the illumina iGenomes reference index files. If running with docker or AWS, the configuration is set up to use the [AWS-iGenomes](https://ewels.github.io/AWS-iGenomes/) resource.
 
-### `-with-docker`
-Flag to enable docker. The image will automatically be pulled from Dockerhub.
+### `--genome` (using iGenomes)
 
-## Reference Genomes
+The reference genome to use of the analysis, needs to be one of the genome specified in the config file.
+The human `GRCh37` genome is used by default.
 
-### `--genome`
-To make it easier to run an analysis with a common reference genome, the pipeline comes bundled with configuration paths for the AWS-iGenomes resource. If using these references, you can specify just the genome ID using `--genome`.
+```bash
+--genome 'GRCh37'
+```
 
-The default AWS-iGenome paths are for files hosted on AWS s3. If running regularly, it is recommended that you download your own copy of the reference genomes and set the path root using `--igenomes_base` (or `params.igenomes_base` in a config file).
+### Supported genomes
 
-If using the `uppmax` config profile (see below), the iGenomes base is already set to a local copy of the files held on the UPPMAX clusters.
+| Parameter     |       Latin Name                 |      Common Name   |
+| :------------ |:-------------------------------- |:------------------ |
+| AGPv3         |       *Zea mays*                 |       Maize        |
+| BDGP6         |       *Drosophila melanogaster*  |       Fruit fly    |
+| CanFam3.1     |       *Canis familiaris*         |       Dog          |
+| CHIMP2.1.4    |       *Pan troglodytes*          |       Chimpanze    |
+| EquCab2       |       *Equus caballus*           |       Horse        |
+| Galgal4       |       *Gallus gallus*            |       Chicken      |
+| Gm01          |       *Glycine max*              |       Soybean      |
+| GRCh37        |       *Homo sapiens*             |       Human        |
+| GRCm38        |       *Mus musculus*             |       Mouse        |
+| GRCz10        |       *Danio rerio*              |       Zebrafish    |
+| IRGSP-1.0     |       *Oryza sativa japonica*    |       Rice         |
+| Mmul_1        |       *Macaca mulatta*           |       Macaque      |
+| Rnor_6.0      |       *Rattus norvegicus*        |       Rat          |
+| Sbi1          |       *Sorghum bicolor*          |       Great millet |
+| Sscrofa10.2   |       *Sus scrofa*               |       Pig          |
+| TAIR10        |       *Arabidopsis thaliana*     |       Thale cress  |
+| UMD3.1        |       *Bos taurus*               |       Cow          |
+| WBcel235      |       *Caenorhabditis elegans*   |       Nematode     |
 
-See [`conf/igenomes.config`](conf/igenomes.config) for a list of all of the supported reference genomes and their keys. Common genomes that are supported are:
+There are 31 different species supported in the iGenomes references. To run the pipeline, you must specify which to use with the `--genome` flag.
+
+You can find the keys to specify the genomes in the [iGenomes config file](../conf/igenomes.config). Common genomes that are supported are:
 
 * Human
   * `--genome GRCh37`
@@ -101,106 +197,191 @@ See [`conf/igenomes.config`](conf/igenomes.config) for a list of all of the supp
 
 > There are numerous others - check the config file for more.
 
-### Supplying reference indices
+Note that you can use the same configuration setup to save sets of reference files for your own use, even if they are not part of the iGenomes resource. See the [Nextflow documentation](https://www.nextflow.io/docs/latest/config.html) for instructions on where to save such a file.
 
-If you don't want to use the illumina iGenomes references, you can supply your own reference genome.
+The syntax for this reference configuration is as follows:
 
-<!-- TODO nf-core: write docs about reference indices -->
+```nextflow
+params {
+  genomes {
+    'GRCh37' {
+      fasta   = '<path to the genome fasta file>' // Used if no star index given
+      mature  = '<path to the genome fasta file>' //mature.fa"
+      hairpin = '<path to the genome fasta file>' //hairpin.fa"
+      bowtie  = '<path to the genome fasta file>' // index
+      gtf     = '<path to the gtf file>'
+      mirtrace_species = "sps" // species according mirbase
 
+    }
+    // Any number of additional genomes, key is used with --genome
+  }
+}
+```
 
 ### `--saveReference`
 Supply this parameter to save any generated reference genome files to your results folder. These can then be used for future pipeline runs, reducing processing times.
 
-## Adapter Trimming
-Bisulfite libraries often require additional base pairs to be removed from the ends of the reads before alignment. You can specify these custom trimming parameters as follows:
-
-* `--clip_r1 <NUMBER>`
-  * Instructs Trim Galore to remove bp from the 5' end of read 1 (or single-end reads).
-* `--clip_r2 <NUMBER>`
-  * Instructs Trim Galore to remove bp from the 5' end of read 2 (paired-end reads only).
-* `--three_prime_clip_r1 <NUMBER>`
-  * Instructs Trim Galore to remove bp from the 3' end of read 1 _AFTER_ adapter/quality trimming has been
-* `--three_prime_clip_r2 <NUMBER>`
-  * Instructs Trim Galore to re move bp from the 3' end of read 2 _AFTER_ adapter/quality trimming has been performed.
-
-## Preset configurations
-
-### `-profile`
-Use this parameter to choose a configuration profile. See the [installation documentation](installation.md#33-configuration-profiles) for more information about profiles.
-
-Profiles available with the pipeline are:
-
-* `standard`
-    * The default profile, used if `-profile` is not specified.
-    * Uses sensible defaults for requirements, runs using the `local` executor (native system calls) and expects all software to be installed and available on the `PATH`.
-    * This profile is mainly designed to be used as a starting point for other configurations and is inherited by most of the other profiles below.
-* `uppmax`
-    * Designed to be used on the Swedish [UPPMAX](http://uppmax.uu.se/) clusters such as `milou`, `rackham`, `bianca` and `irma`
-    * Launches jobs using the SLURM executor.
-    * Uses [Singularity](http://singularity.lbl.gov/) to provide all software requirements
-    * Comes with locations for illumina iGenome reference paths built in
-    * Use with `--project` to provide your UPPMAX project ID.
-* `uppmax_devel`
-    * Uses the milou [devel partition](http://www.uppmax.uu.se/support/user-guides/slurm-user-guide/#tocjump_030509106905141747_8) for testing the pipeline quickly.
-    * Not suitable for proper analysis runs
-* `aws`
-    * A starter configuration for running the pipeline on Amazon Web Services.
-    * Specifies docker configuration and uses the `spark` job executor
-    * Requires additional configuration to run - see the documentation dedicated to this topic.
-* `none`
-    * No configuration at all. Useful if you want to build your own config from scratch and want to avoid loading in the default `base` config profile.
-
-## Additional parameters
-
-### `--saveTrimmed`
-By default, trimmed FastQ files will not be saved to the results directory. Specify this flag (or set to true in your config file) to copy these files to the results directory when complete.
-
-### `--saveAlignedIntermediates`
-By default intermediate BAM files will not be saved. The final BAM files created after the deduplication step are always. Set to true to also copy out BAM files from the initial Bismark alignment step. If `--nodedup` or `--rrbs` is specified then BAMs from the initial alignment will always be saved.
-
-## Job Resources
-### Automatic resubmission
-Each step in the pipeline has a default set of requirements for number of CPUs, memory and time. For most of the steps in the pipeline, if the job exits on UPPMAX with an error code of `143` or `137` (exceeded requested resources) it will automatically resubmit with higher requests (2 x original, then 3 x original). If it still fails after three times then the pipeline is stopped.
-
-### Maximum resource requests
-All resource requests are checked against the following default limits (`standard` config profile shown):
+### `--fasta`
+If you prefer, you can specify the full path to your reference genome when you run the pipeline:
 
 ```bash
---max_memory '128.GB'
---max_cpus '16'
---max_time '240.h'
+--fasta '[path to Fasta reference]'
 ```
 
-If a task requests more than this amount, it will be reduced to this threshold.
+### `--igenomesIgnore`
+Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`.
 
-To adjust these limits, specify them on the command line, eg. `--max_memory '64.GB'`.
+### `--mature`
+If you prefer, you can specify the full path to the FASTA file of mature miRNAs when you run the pipeline:
 
-Note that these limits are the maximum to be used _per task_. Nextflow will automatically attempt to parallelise as many jobs as possible given the available resources.
+```bash
+--mature [path to the FASTA file of mature miRNAs]
+```
+
+### `--hairpin`
+If you prefer, you can specify the full path to the FASTA file of miRNA precursors when you run the pipeline:
+
+```bash
+--hairpin [path to the FASTA file of miRNA precursors]
+```
+
+### `--bt_index`
+If you prefer, you can specify the full path to your reference genome when you run the pipeline:
+
+```bash
+--bt_index [path to Bowtie 1 index]
+```
+
+## Trimming options
+### `--min_length [int]`
+Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
+### `--clip_R1 [int]`
+Instructs Trim Galore to remove bp from the 5' end of read 1
+### `--three_prime_clip_R1 [int]`
+Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed
+### `--three_prime_adapter [sequence]`
+Instructs Trim Galore to remove 3' adapters which are typically used in smRNA-seq library preparation
+
+## Skipping QC steps
+### `--skipQC`
+Skip all QC steps aside from MultiQC
+
+### `--skipFastqc`
+Skip FastQC
+
+### `--skipMultiqc`
+Skip MultiQC
+
+
+## Job resources
+### Automatic resubmission
+Each step in the pipeline has a default set of requirements for number of CPUs, memory and time. For most of the steps in the pipeline, if the job exits with an error code of `143` (exceeded requested resources) it will automatically resubmit with higher requests (2 x original, then 3 x original). If it still fails after three times then the pipeline is stopped.
+
+### Custom resource requests
+Wherever process-specific requirements are set in the pipeline, the default value can be changed by creating a custom config file. See the files hosted at [`nf-core/configs`](https://github.com/nf-core/configs/tree/master/conf) for examples.
+
+If you are likely to be running `nf-core` pipelines regularly it may be a good idea to request that your custom config file is uploaded to the `nf-core/configs` git repository. Before you do this please can you test that the config file works with your pipeline of choice using the `-c` parameter (see definition below). You can then create a pull request to the `nf-core/configs` repository with the addition of your config file, associated documentation file (see examples in [`nf-core/configs/docs`](https://github.com/nf-core/configs/tree/master/docs)), and amending [`nfcore_custom.config`](https://github.com/nf-core/configs/blob/master/nfcore_custom.config) to include your custom profile.
+
+If you have any questions or issues please send us a message on [Slack](https://nf-core-invite.herokuapp.com/).
+
+## AWS Batch specific parameters
+Running the pipeline on AWS Batch requires a couple of specific parameters to be set according to your AWS Batch configuration. Please use the `-awsbatch` profile and then specify all of the following parameters.
+### `--awsqueue`
+The JobQueue that you intend to use on AWS Batch.
+### `--awsregion`
+The AWS region to run your job in. Default is set to `eu-west-1` but can be adjusted to your needs.
+
+Please make sure to also set the `-w/--work-dir` and `--outdir` parameters to a S3 storage bucket of your choice - you'll get an error message notifying you if you didn't.
 
 ## Other command line parameters
+### `--outdir`
+The output directory where the results will be saved.
 
-### `-name` _(single dash)_
-Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic. This name is also used in MultiQC reports if specified.
+### `--email`
+Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.
 
-### `-resume` _(single dash)_
+### `-name`
+Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
+
+This is used in the MultiQC report (if not default) and in the summary HTML / e-mail (always).
+
+**NB:** Single hyphen (core Nextflow option)
+
+### `--seq_center`
+Text about sequencing center which will be added in the header of output bam files.
+
+### `-resume`
 Specify this when restarting a pipeline. Nextflow will used cached results from any pipeline steps where the inputs are the same, continuing from where it got to previously.
 
 You can also supply a run name to resume a specific run: `-resume [run-name]`. Use the `nextflow log` command to show previous run names.
 
-### `--email`
-Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to speicfy this on the command line for every run.
+**NB:** Single hyphen (core Nextflow option)
+
+### `-c`
+Specify the path to a specific config file (this is a core NextFlow command). Useful if using different UPPMAX
+projects or different sets of reference genomes. **NOTE! One hyphen only (core Nextflow parameter).**
+
+**NB:** Single hyphen (core Nextflow option)
+
+Note - you can use this to override defaults. For example, we run on UPPMAX but don't want to use the MultiQC
+environment module as is the default. So we specify a config file using `-c` that contains the following:
+
+```nextflow
+process.$multiqc.module = []
+```
+
+## Stand-alone scripts
+The `bin` directory contains some scripts used by the pipeline which may also be run manually:
+
+* `edgeR_miRBase.r`
+  * R script using for processing reads counts of mature miRNAs and miRNA precursors (hairpins).
+
+
+### `--custom_config_version`
+Provide git commit id for custom Institutional configs hosted at `nf-core/configs`. This was implemented for reproducibility purposes. Default is set to `master`.
+
+```bash
+## Download and use config file with following git commid id
+--custom_config_version d52db660777c4bf36546ddb188ec530c3ada1b96
+```
+
+### `--custom_config_base`
+If you're running offline, nextflow will not be able to fetch the institutional config files
+from the internet. If you don't need them, then this is not a problem. If you do need them,
+you should download the files from the repo and tell nextflow where to find them with the
+`custom_config_base` option. For example:
+
+```bash
+## Download and unzip the config files
+cd /path/to/my/configs
+wget https://github.com/nf-core/configs/archive/master.zip
+unzip master.zip
+
+## Run the pipeline
+cd /path/to/my/data
+nextflow run /path/to/pipeline/ --custom_config_base /path/to/my/configs/configs-master/
+```
+
+> Note that the nf-core/tools helper package has a `download` command to download all required pipeline
+> files + singularity containers + institutional configs in one go for you, to make this process easier.
+
+### `--max_memory`
+Use to set a top-limit for the default memory requirement for each process.
+Should be a string in the format integer-unit. eg. `--max_memory '8.GB'`
+
+### `--max_time`
+Use to set a top-limit for the default time requirement for each process.
+Should be a string in the format integer-unit. eg. `--max_time '2.h'`
+
+### `--max_cpus`
+Use to set a top-limit for the default CPU requirement for each process.
+Should be a string in the format integer-unit. eg. `--max_cpus 1`
 
 ### `--plaintext_email`
 Set to receive plain-text e-mails instead of HTML formatted.
 
-### `-c` _(single dash)_
-Specify the path to a specific config file (this is a core NextFlow command). You can use this in combination with configuration profiles to override defaults.
+### `--monochrome_logs`
+Set to disable colourful command line output and live life in monochrome.
 
 ### `--multiqc_config`
-If you would like to supply a custom config file to MultiQC, you can specify a path with `--multiqc_config`. This is used _instead of_ the [config file](../conf/multiqc_config.yaml) that comes with the pipeline.
-
-### `--project`
-UPPMAX profile only: Cluster project for SLURM job submissions.
-
-### `--clusterOptions`
-UPPMAX profile only: Submit arbitrary SLURM options.
+Specify a path to a custom MultiQC configuration file.
