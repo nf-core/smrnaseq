@@ -6,6 +6,10 @@
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/)
 [![Docker](https://img.shields.io/docker/automated/nfcore/smrnaseq.svg)](https://hub.docker.com/r/nfcore/smrnaseq)
 
+[![DOI](https://zenodo.org/badge/140590861.svg)](https://zenodo.org/badge/latestdoi/140590861)
+
+
+
 ## Introduction
 **nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data.
 
