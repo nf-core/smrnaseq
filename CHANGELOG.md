@@ -1,5 +1,8 @@
 # nf-core/smrnaseq: Changelog
 
+## v1.0.1dev
+* Fix error when UMI is on the reads header: https://github.com/nf-core/smrnaseq/issues/35
+
 ## v1.0.0 - 2019-09-19
 * Add figures to output documentation
 * Add samtools stats for genome alignments
