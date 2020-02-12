@@ -1,6 +1,7 @@
 # nf-core/smrnaseq: Changelog
 
 ## v1.0.0 - 2019-09-19
+
 * Add figures to output documentation
 * Add samtools stats for genome alignments
 * Add seqkit and remove razers
@@ -9,6 +10,7 @@
 * Update tools and Dockerfile/Singularity to match current template
 
 #### Dependency Updates
+
 * openjdk 8.0.144 -> 11.0.1
 * fastqc 0.11.7 -> 0.11.8
 * trim-galore 0.5.0 -> 0.6.2
@@ -32,11 +34,13 @@
 * bioconductor-limma=3.40.0 -> 3.40.2
 
 ## [1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.0) - 2019-01-10
+
 * Add "protocol" with pre-defined settings
 * Add miRTrace in the pipeline.
 * Software updates: multiqc 1.6 to 1.7.
 
 ## [1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.0) - 2018-08-06
+
 * Switch from SciLifeLab/NGI-smRNAseq to nf-core/smrnaseq.
 * Use Bowtie 1 instead of Bowtie 2 for the alignment to host reference genome.
 * Add option for sequencing centre in BAM file.
