@@ -33,13 +33,13 @@
 * bioconductor-edger=3.26.0 -> 3.26.5
 * bioconductor-limma=3.40.0 -> 3.40.2
 
-## [1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.0) - 2019-01-10
+## 1.0 - 2019-01-10
 
 * Add "protocol" with pre-defined settings
 * Add miRTrace in the pipeline.
 * Software updates: multiqc 1.6 to 1.7.
 
-## [1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.0) - 2018-08-06
+## 1.0 - 2018-08-06
 
 * Switch from SciLifeLab/NGI-smRNAseq to nf-core/smrnaseq.
 * Use Bowtie 1 instead of Bowtie 2 for the alignment to host reference genome.
