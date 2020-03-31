@@ -1,5 +1,36 @@
 # nf-core/smrnaseq: Changelog
 
+## v1.0.1dev - 2020-03-31
+
+* Update conda environment with new packages and updates
+
+#### Dependency Updates
+
+ * conda-forge::r-base=3.6.1 -> 3.6.3
+ * conda-forge::r-statmod=1.4.32 -> 1.4.34
+ * conda-forge::r-data.table=1.12.2 -> 1.12.8
+ * conda-forge::r-gplots=3.0.1.1 -> 3.0.3
+ * conda-forge::r-r.methodss3=1.7.1 -> 1.8.0
+ * fastqc=0.11.8 -> 0.11.9
+ * trim-galore=0.6.3 -> 0.6.5
+ * samtools=1.9 -> 1.10
+ * bowtie=1.2.2 -> 1.2.3
+ * multiqc=1.7 -> 1.8
+ * mirtop=0.4.22 -> 0.4.23
+ * seqcluster=1.2.5 -> 1.2.7
+ * htseq=0.11.2 -> 0.11.3
+ * fastx_toolkit=0.0.14 -> 0.0.14
+ * seqkit=0.10.1 -> 0.12.0
+ * mirtrace=1.0.0 -> 1.0.1
+ * bioconductor-edger=3.26.5 -> 3.28.0
+ * bioconductor-limma=3.40.2 -> 3.42.0
+ * Added conda-forge::python=3.8.2
+ * Added conda-forge::markdown=3.2.1
+ * Added conda-forge::pymdown-extensions=6.0
+ * Added conda-forge::pygments=2.6.1
+ * Removed conda-forge::r-markdown=1.0
+ * Removed conda-forge::matplotlib=3.0.3
+
 ## v1.0.0 - 2019-09-19
 * Add figures to output documentation
 * Add samtools stats for genome alignments
