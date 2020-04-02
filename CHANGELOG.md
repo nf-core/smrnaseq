@@ -1,10 +1,10 @@
 # nf-core/smrnaseq: Changelog
 
-## v1.0.1dev - 2020-03-31
+## v1.0.1dev
 
 * Update conda environment with new packages and updates
 
-#### Dependency Updates
+#### Packaged software updates
 
  * conda-forge::r-base=3.6.1 -> 3.6.3
  * conda-forge::r-statmod=1.4.32 -> 1.4.34
