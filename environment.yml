@@ -13,8 +13,7 @@ dependencies:
   - conda-forge::r-data.table=1.12.4
   - conda-forge::r-gplots=3.0.1.1
   - conda-forge::r-r.methodss3=1.7.1
-  # - conda-forge::r-markdown=1.0
-  - conda-forge::matplotlib=3.0.3 # Current 3.1.0 build incompatible with multiqc=1.7
+  - conda-forge::matplotlib=3.0.3 # To avoid conflics with multiple packages during docker build
   - conda-forge::python=3.7.3
   - conda-forge::markdown=3.1.1
   - conda-forge::pymdown-extensions=6.0
