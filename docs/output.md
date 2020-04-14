@@ -57,6 +57,7 @@ This is an example of the output we can get:
 ![cutadapt](images/cutadapt_plot.png)
 
 ## Bowtie - miRNAs
+
 [Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) in [miRBase](http://www.mirbase.org/).
 
 **Output directory: `results/bowtie`**
@@ -71,6 +72,7 @@ This is an example of the output we can get:
   * Unmapped reads against miRNA precursors (hairpins)
 
 ## SAMtools
+
 [SAMtools](http://samtools.sourceforge.net/) is used for sorting and indexing the output BAM files from Bowtie. In addition, the numbers of features are counted with the `idxstats` option.
 
 **Output directory: `results/bowtie`**
@@ -91,6 +93,7 @@ This is an example of the output we can get:
 ![samtools](images/samtools_alignment_plot.png)
 
 ## edgeR
+
 [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html) is an R package used for differential expression analysis of RNA-seq expression profiles.
 
 **Output directory: `results/edgeR`**
@@ -109,11 +112,11 @@ This is an example of the output we can get:
 **Example**: MDS plot of 10 samples based on their expression profiles of mature miRNAs. Here we can see that samples cluster based on different sample types and library preparation kits.
 ![edgeR](images/Example_MDS_plot.png)
 
-
 **Example**: Heatmap of tumor and normal samples based on the top differentially expressed mature miRNAs.
 ![edgeR](images/Example_heatmap.png)
 
 ## Bowtie - QC
+
 [Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the reference genome for quality control purposes.
 
 **Output directory: `results/bowtie_ref`**
@@ -124,6 +127,7 @@ This is an example of the output we can get:
   * Raw mapped read counts and stats of mature miRNAs
 
 ## mirtop
+
 [mirtop](https://github.com/miRTop/mirtop) is used to parse the BAM files from `bowtie` alignment, and produce a [mirgff3](https://github.com/miRTop/mirGFF3) file with information about miRNAs and isomirs.
 
 ** Output directory: `results/mirtop` **
@@ -134,6 +138,7 @@ This is an example of the output we can get:
 * `mirna.tsv`: tabular file with miRNA counts after summarizing unique isomiRs for each miRNA
 
 ## miRTrace
+
 [miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts).
 
 **Output directory: `results/miRTrace`**
@@ -152,7 +157,6 @@ This is an example of the output we can get:
 Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/manual.pdf) for detailed specifications about output files. Here is an example of the RNA types plot that you will see:
 
 ![mirtrace](images/mirtrace_plot.png)
-
 
 ## MultiQC
 

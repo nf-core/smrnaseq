@@ -9,14 +9,13 @@
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/)
 [![Docker](https://img.shields.io/docker/automated/nfcore/smrnaseq.svg)](https://hub.docker.com/r/nfcore/smrnaseq)
 
-<<<<<<< HEAD
 [![DOI](https://zenodo.org/badge/140590861.svg)](https://zenodo.org/badge/latestdoi/140590861)
 
-=======
 ## Introduction
 
+**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data.
+
 The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.
->>>>>>> TEMPLATE
 
 ## Quick Start
 
@@ -40,13 +39,7 @@ nextflow run nf-core/smrnaseq -profile <docker/singularity/conda/institute> --re
 
 See [usage docs](docs/usage.md) for all of the available options when running the pipeline.
 
-## Introduction
-**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data.
-
-The pipeline is built using Nextflow, a workflow tool to run tasks across multiple compute infrastructures in a very portable manner. It comes with docker containers making installation trivial and results highly reproducible.
-
 ### Pipeline summary
-
 
 1. Raw read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. Adapter trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
@@ -68,8 +61,8 @@ The pipeline is built using Nextflow, a workflow tool to run tasks across multip
 7. miRNA quality control ([`mirtrace`](https://github.com/friedlanderlab/mirtrace))
 8. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
 
-
 ### Documentation
+
 The nf-core/smrnaseq pipeline comes with documentation about the pipeline, found in the `docs/` directory:
 
 1. [Installation](https://nf-co.re/usage/installation)
@@ -82,6 +75,7 @@ The nf-core/smrnaseq pipeline comes with documentation about the pipeline, found
 5. [Troubleshooting](https://nf-co.re/usage/troubleshooting)
 
 ## Credits
+
 nf-core/smrnaseq was originally written for use at the [National Genomics Infrastructure](https://portal.scilifelab.se/genomics/) at [SciLifeLab](http://www.scilifelab.se/) in Stockholm, Sweden, by Phil Ewels (@ewels), Chuan Wang (@chuan-wang) and Rickard Hammarén (@Hammarn). Updated by Lorena Pantano (@lpantano) from MIT.
 
 ## Contributions and Support
@@ -91,6 +85,7 @@ If you would like to contribute to this pipeline, please see the [contributing g
 For further information or help, don't hesitate to get in touch on [Slack](https://nfcore.slack.com/channels/smrnaseq) (you can join with [this invite](https://nf-co.re/join/slack)).
 
 ## Citation
+
 You can cite the `nf-core` publication as follows:
 
 > **The nf-core framework for community-curated bioinformatics pipelines.**

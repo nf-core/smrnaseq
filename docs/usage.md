@@ -147,8 +147,8 @@ Please note the following requirements:
 1. The path must be enclosed in quotes
 2. The path must have at least one `*` wildcard character
 
-
 ### `--protocol`
+
 Protocol for constructing smRNA-seq libraries. Note that trimming parameters and 3' adapter sequence are pre-defined with a specified protocol.
 Default: "illumina"
 
@@ -163,6 +163,7 @@ Default: "illumina"
 | qiaseq        | QIAGEN QIAseq miRNA                     | clip_R1 = 0; three_prime_clip_R1 = 0 | AACTGTAGGCACCATCAAT   |
 | cats          | Diagenode CATS Small RNA-seq            | clip_R1 = 3; three_prime_clip_R1 = 0 | AAAAAAAAAAA + GATCGGAAGAGCACACGTCTG (only polyA is used for trimming) |
 =======
+
 ### `--single_end`
 
 This pipeline is not compatible with paired-data
@@ -210,6 +211,7 @@ params {
 ```
 
 ### `--saveReference`
+
 Supply this parameter to save any generated reference genome files to your results folder. These can then be used for future pipeline runs, reducing processing times.
 
 ### `--fasta`
@@ -225,6 +227,7 @@ If you prefer, you can specify the full path to your reference genome when you r
 Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`.
 
 ### `--mature`
+
 If you prefer, you can specify the full path to the FASTA file of mature miRNAs when you run the pipeline:
 
 ```bash
@@ -232,6 +235,7 @@ If you prefer, you can specify the full path to the FASTA file of mature miRNAs 
 ```
 
 ### `--hairpin`
+
 If you prefer, you can specify the full path to the FASTA file of miRNA precursors when you run the pipeline:
 
 ```bash
@@ -239,6 +243,7 @@ If you prefer, you can specify the full path to the FASTA file of miRNA precurso
 ```
 
 ### `--bt_index`
+
 If you prefer, you can specify the full path to your reference genome when you run the pipeline:
 
 ```bash
@@ -246,25 +251,36 @@ If you prefer, you can specify the full path to your reference genome when you r
 ```
 
 ## Trimming options
+
 ### `--min_length [int]`
+
 Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
+
 ### `--clip_R1 [int]`
+
 Instructs Trim Galore to remove bp from the 5' end of read 1
+
 ### `--three_prime_clip_R1 [int]`
+
 Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed
+
 ### `--three_prime_adapter [sequence]`
+
 Instructs Trim Galore to remove 3' adapters which are typically used in smRNA-seq library preparation
 
 ## Skipping QC steps
+
 ### `--skipQC`
+
 Skip all QC steps aside from MultiQC
 
 ### `--skipFastqc`
+
 Skip FastQC
 
 ### `--skipMultiqc`
-Skip MultiQC
 
+Skip MultiQC
 
 ## Job resources
 
@@ -299,6 +315,7 @@ The [AWS CLI](https://www.nextflow.io/docs/latest/awscloud.html#aws-cli-installa
 Please make sure to also set the `-w/--work-dir` and `--outdir` parameters to a S3 storage bucket of your choice - you'll get an error message notifying you if you didn't.
 
 ## Other command line parameters
+
 ### `--outdir`
 
 The output directory where the results will be saved.
@@ -324,6 +341,7 @@ This is used in the MultiQC report (if not default) and in the summary HTML / e-
 **NB:** Single hyphen (core Nextflow option)
 
 ### `--seq_center`
+
 Text about sequencing center which will be added in the header of output bam files.
 
 ### `-resume`
@@ -348,11 +366,11 @@ process.$multiqc.module = []
 ```
 
 ## Stand-alone scripts
+
 The `bin` directory contains some scripts used by the pipeline which may also be run manually:
 
 * `edgeR_miRBase.r`
   * R script using for processing reads counts of mature miRNAs and miRNA precursors (hairpins).
-
 
 ### `--custom_config_version`
 
