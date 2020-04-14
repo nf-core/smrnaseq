@@ -4,6 +4,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## v1.0.1dev
 
+* Update with the latest TEMPLATE version and nf-core 1.9
 * Update conda environment with new packages and updates
 
 #### Packaged software updates
