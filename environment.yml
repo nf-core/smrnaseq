@@ -7,7 +7,7 @@ channels:
   - defaults
 dependencies:
  ## conda-forge packages
-  - conda-forge::r-base=3.6.1
+  - conda-forge::r-base=3.6.3
   - conda-forge::openjdk=11.0.1 # Needed for FastQC - conda build hangs without this
   - conda-forge::r-statmod=1.4.32
   - conda-forge::r-data.table=1.12.4
