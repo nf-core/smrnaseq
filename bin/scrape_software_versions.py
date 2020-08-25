@@ -13,8 +13,9 @@ regexes = {
     'Samtools': ['v_samtools.txt', r"samtools (\S+)"],
     'Htseq': ['v_htseq.txt', r"version (\S+)"],
     'FASTX': ['v_fastx.txt', r"Toolkit (\S+)"],
-    'miRTrace': ['v_mirtrace.txt', r"mirtrace, version (\S+)"],
+    'miRTrace': ['v_mirtrace.txt', r"(\S+)"],
     'MultiQC': ['v_multiqc.txt', r"multiqc, version (\S+)"],
+    'miRDeep2': ['v_mirdeep2.txt', r"miRDeep(\S+)"]
 }
 results = OrderedDict()
 results['nf-core/smrnaseq'] = '<span style="color:#999999;\">N/A</span>'
@@ -28,7 +29,7 @@ results['Htseq'] = '<span style="color:#999999;\">N/A</span>'
 results['FASTX'] = '<span style="color:#999999;\">N/A</span>'
 results['miRTrace'] = '<span style="color:#999999;\">N/A</span>'
 results['MultiQC'] = '<span style="color:#999999;\">N/A</span>'
-
+results['miRDeep2'] = '<span style="color:#999999;\">N/A</span>'
 
 # Search each file using its regex
 for k, v in regexes.items():

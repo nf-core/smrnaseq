@@ -30,3 +30,4 @@ dependencies:
   - mirtrace=1.0.0
   - bioconductor-edger=3.26.5
   - bioconductor-limma=3.40.2
+  - mirdeep2=2.0.1.2
