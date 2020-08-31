@@ -564,7 +564,7 @@ process edgeR_mirna {
     file input_files from miRBase_counts.toSortedList()
 
     output:
-    file '*.{txt,pdf}' into edgeR_miRBase_results
+    file '*.{txt,pdf,csv}' into edgeR_miRBase_results
 
     script:
     """
@@ -596,9 +596,9 @@ process mirtop_bam_hairpin {
     
     script:
     """
-    mirtop gff --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species $input
-    mirtop counts --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species --add-extra --gff mirtop/mirtop.gff
-    mirtop export --format isomir --hairpin $hairpin --gtf $gtf --sps $params.mirtrace_species -o mirtop mirtop/mirtop.gff
+    mirtop gff --hairpin $hairpin --gtf $gtf -o mirtop --sps hsa $input
+    mirtop counts --hairpin $hairpin --gtf $gtf -o mirtop --sps hsa --add-extra --gff mirtop/mirtop.gff
+    mirtop export --format isomir --hairpin $hairpin --gtf $gtf --sps hsa -o mirtop mirtop/mirtop.gff
     collapse_mirtop.r mirtop/mirtop.tsv 
     """   
 }
