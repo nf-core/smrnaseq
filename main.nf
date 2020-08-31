@@ -720,7 +720,7 @@ process mirtrace {
      done > mirtrace_config
 
      mirtrace qc \\
-         --species $params.mirtrace_species \\
+         --species hsa \\
          $primer \\
          --protocol $protocol \\
          --config mirtrace_config \\
