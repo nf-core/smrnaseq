@@ -125,49 +125,52 @@ if (!params.mirna_gtf && params.mirtrace_species){
 }
 
 // Validate inputs
+
 if( !params.mature || !params.hairpin ){
     exit 1, "Missing mature / hairpin reference indexes! Is --genome specified?"
 }
 
-if (params.mature) { mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
+if (params.skip_mirdeep){
+  if (params.mature) { mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
 
-if (params.hairpin) { hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
+  if (params.hairpin) { hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
 
-if (params.gtf) { gtf = file(params.gtf, checkIfExists: true) }
-
-if (!params.skip_mirdeep){
-  if (params.refgenome) { refgenome = file(params.refgenome, checkIfExists: true) } else { exit 1, "Reference genome file not found: ${params.refgenome}" }
+  if (params.gtf) { gtf = file(params.gtf, checkIfExists: true) }
 }
+else{
+  if (params.references_parsed){
+    refgenome = file("$params.references_parsed/genome.fa", checkIfExists: true)
+    .ifEmpty { exit 1, "Reference parsed genome not found: ${references_parsed}"}
 
-if (params.references_parsed){
-  refgenome = Channel
-  .fromPath("$params.references_parsed/genome.fa", checkIfExists: true)
-  .ifEmpty { exit 1, "Reference parsed genome not found: ${references_parsed}"}
-  .into { reference_genome }
+    indices_mirdeep2 = Channel
+    .fromPath("$params.references_parsed/genome.*.ebwt", checkIfExists: true)
+    .ifEmpty { exit 1, "Reference parsed genome indices not found: ${references_parsed}"}
 
-  bowtie = Channel
-  .fromPath("$params.references_parsed/genome", checkIfExists: true)
-  .ifEmpty { exit 1, "Reference parsed genome not found: ${references_parsed}"}
-  .into { indices_bowtie; indices_mirdeep2 }
+    hairpin = file("$params.references_parsed/hairpin.fa", checkIfExists: true)
+    .ifEmpty { exit 1, "Reference parsed hairpin.fa not found: ${references_parsed}"}
 
-  hairpin = Channel
-  .fromPath("$params.references_parsed/hairpin.fa", checkIfExists: true)
-  .ifEmpty { exit 1, "Reference parsed hairpin.fa not found: ${references_parsed}"}
+    mature = file("$params.references_parsed/mature.fa", checkIfExists: true)
+    .ifEmpty { exit 1, "Reference parsed mature.fa not found: ${references_parsed}"}
 
-  mature = Channel
-  .fromPath("$params.references_parsed/mature.fa", checkIfExists: true)
-  .ifEmpty { exit 1, "Reference parsed mature.fa not found: ${references_parsed}"}
+  }
+  else{
+    if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
+
+    if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
+
+    if (params.refgenome) {reference_genome = file(params.refgenome, checkIfExists: true) } else { exit 1, "Reference genome file not found: ${params.refgenome}" }
+
+  }
+
 
 }
 
 if( params.bt_index ){
-  if (params.skip_mirdeep){
-    bt_indices = Channel
-        .fromPath("${params.bt_index}*", checkIfExists: true)
-        .ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_dir}" }
-        .into { indices_mirdeep2; indices_bowtie}
-    }
+  bt_indices = Channel
+    .fromPath("${params.bt_index}*", checkIfExists: true)
+    .ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_dir}" }
 }
+
 else if( params.bt_indices ){
     bt_indices = Channel.from(params.readPaths).map{ file(it) }.toList()
 }
@@ -314,6 +317,36 @@ process get_software_versions {
    """
 }
 
+
+if (! params.references_parsed & !params.skip_mirdeep){
+  /*
+   * PREPROCESSING - Parse genome.fa and build Bowtie index for refgenome
+   */
+  process bowtie_indices {
+    label 'process_medium'
+    publishDir "${params.outdir}/references", mode: 'symlink'
+
+    input:
+    file refgenome from reference_genome
+    file mature from reference_mature
+    file hairpin from reference_hairpin
+
+    output:
+    file 'genome.fa' into refgenome
+    file 'genome.*.ebwt' into indices_mirdeep2
+    file 'hairpin.fa' into hairpin
+    file 'mature.fa' into mature
+
+    script:
+    """
+    sed -i '/^[^>]/s/[^ATGCatgc]/N/g' $refgenome
+    sed -i 's, ,_,g' $hairpin
+    sed -i 's, ,_,g' $mature
+    bowtie-build $refgenome genome
+    """
+
+   }
+}
 /*
  * PREPROCESSING - Build Bowtie index for mature and hairpin
  */
@@ -328,7 +361,7 @@ process make_bowtie_index {
 
     output:
     file 'mature_idx.*' into mature_index_bowtie
-    file 'hairpin_idx.*' into hairpin_index_bowtie
+    file 'hairpin_idx.*' into hairpin_index_bowtie, hairpin_index_bowtie_2
     file 'hairpin_idx.fa' into hairpin_mirtop
 
     script:
@@ -345,36 +378,6 @@ process make_bowtie_index {
     fasta_formatter -w 0 -i hairpin_igenome.fa -o hairpin_idx.fa
     bowtie-build hairpin_idx.fa hairpin_idx
     """
-}
-
-if (! params.references_parsed & !params.skip_mirdeep){
-  /*
-   * STEP 0.0.1 - Parse Genome.fa and generate bowtie indices
-   */
-  process bowtie_indices {
-    label 'process_medium'
-    publishDir "${params.outdir}/references", mode: 'symlink'
-
-    input:
-    file refgenome from refgenome
-    file mature from mature
-    file hairpin from hairpin
-
-    output:
-    file 'genome.fa' into reference_genome
-    file '*.ebwt' into indices_bowtie,indices_mirdeep2
-    file 'hairpin.fa' into hairpin
-    file 'mature.fa' into mature
-
-    script:
-    """
-    sed -i '/^[^>]/s/[^ATGCatgc]/N/g' $refgenome
-    sed -i 's, ,_,g' $hairpin
-    sed -i 's, ,_,g' $mature
-    bowtie-build $refgenome genome
-    """
-
-   }
 }
 
 /*
@@ -558,7 +561,7 @@ process bowtie_miRBase_hairpin_collapsed {
 
     input:
     file reads from collapsed_fasta
-    file index from hairpin_index_bowtie
+    file index from hairpin_index_bowtie_2
 
     output:
     file '*.bam' into miRBase_hairpin_collapse_bam
@@ -671,7 +674,7 @@ process mirtop_bam_hairpin {
 /*
  * STEP 6.1 and 6.2 IF A GENOME SPECIFIED ONLY!
  */
-if( params.genome ) {
+if( params.bt_index ) {
 
     /*
      * STEP 6.1 - Bowtie 1 against reference genome
@@ -683,7 +686,7 @@ if( params.genome ) {
 
         input:
         file reads from trimmed_reads_bowtie_ref
-        file indices from indices_bowtie.collect()
+        file indices from bt_indices.collect()
 
         output:
         file '*.genome.bam' into bowtie_bam, bowtie_bam_for_unmapped
