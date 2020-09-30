@@ -132,32 +132,21 @@ if( !params.mature || !params.hairpin ){
 
 if (params.skip_mirdeep){
   if (params.mature) { mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
-
   if (params.hairpin) { hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
-
   if (params.gtf) { gtf = file(params.gtf, checkIfExists: true) }
 }
 else{
   if (params.references_parsed){
     refgenome = file("$params.references_parsed/genome.fa", checkIfExists: true)
-    .ifEmpty { exit 1, "Reference parsed genome not found: ${references_parsed}"}
-
+    hairpin = file("$params.references_parsed/hairpin.fa", checkIfExists: true)
+    mature = file("$params.references_parsed/mature.fa", checkIfExists: true)
     indices_mirdeep2 = Channel
     .fromPath("$params.references_parsed/genome.*.ebwt", checkIfExists: true)
     .ifEmpty { exit 1, "Reference parsed genome indices not found: ${references_parsed}"}
-
-    hairpin = file("$params.references_parsed/hairpin.fa", checkIfExists: true)
-    .ifEmpty { exit 1, "Reference parsed hairpin.fa not found: ${references_parsed}"}
-
-    mature = file("$params.references_parsed/mature.fa", checkIfExists: true)
-    .ifEmpty { exit 1, "Reference parsed mature.fa not found: ${references_parsed}"}
-
   }
   else{
     if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
-
     if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
-
     if (params.refgenome) {reference_genome = file(params.refgenome, checkIfExists: true) } else { exit 1, "Reference genome file not found: ${params.refgenome}" }
 
   }
@@ -829,7 +818,7 @@ if (! params.skip_mirdeep){
       publishDir "${params.outdir}/mirdeep2/mirdeep", mode: 'copy'
 
       input:
-      file refgenome from reference_genome
+      file refgenome from refgenome
       file reads_collapsed from mirdeep_reads_collapsed
       file reads_vs_refdb from reads_vs_refdb
       file mature from mature
