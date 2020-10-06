@@ -126,10 +126,6 @@ if (!params.mirna_gtf && params.mirtrace_species){
 
 // Validate inputs
 
-if( !params.mature || !params.hairpin ){
-    exit 1, "Missing mature / hairpin reference indexes! Is --genome specified?"
-}
-
 if (params.skip_mirdeep){
   if (params.mature) { mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
   if (params.hairpin) { hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
@@ -149,6 +145,10 @@ else{
     if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
     if (params.refgenome) {reference_genome = file(params.refgenome, checkIfExists: true) } else { exit 1, "Reference genome file not found: ${params.refgenome}" }
   }
+}
+
+if( !params.mature || !params.hairpin ){
+    exit 1, "Missing mature / hairpin reference indexes! Is --genome specified?"
 }
 
 if( params.bt_index ){
@@ -311,7 +311,7 @@ if (!params.references_parsed && !params.skip_mirdeep){
     label 'process_medium'
     publishDir path: { params.saveReference ? "${params.outdir}/references_parsed" : params.outdir },
                saveAs: { params.saveReference ? it : null }, mode: 'copy'
-               
+
     input:
     file refgenome from reference_genome
     file mature from reference_mature
