@@ -147,10 +147,6 @@ else{
   }
 }
 
-if( !params.mature || !params.hairpin ){
-    exit 1, "Missing mature / hairpin reference indexes! Is --genome specified?"
-}
-
 if( params.bt_index ){
   bt_indices = Channel
     .fromPath("${params.bt_index}*", checkIfExists: true)
