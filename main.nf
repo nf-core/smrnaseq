@@ -148,10 +148,7 @@ else{
     if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
     if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
     if (params.refgenome) {reference_genome = file(params.refgenome, checkIfExists: true) } else { exit 1, "Reference genome file not found: ${params.refgenome}" }
-
   }
-
-
 }
 
 if( params.bt_index ){
@@ -306,15 +303,15 @@ process get_software_versions {
    """
 }
 
-
-if (! params.references_parsed & !params.skip_mirdeep){
+if (!params.references_parsed && !params.skip_mirdeep){
   /*
    * PREPROCESSING - Parse genome.fa and build Bowtie index for refgenome
    */
   process bowtie_indices {
     label 'process_medium'
-    publishDir "${params.outdir}/references", mode: 'symlink'
-
+    publishDir path: { params.saveReference ? "${params.outdir}/references_parsed" : params.outdir },
+               saveAs: { params.saveReference ? it : null }, mode: 'copy'
+               
     input:
     file refgenome from reference_genome
     file mature from reference_mature
@@ -333,8 +330,7 @@ if (! params.references_parsed & !params.skip_mirdeep){
     sed -i 's, ,_,g' $mature
     bowtie-build $refgenome genome
     """
-
-   }
+  }
 }
 /*
  * PREPROCESSING - Build Bowtie index for mature and hairpin
