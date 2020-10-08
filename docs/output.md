@@ -136,10 +136,12 @@ This is an example of the output we can get:
 
 **Output directory: `results/mirdeep2`**
 
-* `mapper/sample_reads_vs_refdb.arf`: file with the mapped reads to the genome.
-* `mirdeep/timestamp_sample.bed`: file with the known and novel miRNAs in bed format.
-* `mirdeep/timestamp_sample.csv`: file with an overview of all detected miRNAs (known and novel) in csv format.
-* `mirdeep/timestamp_sample.html`: file with an overview of all detected miRNAs (known and novel) in html format.
+* `mirdeep/timestamp_sample.bed`
+  * File with the known and novel miRNAs in bed format.
+* `mirdeep/timestamp_sample.csv`
+  * File with an overview of all detected miRNAs (known and novel) in csv format.
+* `mirdeep/timestamp_sample.html`
+  * A HTML report with an overview of all detected miRNAs (known and novel) in html format.
 
 ## miRTrace
 [miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts).
