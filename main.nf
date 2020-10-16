@@ -33,7 +33,7 @@ def helpMessage() {
       --mirna_gtf                   GFF/GTF file with coordinates positions of precursor and miRNAs. See: ftp://mirbase.org/pub/mirbase/CURRENT/genomes/hsa.gff3
       --bt_index                    Path to the bowtie 1 index files of the host reference genome. Optional.
       --mirtrace_species            Species for miRTrace. Pre-defined when '--genome' is specified. (hsa, mmu ...)
-      --refgenome                   Path to the Fasta file of the reference genome.
+      --fasta                       Path to genome fasta file
       --references_parsed           Path to the parsed reference folder containing the files for the miRDeep2.
 
     Trimming options
@@ -83,7 +83,7 @@ params.bt_index = params.genome ? params.genomes[ params.genome ].bowtie ?: fals
 params.mature = params.genome ? params.genomes[ params.genome ].mature ?: false : false
 params.hairpin = params.genome ? params.genomes[ params.genome ].hairpin ?: false : false
 params.mirtrace_species = params.genome ? params.genomes[ params.genome ].mirtrace_species ?: false : false
-params.refgenome = params.genome ? params.genomes[ params.genome ].refgenome ?: false : false
+params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 
 // Define regular variables so that they can be overwritten
 clip_R1 = params.clip_R1
@@ -133,7 +133,7 @@ if (params.skip_mirdeep){
 }
 else{
   if (params.references_parsed){
-    refgenome = file("$params.references_parsed/genome.fa", checkIfExists: true)
+    fasta = file("$params.references_parsed/genome.fa", checkIfExists: true)
     hairpin = file("$params.references_parsed/hairpin.fa", checkIfExists: true)
     mature = file("$params.references_parsed/mature.fa", checkIfExists: true)
     indices_mirdeep2 = Channel
@@ -143,7 +143,7 @@ else{
   else{
     if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
     if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
-    if (params.refgenome) {reference_genome = file(params.refgenome, checkIfExists: true) } else { exit 1, "Reference genome file not found: ${params.refgenome}" }
+    if (params.fasta) {reference_genome = file(params.fasta, checkIfExists: true) } else { exit 1, "Reference genome file not found: ${params.fasta}" }
   }
 }
 
@@ -213,7 +213,7 @@ summary["Trim 5' R1"]          = clip_R1
 summary["Trim 3' R1"]          = three_prime_clip_R1
 summary['miRBase mature']      = params.mature
 summary['miRBase hairpin']     = params.hairpin
-summary['Reference Genome']    = params.refgenome
+summary['Reference Genome']    = params.fasta
 if(params.bt_index)            summary['Bowtie Index for Ref'] = params.bt_index
 summary['Save Reference']      = params.saveReference ? 'Yes' : 'No'
 summary['Protocol']            = params.protocol
@@ -301,7 +301,7 @@ process get_software_versions {
 
 if (!params.references_parsed && !params.skip_mirdeep){
   /*
-   * PREPROCESSING - Parse genome.fa and build Bowtie index for refgenome
+   * PREPROCESSING - Parse genome.fa and build Bowtie index for the reference genome
    */
   process bowtie_indices {
     label 'process_medium'
@@ -314,7 +314,7 @@ if (!params.references_parsed && !params.skip_mirdeep){
     file hairpin from reference_hairpin
 
     output:
-    file 'genome.fa' into refgenome
+    file 'genome.fa' into fasta
     file 'genome.*.ebwt' into indices_mirdeep2
     file 'hairpin.fa' into hairpin
     file 'mature.fa' into mature
@@ -810,7 +810,7 @@ if (! params.skip_mirdeep){
       publishDir "${params.outdir}/mirdeep2/mirdeep", mode: 'copy'
 
       input:
-      file refgenome from refgenome
+      file refgenome from fasta
       file reads_collapsed from mirdeep_reads_collapsed
       file reads_vs_refdb from reads_vs_refdb
       file mature from mature
