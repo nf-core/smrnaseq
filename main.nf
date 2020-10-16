@@ -743,133 +743,138 @@ if( params.bt_index ) {
     ch_genome_bam_flagstat_mqc = Channel.empty()
 }
 /*
- * STEP 7.0, 7.1 and 7.2 if skip_mirdeep is not specified
+ * STEP 7.0 - unzip trim galore reads
  */
-if (! params.skip_mirdeep){
-    /*
-     * STEP 7.0 - unzip trim galore reads
-     */
 
-    process uncompress_trimmed_reads{
-      label 'process_low'
+process uncompress_trimmed_reads{
+    label 'process_low'
 
-      input:
-      path reads from trimmed_zipped_reads_mirdeep2
+    when:
+    !params.skip_mirdeep
+    
+    input:
+    path reads from trimmed_zipped_reads_mirdeep2
 
-      output:
-      path "$unzip" into trimmed_reads_mirdeep2
+    output:
+    path "$unzip" into trimmed_reads_mirdeep2
 
-      script:
-      unzip = reads.toString() - '.gz'
-      """
-      pigz -f -d -p $task.cpus $reads
-      """
+    script:
+    unzip = reads.toString() - '.gz'
+    """
+    pigz -f -d -p $task.cpus $reads
+    """
 
-    }
-
-    /*
-     * STEP 7.1 - miRDeep2 mapper
-     */
-    process mapper_mirdeep2 {
-      label 'process_medium'
-      tag "$reads"
-      publishDir "${params.outdir}/mirdeep2/mapper", mode: 'copy'
-
-      input:
-      file reads from trimmed_reads_mirdeep2
-      file indices from indices_mirdeep2.collect()
-
-
-      output:
-      file '*_collapsed.fa' into mirdeep_reads_collapsed
-      file '*reads_vs_refdb.arf' into reads_vs_refdb
-
-      script:
-      index_base = indices.toString().tokenize(' ')[0].tokenize('.')[0]
-
-      """
-      mapper.pl \\
-      $reads \\
-      -e \\
-      -h \\
-      -i \\
-      -j \\
-      -m \\
-      -p $index_base \\
-      -s ${reads.baseName}_collapsed.fa \\
-      -t ${reads.baseName}_reads_vs_refdb.arf \\
-      -o 4
-      """
-    }
-
-    /*
-     * STEP 7.2 - miRDeep2 novel mirnas
-     */
-    process mirdeep2 {
-      label 'process_medium'
-      publishDir "${params.outdir}/mirdeep2/mirdeep", mode: 'copy'
-
-      input:
-      file refgenome from fasta
-      file reads_collapsed from mirdeep_reads_collapsed
-      file reads_vs_refdb from reads_vs_refdb
-      file mature from mature
-      file hairpin from hairpin
-
-      output:
-
-      file 'result*.{bed,csv,html}'
-
-
-      script:
-
-      """
-      miRDeep2.pl \\
-      $reads_collapsed \\
-      $refgenome \\
-      $reads_vs_refdb \\
-      $mature \\
-      none \\
-      $hairpin \\
-      -d \\
-      -z _${reads_collapsed.simpleName}
-      """
-    }
 }
+
+/*
+ * STEP 7.1 - miRDeep2 mapper
+ */
+process mapper_mirdeep2 {
+    label 'process_medium'
+    tag "$reads"
+    publishDir "${params.outdir}/mirdeep2/mapper", mode: 'copy'
+
+    when:
+    !params.skip_mirdeep
+
+    input:
+    file reads from trimmed_reads_mirdeep2
+    file indices from indices_mirdeep2.collect()
+
+
+    output:
+    file '*_collapsed.fa' into mirdeep_reads_collapsed
+    file '*reads_vs_refdb.arf' into reads_vs_refdb
+
+    script:
+    index_base = indices.toString().tokenize(' ')[0].tokenize('.')[0]
+
+    """
+    mapper.pl \\
+    $reads \\
+    -e \\
+    -h \\
+    -i \\
+    -j \\
+    -m \\
+    -p $index_base \\
+    -s ${reads.baseName}_collapsed.fa \\
+    -t ${reads.baseName}_reads_vs_refdb.arf \\
+    -o 4
+    """
+}
+
+/*
+ * STEP 7.2 - miRDeep2 novel mirnas
+ */
+process mirdeep2 {
+    label 'process_medium'
+    publishDir "${params.outdir}/mirdeep2/mirdeep", mode: 'copy'
+
+    when:
+    !params.skip_mirdeep
+
+    input:
+    file refgenome from fasta
+    file reads_collapsed from mirdeep_reads_collapsed
+    file reads_vs_refdb from reads_vs_refdb
+    file mature from mature
+    file hairpin from hairpin
+
+    output:
+
+    file 'result*.{bed,csv,html}'
+
+
+    script:
+
+    """
+    miRDeep2.pl \\
+    $reads_collapsed \\
+    $refgenome \\
+    $reads_vs_refdb \\
+    $mature \\
+    none \\
+    $hairpin \\
+    -d \\
+    -z _${reads_collapsed.simpleName}
+    """
+}
+
 
 /*
  * STEP 8 - miRTrace
  */
 process mirtrace {
-     tag "$reads"
-     publishDir "${params.outdir}/miRTrace", mode: 'copy'
+    tag "$reads"
+    publishDir "${params.outdir}/miRTrace", mode: 'copy'
 
-     input:
-     file reads from raw_reads_mirtrace.collect()
+    input:
+    file reads from raw_reads_mirtrace.collect()
 
-     output:
-     file '*mirtrace' into mirtrace_results
+    output:
+    file '*mirtrace' into mirtrace_results
 
-     script:
-     primer = (protocol=="cats") ? " " : " --adapter $three_prime_adapter "
-     """
-     for i in $reads
-     do
-         path=\$(realpath \${i})
-         prefix=\$(echo \${i} | sed -e 's/.gz//' -e 's/.fastq//' -e 's/.fq//' -e 's/_val_1//' -e 's/_trimmed//' -e 's/_R1//' -e 's/.R1//')
-         echo \$path","\$prefix
-     done > mirtrace_config
+    script:
+    primer = (protocol=="cats") ? " " : " --adapter $three_prime_adapter "
+    """
+    for i in $reads
+    do
+        path=\$(realpath \${i})
+        prefix=\$(echo \${i} | sed -e 's/.gz//' -e 's/.fastq//' -e 's/.fq//' -e 's/_val_1//' -e 's/_trimmed//' -e 's/_R1//' -e 's/.R1//')
+        echo \$path","\$prefix
+    done > mirtrace_config
 
-     mirtrace qc \\
-         --species $params.mirtrace_species \\
-         $primer \\
-         --protocol $protocol \\
-         --config mirtrace_config \\
-         --write-fasta \\
-         --output-dir mirtrace \\
-         --force
-     """
- }
+    mirtrace qc \\
+        --species $params.mirtrace_species \\
+        $primer \\
+        --protocol $protocol \\
+        --config mirtrace_config \\
+        --write-fasta \\
+        --output-dir mirtrace \\
+        --force
+    """
+}
 
 
 /*
