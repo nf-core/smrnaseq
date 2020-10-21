@@ -139,6 +139,7 @@ This is an example of the output we can get:
 * `mirna.tsv`: tabular file with miRNA counts after summarizing unique isomiRs for each miRNA
 
 ## miRDeep2
+
 [miRDeep2](https://www.mdc-berlin.de/content/mirdeep2-documentation) is used for the identification of novel and known miRNAs in deep sequencing data.
 
 **Output directory: `results/mirdeep2`**
