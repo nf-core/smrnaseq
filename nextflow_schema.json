@@ -1,5 +1,5 @@
 {
-    "$schema": "https://json-schema.org/draft-07/schema",
+    "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/nf-core/smrnaseq/master/nextflow_schema.json",
     "title": "nf-core/smrnaseq pipeline parameters",
     "description": "Small RNA-Seq Best Practice Analysis Pipeline.",
@@ -101,7 +101,7 @@
                         "link",
                         "copy",
                         "copyNoFollow",
-                        "mov"
+                        "move"
                     ]
                 },
                 "name": {
