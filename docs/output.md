@@ -16,6 +16,7 @@ and processes data using the following steps:
 * [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
 * [Bowtie](#bowtie) - alignment against reference genome for QC purpose
 * [mirtop](#mirtop) - miRNA and isomiR annotation
+* [miRDeep2](#mirdeep2) - known and novel miRNA annotation
 * [miRTrace](#mirtrace) - a comprehensive tool for QC purpose
 * [MultiQC](#multiqc) - aggregate report, describing results of the whole pipeline
 
@@ -130,12 +131,25 @@ This is an example of the output we can get:
 
 [mirtop](https://github.com/miRTop/mirtop) is used to parse the BAM files from `bowtie` alignment, and produce a [mirgff3](https://github.com/miRTop/mirGFF3) file with information about miRNAs and isomirs.
 
-** Output directory: `results/mirtop` **
+**Output directory: `results/mirtop`**
 
 * `mirtop.gff`: [mirgff3](https://github.com/miRTop/mirGFF3) file
 * `mirtop.tsv`: tabular file of the previous file for easy integration with downstream analysis.
 * `mirtop_rawData.tsv`: File compatible with [isomiRs](http://lpantano.github.io/isomiRs/reference/IsomirDataSeqFromMirtop.html) Bioconductor package to perform isomiRs analysis.
 * `mirna.tsv`: tabular file with miRNA counts after summarizing unique isomiRs for each miRNA
+
+## miRDeep2
+
+[miRDeep2](https://www.mdc-berlin.de/content/mirdeep2-documentation) is used for the identification of novel and known miRNAs in deep sequencing data.
+
+**Output directory: `results/mirdeep2`**
+
+* `mirdeep/timestamp_sample.bed`
+  * File with the known and novel miRNAs in bed format.
+* `mirdeep/timestamp_sample.csv`
+  * File with an overview of all detected miRNAs (known and novel) in csv format.
+* `mirdeep/timestamp_sample.html`
+  * A HTML report with an overview of all detected miRNAs (known and novel) in html format.
 
 ## miRTrace
 

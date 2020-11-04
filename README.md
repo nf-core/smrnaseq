@@ -58,8 +58,11 @@ See [usage docs](docs/usage.md) for all of the available options when running th
     3. miRNA and isomiR annotation from step 4.1 ([`mirtop`](https://github.com/miRTop/mirtop))
 6. Alignment against host reference genome ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
     1. Post-alignment processing of alignment against host reference genome ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-7. miRNA quality control ([`mirtrace`](https://github.com/friedlanderlab/mirtrace))
-8. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
+7. Novel miRNAs and known miRNAs discovery ([`MiRDeep2`](https://www.mdc-berlin.de/content/mirdeep2-documentation))
+    1. Mapping against reference genome with the mapper module
+    2. Known and novel miRNA discovery with the mirdeep2 module
+8. miRNA quality control ([`mirtrace`](https://github.com/friedlanderlab/mirtrace))
+9. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
 
 ### Documentation
 
