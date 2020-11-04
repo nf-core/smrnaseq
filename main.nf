@@ -38,9 +38,6 @@ def helpMessage() {
       --mirtrace_species [str]      Species for miRTrace. Pre-defined when '--genome' is specified. (hsa, mmu ...)
       --references_parsed [folder]  Path to the parsed reference folder containing the files for the miRDeep2
 
->>>>>>> origin/dev
-
-
     Trimming options
       --three_prime_adapter [str]   3’ Adapter to trim. Default: None
       --min_length [int]            Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
