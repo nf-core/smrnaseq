@@ -249,5 +249,61 @@
         {
             "$ref": "#/definitions/institutional_config_options"
         }
-    ]
+    ],
+    "properties": {
+        "protocol": {
+            "type": "string",
+            "default": "illumina"
+        },
+        "clip_R1": {
+            "type": "integer",
+            "default": 0
+        },
+        "three_prime_clip_R1": {
+            "type": "integer",
+            "default": 0
+        },
+        "three_prime_adapter": {
+            "type": "string",
+            "default": "TGGAATTCTCGGGTGCCAAGG"
+        },
+        "min_length": {
+            "type": "integer",
+            "default": 17
+        },
+        "skipQC": {
+            "type": "string"
+        },
+        "skipFastqc": {
+            "type": "string"
+        },
+        "skipMultiqc": {
+            "type": "string"
+        },
+        "skip_mirdeep": {
+            "type": "string"
+        },
+        "saveReference": {
+            "type": "string",
+            "default": "true"
+        },
+        "seq_center": {
+            "type": "string"
+        },
+        "references_parsed": {
+            "type": "string"
+        },
+        "bt_index": {
+            "type": "string"
+        },
+        "mature": {
+            "type": "string"
+        },
+        "hairpin": {
+            "type": "string"
+        },
+        "mirtrace_species": {
+            "type": "string"
+        }
+    }
 }
