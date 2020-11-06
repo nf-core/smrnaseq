@@ -11,7 +11,7 @@
 The typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/smrnaseq --reads '*.fastq.gz' -profile docker
+nextflow run nf-core/smrnaseq --input '*.fastq.gz' -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
@@ -77,12 +77,12 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
   * A profile with a complete configuration for automated testing
   * Includes links to test data so needs no other parameters
 
-### `--reads`
+### `--input`
 
 Use this to specify the location of your input FastQ files. For example:
 
 ```bash
- --reads 'path/to/data/*.fastq.gz'
+ --input 'path/to/data/*.fastq.gz'
 ```
 
 Please note the following requirements:

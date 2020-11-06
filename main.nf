@@ -17,10 +17,10 @@ def helpMessage() {
 
     The typical command for running the pipeline is as follows:
 
-    nextflow run nf-core/smrnaseq --reads '*.fastq.gz' --genome GRCh37 -profile docker
+    nextflow run nf-core/smrnaseq --input '*.fastq.gz' --genome GRCh37 -profile docker
 
     Mandatory arguments:
-      --reads [file]                Path to input data (must be surrounded with quotes)
+      --input [file]                Path to input data (must be surrounded with quotes)
       -profile [str]                Configuration profile to use. Can use multiple (comma separated)
                                     Available: conda, docker, singularity, test, awsbatch, <institute> and more
       --protocol [str]              Library preparation protocol. Default: "illumina". Can be set as "illumina", "nextflex", "qiaseq" or "cats"
@@ -198,8 +198,8 @@ if(params.input_paths){
         .into { raw_reads_fastqc; raw_reads_trimgalore; raw_reads_mirtrace }
 } else {
     Channel
-        .fromPath( params.reads )
-        .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}" }
+        .fromPath( params.input )
+        .ifEmpty { exit 1, "Cannot find any reads matching: ${params.input}" }
         .into { raw_reads_fastqc; raw_reads_trimgalore; raw_reads_mirtrace }
 }
 
@@ -208,7 +208,7 @@ log.info nfcoreHeader()
 def summary = [:]
 if(workflow.revision)          summary['Pipeline Release'] = workflow.revision
 summary['Run Name']            = custom_runName ?: workflow.runName
-summary['Reads']               = params.reads
+summary['Input']               = params.input
 summary['Genome']              = params.genome
 summary['Min Trimmed Length']  = params.min_length
 summary["Trim 5' R1"]          = clip_R1
