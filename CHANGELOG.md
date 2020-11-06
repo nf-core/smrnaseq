@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v1.1dev - [date]
 
 * Change `--reads` to `--input` for consistency with rest of nf-core
+* Move all parameter documentation into new `nextflow_schema.json` file.
 * Update with the latest TEMPLATE version and nf-core 1.11
 * Update conda environment with new packages and updates
 

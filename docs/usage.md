@@ -41,6 +41,13 @@ First, go to the [nf-core/smrnaseq releases page](https://github.com/nf-core/smr
 
 This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future.
 
+## Stand-alone scripts
+
+The `bin` directory contains some scripts used by the pipeline which may also be run manually:
+
+* `edgeR_miRBase.r`
+  * R script using for processing reads counts of mature miRNAs and miRNA precursors (hairpins).
+
 ## Core Nextflow arguments
 
 > **NB:** These options are part of Nextflow and use a _single_ hyphen (pipeline parameters use a double-hyphen).
@@ -77,34 +84,7 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
   * A profile with a complete configuration for automated testing
   * Includes links to test data so needs no other parameters
 
-### `--input`
-
-Use this to specify the location of your input FastQ files. For example:
-
-```bash
- --input 'path/to/data/*.fastq.gz'
-```
-
-Please note the following requirements:
-
-1. The path must be enclosed in quotes
-2. The path must have at least one `*` wildcard character
-
-### `--protocol`
-
-Protocol for constructing smRNA-seq libraries. Note that trimming parameters and 3' adapter sequence are pre-defined with a specified protocol.
-Default: "illumina"
-
-```bash
---protocol [one protocol listed in the table below]
-```
-
-| Protocol      | Library Prep Kit                        | Trimming Parameter                   | 3' Adapter Sequence   |
-| :------------ | :-------------------------------------- | :----------------------------------- | :-------------------  |
-| illumina      | Illumina TruSeq Small RNA               | clip_R1 = 0; three_prime_clip_R1 = 0 | TGGAATTCTCGGGTGCCAAGG |
-| nextflex      | BIOO SCIENTIFIC  NEXTFLEX Small RNA-Seq | clip_R1 = 4; three_prime_clip_R1 = 4 | TGGAATTCTCGGGTGCCAAGG |
-| qiaseq        | QIAGEN QIAseq miRNA                     | clip_R1 = 0; three_prime_clip_R1 = 0 | AACTGTAGGCACCATCAAT   |
-| cats          | Diagenode CATS Small RNA-seq            | clip_R1 = 3; three_prime_clip_R1 = 0 | AAAAAAAAAAA + GATCGGAAGAGCACACGTCTG (only polyA is used for trimming) |
+### `-resume`
 
 Specify this when restarting a pipeline. Nextflow will used cached results from any pipeline steps where the inputs are the same, continuing from where it got to previously.
 
@@ -118,112 +98,17 @@ Specify the path to a specific config file (this is a core Nextflow command). Se
 
 Each step in the pipeline has a default set of requirements for number of CPUs, memory and time. For most of the steps in the pipeline, if the job exits with an error code of `143` (exceeded requested resources) it will automatically resubmit with higher requests (2 x original, then 3 x original). If it still fails after three times then the pipeline is stopped.
 
-```nextflow
-params {
-  genomes {
-    'GRCh37' {
-      fasta   = '<path to the genome fasta file>' // Used if no star index given
-      mature  = '<path to the genome fasta file>' //mature.fa"
-      hairpin = '<path to the genome fasta file>' //hairpin.fa"
-      bowtie  = '<path to the genome fasta file>' // index
-      gtf     = '<path to the gtf file>'
-      mirtrace_species = "sps" // species according mirbase
+Whilst these default requirements will hopefully work for most people with most data, you may find that you want to customise the compute resources that the pipeline requests. You can do this by creating a custom config file. For example, to give the workflow process `star` 32GB of memory, you could use the following config:
 
-    }
-    // Any number of additional genomes, key is used with --genome
+```nextflow
+process {
+  withName: star {
+    memory = 32.GB
   }
 }
 ```
 
-### `--saveReference`
-
-Supply this parameter to save any generated reference genome files to your results folder. These can then be used for future pipeline runs, reducing processing times.
-
-### `--fasta`
-
-If you prefer, you can specify the full path to your reference genome when you run the pipeline:
-
-```bash
---fasta '[path to Fasta reference]'
-```
-
-### `--igenomes_ignore`
-
-Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`.
-
-### `--mature`
-
-If you prefer, you can specify the full path to the FASTA file of mature miRNAs when you run the pipeline:
-
-```bash
---mature [path to the FASTA file of mature miRNAs]
-```
-
-### `--hairpin`
-
-If you prefer, you can specify the full path to the FASTA file of miRNA precursors when you run the pipeline:
-
-```bash
---hairpin [path to the FASTA file of miRNA precursors]
-```
-
-### `--bt_index`
-
-If you prefer, you can specify the full path to your reference genome when you run the pipeline:
-
-```bash
---bt_index [path to Bowtie 1 index]
-```
-
-## Trimming options
-
-### `--min_length [int]`
-
-Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
-
-### `--clip_R1 [int]`
-
-Instructs Trim Galore to remove bp from the 5' end of read 1
-
-### `--three_prime_clip_R1 [int]`
-
-Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed
-
-### `--three_prime_adapter [sequence]`
-
-Instructs Trim Galore to remove 3' adapters which are typically used in smRNA-seq library preparation
-
-## Skipping QC steps
-
-### `--skipQC`
-
-Skip all QC steps aside from MultiQC
-
-### `--skipFastqc`
-
-Skip FastQC
-
-### `--skipMultiqc`
-
-Skip MultiQC
-
-## Job resources
-
-### Automatic resubmission
-
-Each step in the pipeline has a default set of requirements for number of CPUs, memory and time. For most of the steps in the pipeline, if the job exits with an error code of `143` (exceeded requested resources) it will automatically resubmit with higher requests (2 x original, then 3 x original). If it still fails after three times then the pipeline is stopped.
-
-### Custom resource requests
-
-Wherever process-specific requirements are set in the pipeline, the default value can be changed by creating a custom config file. See the files hosted at [`nf-core/configs`](https://github.com/nf-core/configs/tree/master/conf) for examples.
-
-If you are likely to be running `nf-core` pipelines regularly it may be a good idea to request that your custom config file is uploaded to the `nf-core/configs` git repository. Before you do this please can you test that the config file works with your pipeline of choice using the `-c` parameter (see definition below). You can then create a pull request to the `nf-core/configs` repository with the addition of your config file, associated documentation file (see examples in [`nf-core/configs/docs`](https://github.com/nf-core/configs/tree/master/docs)), and amending [`nfcore_custom.config`](https://github.com/nf-core/configs/blob/master/nfcore_custom.config) to include your custom profile.
-
-If you have any questions or issues please send us a message on [Slack](https://nf-co.re/join/slack).
-
-## AWS Batch specific parameters
-
-Running the pipeline on AWS Batch requires a couple of specific parameters to be set according to your AWS Batch configuration. Please use [`-profile awsbatch`](https://github.com/nf-core/configs/blob/master/conf/awsbatch.config) and then specify all of the following parameters
+See the main [Nextflow documentation](https://www.nextflow.io/docs/latest/config.html) for more information.
 
 If you are likely to be running `nf-core` pipelines regularly it may be a good idea to request that your custom config file is uploaded to the `nf-core/configs` git repository. Before you do this please can you test that the config file works with your pipeline of choice using the `-c` parameter (see definition above). You can then create a pull request to the `nf-core/configs` repository with the addition of your config file, associated documentation file (see examples in [`nf-core/configs/docs`](https://github.com/nf-core/configs/tree/master/docs)), and amending [`nfcore_custom.config`](https://github.com/nf-core/configs/blob/master/nfcore_custom.config) to include your custom profile.
 
@@ -240,79 +125,8 @@ Some HPC setups also allow you to run nextflow within a cluster job submitted yo
 
 #### Nextflow memory requirements
 
-## Other command line parameters
-
-### `--outdir`
-
-The output directory where the results will be saved.
-
-### `--email`
-
-Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.
-
-### `--email_on_fail`
-
-This works exactly as with `--email`, except emails are only sent if the workflow is not successful.
-
-### `--max_multiqc_email_size`
-
-Threshold size for MultiQC report to be attached in notification email. If file generated by pipeline exceeds the threshold, it will not be attached (Default: 25MB).
-
-### `-name`
-
-Name for the pipeline run. If not specified, Nextflow will automatically generate a random mnemonic.
-
-This is used in the MultiQC report (if not default) and in the summary HTML / e-mail (always).
-
-**NB:** Single hyphen (core Nextflow option)
-
-### `--seq_center`
-
-Text about sequencing center which will be added in the header of output bam files.
-
-### `-resume`
-
-Specify this when restarting a pipeline. Nextflow will used cached results from any pipeline steps where the inputs are the same, continuing from where it got to previously.
-
-You can also supply a run name to resume a specific run: `-resume [run-name]`. Use the `nextflow log` command to show previous run names.
-
-**NB:** Single hyphen (core Nextflow option)
-
-### `-c`
-
-Specify the path to a specific config file (this is a core NextFlow command).
-
-**NB:** Single hyphen (core Nextflow option)
-
-Note - you can use this to override defaults. For example, we run on UPPMAX but don't want to use the MultiQC
-environment module as is the default. So we specify a config file using `-c` that contains the following:
-
-```nextflow
-process.$multiqc.module = []
-```
-
-## Stand-alone scripts
-
-The `bin` directory contains some scripts used by the pipeline which may also be run manually:
-
-* `edgeR_miRBase.r`
-  * R script using for processing reads counts of mature miRNAs and miRNA precursors (hairpins).
-
-### `--custom_config_version`
-
-Provide git commit id for custom Institutional configs hosted at `nf-core/configs`. This was implemented for reproducibility purposes. Default: `master`.
-
-```bash
-## Download and use config file with following git commid id
---custom_config_version d52db660777c4bf36546ddb188ec530c3ada1b96
-```
-
-### `--custom_config_base`
-
-If you're running offline, nextflow will not be able to fetch the institutional config files
-from the internet. If you don't need them, then this is not a problem. If you do need them,
-you should download the files from the repo and tell nextflow where to find them with the
-`custom_config_base` option. For example:
+In some cases, the Nextflow Java virtual machines can start to request a large amount of memory.
+We recommend adding the following line to your environment to limit this (typically in `~/.bashrc` or `~./bash_profile`):
 
 ```bash
 NXF_OPTS='-Xms1g -Xmx4g'
