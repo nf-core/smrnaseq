@@ -6,27 +6,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v1.1dev - [date]
 
 * Change `--reads` to `--input` for consistency with rest of nf-core
+* Made `CamelCase` pipeline parameters `snake_case` and lower case
+  * `clip_R1` -> `clip_r1`
+  * `three_prime_clip_R1` -> `three_prime_clip_r1`
+  * `saveReference` -> `save_reference`
+  * `skipQC` -> `skip_qc`
+  * `skipFastqc` -> `skip_fastqc`
+  * `skipMultiqc` -> `skip_multiqc`
 * Move all parameter documentation into new `nextflow_schema.json` file.
-* Update with the latest TEMPLATE version and nf-core 1.11
+* Update with the latest `TEMPLATE` version for nf-core `v1.11`
 * Update conda environment with new packages and updates
 
 ### Packaged software updates
 
-* fastqc=0.11.8 -> 0.11.9
-* trim-galore=0.6.3 -> 0.6.5
-* bowtie=1.2.2 -> 1.2.3
-* multiqc=1.7 -> 1.8
-* mirtop=0.4.22 -> 0.4.23
-* seqcluster=1.2.5 -> 1.2.7
-* htseq=0.11.2 -> 0.11.3
-* fastx_toolkit=0.0.14 -> 0.0.14
-* seqkit=0.10.1 -> 0.12.0
-* mirtrace=1.0.0 -> 1.0.1
-* Added conda-forge::python=3.7.3
-* Added conda-forge::markdown=3.1.1
-* Added conda-forge::pymdown-extensions=6.0
-* Added conda-forge::pygments=2.5.2
-* Removed conda-forge::r-markdown=1.0
+* `fastqc=0.11.8` -> `0.11.9`
+* `trim-galore=0.6.3` -> `0.6.5`
+* `bowtie=1.2.2` -> `1.2.3`
+* `multiqc=1.7` -> `1.9`
+* `mirtop=0.4.22` -> `0.4.23`
+* `seqcluster=1.2.5` -> `1.2.7`
+* `htseq=0.11.2` -> `0.11.3`
+* `fastx_toolkit=0.0.14` -> `0.0.14`
+* `seqkit=0.10.1` -> `0.12.0`
+* `mirtrace=1.0.0` -> `1.0.1`
+* Added `conda-forge::python=3.7.3`
+* Added `conda-forge::markdown=3.1.1`
+* Added `conda-forge::pymdown-extensions=6.0`
+* Added `conda-forge::pygments=2.5.2`
+* Removed `conda-forge::r-markdown=1.0`
 
 ## v1.0.0 - 2019-09-19
 

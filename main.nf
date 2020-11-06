@@ -30,7 +30,7 @@ def helpMessage() {
 
     References                      If not specified in the configuration file or you wish to overwrite any of the references
       --fasta [file]                Path to fasta reference
-      --saveReference [str]         Save the generated reference files the the Results directory
+      --save_reference [str]         Save the generated reference files the the Results directory
       --mature [file]               Path to the FASTA file of mature miRNAs
       --hairpin [file]              Path to the FASTA file of miRNA precursors
       --mirna_gtf [file]            GFF/GTF file with coordinates positions of precursor and miRNAs. See: ftp://mirbase.org/pub/mirbase/CURRENT/genomes/hsa.gff3
@@ -41,8 +41,8 @@ def helpMessage() {
     Trimming options
       --three_prime_adapter [str]   3’ Adapter to trim. Default: None
       --min_length [int]            Discard reads that became shorter than length [int] because of either quality or adapter trimming. Default: 18
-      --clip_R1 [int]               Instructs Trim Galore to remove bp from the 5' end of read 1
-      --three_prime_clip_R1 [int]   Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed
+      --clip_r1 [int]               Instructs Trim Galore to remove bp from the 5' end of read 1
+      --three_prime_clip_r1 [int]   Instructs Trim Galore to remove bp from the 3' end of read 1 AFTER adapter/quality trimming has been performed
 
     Other options:
       --outdir [file]                 The output directory where the results will be saved
@@ -84,32 +84,32 @@ params.mirtrace_species = params.genome ? params.genomes[ params.genome ].mirtra
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 
 // Define regular variables so that they can be overwritten
-clip_R1 = params.clip_R1
-three_prime_clip_R1 = params.three_prime_clip_R1
+clip_r1 = params.clip_r1
+three_prime_clip_r1 = params.three_prime_clip_r1
 three_prime_adapter = params.three_prime_adapter
 protocol = params.protocol
 // Presets
 if (params.protocol == "illumina"){
-    clip_R1 = 0
-    three_prime_clip_R1 = 0
+    clip_r1 = 0
+    three_prime_clip_r1 = 0
     three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"
 } else if (params.protocol == "nextflex"){
-    clip_R1 = 4
-    three_prime_clip_R1 = 4
+    clip_r1 = 4
+    three_prime_clip_r1 = 4
     three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"
 } else if (params.protocol == "qiaseq"){
-    clip_R1 = 0
-    three_prime_clip_R1 = 0
+    clip_r1 = 0
+    three_prime_clip_r1 = 0
     three_prime_adapter = "AACTGTAGGCACCATCAAT"
 } else if (params.protocol == "cats"){
-    clip_R1 = 3
-    three_prime_clip_R1 = 0
+    clip_r1 = 3
+    three_prime_clip_r1 = 0
     // three_prime_adapter = "GATCGGAAGAGCACACGTCTG"
     three_prime_adapter = "AAAAAAAA"
 } else {
     //custom protocol
-    clip_R1 = params.clip_R1
-    three_prime_clip_R1 = params.three_prime_clip_R1
+    clip_r1 = params.clip_r1
+    three_prime_clip_r1 = params.three_prime_clip_r1
     three_prime_adapter = params.three_prime_adapter
     protocol = params.protocol
 }
@@ -211,13 +211,13 @@ summary['Run Name']            = custom_runName ?: workflow.runName
 summary['Input']               = params.input
 summary['Genome']              = params.genome
 summary['Min Trimmed Length']  = params.min_length
-summary["Trim 5' R1"]          = clip_R1
-summary["Trim 3' R1"]          = three_prime_clip_R1
+summary["Trim 5' R1"]          = clip_r1
+summary["Trim 3' R1"]          = three_prime_clip_r1
 summary['miRBase mature']      = params.mature
 summary['miRBase hairpin']     = params.hairpin
 summary['Reference Genome']    = params.fasta
 if(params.bt_index)            summary['Bowtie Index for Ref'] = params.bt_index
-summary['Save Reference']      = params.saveReference ? 'Yes' : 'No'
+summary['Save Reference']      = params.save_reference ? 'Yes' : 'No'
 summary['Protocol']            = params.protocol
 summary['miRTrace species']    = params.mirtrace_species
 summary["3' adapter"]          = three_prime_adapter
@@ -311,8 +311,8 @@ if (!params.references_parsed && !params.skip_mirdeep){
    */
   process bowtie_indices {
     label 'process_medium'
-    publishDir path: { params.saveReference ? "${params.outdir}/references_parsed" : params.outdir },
-               saveAs: { params.saveReference ? it : null }, mode: 'copy'
+    publishDir path: { params.save_reference ? "${params.outdir}/references_parsed" : params.outdir },
+               saveAs: { params.save_reference ? it : null }, mode: 'copy'
 
     input:
     file refgenome from reference_genome
@@ -339,8 +339,8 @@ if (!params.references_parsed && !params.skip_mirdeep){
  */
 process make_bowtie_index {
     label 'process_medium'
-    publishDir path: { params.saveReference ? "${params.outdir}/bowtie/reference" : params.outdir },
-               saveAs: { params.saveReference ? it : null }, mode: 'copy'
+    publishDir path: { params.save_reference ? "${params.outdir}/bowtie/reference" : params.outdir },
+               saveAs: { params.save_reference ? it : null }, mode: 'copy'
 
     input:
     file mature from mature
@@ -378,7 +378,7 @@ process fastqc {
                       filename.indexOf(".zip") > 0 ? "zips/$filename" : "$filename"
                 }
     when:
-    !params.skipQC && !params.skipFastqc
+    !params.skip_qc && !params.skip_fastqc
 
     input:
     file reads from raw_reads_fastqc
@@ -411,8 +411,8 @@ process trim_galore {
 
     script:
     tg_length = "--length ${params.min_length}"
-    c_r1 = clip_R1 > 0 ? "--clip_R1 ${clip_R1}" : ''
-    tpc_r1 = three_prime_clip_R1 > 0 ? "--three_prime_clip_R1 ${three_prime_clip_R1}" : ''
+    c_r1 = clip_r1 > 0 ? "--clip_r1 ${clip_r1}" : ''
+    tpc_r1 = three_prime_clip_r1 > 0 ? "--three_prime_clip_r1 ${three_prime_clip_r1}" : ''
     tpa = (protocol == "qiaseq" | protocol == "cats") ? "--adapter ${three_prime_adapter}" : '--small_rna'
     """
     trim_galore --adapter ${three_prime_adapter} $tg_length $c_r1 $tpc_r1 --max_length 40 --gzip $reads --fastqc
@@ -892,7 +892,7 @@ process multiqc {
     publishDir "${params.outdir}/MultiQC", mode: params.publish_dir_mode
 
     when:
-    !params.skipQC && !params.skipMultiqc
+    !params.skip_qc && !params.skip_multiqc
 
     input:
     file (multiqc_config) from ch_multiqc_config

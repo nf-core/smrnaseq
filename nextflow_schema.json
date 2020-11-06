@@ -25,7 +25,7 @@
                     "default": "illumina",
                     "fa_icon": "fas fa-vial",
                     "description": "Protocol for constructing smRNA-seq libraries.",
-                    "help_text": "Presets for trimming parameters and 3' adapter sequence with a specified protocol.\n\n| Protocol      | Library Prep Kit                        | Trimming Parameter                      | 3' Adapter Sequence   |\n| :------------ | :-------------------------------------- | :-------------------------------------- | :-------------------  |\n| illumina      | Illumina TruSeq Small RNA               | `clip_R1 = 0` `three_prime_clip_R1 = 0` | `TGGAATTCTCGGGTGCCAAGG` |\n| nextflex      | BIOO SCIENTIFIC  NEXTFLEX Small RNA-Seq | `clip_R1 = 4` `three_prime_clip_R1 = 4` | `TGGAATTCTCGGGTGCCAAGG` |\n| qiaseq        | QIAGEN QIAseq miRNA                     | `clip_R1 = 0` `three_prime_clip_R1 = 0` | `AACTGTAGGCACCATCAAT`   |\n| cats          | Diagenode CATS Small RNA-seq            | `clip_R1 = 3` `three_prime_clip_R1 = 0` | `AAAAAAAAAAA` + `GATCGGAAGAGCACACGTCTG` (only polyA is used for trimming) |",
+                    "help_text": "Presets for trimming parameters and 3' adapter sequence with a specified protocol.\n\n| Protocol      | Library Prep Kit                        | Trimming Parameter                      | 3' Adapter Sequence   |\n| :------------ | :-------------------------------------- | :-------------------------------------- | :-------------------  |\n| illumina      | Illumina TruSeq Small RNA               | `clip_r1 = 0` `three_prime_clip_r1 = 0` | `TGGAATTCTCGGGTGCCAAGG` |\n| nextflex      | BIOO SCIENTIFIC  NEXTFLEX Small RNA-Seq | `clip_r1 = 4` `three_prime_clip_r1 = 4` | `TGGAATTCTCGGGTGCCAAGG` |\n| qiaseq        | QIAGEN QIAseq miRNA                     | `clip_r1 = 0` `three_prime_clip_r1 = 0` | `AACTGTAGGCACCATCAAT`   |\n| cats          | Diagenode CATS Small RNA-seq            | `clip_r1 = 3` `three_prime_clip_r1 = 0` | `AAAAAAAAAAA` + `GATCGGAAGAGCACACGTCTG` (only polyA is used for trimming) |",
                     "enum": [
                         "illumina",
                         "nextflex",
@@ -92,7 +92,7 @@
                     "description": "Path to the parsed reference folder containing the files for the miRDeep2.",
                     "fa_icon": "fas fa-align-left"
                 },
-                "saveReference": {
+                "save_reference": {
                     "type": "boolean",
                     "default": true,
                     "description": "Save generated reference genome files to results.",
@@ -128,12 +128,12 @@
                     "description": "Discard reads that are shorter than this after quality / adapter trimming.",
                     "fa_icon": "fas fa-ruler"
                 },
-                "clip_R1": {
+                "clip_r1": {
                     "type": "integer",
                     "fa_icon": "fas fa-cut",
                     "description": "Bp to remove from the 5' end of read 1"
                 },
-                "three_prime_clip_R1": {
+                "three_prime_clip_r1": {
                     "type": "integer",
                     "fa_icon": "fas fa-cut",
                     "description": "Bp to remove from the 3' end of read 1 AFTER adapter/quality trimming has been performed"
@@ -153,12 +153,12 @@
             "default": "",
             "fa_icon": "fas fa-fast-forward",
             "properties": {
-                "skipQC": {
+                "skip_qc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip all QC steps"
                 },
-                "skipFastqc": {
+                "skip_fastqc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip FastQC"
@@ -168,7 +168,7 @@
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip miRDeep"
                 },
-                "skipMultiqc": {
+                "skip_multiqc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip MultiQC"
