@@ -865,6 +865,7 @@ process mirtrace {
 
     script:
     primer = (protocol=="cats") ? " " : " --adapter $three_prime_adapter "
+    protocol_opt = (protocol=="custom") ? " " : " --protocol $protocol "
     """
     for i in $reads
     do
@@ -876,7 +877,7 @@ process mirtrace {
     mirtrace qc \\
         --species $params.mirtrace_species \\
         $primer \\
-        --protocol $protocol \\
+        $protocol_opt \\
         --config mirtrace_config \\
         --write-fasta \\
         --output-dir mirtrace \\
