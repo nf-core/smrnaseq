@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Move all parameter documentation into new `nextflow_schema.json` file.
 * Update with the latest `TEMPLATE` version for nf-core `v1.11`
 * Update conda environment with new packages and updates
+* Added `--protocol custom` to allow custom adapter trimming modes [[#41]](https://github.com/nf-core/smrnaseq/issues/41)]
 
 ### Packaged software updates
 
