@@ -162,11 +162,9 @@ Default: "illumina"
 | nextflex      | BIOO SCIENTIFIC  NEXTFLEX Small RNA-Seq | clip_R1 = 4; three_prime_clip_R1 = 4 | TGGAATTCTCGGGTGCCAAGG |
 | qiaseq        | QIAGEN QIAseq miRNA                     | clip_R1 = 0; three_prime_clip_R1 = 0 | AACTGTAGGCACCATCAAT   |
 | cats          | Diagenode CATS Small RNA-seq            | clip_R1 = 3; three_prime_clip_R1 = 0 | AAAAAAAAAAA + GATCGGAAGAGCACACGTCTG (only polyA is used for trimming) |
-=======
+| custom<sup>*</sup> | user defined                       | user defined                         | user defined          |
 
-### `--single_end`
-
-This pipeline is not compatible with paired-data
+<sup>*</sup>**Note:** when running `--protocol custom` the user must define the 3' Adapter Sequence. If trimming parameters aren't provided the pipeline will deafult to clip_R1 = 0 and three_prime_clip_R1 = 0 (i.e. no extra clipping).
 
 ## Reference genomes
 
