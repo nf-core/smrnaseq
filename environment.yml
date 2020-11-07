@@ -8,16 +8,15 @@ channels:
 dependencies:
   ## conda-forge packages
   - conda-forge::r-base=3.6.3
-  - conda-forge::openjdk=11.0.1 # Needed for FastQC - conda build hangs without this
   - conda-forge::r-statmod=1.4.32
   - conda-forge::r-data.table=1.12.4
   - conda-forge::r-gplots=3.0.1.1
   - conda-forge::r-r.methodss3=1.7.1
-  - conda-forge::matplotlib=3.0.3 # To avoid conflics with multiple packages during docker build
   - conda-forge::python=3.7.3
   - conda-forge::markdown=3.1.1
   - conda-forge::pymdown-extensions=6.0
-  - conda-forge::pygments=2.5.2
+  - conda-forge::pygments=2.6.1
+  - conda-forge::pigz=2.3.4
 
   # bioconda packages
   - bioconda::fastqc=0.11.9
@@ -33,4 +32,4 @@ dependencies:
   - bioconda::mirtrace=1.0.1
   - bioconda::bioconductor-edger=3.26.5
   - bioconda::bioconductor-limma=3.40.2
-  - mirdeep2=2.0.1.2
+  - bioconda::mirdeep2=2.0.1.2
