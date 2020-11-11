@@ -45,7 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Adapt code and docs to [nf-core](http://nf-co.re/) template
 * Update tools and Dockerfile/Singularity to match current template
 
-### Dependency Updates
+### Packaged software updates
 
 * openjdk 8.0.144 -> 11.0.1
 * fastqc 0.11.7 -> 0.11.8
@@ -69,13 +69,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * bioconductor-edger=3.26.0 -> 3.26.5
 * bioconductor-limma=3.40.0 -> 3.40.2
 
-## [1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.0) - 2019-01-10
+## 1.0 - 2019-01-10
 
 * Add "protocol" with pre-defined settings
 * Add miRTrace in the pipeline.
 * Software updates: multiqc 1.6 to 1.7.
 
-## [1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.0) - 2018-08-06
+## 1.0 - 2018-08-06
 
 * Switch from SciLifeLab/NGI-smRNAseq to nf-core/smrnaseq.
 * Use Bowtie 1 instead of Bowtie 2 for the alignment to host reference genome.
