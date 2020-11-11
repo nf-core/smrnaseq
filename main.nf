@@ -452,13 +452,14 @@ process collapse {
     file reads from trimmed_reads_collapse
 
     output:
-    file 'collapsed/*.fastq' into collapsed_fasta
+    file 'final/*.fastq' into collapsed_fasta
 
     script:
     prefix = reads.toString() - '_trimmed.fq.gz'
     """
     seqcluster collapse -f $reads -m 1 --min_size 15 -o collapsed
-    mv collapsed/${prefix}_trimmed_trimmed.fastq collapsed/${prefix}.fastq
+    mkdir final
+    mv collapsed/${prefix}_trimmed_trimmed.fastq final/${prefix}.fastq
     """
 }
 
