@@ -15,6 +15,7 @@
 * Update conda environment with new packages and updates
 * Added `--protocol custom` to allow custom adapter trimming modes [[#41]](https://github.com/nf-core/smrnaseq/issues/41)]
 * Fix error when UMI is on the reads header: [[#35](https://github.com/nf-core/smrnaseq/issues/35)]
+* Add full-size benchmark / test dataset to run on AWS for each release (see `test_full.config`)
 
 ### Packaged software updates
 
