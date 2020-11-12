@@ -72,6 +72,12 @@
                     "description": "Path to FASTA genome file.",
                     "help_text": "If you have no genome reference available, the pipeline can build one using a FASTA file. This requires additional time and resources, so it's better to use a pre-build index if possible."
                 },
+                "mirna_gtf": {
+                    "type": "string",
+                    "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
+                    "help_text": "This can be downloaded from [`ftp://mirbase.org/pub/mirbase/CURRENT/genomes/hsa.gff3`](ftp://mirbase.org/pub/mirbase/CURRENT/genomes/hsa.gff3)",
+                    "fa_icon": "fas fa-address-book"
+                },
                 "mature": {
                     "type": "string",
                     "description": "Path to FASTA file with mature miRNAs.",
