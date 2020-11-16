@@ -80,6 +80,7 @@ if (params.genomes && params.genome && !params.genomes.containsKey(params.genome
 params.bt_index = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
 params.mirtrace_species = params.genome ? params.genomes[ params.genome ].mirtrace_species ?: false : false
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
+params.mirna_gtf = params.mirtrace_species ? "ftp://mirbase.org/pub/mirbase/CURRENT/genomes/${params.mirtrace_species}.gff3" : false
 
 // Define regular variables so that they can be overwritten
 clip_r1 = params.clip_r1
@@ -112,9 +113,7 @@ if (params.protocol == "illumina"){
     protocol = params.protocol
 }
 
-if (!params.mirna_gtf && params.mirtrace_species){
-    mirna_gtf = file("ftp://mirbase.org/pub/mirbase/CURRENT/genomes/${params.mirtrace_species}.gff3", checkIfExists: true)
-} else if (params.mirna_gtf) {
+if (params.mirna_gtf) {
     mirna_gtf = file(params.mirna_gtf, checkIfExists: true)
 } else {
     mirna_gtf = false
