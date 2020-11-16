@@ -78,8 +78,6 @@ if (params.genomes && params.genome && !params.genomes.containsKey(params.genome
 
 // Genome options
 params.bt_index = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
-params.mature = params.genome ? params.genomes[ params.genome ].mature ?: false : false
-params.hairpin = params.genome ? params.genomes[ params.genome ].hairpin ?: false : false
 params.mirtrace_species = params.genome ? params.genomes[ params.genome ].mirtrace_species ?: false : false
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 
@@ -327,9 +325,24 @@ if (!params.references_parsed && !params.skip_mirdeep){
 
     script:
     """
+    # Uncompress FASTA reference files if necessary
+    MATURE="$mature"
+    HAIRPIN="$hairpin"
+    if [ \${MATURE: -3} == ".gz" ]; then
+        gunzip "$mature"
+    fi
+    if [ \${HAIRPIN: -3} == ".gz" ]; then
+        gunzip "$hairpin"
+    fi
+
+    # Remove any special base characters from reference genome FASTA file
     sed -i '/^[^>]/s/[^ATGCatgc]/N/g' $refgenome
+
+    # Remove spaces from miRBase FASTA files
     sed -i 's, ,_,g' $hairpin
     sed -i 's, ,_,g' $mature
+
+    # Build bowtie index
     bowtie-build $refgenome genome
     """
   }
