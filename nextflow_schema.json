@@ -81,12 +81,16 @@
                 "mature": {
                     "type": "string",
                     "description": "Path to FASTA file with mature miRNAs.",
-                    "fa_icon": "fas fa-wheelchair"
+                    "fa_icon": "fas fa-wheelchair",
+                    "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
+                    "default": "ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz"
                 },
                 "hairpin": {
                     "type": "string",
                     "description": "Path to FASTA file with miRNAs precursors.",
-                    "fa_icon": "fab fa-cuttlefish"
+                    "fa_icon": "fab fa-cuttlefish",
+                    "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
+                    "default": "ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz"
                 },
                 "bt_index": {
                     "type": "string",
