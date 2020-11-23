@@ -69,18 +69,28 @@
                 "fasta": {
                     "type": "string",
                     "fa_icon": "fas fa-font",
-                    "description": "Path to FASTA genome file.",
+                    "description": "Path to reference genome FASTA genome file.",
                     "help_text": "If you have no genome reference available, the pipeline can build one using a FASTA file. This requires additional time and resources, so it's better to use a pre-build index if possible."
+                },
+                "mirna_gtf": {
+                    "type": "string",
+                    "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
+                    "help_text": "miRBase `.gff3` file, typically downloadedfrom [`ftp://mirbase.org/pub/mirbase/CURRENT/genomes/`](ftp://mirbase.org/pub/mirbase/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
+                    "fa_icon": "fas fa-address-book"
                 },
                 "mature": {
                     "type": "string",
                     "description": "Path to FASTA file with mature miRNAs.",
-                    "fa_icon": "fas fa-wheelchair"
+                    "fa_icon": "fas fa-wheelchair",
+                    "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
+                    "default": "ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz"
                 },
                 "hairpin": {
                     "type": "string",
                     "description": "Path to FASTA file with miRNAs precursors.",
-                    "fa_icon": "fab fa-cuttlefish"
+                    "fa_icon": "fab fa-cuttlefish",
+                    "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
+                    "default": "ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz"
                 },
                 "bt_index": {
                     "type": "string",

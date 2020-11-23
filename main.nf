@@ -78,10 +78,9 @@ if (params.genomes && params.genome && !params.genomes.containsKey(params.genome
 
 // Genome options
 params.bt_index = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
-params.mature = params.genome ? params.genomes[ params.genome ].mature ?: false : false
-params.hairpin = params.genome ? params.genomes[ params.genome ].hairpin ?: false : false
 params.mirtrace_species = params.genome ? params.genomes[ params.genome ].mirtrace_species ?: false : false
 params.fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
+params.mirna_gtf = params.mirtrace_species ? "ftp://mirbase.org/pub/mirbase/CURRENT/genomes/${params.mirtrace_species}.gff3" : false
 
 // Define regular variables so that they can be overwritten
 clip_r1 = params.clip_r1
@@ -114,50 +113,37 @@ if (params.protocol == "illumina"){
     protocol = params.protocol
 }
 
-if (!params.mirna_gtf && params.mirtrace_species){
-    mirna_gtf = file("ftp://mirbase.org/pub/mirbase/CURRENT/genomes/${params.mirtrace_species}.gff3", checkIfExists: true)
-}else if (params.mirna_gtf) {
+if (params.mirna_gtf) {
     mirna_gtf = file(params.mirna_gtf, checkIfExists: true)
-}else{
+} else {
     mirna_gtf = false
 }
 
 // Validate inputs
-
 if (params.skip_mirdeep){
-  if (params.mature) { mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
-  if (params.hairpin) { hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
-  if (params.gtf) { gtf = file(params.gtf, checkIfExists: true) }
-  indices_mirdeep2 = Channel.empty()
-  fasta = Channel.empty()
-}
-else{
-  if (params.references_parsed){Channel.empty()
-    fasta = file("$params.references_parsed/genome.fa", checkIfExists: true)
-    hairpin = file("$params.references_parsed/hairpin.fa", checkIfExists: true)
-    mature = file("$params.references_parsed/mature.fa", checkIfExists: true)
-    indices_mirdeep2 = Channel
-    .fromPath("$params.references_parsed/genome.*.ebwt", checkIfExists: true)
-    .ifEmpty { exit 1, "Reference parsed genome indices not found: ${references_parsed}"}
-  }
-  else{
-    if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
-    if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
-    if (params.fasta) {reference_genome = file(params.fasta, checkIfExists: true) } else { exit 1, "Reference genome file not found: ${params.fasta}" }
-  }
+    if (params.mature) { mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
+    if (params.hairpin) { hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
+    indices_mirdeep2 = Channel.empty()
+    fasta = Channel.empty()
+} else {
+    if (params.references_parsed){
+        fasta = file("$params.references_parsed/genome.fa", checkIfExists: true)
+        hairpin = file("$params.references_parsed/hairpin.fa", checkIfExists: true)
+        mature = file("$params.references_parsed/mature.fa", checkIfExists: true)
+        indices_mirdeep2 = Channel.fromPath("$params.references_parsed/genome.*.ebwt", checkIfExists: true).ifEmpty { exit 1, "Reference parsed genome indices not found: ${references_parsed}"}
+    } else {
+        if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
+        if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
+        if (params.fasta) { reference_genome = file(params.fasta, checkIfExists: true) } else { exit 1, "Reference genome file not found: ${params.fasta}" }
+    }
 }
 
 if( params.bt_index ){
-  bt_indices = Channel
-    .fromPath("${params.bt_index}*", checkIfExists: true)
-    .ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_dir}" }
-}
-
-else if( params.bt_indices ){
-    bt_indices = Channel.from(params.input_paths).map{ file(it) }.toList()
-}
-if( !params.bt_index) {
-    log.info "No GTF / Bowtie 1 index supplied - host reference genome analysis will be skipped."
+    bt_indices = Channel.fromPath("${params.bt_index}*", checkIfExists: true).ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_dir}" }
+} else if( params.bt_indices ){
+    bt_indices = Channel.from(params.bt_indices).map{ file(it) }.toList()
+} else {
+    log.info "No Bowtie 1 index supplied - host reference genome analysis will be skipped."
 }
 if( !params.mirtrace_species ){
     exit 1, "Reference species for miRTrace is not defined."
@@ -327,9 +313,24 @@ if (!params.references_parsed && !params.skip_mirdeep){
 
     script:
     """
+    # Uncompress FASTA reference files if necessary
+    MATURE="$mature"
+    HAIRPIN="$hairpin"
+    if [ \${MATURE: -3} == ".gz" ]; then
+        gunzip "$mature"
+    fi
+    if [ \${HAIRPIN: -3} == ".gz" ]; then
+        gunzip "$hairpin"
+    fi
+
+    # Remove any special base characters from reference genome FASTA file
     sed -i '/^[^>]/s/[^ATGCatgc]/N/g' $refgenome
+
+    # Remove spaces from miRBase FASTA files
     sed -i 's, ,_,g' $hairpin
     sed -i 's, ,_,g' $mature
+
+    # Build bowtie index
     bowtie-build $refgenome genome
     """
   }
