@@ -132,9 +132,9 @@ if (params.skip_mirdeep){
         mature = file("$params.references_parsed/mature.fa", checkIfExists: true)
         indices_mirdeep2 = Channel.fromPath("$params.references_parsed/genome.*.ebwt", checkIfExists: true).ifEmpty { exit 1, "Reference parsed genome indices not found: ${references_parsed}"}
     } else {
-        if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature file not found: ${params.mature}" }
-        if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin file not found: ${params.hairpin}" }
-        if (params.fasta) { reference_genome = file(params.fasta, checkIfExists: true) } else { exit 1, "Reference genome file not found: ${params.fasta}" }
+        if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
+        if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
+        if (params.fasta) { reference_genome = file(params.fasta, checkIfExists: true) } else { exit 1, "Reference genome Fasta file not found: ${params.fasta}" }
     }
 }
 
