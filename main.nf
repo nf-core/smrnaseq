@@ -317,10 +317,10 @@ if (!params.references_parsed && !params.skip_mirdeep){
     MATURE="$mature"
     HAIRPIN="$hairpin"
     if [ \${MATURE: -3} == ".gz" ]; then
-        gunzip "$mature"
+        gunzip -f "$mature"
     fi
     if [ \${HAIRPIN: -3} == ".gz" ]; then
-        gunzip "$hairpin"
+        gunzip -f "$hairpin"
     fi
 
     # Remove any special base characters from reference genome FASTA file
