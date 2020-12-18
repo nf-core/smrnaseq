@@ -1,10 +1,8 @@
 # ![nf-core/smrnaseq](docs/images/nf-core-smrnaseq_logo.png)
 
-**Small RNA-Seq Best Practice Analysis Pipeline.**.
-
 [![GitHub Actions CI Status](https://github.com/nf-core/smrnaseq/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/smrnaseq/actions)
 [![GitHub Actions Linting Status](https://github.com/nf-core/smrnaseq/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/smrnaseq/actions)
-[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A519.10.0-brightgreen.svg)](https://www.nextflow.io/)
+[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A520.04.0-brightgreen.svg)](https://www.nextflow.io/)
 
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](https://bioconda.github.io/)
 [![Docker](https://img.shields.io/docker/automated/nfcore/smrnaseq.svg)](https://hub.docker.com/r/nfcore/smrnaseq)
@@ -40,7 +38,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 See [usage docs](https://nf-co.re/smrnaseq/usage) for all of the available options when running the pipeline.
 
-### Pipeline summary
+## Pipeline summary
 
 1. Raw read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. Adapter trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
@@ -65,7 +63,7 @@ See [usage docs](https://nf-co.re/smrnaseq/usage) for all of the available optio
 8. miRNA quality control ([`mirtrace`](https://github.com/friedlanderlab/mirtrace))
 9. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
 
-### Documentation
+## Documentation
 
 The nf-core/smrnaseq pipeline comes with documentation about the pipeline: [usage](https://nf-co.re/smrnaseq/usage) and [output](https://nf-co.re/smrnaseq/output).
 
@@ -79,7 +77,7 @@ If you would like to contribute to this pipeline, please see the [contributing g
 
 For further information or help, don't hesitate to get in touch on the [Slack `#smrnaseq` channel](https://nfcore.slack.com/channels/smrnaseq) (you can join with [this invite](https://nf-co.re/join/slack)).
 
-## Citation
+## Citations
 
 You can cite the `nf-core` publication as follows:
 
@@ -88,4 +86,6 @@ You can cite the `nf-core` publication as follows:
 > Philip Ewels, Alexander Peltzer, Sven Fillinger, Harshil Patel, Johannes Alneberg, Andreas Wilm, Maxime Ulysse Garcia, Paolo Di Tommaso & Sven Nahnsen.
 >
 > _Nat Biotechnol._ 2020 Feb 13. doi: [10.1038/s41587-020-0439-x](https://dx.doi.org/10.1038/s41587-020-0439-x).
-> ReadCube: [Full Access Link](https://rdcu.be/b1GjZ)
+
+<!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
+<!-- In addition, references of tools and data used in this pipeline are as follows: -->
