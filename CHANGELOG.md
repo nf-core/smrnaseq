@@ -19,6 +19,7 @@
 * Made `params.mature` and `params.hairpin` default to miRBase FTP URL so that the file is automatically downloaded if not provided
 * Allow `.fa` or `.fa.gz` files for mature and hairpin FASTA files.
 * Add full-size benchmark / test dataset to run on AWS for each release (see `test_full.config`)
+* Add `-f` flag to `gunzip` commands to deal with soft-links
 
 ### Packaged software updates
 
