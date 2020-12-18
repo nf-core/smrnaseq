@@ -317,18 +317,20 @@ if (!params.references_parsed && !params.skip_mirdeep){
     MATURE="$mature"
     HAIRPIN="$hairpin"
     if [ \${MATURE: -3} == ".gz" ]; then
-        gunzip "$mature"
+        gunzip -f \$MATURE
+        MATURE=\${MATURE: -3}
     fi
     if [ \${HAIRPIN: -3} == ".gz" ]; then
-        gunzip "$hairpin"
+        gunzip -f \$HAIRPIN
+        HAIRPIN=\${HAIRPIN: -3}
     fi
 
     # Remove any special base characters from reference genome FASTA file
     sed -i '/^[^>]/s/[^ATGCatgc]/N/g' $refgenome
 
     # Remove spaces from miRBase FASTA files
-    sed -i 's, ,_,g' $hairpin
-    sed -i 's, ,_,g' $mature
+    sed -i 's, ,_,g' \$HAIRPIN
+    sed -i 's, ,_,g' \$MATURE
 
     # Build bowtie index
     bowtie-build $refgenome genome
