@@ -306,7 +306,7 @@ if (!params.references_parsed && !params.skip_mirdeep){
     file hairpin from reference_hairpin
 
     output:
-    file 'genome.fa' into fasta
+    //file 'genome.fa' into fasta
     file 'genome.*.ebwt' into indices_mirdeep2
     file 'hairpin.fa' into hairpin
     file 'mature.fa' into mature
@@ -318,11 +318,11 @@ if (!params.references_parsed && !params.skip_mirdeep){
     HAIRPIN="$hairpin"
     if [ \${MATURE: -3} == ".gz" ]; then
         gunzip -f \$MATURE
-        MATURE=\${MATURE: -3}
+        MATURE=\${MATURE%%.gz}
     fi
     if [ \${HAIRPIN: -3} == ".gz" ]; then
         gunzip -f \$HAIRPIN
-        HAIRPIN=\${HAIRPIN: -3}
+        HAIRPIN=\${HAIRPIN%%.gz}
     fi
 
     # Remove any special base characters from reference genome FASTA file
@@ -827,7 +827,7 @@ process mirdeep2 {
     !params.skip_mirdeep
 
     input:
-    file refgenome from fasta
+    file refgenome from reference_genome
     file reads_collapsed from mirdeep_reads_collapsed
     file reads_vs_refdb from reads_vs_refdb
     file mature from mature
@@ -839,7 +839,7 @@ process mirdeep2 {
 
 
     script:
-
+// perl -ane 's/y/N/ig;print;' $hairpin > hairpin_yn.fa;
     """
     miRDeep2.pl \\
     $reads_collapsed \\
@@ -847,7 +847,7 @@ process mirdeep2 {
     $reads_vs_refdb \\
     $mature \\
     none \\
-    $hairpin \\
+    hairpin_yn.fa \\
     -d \\
     -z _${reads_collapsed.simpleName}
     """
