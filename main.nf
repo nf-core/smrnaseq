@@ -839,8 +839,9 @@ process mirdeep2 {
 
 
     script:
-// perl -ane 's/y/N/ig;print;' $hairpin > hairpin_yn.fa;
     """
+    perl -ane 's/y/N/ig;print;' $hairpin > hairpin_yn.fa
+    
     miRDeep2.pl \\
     $reads_collapsed \\
     $refgenome \\
