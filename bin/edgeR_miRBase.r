@@ -60,15 +60,15 @@ for (i in 1:2) {
     colnames(data)<-gsub(".stats","",basename(filelist[[i]]))
     colnames(unmapped)<-gsub(".stats","",basename(filelist[[i]]))
 
-    data<-data[rownames(data)!="*",]
-    unmapped<-unmapped[rownames(unmapped)=="*",]
+    data<-data[rownames(data)!="*",,drop=FALSE]
+    unmapped<-unmapped[rownames(unmapped)=="*",,drop=FALSE]
 
     # Write the summary table of unmapped reads
     write.table(unmapped,file=paste(header,"_unmapped_read_counts.txt",sep=""),sep='\t',quote=FALSE)
 
     # Remove genes with 0 reads in all samples
     row_sub = apply(data, 1, function(row) all(row ==0 ))
-    data<-data[!row_sub,]
+    data<-data[!row_sub,,drop=FALSE]
 
     # Normalization
     dataDGE<-DGEList(counts=data,genes=rownames(data))
@@ -80,10 +80,12 @@ for (i in 1:2) {
     dataNorm_df<-as.data.frame(cpm(dataNorm))
     write.table(dataNorm_df,file=paste(header,"_normalized_CPM.txt",sep=""),sep='\t',quote=FALSE)
 
-    # Print heatmap based on normalized read counts
-    pdf(paste(header,"_CPM_heatmap.pdf",sep=""))
-    heatmap.2(cpm(dataNorm),col=redgreen(100),key=TRUE,scale="row",density.info="none",trace="none")
-    dev.off()
+    if (ncol(data)>1){ # with more than 1 sample
+        # Print heatmap based on normalized read counts
+        pdf(paste(header,"_CPM_heatmap.pdf",sep=""))
+        heatmap.2(cpm(dataNorm),col=redgreen(100),key=TRUE,scale="row",density.info="none",trace="none")
+        dev.off()
+    }
 
     # Make MDS plot (only perform with 3 or more samples)
     if (ncol(data)>2){
