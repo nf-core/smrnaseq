@@ -100,5 +100,3 @@
 * trim-galore 0.4.5 -> 0.5.0
 * samtools 1.8 -> 1.9
 * multiqc 1.5 -> 1.6
-
-[v1.0.0]: https://github.com/nf-core/smrnaseq/releases/tag/1.0.0
