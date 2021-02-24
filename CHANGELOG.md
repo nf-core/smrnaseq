@@ -44,6 +44,7 @@
 ## [v1.0.0] - 2019-09-19
 
 ### Added
+
 * Figures to output documentation
 * Samtools stats for genome alignments
 * Seqkit and remove razers
@@ -78,16 +79,18 @@
 ## 2019-01-10
 
 ### Added
+
 * "protocol" with pre-defined settings
 * miRTrace in the pipeline.
 
 ### Software updates
-* multiqc 1.6 -> 1.7.
 
+* multiqc 1.6 -> 1.7.
 
 ## 2018-08-06
 
 ### Added 
+
 * Switch from SciLifeLab/NGI-smRNAseq to nf-core/smrnaseq.
 * Use Bowtie 1 instead of Bowtie 2 for the alignment to host reference genome.
 * Option for sequencing centre in BAM file.
@@ -96,6 +99,6 @@
 
 * trim-galore 0.4.5 -> 0.5.0
 * samtools 1.8 -> 1.9
-* multiqc 1.5 -> 1.6.
+* multiqc 1.5 -> 1.6
 
 [v1.0.0]: https://github.com/nf-core/smrnaseq/releases/tag/1.0.0
