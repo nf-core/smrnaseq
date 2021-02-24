@@ -89,7 +89,7 @@
 
 ## 2018-08-06
 
-### Added 
+### Added
 
 * Switch from SciLifeLab/NGI-smRNAseq to nf-core/smrnaseq.
 * Use Bowtie 1 instead of Bowtie 2 for the alignment to host reference genome.
