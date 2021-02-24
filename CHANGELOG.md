@@ -41,12 +41,14 @@
 * Added `conda-forge::pygments=2.5.2`
 * Removed `conda-forge::r-markdown=1.0`
 
-## v1.0.0 - 2019-09-19
+## [v1.0.0](https://github.com/nf-core/smrnaseq/releases/tag/1.0.0) - 2019-09-19
 
-* Add figures to output documentation
-* Add samtools stats for genome alignments
-* Add seqkit and remove razers
-* Add mirtop and razers tools
+### Added
+
+* Figures to output documentation
+* Samtools stats for genome alignments
+* Seqkit and remove razers
+* Mirtop and razers tools
 * Adapt code and docs to [nf-core](http://nf-co.re/) template
 * Update tools and Dockerfile/Singularity to match current template
 
@@ -74,15 +76,27 @@
 * bioconductor-edger=3.26.0 -> 3.26.5
 * bioconductor-limma=3.40.0 -> 3.40.2
 
-## 1.0 - 2019-01-10
+## 2019-01-10
 
-* Add "protocol" with pre-defined settings
-* Add miRTrace in the pipeline.
-* Software updates: multiqc 1.6 to 1.7.
+### Added
 
-## 1.0 - 2018-08-06
+* "protocol" with pre-defined settings
+* miRTrace in the pipeline.
 
-* Switch from SciLifeLab/NGI-smRNAseq to nf-core/smrnaseq.
+### Software updates
+
+* multiqc 1.6 -> 1.7.
+
+## 2018-08-06
+
+### Added
+
+* Port original pipeline [SciLifeLab/NGI-smRNAseq](https://github.com/SciLifeLab/NGI-smRNAseq) to [nf-core/smrnaseq](https://github.com/nf-core/smrnaseq).
 * Use Bowtie 1 instead of Bowtie 2 for the alignment to host reference genome.
-* Add option for sequencing centre in BAM file.
-* Software updates: trim-galore 0.4.5 to 0.5.0; samtools 1.8 to 1.9; multiqc 1.5 to 1.6.
+* Option for sequencing centre in BAM file.
+
+### Software updates
+
+* trim-galore 0.4.5 -> 0.5.0
+* samtools 1.8 -> 1.9
+* multiqc 1.5 -> 1.6
