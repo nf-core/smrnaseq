@@ -41,7 +41,7 @@
 * Added `conda-forge::pygments=2.5.2`
 * Removed `conda-forge::r-markdown=1.0`
 
-## [v1.0.0] - 2019-09-19
+## [v1.0.0](https://github.com/nf-core/smrnaseq/releases/tag/1.0.0) - 2019-09-19
 
 ### Added
 
