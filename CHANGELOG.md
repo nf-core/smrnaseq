@@ -91,7 +91,7 @@
 
 ### Added
 
-* Switch from SciLifeLab/NGI-smRNAseq to nf-core/smrnaseq.
+* Port original pipeline [SciLifeLab/NGI-smRNAseq](https://github.com/SciLifeLab/NGI-smRNAseq) to [nf-core/smrnaseq](https://github.com/nf-core/smrnaseq).
 * Use Bowtie 1 instead of Bowtie 2 for the alignment to host reference genome.
 * Option for sequencing centre in BAM file.
 
