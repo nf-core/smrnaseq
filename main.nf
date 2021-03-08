@@ -333,7 +333,7 @@ if (!params.references_parsed && !params.skip_mirdeep){
     sed -i 's, ,_,g' \$MATURE
 
     # Build bowtie index
-    bowtie-build genome.fa genome
+    bowtie-build genome.fa genome --threads $(nproc) 
     """
   }
 }
@@ -360,13 +360,13 @@ process make_bowtie_index {
     seqkit seq --rna2dna mature_sps.fa > mature_igenome.fa
     fasta_formatter -w 0 -i mature_igenome.fa -o mature_idx.fa
     # fasta_nucleotide_changer -d -i mature_igenome.fa -o mature_idx.fa
-    bowtie-build mature_idx.fa mature_idx
+    bowtie-build mature_idx.fa mature_idx --threads $(nproc) 
 
     seqkit grep -r --pattern \".*${params.mirtrace_species}-.*\" $hairpin > hairpin_sps.fa
     seqkit seq --rna2dna hairpin_sps.fa > hairpin_igenome.fa
     # fasta_nucleotide_changer -d -i hairpin_igenome.fa -o hairpin_idx.fa
     fasta_formatter -w 0 -i hairpin_igenome.fa -o hairpin_idx.fa
-    bowtie-build hairpin_idx.fa hairpin_idx
+    bowtie-build hairpin_idx.fa hairpin_idx --threads $(nproc) 
     """
 }
 
