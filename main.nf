@@ -624,7 +624,7 @@ process edgeR_mirna {
     file input_files from miRBase_counts.toSortedList()
 
     output:
-    file '*.{txt,pdf}' into edgeR_miRBase_results
+    file '*.{txt,pdf,csv}' into edgeR_miRBase_results
 
     script:
     """
