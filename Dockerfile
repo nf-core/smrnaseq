@@ -1,4 +1,4 @@
-FROM nfcore/base:1.13
+FROM nfcore/base:1.13.1
 LABEL authors="Phil Ewels <phil.ewels@scilifelab.se>, Chuan Wang <chuan.wang@scilifelab.se>, Rickard Hammarén <rickard.hammaren@scilifelab.se>, Lorena Pantano <lorena.pantano@gmail.com>" \
       description="Docker image containing all software requirements for the nf-core/smrnaseq pipeline"
 
