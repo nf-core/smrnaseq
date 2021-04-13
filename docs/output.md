@@ -1,9 +1,5 @@
 # nf-core/smrnaseq Output
 
-## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/smrnaseq/output](https://nf-co.re/smrnaseq/output)
-
-> _Documentation of pipeline parameters is generated automatically from the pipeline schema and can no longer be found in markdown files._
-
 ## Introduction
 
 **nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline used for small RNA sequencing data analysis.
