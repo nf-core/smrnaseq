@@ -68,12 +68,24 @@ for (i in 1:2) {
 
     # Remove genes with 0 reads in all samples
     row_sub = apply(data, 1, function(row) all(row ==0 ))
-    data<-data[!row_sub,,drop=FALSE]
+
+    data<-data[!row_sub,]
+    write.csv(t(data),file=paste(header,"_counts.csv",sep=""))
 
     # Normalization
     dataDGE<-DGEList(counts=data,genes=rownames(data))
     o <- order(rowSums(dataDGE$counts), decreasing=TRUE)
     dataDGE <- dataDGE[o,]
+                    
+    # Save log10(TPM)
+    tpm = cpm(dataDGE, normalized.lib.sizes=F, log = F, prior.count = 0.001)
+    tpm = tpm + 0.001
+    tpm = log10(tpm)
+    ttpm = t(tpm)
+    write.table(ttpm,file=paste(header,"_logtpm.txt",sep=""),sep='\t',quote=FALSE)
+    write.csv(ttpm,file=paste(header,"_logtpm.csv",sep=""))
+                    
+    # TMM
     dataNorm <- calcNormFactors(dataDGE)
 
     # Print normalized read counts to file
