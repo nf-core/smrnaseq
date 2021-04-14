@@ -333,7 +333,7 @@ if (!params.references_parsed && !params.skip_mirdeep){
     sed -i 's, ,_,g' \$MATURE
 
     # Build bowtie index
-    bowtie-build genome.fa genome --threads \$(nproc) 
+    bowtie-build genome.fa genome --threads \$(task.cpus)
     """
   }
 }
@@ -360,13 +360,13 @@ process make_bowtie_index {
     seqkit seq --rna2dna mature_sps.fa > mature_igenome.fa
     fasta_formatter -w 0 -i mature_igenome.fa -o mature_idx.fa
     # fasta_nucleotide_changer -d -i mature_igenome.fa -o mature_idx.fa
-    bowtie-build mature_idx.fa mature_idx --threads \$(nproc) 
+    bowtie-build mature_idx.fa mature_idx --threads \$(task.cpus)
 
     seqkit grep -r --pattern \".*${params.mirtrace_species}-.*\" $hairpin > hairpin_sps.fa
     seqkit seq --rna2dna hairpin_sps.fa > hairpin_igenome.fa
     # fasta_nucleotide_changer -d -i hairpin_igenome.fa -o hairpin_idx.fa
     fasta_formatter -w 0 -i hairpin_igenome.fa -o hairpin_idx.fa
-    bowtie-build hairpin_idx.fa hairpin_idx --threads \$(nproc) 
+    bowtie-build hairpin_idx.fa hairpin_idx --threads \$(task.cpus)
     """
 }
 
@@ -638,7 +638,7 @@ process edgeR_mirna {
 process mirtop_bam_hairpin {
     label 'process_medium'
     tag "$input"
-    publishDir "${params.outdir}", mode: 'cbopy'
+    publishDir "${params.outdir}", mode: 'copy'
 
     when:
     mirna_gtf
@@ -841,7 +841,7 @@ process mirdeep2 {
     script:
     """
     perl -ane 's/y/N/ig;print;' $hairpin > hairpin_yn.fa
-    
+
     miRDeep2.pl \\
     $reads_collapsed \\
     $refgenome \\
