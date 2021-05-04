@@ -840,7 +840,7 @@ process mirdeep2 {
 
     script:
     """
-    perl -ane 's/y/N/ig;print;' $hairpin > hairpin_yn.fa
+    awk '{ gsub(/Y/,"N",\$0); gsub(/B/,"N",\$0); gsub(/K/,"N",\$0); gsub(/M/,"N",\$0); gsub(/R/,"N",\$0); gsub(/S/,"N",\$0); gsub(/W/,"N",\$0); print}' $hairpin > hairpin_ok.fa
     
     miRDeep2.pl \\
     $reads_collapsed \\
@@ -848,7 +848,7 @@ process mirdeep2 {
     $reads_vs_refdb \\
     $mature \\
     none \\
-    hairpin_yn.fa \\
+    hairpin_ok.fa \\
     -d \\
     -z _${reads_collapsed.simpleName}
     """
