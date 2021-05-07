@@ -153,6 +153,22 @@
                     "default": "TGGAATTCTCGGGTGCCAAGG",
                     "fa_icon": "fas fa-text-width",
                     "description": "Sequencing adapter sequence to search for and remove."
+                },
+                "mirtrace_protocol": {
+                    "type": "string",
+                    "default": "illumina",
+                    "description": "protocol to be used for the mirtrace process",
+                    "enum": [
+                        "illumina",
+                        "cats",
+                        "qiaseq",
+                        "nextflex"
+                    ]
+                },
+                "trim_galore_max_length": {
+                    "type": "integer",
+                    "default": 40,
+                    "description": "trimgalore max-length parameter"
                 }
             }
         },

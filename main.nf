@@ -73,6 +73,13 @@ if (params.protocol == "illumina"){
     protocol = params.protocol
 }
 
+// mirtrace protocol defaults to 'params.protocol' if not set
+if (!params.mirtrace_protocol){
+    mirtrace_protocol = protocol
+} else {
+    mirtrace_protocol = params.mirtrace_protocol
+}
+
 if (params.mirna_gtf) {
     mirna_gtf = file(params.mirna_gtf, checkIfExists: true)
 } else {
@@ -162,6 +169,7 @@ summary['Reference Genome']    = params.fasta
 if(params.bt_index)            summary['Bowtie Index for Ref'] = params.bt_index
 summary['Save Reference']      = params.save_reference ? 'Yes' : 'No'
 summary['Protocol']            = params.protocol
+summary['Mirtrace Protocol']   = mirtrace_protocol
 summary['miRTrace species']    = params.mirtrace_species
 summary["3' adapter"]          = three_prime_adapter
 summary['Output dir']          = params.outdir
@@ -375,7 +383,7 @@ process trim_galore {
     tpc_r1 = three_prime_clip_r1 > 0 ? "--three_prime_clip_r1 ${three_prime_clip_r1}" : ''
     tpa = (protocol == "qiaseq" | protocol == "cats") ? "--adapter ${three_prime_adapter}" : '--small_rna'
     """
-    trim_galore --adapter ${three_prime_adapter} $tg_length $c_r1 $tpc_r1 --max_length 40 --gzip $reads --fastqc
+    trim_galore --adapter ${three_prime_adapter} $tg_length $c_r1 $tpc_r1 --max_length ${params.trim_galore_max_length} --gzip $reads --fastqc
     """
 }
 
@@ -816,6 +824,7 @@ process mirdeep2 {
  * STEP 8 - miRTrace
  */
 process mirtrace {
+    label 'process_medium'
     tag "$reads"
     publishDir "${params.outdir}/miRTrace", mode: 'copy'
 
@@ -826,9 +835,10 @@ process mirtrace {
     file '*mirtrace' into mirtrace_results
 
     script:
-    primer = (protocol=="cats") ? " " : " --adapter $three_prime_adapter "
-    protocol_opt = (protocol=="custom") ? " " : " --protocol $protocol "
+    primer = (mirtrace_protocol=="cats") ? " " : " --adapter $three_prime_adapter "
+    memory = task.memory.toString().replaceAll("\\s", "").replaceAll("B", "")
     """
+    export mirtracejar=\$(dirname \$(which mirtrace))
     for i in $reads
     do
         path=\$(realpath \${i})
@@ -836,10 +846,10 @@ process mirtrace {
         echo \$path","\$prefix
     done > mirtrace_config
 
-    mirtrace qc \\
+    java -Xms${memory} -Xmx${memory} -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace qc  \\
         --species $params.mirtrace_species \\
         $primer \\
-        $protocol_opt \\
+        --protocol $mirtrace_protocol \\
         --config mirtrace_config \\
         --write-fasta \\
         --output-dir mirtrace \\
