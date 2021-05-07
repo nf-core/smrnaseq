@@ -383,7 +383,7 @@ process trim_galore {
     tpc_r1 = three_prime_clip_r1 > 0 ? "--three_prime_clip_r1 ${three_prime_clip_r1}" : ''
     tpa = (protocol == "qiaseq" | protocol == "cats") ? "--adapter ${three_prime_adapter}" : '--small_rna'
     """
-    trim_galore --adapter ${three_prime_adapter} $tg_length $c_r1 $tpc_r1 --max_length 40 --gzip $reads --fastqc
+    trim_galore --adapter ${three_prime_adapter} $tg_length $c_r1 $tpc_r1 --max_length ${params.trim_galore_max_length} --gzip $reads --fastqc
     """
 }
 

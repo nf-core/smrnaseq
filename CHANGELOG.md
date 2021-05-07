@@ -22,6 +22,8 @@
 * Allow `.fa` or `.fa.gz` files for mature and hairpin FASTA files.
 * Add full-size benchmark / test dataset to run on AWS for each release (see `test_full.config`)
 * Add `-f` flag to `gunzip` commands to deal with soft-links
+* Add `--mirtrace_protocol` parameter to allow for more flexible selection of this parameter
+* Added `--trim_galore_max_length` option [[#77](https://github.com/nf-core/smrnaseq/issues/77)]
 
 ### Packaged software updates
 
