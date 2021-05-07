@@ -73,6 +73,13 @@ if (params.protocol == "illumina"){
     protocol = params.protocol
 }
 
+// mirtrace protocol defaults to 'params.protocol' if not set
+if (!params.mirtrace_protocol){
+    mirtrace_protocol = protocol
+} else {
+    mirtrace_protocol = params.mirtrace_protocol
+}
+
 if (params.mirna_gtf) {
     mirna_gtf = file(params.mirna_gtf, checkIfExists: true)
 } else {
@@ -162,6 +169,7 @@ summary['Reference Genome']    = params.fasta
 if(params.bt_index)            summary['Bowtie Index for Ref'] = params.bt_index
 summary['Save Reference']      = params.save_reference ? 'Yes' : 'No'
 summary['Protocol']            = params.protocol
+summary['Mirtrace Protocol']   = mirtrace_protocol
 summary['miRTrace species']    = params.mirtrace_species
 summary["3' adapter"]          = three_prime_adapter
 summary['Output dir']          = params.outdir
@@ -826,8 +834,7 @@ process mirtrace {
     file '*mirtrace' into mirtrace_results
 
     script:
-    primer = (protocol=="cats") ? " " : " --adapter $three_prime_adapter "
-    protocol_opt = (protocol=="custom") ? " " : " --protocol $protocol "
+    primer = (mirtrace_protocol=="cats") ? " " : " --adapter $three_prime_adapter "
     """
     for i in $reads
     do
@@ -839,7 +846,7 @@ process mirtrace {
     mirtrace qc \\
         --species $params.mirtrace_species \\
         $primer \\
-        $protocol_opt \\
+        --protocol $mirtrace_protocol \\
         --config mirtrace_config \\
         --write-fasta \\
         --output-dir mirtrace \\

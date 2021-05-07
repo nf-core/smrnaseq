@@ -391,5 +391,10 @@
         {
             "$ref": "#/definitions/institutional_config_options"
         }
-    ]
+    ],
+    "properties": {
+        "mirtrace_protocol": {
+            "type": "string"
+        }
+    }
 }
