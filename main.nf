@@ -824,6 +824,7 @@ process mirdeep2 {
  * STEP 8 - miRTrace
  */
 process mirtrace {
+    label 'process_medium'
     tag "$reads"
     publishDir "${params.outdir}/miRTrace", mode: 'copy'
 
@@ -835,7 +836,9 @@ process mirtrace {
 
     script:
     primer = (mirtrace_protocol=="cats") ? " " : " --adapter $three_prime_adapter "
+    memory = task.memory.toString().replaceAll("\\s", "").replaceAll("B", "")
     """
+    export mirtracejar=\$(dirname \$(which mirtrace))
     for i in $reads
     do
         path=\$(realpath \${i})
@@ -843,7 +846,7 @@ process mirtrace {
         echo \$path","\$prefix
     done > mirtrace_config
 
-    mirtrace qc \\
+    java -Xms${memory} -Xmx${memory} -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace qc  \\
         --species $params.mirtrace_species \\
         $primer \\
         --protocol $mirtrace_protocol \\

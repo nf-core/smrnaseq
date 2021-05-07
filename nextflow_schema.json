@@ -395,6 +395,10 @@
     "properties": {
         "mirtrace_protocol": {
             "type": "string"
+        },
+        "trim_galore_max_length": {
+            "type": "integer",
+            "default": 40
         }
     }
 }
