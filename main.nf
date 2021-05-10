@@ -238,7 +238,11 @@ process get_software_versions {
    file "software_versions.csv"
 
    script:
-   memory = task.memory.toString().replaceAll("\\s", "").replaceAll("B", "")
+   java_mem = ''
+   if(task.memory){
+       tmem = task.memory.toBytes()
+       java_mem = "-Xms${tmem} -Xmx${tmem}"
+   }
    """
    export mirtracejar=\$(dirname \$(which mirtrace))
    echo $workflow.manifest.version > v_pipeline.txt
