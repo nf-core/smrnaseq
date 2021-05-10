@@ -842,7 +842,11 @@ process mirtrace {
 
     script:
     primer = (mirtrace_protocol=="cats") ? " " : " --adapter $three_prime_adapter "
-    memory = task.memory.toString().replaceAll("\\s", "").replaceAll("B", "")
+    java_mem = ''
+    if(task.memory){
+        tmem = task.memory.toBytes()
+        java_mem = "-Xms${tmem} -Xmx${tmem}"
+    }
     """
     export mirtracejar=\$(dirname \$(which mirtrace))
     for i in $reads
@@ -852,7 +856,7 @@ process mirtrace {
         echo \$path","\$prefix
     done > mirtrace_config
 
-    java -Xms${memory} -Xmx${memory} -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace qc  \\
+    java $java_mem -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace qc  \\
         --species $params.mirtrace_species \\
         $primer \\
         --protocol $mirtrace_protocol \\
