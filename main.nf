@@ -254,7 +254,7 @@ process get_software_versions {
    samtools --version > v_samtools.txt
    htseq-count -h > v_htseq.txt
    fasta_formatter -h > v_fastx.txt
-   java -Xms${memory} -Xmx${memory} -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace --version > v_mirtrace.txt
+   java $java_mem -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace --version > v_mirtrace.txt
    multiqc --version > v_multiqc.txt
    miRDeep2.pl -h > v_mirdeep2.txt
 
