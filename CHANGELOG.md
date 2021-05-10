@@ -2,7 +2,7 @@
 
 ## v1.1dev - [date]
 
-* remove spaces in genome headers and replace special nt by N in hairpin file for mirdeep2 to work. [[#69]] (https://github.com/nf-core/smrnaseq/pull/79)
+* remove spaces in genome headers and replace special nt by N in hairpin file for mirdeep2 to work. [[#69]](https://github.com/nf-core/smrnaseq/pull/79)
 * Accept custom genome and remove non-canonical letters in the genome. Thanks to @sdjebali. Follow up from [[#63]](https://github.com/nf-core/smrnaseq/pull/63)
 * Fix error when only one sample is in the input [[#31]](https://github.com/nf-core/smrnaseq/issues/31)
 * Change `--reads` to `--input` for consistency with rest of nf-core
