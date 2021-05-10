@@ -805,15 +805,16 @@ process mirdeep2 {
 
     script:
     """
-    perl -ane 's/y/N/ig;print;' $hairpin > hairpin_yn.fa
-
+    perl -ane 's/[ybkmrsw]/N/ig;print;' $hairpin > hairpin_ok.fa
+    sed 's/ .*//' $refgenome | awk '\$1 ~ /^>/ {gsub(/_/,"",\$1); print; next} {print}' > genome_nowhitespace.fa
+    
     miRDeep2.pl \\
     $reads_collapsed \\
-    $refgenome \\
+    genome_nowhitespace.fa \\
     $reads_vs_refdb \\
     $mature \\
     none \\
-    hairpin_yn.fa \\
+    hairpin_ok.fa \\
     -d \\
     -z _${reads_collapsed.simpleName}
     """
