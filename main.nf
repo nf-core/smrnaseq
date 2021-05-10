@@ -238,7 +238,9 @@ process get_software_versions {
    file "software_versions.csv"
 
    script:
+   memory = task.memory.toString().replaceAll("\\s", "").replaceAll("B", "")
    """
+   export mirtracejar=\$(dirname \$(which mirtrace))
    echo $workflow.manifest.version > v_pipeline.txt
    echo $workflow.nextflow.version > v_nextflow.txt
    echo \$(R --version 2>&1) > v_R.txt
@@ -248,7 +250,7 @@ process get_software_versions {
    samtools --version > v_samtools.txt
    htseq-count -h > v_htseq.txt
    fasta_formatter -h > v_fastx.txt
-   mirtrace --version > v_mirtrace.txt
+   java -Xms${memory} -Xmx${memory} -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace --version > v_mirtrace.txt
    multiqc --version > v_multiqc.txt
    miRDeep2.pl -h > v_mirdeep2.txt
 
