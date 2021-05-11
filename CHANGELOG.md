@@ -25,7 +25,7 @@
 * Add `-f` flag to `gunzip` commands to deal with soft-links
 * Add `--mirtrace_protocol` parameter to allow for more flexible selection of this parameter
 * Added `--trim_galore_max_length` option [[#77](https://github.com/nf-core/smrnaseq/issues/77)]
-* Solved memory usage issue for mirtrace process [[#68](https://github.com/nf-core/smrnaseq/issues/68)]
+* Solved memory usage issue for mirtrace in the main process and in the `get_software_versions` process [[#68](https://github.com/nf-core/smrnaseq/issues/68)]
 
 ### Packaged software updates
 
