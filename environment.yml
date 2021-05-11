@@ -6,10 +6,30 @@ channels:
   - bioconda
   - defaults
 dependencies:
+  ## conda-forge packages
+  - conda-forge::r-base=3.6.3
+  - conda-forge::r-statmod=1.4.32
+  - conda-forge::r-data.table=1.12.4
+  - conda-forge::r-gplots=3.0.1.1
+  - conda-forge::r-r.methodss3=1.7.1
   - conda-forge::python=3.7.3
   - conda-forge::markdown=3.1.1
   - conda-forge::pymdown-extensions=6.0
-  - conda-forge::pygments=2.5.2
-  # TODO nf-core: Add required software dependencies here
-  - bioconda::fastqc=0.11.8
-  - bioconda::multiqc=1.7
+  - conda-forge::pygments=2.6.1
+  - conda-forge::pigz=2.3.4
+
+  # bioconda packages
+  - bioconda::fastqc=0.11.9
+  - bioconda::trim-galore=0.6.5
+  - bioconda::samtools=1.9
+  - bioconda::bowtie=1.2.3
+  - bioconda::multiqc=1.9
+  - bioconda::mirtop=0.4.23
+  - bioconda::seqcluster=1.2.7
+  - bioconda::htseq=0.11.3
+  - bioconda::fastx_toolkit=0.0.14
+  - bioconda::seqkit=0.12.0
+  - bioconda::mirtrace=1.0.1
+  - bioconda::bioconductor-edger=3.26.5
+  - bioconda::bioconductor-limma=3.40.2
+  - bioconda::mirdeep2=2.0.1.2

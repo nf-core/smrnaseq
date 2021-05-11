@@ -6,14 +6,12 @@
 
 ## Introduction
 
-<!-- TODO nf-core: Add documentation about anything specific to running your pipeline. For general topics, please point to (and add to) the main nf-core website. -->
-
 ## Running the pipeline
 
 The typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/smrnaseq --input '*_R{1,2}.fastq.gz' -profile docker
+nextflow run nf-core/smrnaseq --input '*.fastq.gz' -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
@@ -42,6 +40,13 @@ It's a good idea to specify a pipeline version when running the pipeline on your
 First, go to the [nf-core/smrnaseq releases page](https://github.com/nf-core/smrnaseq/releases) and find the latest version number - numeric only (eg. `1.3.1`). Then specify this when running the pipeline with `-r` (one hyphen) - eg. `-r 1.3.1`.
 
 This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future.
+
+## Stand-alone scripts
+
+The `bin` directory contains some scripts used by the pipeline which may also be run manually:
+
+* `edgeR_miRBase.r`
+  * R script using for processing reads counts of mature miRNAs and miRNA precursors (hairpins).
 
 ## Core Nextflow arguments
 
