@@ -34,13 +34,13 @@ jobs:
 
       - name: Build new docker image
         if: env.MATCHED_FILES
-        run: docker build --no-cache . -t nfcore/smrnaseq:dev
+        run: docker build --no-cache . -t nfcore/smrnaseq:1.1.0
 
       - name: Pull docker image
         if: ${{ !env.MATCHED_FILES }}
         run: |
           docker pull nfcore/smrnaseq:dev
-          docker tag nfcore/smrnaseq:dev nfcore/smrnaseq:dev
+          docker tag nfcore/smrnaseq:dev nfcore/smrnaseq:1.1.0
 
       - name: Install Nextflow
         env:
