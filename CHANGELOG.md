@@ -2,9 +2,20 @@
 
 ## [v1.1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.1.0) - 2021-05-11
 
+### Major changes
+
+**:warning: Breaking changes!**
+
+This release contains several major (potentially breaking) changes:
+
+* The main input parameter has been changed from `--reads` to `--input` to standardize the pipeline with other nf-core pipelines
+* All parameter documentation has moved into a new `nextflow_schema.json` file
+* A `lib` folder with groovy helper classes has been added to the pipeline. This includes validation of input parameters using the schema defined in the `nextflow_schema.json` file
+
+### General improvements
+
 * Accept custom genome and remove non-canonical letters in the genome. Thanks to @sdjebali. Follow up from [[#63]](https://github.com/nf-core/smrnaseq/pull/63)
 * Fix error when only one sample is in the input [[#31]](https://github.com/nf-core/smrnaseq/issues/31)
-* Change `--reads` to `--input` for consistency with rest of nf-core
 * Made `CamelCase` pipeline parameters `snake_case` and lower case
   * `clip_R1` -> `clip_r1`
   * `three_prime_clip_R1` -> `three_prime_clip_r1`
@@ -12,7 +23,6 @@
   * `skipQC` -> `skip_qc`
   * `skipFastqc` -> `skip_fastqc`
   * `skipMultiqc` -> `skip_multiqc`
-* Move all parameter documentation into new `nextflow_schema.json` file.
 * Update with the latest `TEMPLATE` version for nf-core `1.12.1`
 * Update conda environment with new packages and updates
 * Added `--protocol custom` to allow custom adapter trimming modes [[#41]](https://github.com/nf-core/smrnaseq/issues/41)]
