@@ -1,6 +1,6 @@
 # nf-core/smrnaseq: Changelog
 
-## v1.1dev - [date]
+## [v1.1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.1.0) - 2021-05-11
 
 * Accept custom genome and remove non-canonical letters in the genome. Thanks to @sdjebali. Follow up from [[#63]](https://github.com/nf-core/smrnaseq/pull/63)
 * Fix error when only one sample is in the input [[#31]](https://github.com/nf-core/smrnaseq/issues/31)
