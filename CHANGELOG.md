@@ -37,6 +37,7 @@ This release contains several major (potentially breaking) changes:
 * Added `--trim_galore_max_length` option [[#77](https://github.com/nf-core/smrnaseq/issues/77)]
 * Solved memory usage issue for mirtrace in the main process and in the `get_software_versions` process [[#68](https://github.com/nf-core/smrnaseq/issues/68)]
 * Removed logging of `single_end` parameter and added missing parameters to schema and config files
+* Added "custom" as option for `--protocol` in the `nextflow_schema.json`
 
 ### Packaged software updates
 
