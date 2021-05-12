@@ -130,7 +130,7 @@
                 },
                 "bt_indices": {
                     "type": "array",
-                    "default": "null"
+                    "description": "List of bowtie index files"
                 }
             }
         },
