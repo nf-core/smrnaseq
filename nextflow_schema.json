@@ -122,6 +122,15 @@
                     "fa_icon": "fas fa-ban",
                     "hidden": true,
                     "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                },
+                "gtf": {
+                    "type": "string",
+                    "description": "Path to reference genome GTF file",
+                    "fa_icon": "fas fa-address-book"
+                },
+                "bt_indices": {
+                    "type": "array",
+                    "description": "List of bowtie index files"
                 }
             }
         },

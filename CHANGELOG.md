@@ -36,6 +36,7 @@ This release contains several major (potentially breaking) changes:
 * Add `--mirtrace_protocol` parameter to allow for more flexible selection of this parameter
 * Added `--trim_galore_max_length` option [[#77](https://github.com/nf-core/smrnaseq/issues/77)]
 * Solved memory usage issue for mirtrace in the main process and in the `get_software_versions` process [[#68](https://github.com/nf-core/smrnaseq/issues/68)]
+* Removed logging of `single_end` parameter and added missing parameters to schema and config files
 
 ### Packaged software updates
 
