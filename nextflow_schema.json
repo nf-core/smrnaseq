@@ -30,7 +30,8 @@
                         "illumina",
                         "nextflex",
                         "qiaseq",
-                        "cats"
+                        "cats",
+                        "custom"
                     ]
                 },
                 "outdir": {
