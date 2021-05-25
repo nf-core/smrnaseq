@@ -68,8 +68,13 @@ for (i in 1:2) {
 
     # Remove genes with 0 reads in all samples
     row_sub = apply(data, 1, function(row) all(row ==0 ))
-
-    data<-data[!row_sub,]
+    # Only subset if at least one sample is remaining
+    nr_keep <- table(row_sub)
+    nr_keep <- as.numeric(nr_keep[names(nr_keep) == TRUE])
+    if (nr_keep > 0){
+        data<-data[!row_sub,]
+    }
+    
     write.csv(t(data),file=paste(header,"_counts.csv",sep=""))
 
     # Normalization
