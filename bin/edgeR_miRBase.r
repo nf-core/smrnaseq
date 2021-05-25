@@ -68,8 +68,13 @@ for (i in 1:2) {
 
     # Remove genes with 0 reads in all samples
     row_sub = apply(data, 1, function(row) all(row ==0 ))
-
-    data<-data[!row_sub,]
+    # Only subset if at least one sample is remaining
+    nr_keep <- table(row_sub)
+    nr_keep <- as.numeric(nr_keep[names(nr_keep) == TRUE])
+    if (nr_keep > 0){
+        data<-data[!row_sub,]
+    }
+    
     write.csv(t(data),file=paste(header,"_counts.csv",sep=""))
 
     # Normalization
@@ -92,7 +97,7 @@ for (i in 1:2) {
     dataNorm_df<-as.data.frame(cpm(dataNorm))
     write.table(dataNorm_df,file=paste(header,"_normalized_CPM.txt",sep=""),sep='\t',quote=FALSE)
 
-    if (ncol(data)>1){ # with more than 1 sample
+    if (length(filelist[[1]]) > 1){ # with more than 1 sample
         # Print heatmap based on normalized read counts
         pdf(paste(header,"_CPM_heatmap.pdf",sep=""))
         heatmap.2(cpm(dataNorm),col=redgreen(100),key=TRUE,scale="row",density.info="none",trace="none")
@@ -100,7 +105,7 @@ for (i in 1:2) {
     }
 
     # Make MDS plot (only perform with 3 or more samples)
-    if (ncol(data)>2){
+    if (length(filelist[[1]]) > 2){
         pdf(paste(header,"_edgeR_MDS_plot.pdf",sep=""))
         MDSdata <- plotMDS(dataNorm)
         dev.off()
