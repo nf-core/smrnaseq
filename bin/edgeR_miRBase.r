@@ -60,33 +60,52 @@ for (i in 1:2) {
     colnames(data)<-gsub(".stats","",basename(filelist[[i]]))
     colnames(unmapped)<-gsub(".stats","",basename(filelist[[i]]))
 
-    data<-data[rownames(data)!="*",]
-    unmapped<-unmapped[rownames(unmapped)=="*",]
+    data<-data[rownames(data)!="*",,drop=FALSE]
+    unmapped<-unmapped[rownames(unmapped)=="*",,drop=FALSE]
 
     # Write the summary table of unmapped reads
     write.table(unmapped,file=paste(header,"_unmapped_read_counts.txt",sep=""),sep='\t',quote=FALSE)
 
     # Remove genes with 0 reads in all samples
     row_sub = apply(data, 1, function(row) all(row ==0 ))
-    data<-data[!row_sub,]
+    # Only subset if at least one sample is remaining
+    nr_keep <- table(row_sub)
+    nr_keep <- as.numeric(nr_keep[names(nr_keep) == TRUE])
+    if (nr_keep > 0){
+        data<-data[!row_sub,]
+    }
+    
+    write.csv(t(data),file=paste(header,"_counts.csv",sep=""))
 
     # Normalization
     dataDGE<-DGEList(counts=data,genes=rownames(data))
     o <- order(rowSums(dataDGE$counts), decreasing=TRUE)
     dataDGE <- dataDGE[o,]
+                    
+    # Save log10(TPM)
+    tpm = cpm(dataDGE, normalized.lib.sizes=F, log = F, prior.count = 0.001)
+    tpm = tpm + 0.001
+    tpm = log10(tpm)
+    ttpm = t(tpm)
+    write.table(ttpm,file=paste(header,"_logtpm.txt",sep=""),sep='\t',quote=FALSE)
+    write.csv(ttpm,file=paste(header,"_logtpm.csv",sep=""))
+                    
+    # TMM
     dataNorm <- calcNormFactors(dataDGE)
 
     # Print normalized read counts to file
     dataNorm_df<-as.data.frame(cpm(dataNorm))
     write.table(dataNorm_df,file=paste(header,"_normalized_CPM.txt",sep=""),sep='\t',quote=FALSE)
 
-    # Print heatmap based on normalized read counts
-    pdf(paste(header,"_CPM_heatmap.pdf",sep=""))
-    heatmap.2(cpm(dataNorm),col=redgreen(100),key=TRUE,scale="row",density.info="none",trace="none")
-    dev.off()
+    if (length(filelist[[1]]) > 1){ # with more than 1 sample
+        # Print heatmap based on normalized read counts
+        pdf(paste(header,"_CPM_heatmap.pdf",sep=""))
+        heatmap.2(cpm(dataNorm),col=redgreen(100),key=TRUE,scale="row",density.info="none",trace="none")
+        dev.off()
+    }
 
     # Make MDS plot (only perform with 3 or more samples)
-    if (ncol(data)>2){
+    if (length(filelist[[1]]) > 2){
         pdf(paste(header,"_edgeR_MDS_plot.pdf",sep=""))
         MDSdata <- plotMDS(dataNorm)
         dev.off()
