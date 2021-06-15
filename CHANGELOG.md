@@ -6,7 +6,7 @@
 
 ### Packaged software updates
 
-## [v1.1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.1.0) - 2021-05-11
+## [v1.1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.1.0) - 2021-06-15
 
 ### Major changes
 
