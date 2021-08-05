@@ -4,6 +4,8 @@
 
 ### Added
 
+* Allow a gene to be associated to a non null number of reads in all samples (in `edgeR_miRBase.r` script)
+
 ### Packaged software updates
 
 ## [v1.1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.1.0) - 2021-06-15
