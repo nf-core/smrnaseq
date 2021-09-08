@@ -4,6 +4,18 @@ name: nf-core AWS test
 
 on:
   workflow_dispatch:
+<<<<<<< HEAD
+=======
+
+env:
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  TOWER_ACCESS_TOKEN: ${{ secrets.AWS_TOWER_TOKEN }}
+  AWS_JOB_DEFINITION: ${{ secrets.AWS_JOB_DEFINITION }}
+  AWS_JOB_QUEUE: ${{ secrets.AWS_JOB_QUEUE }}
+  AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+
+>>>>>>> origin/dev
 jobs:
   run-tower:
     name: Run AWS tests
@@ -14,6 +26,7 @@ jobs:
         uses: nf-core/tower-action@master
         
         with:
+<<<<<<< HEAD
           workspace_id: ${{ secrets.TOWER_WORKSPACE_ID }}
           bearer_token: ${{ secrets.TOWER_BEARER_TOKEN }}
           compute_env: ${{ secrets.TOWER_COMPUTE_ENV }}
@@ -26,3 +39,19 @@ jobs:
             }
           profiles: '[ "test", "aws_tower" ]'
 
+=======
+          auto-update-conda: true
+          python-version: 3.7
+      - name: Install awscli
+        run: conda install -c conda-forge awscli
+      - name: Start AWS batch job
+        # For example: adding multiple test runs with different parameters
+        # Remember that you can parallelise this by using strategy.matrix
+        run: |
+          aws batch submit-job \
+          --region eu-west-1 \
+          --job-name nf-core-smrnaseq \
+          --job-queue $AWS_JOB_QUEUE \
+          --job-definition $AWS_JOB_DEFINITION \
+          --container-overrides '{"command": ["nf-core/smrnaseq", "-r '"${GITHUB_SHA}"' -profile test --outdir s3://'"${AWS_S3_BUCKET}"'/smrnaseq/results-'"${GITHUB_SHA}"' -w s3://'"${AWS_S3_BUCKET}"'/smrnaseq/work-'"${GITHUB_SHA}"' -with-tower"], "environment": [{"name": "TOWER_ACCESS_TOKEN", "value": "'"$TOWER_ACCESS_TOKEN"'"}]}'
+>>>>>>> origin/dev

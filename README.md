@@ -14,6 +14,8 @@
 [![Follow on Twitter](http://img.shields.io/badge/twitter-%40nf__core-1DA1F2?labelColor=000000&logo=twitter)](https://twitter.com/nf_core)
 [![Watch on YouTube](http://img.shields.io/badge/youtube-nf--core-FF0000?labelColor=000000&logo=youtube)](https://www.youtube.com/c/nf-core)
 
+[![DOI](https://zenodo.org/badge/140590861.svg)](https://zenodo.org/badge/latestdoi/140590861)
+
 ## Introduction
 
 <!-- TODO nf-core: Write a 1-2 sentence summary of what data the pipeline is for and what it does -->
@@ -66,6 +68,44 @@ nf-core/smrnaseq was originally written by Phil Ewels <phil.ewels@scilifelab.se>
 We thank the following people for their extensive assistance in the development of this pipeline:
 
 <!-- TODO nf-core: If applicable, make list of people who have also contributed -->
+    ```bash
+    nextflow run nf-core/smrnaseq -profile <docker/singularity/podman/shifter/charliecloud/conda/institute> --input '*_R{1,2}.fastq.gz' --genome GRCh37
+    ```
+
+See [usage docs](https://nf-co.re/smrnaseq/usage) for all of the available options when running the pipeline.
+
+## Pipeline summary
+
+1. Raw read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
+2. Adapter trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
+    1. Insert Size calculation
+    2. Collapse reads ([`seqcluster`](https://seqcluster.readthedocs.io/mirna_annotation.html#processing-of-reads))
+3. Alignment against miRBase mature miRNA ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
+4. Alignment against miRBase hairpin
+    1. Unaligned reads from step 3 ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
+    2. Collapsed reads from step 2.2 ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
+5. Post-alignment processing of miRBase hairpin
+    1. Basic statistics from step 3 and step 4.1 ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
+    2. Analysis on miRBase hairpin counts  ([`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html))
+         * TMM normalization and a table of top expression hairpin
+         * MDS plot clustering samples
+         * Heatmap of sample similarities
+    3. miRNA and isomiR annotation from step 4.1 ([`mirtop`](https://github.com/miRTop/mirtop))
+6. Alignment against host reference genome ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
+    1. Post-alignment processing of alignment against host reference genome ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
+7. Novel miRNAs and known miRNAs discovery ([`MiRDeep2`](https://www.mdc-berlin.de/content/mirdeep2-documentation))
+    1. Mapping against reference genome with the mapper module
+    2. Known and novel miRNA discovery with the mirdeep2 module
+8. miRNA quality control ([`mirtrace`](https://github.com/friedlanderlab/mirtrace))
+9. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
+
+## Documentation
+
+The nf-core/smrnaseq pipeline comes with documentation about the pipeline: [usage](https://nf-co.re/smrnaseq/usage) and [output](https://nf-co.re/smrnaseq/output).
+
+## Credits
+
+nf-core/smrnaseq was originally written for use at the [National Genomics Infrastructure](https://portal.scilifelab.se/genomics/) at [SciLifeLab](http://www.scilifelab.se/) in Stockholm, Sweden, by Phil Ewels (@ewels), Chuan Wang (@chuan-wang) and Rickard Hammarén (@Hammarn). Updated by Lorena Pantano (@lpantano) from MIT.
 
 ## Contributions and Support
 
@@ -76,7 +116,7 @@ For further information or help, don't hesitate to get in touch on the [Slack `#
 ## Citations
 
 <!-- TODO nf-core: Add citation for pipeline after first release. Uncomment lines below and update Zenodo doi and badge at the top of this file. -->
-<!-- If you use  nf-core/smrnaseq for your analysis, please cite it using the following doi: [10.5281/zenodo.XXXXXX](https://doi.org/10.5281/zenodo.XXXXXX) -->
+<!-- If you use  nf-core/smrnaseq for your analysis, please cite it using the following doi: [10.5281/zenodo.3456879](https://zenodo.org/badge/latestdoi/140590861) -->
 
 <!-- TODO nf-core: Add bibliography of tools and data used in your pipeline -->
 An extensive list of references for the tools used by the pipeline can be found in the [`CITATIONS.md`](CITATIONS.md) file.
@@ -88,3 +128,5 @@ You can cite the `nf-core` publication as follows:
 > Philip Ewels, Alexander Peltzer, Sven Fillinger, Harshil Patel, Johannes Alneberg, Andreas Wilm, Maxime Ulysse Garcia, Paolo Di Tommaso & Sven Nahnsen.
 >
 > _Nat Biotechnol._ 2020 Feb 13. doi: [10.1038/s41587-020-0439-x](https://dx.doi.org/10.1038/s41587-020-0439-x).
+
+In addition, references of tools and data used in this pipeline are as follows:

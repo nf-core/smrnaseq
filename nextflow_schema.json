@@ -24,6 +24,20 @@
                     "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/smrnaseq/usage#samplesheet-input).",
                     "fa_icon": "fas fa-file-csv"
                 },
+                "protocol": {
+                    "type": "string",
+                    "default": "illumina",
+                    "fa_icon": "fas fa-vial",
+                    "description": "Protocol for constructing smRNA-seq libraries.",
+                    "help_text": "Presets for trimming parameters and 3' adapter sequence with a specified protocol.\n\n| Protocol      | Library Prep Kit                        | Trimming Parameter                      | 3' Adapter Sequence     |\n| :------------ | :-------------------------------------- | :-------------------------------------- | :---------------------  |\n| illumina      | Illumina TruSeq Small RNA               | `clip_r1 = 0` `three_prime_clip_r1 = 0` | `TGGAATTCTCGGGTGCCAAGG` |\n| nextflex      | BIOO SCIENTIFIC  NEXTFLEX Small RNA-Seq | `clip_r1 = 4` `three_prime_clip_r1 = 4` | `TGGAATTCTCGGGTGCCAAGG` |\n| qiaseq        | QIAGEN QIAseq miRNA                     | `clip_r1 = 0` `three_prime_clip_r1 = 0` | `AACTGTAGGCACCATCAAT`   |\n| cats          | Diagenode CATS Small RNA-seq            | `clip_r1 = 3` `three_prime_clip_r1 = 0` | `AAAAAAAAAAA` + `GATCGGAAGAGCACACGTCTG` (only polyA is used for trimming) |\n| custom        | user defined                            | user defined                            | user defined            |\n\n> NB: When running `--protocol custom` the user ***must define the 3' Adapter Sequence***.\n> If trimming parameters aren't provided the pipeline will deafult to `clip_R1 = 0` and `three_prime_clip_R1 = 0` (i.e. no extra clipping).",
+                    "enum": [
+                        "illumina",
+                        "nextflex",
+                        "qiaseq",
+                        "cats",
+                        "custom"
+                    ]
+                },
                 "outdir": {
                     "type": "string",
                     "description": "Path to the output directory where the results will be saved.",
@@ -56,14 +70,54 @@
                     "fa_icon": "fas fa-book",
                     "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
                 },
+                "mirtrace_species": {
+                    "type": "string",
+                    "description": "Species for miRTrace.",
+                    "help_text": "This is automatically set when using `--genome`. Example values: `hsa`, `mmu`...",
+                    "fa_icon": "fas fa-journal-whills"
+                },
                 "fasta": {
                     "type": "string",
-                    "format": "file-path",
-                    "mimetype": "text/plain",
-                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
-                    "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
-                    "fa_icon": "far fa-file-code"
+                    "fa_icon": "fas fa-font",
+                    "description": "Path to reference genome FASTA genome file.",
+                    "help_text": "If you have no genome reference available, the pipeline can build one using a FASTA file. This requires additional time and resources, so it's better to use a pre-build index if possible."
+                },
+                "mirna_gtf": {
+                    "type": "string",
+                    "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
+                    "help_text": "miRBase `.gff3` file, typically downloadedfrom [`ftp://mirbase.org/pub/mirbase/CURRENT/genomes/`](ftp://mirbase.org/pub/mirbase/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
+                    "fa_icon": "fas fa-address-book"
+                },
+                "mature": {
+                    "type": "string",
+                    "description": "Path to FASTA file with mature miRNAs.",
+                    "fa_icon": "fas fa-wheelchair",
+                    "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
+                    "default": "ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz"
+                },
+                "hairpin": {
+                    "type": "string",
+                    "description": "Path to FASTA file with miRNAs precursors.",
+                    "fa_icon": "fab fa-cuttlefish",
+                    "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
+                    "default": "ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz"
+                },
+                "bt_index": {
+                    "type": "string",
+                    "description": "Path to the Bowtie 1 reference genome index.",
+                    "fa_icon": "fas fa-indent"
+                },
+                "references_parsed": {
+                    "type": "string",
+                    "description": "Path to the parsed reference folder containing the files for the miRDeep2.",
+                    "fa_icon": "fas fa-align-left"
+                },
+                "save_reference": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Save generated reference genome files to results.",
+                    "help_text": "Saving generated references means that you can use them for future pipeline runs, reducing processing times.",
+                    "fa_icon": "fas fa-save"
                 },
                 "igenomes_base": {
                     "type": "string",
@@ -79,6 +133,86 @@
                     "fa_icon": "fas fa-ban",
                     "hidden": true,
                     "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                },
+                "bt_indices": {
+                    "type": "array",
+                    "description": "List of bowtie index files"
+                }
+            }
+        },
+        "trimming_options": {
+            "title": "Trimming options",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "fa_icon": "fas fa-cut",
+            "properties": {
+                "min_length": {
+                    "type": "integer",
+                    "default": 17,
+                    "description": "Discard reads that are shorter than this after quality / adapter trimming.",
+                    "fa_icon": "fas fa-ruler"
+                },
+                "clip_r1": {
+                    "type": "integer",
+                    "fa_icon": "fas fa-cut",
+                    "description": "Bp to remove from the 5' end of read 1"
+                },
+                "three_prime_clip_r1": {
+                    "type": "integer",
+                    "fa_icon": "fas fa-cut",
+                    "description": "Bp to remove from the 3' end of read 1 AFTER adapter/quality trimming has been performed"
+                },
+                "three_prime_adapter": {
+                    "type": "string",
+                    "default": "TGGAATTCTCGGGTGCCAAGG",
+                    "fa_icon": "fas fa-text-width",
+                    "description": "Sequencing adapter sequence to search for and remove."
+                },
+                "mirtrace_protocol": {
+                    "type": "string",
+                    "default": "illumina",
+                    "description": "protocol to be used for the mirtrace process",
+                    "enum": [
+                        "illumina",
+                        "cats",
+                        "qiaseq",
+                        "nextflex"
+                    ]
+                },
+                "trim_galore_max_length": {
+                    "type": "integer",
+                    "default": 40,
+                    "description": "trimgalore max-length parameter"
+                }
+            }
+        },
+        "skipping_pipeline_steps": {
+            "title": "Skipping pipeline steps",
+            "type": "object",
+            "description": "",
+            "default": "",
+            "fa_icon": "fas fa-fast-forward",
+            "properties": {
+                "skip_qc": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip all QC steps"
+                },
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip FastQC"
+                },
+                "skip_mirdeep": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip miRDeep"
+                },
+                "skip_multiqc": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip MultiQC"
                 }
             }
         },
@@ -199,6 +333,11 @@
                         "move"
                     ],
                     "hidden": true
+                },
+                "seq_center": {
+                    "type": "string",
+                    "description": "Text about sequencing center which will be added in the header of output bam files.",
+                    "fa_icon": "fas fa-fingerprint"
                 },
                 "email_on_fail": {
                     "type": "string",
