@@ -507,7 +507,7 @@ workflow {
 //     """
 //     perl -ane 's/[ybkmrsw]/N/ig;print;' $hairpin > hairpin_ok.fa
 //     sed 's/ .*//' $refgenome > genome_nowhitespace.fa
-    
+
 //     miRDeep2.pl \\
 //     $reads_collapsed \\
 //     genome_nowhitespace.fa \\

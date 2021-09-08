@@ -17,6 +17,7 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
+
 /*
 ========================================================================================
     CONFIG FILES
@@ -43,8 +44,11 @@ include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' 
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
+def trimgalore_options    = modules['trimgalore']
+// TODO if (params.save_trimmed)  { trimgalore_options.publish_files.put('fq.gz','') }
 
+include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
+include { FASTQC_TRIMGALORE } from '../subworkflows/nf-core/fastqc_trimgalore' addParams( fastqc_options: modules['fastqc'], trimgalore_options: trimgalore_options )
 /*
 ========================================================================================
     IMPORT NF-CORE MODULES/SUBWORKFLOWS
@@ -53,10 +57,11 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( opti
 
 def multiqc_options   = modules['multiqc']
 multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
-
+def cat_fastq_options          = modules['cat_fastq']
 //
 // MODULE: Installed directly from nf-core/modules
 //
+include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main' addParams( options: cat_fastq_options   )
 include { FASTQC  } from '../modules/nf-core/modules/fastqc/main'  addParams( options: modules['fastqc'] )
 include { MULTIQC } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
 
@@ -78,15 +83,56 @@ workflow SMRNASEQ {
     //
     INPUT_CHECK (
         ch_input
-    )
+    ).map {
+        meta, fastq ->
+            meta.id = meta.id.split('_')[0..-2].join('_')
+            [ meta, fastq ] }
+    .dump(tag: 'map')
+    .groupTuple(by: [0])
+    .dump(tag: 'group')
+    .branch {
+        meta, fastq ->
+            single  : fastq.size() == 1
+                return [ meta, fastq.flatten() ]
+            multiple: fastq.size() > 1
+                return [ meta, fastq.flatten() ]
+    }
+    .set { ch_fastq }
+
+    // //
+    // // MODULE: Run FastQC
+    // //
+    // FASTQC (
+    //     INPUT_CHECK.out.reads
+    // )
+    // ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
 
     //
-    // MODULE: Run FastQC
+    // MODULE: Run trimming
+    // //
+    // INPUT_TRIM (
+    //     INPUT_CHECK.out.reads
+    // )
     //
-    FASTQC (
-        INPUT_CHECK.out.reads
+    // MODULE: Concatenate FastQ files from same sample if required
+    //
+    CAT_FASTQ (
+        ch_fastq.multiple
     )
-    ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
+    .mix(ch_fastq.single)
+    .dump(tag:'cat')
+    .set { ch_cat_fastq }
+
+    //
+    // SUBWORKFLOW: Read QC, extract UMI and trim adapters
+    //
+    FASTQC_TRIMGALORE (
+        ch_cat_fastq,
+        params.skip_fastqc || params.skip_qc,
+        params.skip_trimming
+    )
+    ch_software_versions = ch_software_versions.mix(FASTQC_TRIMGALORE.out.fastqc_version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(FASTQC_TRIMGALORE.out.trimgalore_version.first().ifEmpty(null))
 
     //
     // MODULE: Pipeline reporting
@@ -114,7 +160,7 @@ workflow SMRNASEQ {
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(GET_SOFTWARE_VERSIONS.out.yaml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect()
