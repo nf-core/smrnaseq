@@ -12,10 +12,6 @@ The directories listed below will be created in the results directory after the 
 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
 
-<<<<<<< HEAD
-* [FastQC](#fastqc) - Raw read QC
-* [MultiQC](#multiqc) - Aggregate report describing results and QC from the whole pipeline
-=======
 * [FastQC](#fastqc) - read quality control
 * [TrimGalore](#trimgalore) - adapter trimming
 * [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
@@ -26,7 +22,6 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 * [miRDeep2](#mirdeep2) - known and novel miRNA annotation
 * [miRTrace](#mirtrace) - a comprehensive tool for QC purpose
 * [MultiQC](#multiqc) - aggregate report, describing results of the whole pipeline
->>>>>>> origin/dev
 * [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
 ### FastQC
@@ -44,9 +39,6 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 ![MultiQC - FastQC sequence counts plot](images/mqc_fastqc_counts.png)
 
-<<<<<<< HEAD
-![MultiQC - FastQC mean quality scores plot](images/mqc_fastqc_quality.png)
-=======
 ## TrimGalore
 
 [TrimGalore](http://www.bioinformatics.babraham.ac.uk/projects/trim_galore/) is used for removal of adapter contamination and trimming of low quality regions. TrimGalore uses [Cutadapt](https://github.com/marcelm/cutadapt) for adapter trimming and runs FastQC after it finishes.
@@ -185,7 +177,6 @@ Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/maste
 ![mirtrace](images/mirtrace_plot.png)
 
 ## MultiQC
->>>>>>> origin/dev
 
 ![MultiQC - FastQC adapter content plot](images/mqc_fastqc_adapter.png)
 

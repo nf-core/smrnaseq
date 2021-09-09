@@ -10,7 +10,7 @@ process TRIMGALORE {
 
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'pipeline_info', meta:[:], publish_by_meta:[]) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'trimmed', meta:[:], publish_by_meta:[]) }
 
     conda (params.enable_conda ? 'bioconda::trim-galore=0.6.7' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
@@ -75,7 +75,8 @@ process TRIMGALORE {
     def tpc_r1 = three_prime_clip_r1 > 0 ? "--three_prime_clip_r1 ${three_prime_clip_r1}" : ''
     // def tpa = (protocol == "qiaseq" | protocol == "cats") ? "--adapter ${three_prime_adapter}" : '--small_rna'
     """
-    trim_galore --cores $cores --adapter ${three_prime_adapter} $tg_length $c_r1 $tpc_r1 --max_length ${params.trim_galore_max_length} --gzip $reads --fastqc
+    [ ! -f  ${prefix}.fastq.gz ] && ln -s $reads ${prefix}.fastq.gz
+    trim_galore --cores $cores --adapter ${three_prime_adapter} $tg_length $c_r1 $tpc_r1 --max_length ${params.trim_galore_max_length} --gzip ${prefix}.fastq.gz
     echo \$(trim_galore --version 2>&1) | sed 's/^.*version //; s/Last.*\$//' > ${software}.version.txt
     """
 }

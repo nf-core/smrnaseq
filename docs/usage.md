@@ -6,7 +6,6 @@
 
 ## Introduction
 
-<<<<<<< HEAD
 <!-- TODO nf-core: Add documentation about anything specific to running your pipeline. For general topics, please point to (and add to) the main nf-core website. -->
 
 ## Samplesheet input
@@ -23,9 +22,9 @@ The `sample` identifiers have to be the same when you have re-sequenced the same
 
 ```console
 sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz
-CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz
+CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz
+CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz
 ```
 
 ### Full samplesheet
@@ -36,13 +35,13 @@ A final samplesheet file consisting of both single- and paired-end data may look
 
 ```console
 sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz
-CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz
-TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,
-TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz
+CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz
+CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz
+TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz
+TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz
+TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz
+TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz
 ```
 
 | Column         | Description                                                                                                                                                                            |
@@ -53,19 +52,12 @@ TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
-=======
->>>>>>> origin/dev
 ## Running the pipeline
 
 The typical command for running the pipeline is as follows:
 
-<<<<<<< HEAD
 ```console
 nextflow run nf-core/smrnaseq --input samplesheet.csv --genome GRCh37 -profile docker
-=======
-```bash
-nextflow run nf-core/smrnaseq --input '*.fastq.gz' -profile docker
->>>>>>> origin/dev
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
