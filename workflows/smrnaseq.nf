@@ -52,7 +52,12 @@ mirna_gtf = params.mirtrace_species ? file("ftp://mirbase.org/pub/mirbase/CURREN
 
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 include { FASTQC_TRIMGALORE } from '../subworkflows/nf-core/fastqc_trimgalore' addParams( fastqc_options: modules['fastqc'], trimgalore_options: trimgalore_options )
-include { MIRNA_QUANT } from '../subworkflows/local/mirna_quant' addParams( samtools_options: modules['samtools_view'], map_options: modules['map_mirna'] )
+include { MIRNA_QUANT } from '../subworkflows/local/mirna_quant' addParams( samtools_options: modules['samtools_view'], map_options: modules['map_mirna'],
+                                                                            samtools_sort_options: modules['samtools_sort'],
+                                                                            samtools_index_options: modules['samtools_index'],
+                                                                            samtools_stats_options: modules['samtools_index'] )
+
+
 
 /*
 ========================================================================================

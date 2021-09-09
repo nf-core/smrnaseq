@@ -4,6 +4,9 @@
 
 params.samtools_options = [:]
 params.map_options = [:]
+params.samtools_sort_options  = [:]
+params.samtools_index_options = [:]
+params.samtools_stats_options = [:]
 
 include { PARSE_FASTA_MIRNA  as PARSE_MATURE
           PARSE_FASTA_MIRNA  as PARSE_HAIRPIN        } from '../../modules/local/parse_fasta_mirna'
@@ -21,6 +24,8 @@ include { MAP_MIRNA  as MAP_MATURE
 include { SAMTOOLS_VIEW  as SAMTOOLS_VIEW_MATURE
           SAMTOOLS_VIEW  as SAMTOOLS_VIEW_HAIRPIN
           SAMTOOLS_VIEW  as SAMTOOLS_VIEW_SEQCLUSTER        } from '../../modules/nf-core/modules/samtools/view/main' addParams( options: params.samtools_options )
+
+include { BAM_SORT_SAMTOOLS } from './bam_sort'                             addParams( sort_options: params.samtools_sort_options, index_options: params.samtools_index_options, stats_options: params.samtools_stats_options )
 
 include { SEQCLUSTER_SEQUENCES } from '../../modules/local/seqcluster_collapse.nf'
 include { MIRTOP_QUANT } from '../../modules/local/mirtop_quant.nf'
@@ -44,9 +49,11 @@ workflow MIRNA_QUANT {
     INDEX_HAIRPIN ( hairpin_formatted ).index_bowtie.set { hairpin_bowtie }
 
     MAP_MATURE ( reads, mature_bowtie.collect() , 'mature' )
-    SAMTOOLS_VIEW_MATURE ( MAP_MATURE.out.sam ).bam.set { mature_bam }
+    SAMTOOLS_VIEW_MATURE ( MAP_MATURE.out.sam )
     MAP_HAIRPIN ( MAP_MATURE.out.unmapped, hairpin_bowtie.collect() , 'hairpin')
-    SAMTOOLS_VIEW_HAIRPIN ( MAP_HAIRPIN.out.sam ).bam.set { hairpin_bam }
+    SAMTOOLS_VIEW_HAIRPIN ( MAP_HAIRPIN.out.sam )
+
+    BAM_SORT_SAMTOOLS ( SAMTOOLS_VIEW_MATURE.out.bam )
 
     SEQCLUSTER_SEQUENCES ( reads ).collapsed.set { reads_collapsed }
     MAP_SEQCLUSTER ( reads_collapsed, hairpin_bowtie.collect() , 'seqcluster' )
@@ -55,12 +62,12 @@ workflow MIRNA_QUANT {
     if (params.mirtrace_species){
         MIRTOP_QUANT ( SAMTOOLS_VIEW_SEQCLUSTER.out.bam.collect{it[1]}, hairpin_formatted.collect(), gtf )
     }
-    // emit:
+    //emit:
     // fasta_mirna   = mirna_formatted
     // fasta_hairpin = hairpin_formatted
     // bidx_mirna    = mature_bowtie
     // bidx_hairpin  = hairpin_bowtie
-    // bam_mirna     = mature_bam
+    //bam_mirna     = SAMTOOLS_VIEW_MATURE.out.bam
     // bam_hairpin   = hairpin_bam
 
 }
