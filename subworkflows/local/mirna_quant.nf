@@ -45,8 +45,8 @@ workflow MIRNA_QUANT {
     PARSE_HAIRPIN ( hairpin ).parsed_fasta.set { hairpin_parsed }
     FORMAT_HAIRPIN ( hairpin_parsed ).formatted_fasta.set { hairpin_formatted }
 
-    INDEX_MATURE ( mirna_formatted ).index_bowtie.set { mature_bowtie }
-    INDEX_HAIRPIN ( hairpin_formatted ).index_bowtie.set { hairpin_bowtie }
+    INDEX_MATURE ( mirna_formatted ).bt_indeces.set { mature_bowtie }
+    INDEX_HAIRPIN ( hairpin_formatted ).bt_indeces.set { hairpin_bowtie }
 
     MAP_MATURE ( reads, mature_bowtie.collect() , 'mature' )
     SAMTOOLS_VIEW_MATURE ( MAP_MATURE.out.sam )
@@ -62,9 +62,9 @@ workflow MIRNA_QUANT {
     if (params.mirtrace_species){
         MIRTOP_QUANT ( SAMTOOLS_VIEW_SEQCLUSTER.out.bam.collect{it[1]}, hairpin_formatted.collect(), gtf )
     }
-    //emit:
-    // fasta_mirna   = mirna_formatted
-    // fasta_hairpin = hairpin_formatted
+    emit:
+    fasta_mature   = mirna_formatted
+    fasta_hairpin = hairpin_formatted
     // bidx_mirna    = mature_bowtie
     // bidx_hairpin  = hairpin_bowtie
     //bam_mirna     = SAMTOOLS_VIEW_MATURE.out.bam

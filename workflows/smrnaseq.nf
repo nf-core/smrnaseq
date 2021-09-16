@@ -17,6 +17,19 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
+// Check optional parameters
+if( !params.mirtrace_species ){
+    exit 1, "Reference species for miRTrace is not defined."
+}
+// Genome options
+bt_index_from_species = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
+bt_index = params.bt_indeces ?: bt_index_from_species
+mirtrace_species_from_species = params.genome ? params.genomes[ params.genome ].mirtrace_species ?: false : false
+mirtrace_species = params.mirtrace_species ?: mirtrace_species_from_species
+fasta_from_species = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
+fasta = params.fasta ?: fasta_from_species
+mirna_gtf_from_species = params.mirtrace_species ? "ftp://mirbase.org/pub/mirbase/CURRENT/genomes/${params.mirtrace_species}.gff3" : false
+mirna_gtf = params.mirna_gtf ? params.mirna_gtf : mirna_gtf_from_species
 
 /*
 ========================================================================================
@@ -48,7 +61,6 @@ def trimgalore_options    = modules['trimgalore']
 // TODO if (params.save_trimmed)  { trimgalore_options.publish_files.put('fq.gz','') }
 if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
 if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
-mirna_gtf = params.mirtrace_species ? file("ftp://mirbase.org/pub/mirbase/CURRENT/genomes/${params.mirtrace_species}.gff3", checkIfExists: true) : false
 
 include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
 include { FASTQC_TRIMGALORE } from '../subworkflows/nf-core/fastqc_trimgalore' addParams( fastqc_options: modules['fastqc'], trimgalore_options: trimgalore_options )
@@ -56,6 +68,7 @@ include { MIRNA_QUANT } from '../subworkflows/local/mirna_quant' addParams( samt
                                                                             samtools_sort_options: modules['samtools_sort'],
                                                                             samtools_index_options: modules['samtools_index'],
                                                                             samtools_stats_options: modules['samtools_index'] )
+include { GENOME_QUANT } from '../subworkflows/local/genome_quant'
 
 
 
@@ -153,6 +166,12 @@ workflow SMRNASEQ {
     )
 
     //
+    // GENOME
+    //
+    GENOME_QUANT ( fasta, bt_index, mirtrace_species, mirna_gtf,
+                   MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature,
+                   FASTQC_TRIMGALORE.out.reads)
+
     // MODULE: Pipeline reporting
     //
     ch_software_versions

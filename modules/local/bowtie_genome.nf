@@ -4,7 +4,7 @@ include { saveFiles; initOptions; getSoftwareName } from './functions'
 params.options = [:]
 options        = initOptions(params.options)
 
-process INDEX_MIRNA {
+process INDEX_GENOME {
     label 'process_medium'
 
     // publishDir "${params.outdir}",
@@ -22,15 +22,18 @@ process INDEX_MIRNA {
     path fasta
 
     output:
-    path 'fasta_bidx*' , emit: bt_indeces
+    path 'genome*ebwt' , emit: bt_indeces
 
     script:
-    def software = getSoftwareName(task.process)
     """
 
-    bowtie-build ${fasta} fasta_bidx --threads ${task.cpus}
+    # Remove any special base characters from reference genome FASTA file
+    sed '/^[^>]/s/[^ATGCatgc]/N/g' $fasta > genome.edited.fa
+    sed -i 's/ .*//' genome.edited.fa
 
-    # echo \$(bowtie --version 2>&1) | sed 's/^.*version //; s/Last.*\$//' > ${software}.version.txt
+    # Build bowtie index
+    bowtie-build genome.edited.fa genome --threads ${task.cpus}
+
     """
 
 }

@@ -34,9 +34,10 @@ process PARSE_FASTA_MIRNA {
         FASTA=\${FASTA%%.gz}
     fi
     # Remove spaces from miRBase FASTA files
-    sed -i 's, ,_,g' \$FASTA
-
-    seqkit grep -r --pattern \".*${params.mirtrace_species}-.*\" \$FASTA > fasta_sps.fa
+    # sed -i 's, ,_,g' \$FASTA
+    sed '/^[^>]/s/[^AUGCaugc]/N/g' \$FASTA > fasta_parsed.fa
+    sed -i 's/\s.*//' fasta_parsed.fa
+    seqkit grep -r --pattern \".*${params.mirtrace_species}-.*\" fasta_parsed.fa > fasta_sps.fa
     seqkit seq --rna2dna fasta_sps.fa > fasta_igenome.fa
 
     #echo \$(seqkit --version 2>&1) | sed 's/^.*version //; s/Last.*\$//' > ${software}.version.txt
