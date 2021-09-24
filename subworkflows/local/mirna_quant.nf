@@ -19,13 +19,14 @@ include { INDEX_MIRNA  as INDEX_MATURE
 
 include { MAP_MIRNA  as MAP_MATURE
           MAP_MIRNA  as MAP_HAIRPIN
-          MAP_MIRNA  as MAP_SEQCLUSTER        } from '../../modules/local/bowtie_map_mirna'
+          MAP_MIRNA  as MAP_SEQCLUSTER        } from '../../modules/local/bowtie_map_mirna' addParams(options: params.map_options)
 
 include { SAMTOOLS_VIEW  as SAMTOOLS_VIEW_MATURE
           SAMTOOLS_VIEW  as SAMTOOLS_VIEW_HAIRPIN
-          SAMTOOLS_VIEW  as SAMTOOLS_VIEW_SEQCLUSTER        } from '../../modules/nf-core/modules/samtools/view/main' addParams( options: params.samtools_options )
+          SAMTOOLS_VIEW  as SAMTOOLS_VIEW_SEQCLUSTER  } from '../../modules/nf-core/modules/samtools/view/main' addParams( options: params.samtools_options )
 
-include { BAM_SORT_SAMTOOLS } from './bam_sort'                             addParams( sort_options: params.samtools_sort_options, index_options: params.samtools_index_options, stats_options: params.samtools_stats_options )
+include { BAM_SORT_SAMTOOLS as BAM_STATS_MATURE
+          BAM_SORT_SAMTOOLS as BAM_STATS_HAIRPIN } from './bam_sort' addParams( sort_options: params.samtools_sort_options, index_options: params.samtools_index_options, stats_options: params.samtools_stats_options )
 
 include { SEQCLUSTER_SEQUENCES } from '../../modules/local/seqcluster_collapse.nf'
 include { MIRTOP_QUANT } from '../../modules/local/mirtop_quant.nf'
@@ -53,7 +54,8 @@ workflow MIRNA_QUANT {
     MAP_HAIRPIN ( MAP_MATURE.out.unmapped, hairpin_bowtie.collect() , 'hairpin')
     SAMTOOLS_VIEW_HAIRPIN ( MAP_HAIRPIN.out.sam )
 
-    BAM_SORT_SAMTOOLS ( SAMTOOLS_VIEW_MATURE.out.bam )
+    BAM_STATS_MATURE ( SAMTOOLS_VIEW_MATURE.out.bam )
+    BAM_STATS_HAIRPIN ( SAMTOOLS_VIEW_HAIRPIN.out.bam )
 
     SEQCLUSTER_SEQUENCES ( reads ).collapsed.set { reads_collapsed }
     MAP_SEQCLUSTER ( reads_collapsed, hairpin_bowtie.collect() , 'seqcluster' )
@@ -65,6 +67,7 @@ workflow MIRNA_QUANT {
     emit:
     fasta_mature   = mirna_formatted
     fasta_hairpin = hairpin_formatted
+    unmapped = MAP_HAIRPIN.out.unmapped
     // bidx_mirna    = mature_bowtie
     // bidx_hairpin  = hairpin_bowtie
     //bam_mirna     = SAMTOOLS_VIEW_MATURE.out.bam

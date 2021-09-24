@@ -68,7 +68,10 @@ include { MIRNA_QUANT } from '../subworkflows/local/mirna_quant' addParams( samt
                                                                             samtools_sort_options: modules['samtools_sort'],
                                                                             samtools_index_options: modules['samtools_index'],
                                                                             samtools_stats_options: modules['samtools_index'] )
-include { GENOME_QUANT } from '../subworkflows/local/genome_quant'
+include { GENOME_QUANT } from '../subworkflows/local/genome_quant' addParams( samtools_options: modules['samtools_view'], map_options: modules['map_mirna'],
+                                                                            samtools_sort_options: modules['samtools_sort'],
+                                                                            samtools_index_options: modules['samtools_index'],
+                                                                            samtools_stats_options: modules['samtools_index'] )
 
 
 
@@ -168,9 +171,11 @@ workflow SMRNASEQ {
     //
     // GENOME
     //
-    GENOME_QUANT ( fasta, bt_index, mirtrace_species, mirna_gtf,
-                   MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature,
-                   FASTQC_TRIMGALORE.out.reads)
+    if (fasta){
+        fasta_ch = file(fasta)
+        GENOME_QUANT ( fasta_ch, bt_index, MIRNA_QUANT.out.unmapped)
+    }
+
 
     // MODULE: Pipeline reporting
     //

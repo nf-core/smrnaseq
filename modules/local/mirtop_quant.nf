@@ -11,7 +11,7 @@ process MIRTOP_QUANT {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:[:], publish_by_meta:[]) }
 
-    conda (params.enable_conda ? 'bioconda::mirtop=0.4.23' : null)
+    conda (params.enable_conda ? 'bioconda::mirtop=0.4.23,bioconda::samtools=1.13,conda-base::r-base=4.0.3' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
         container "https://depot.galaxyproject.org/singularity/mirtop:0.4.23--pyh864c0ab_1"
     } else {

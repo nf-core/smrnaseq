@@ -10,7 +10,7 @@ process MAP_MIRNA {
 
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:[:], publish_by_meta:[]) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:meta, publish_by_meta:['id']) }
 
     conda (params.enable_conda ? 'bioconda::bowtie=1.3.0-2' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
@@ -22,7 +22,7 @@ process MAP_MIRNA {
     input:
     tuple val(meta), path(reads)
     path index
-    val name_unmapped
+    val suffix
 
     output:
     tuple val(meta), path("*sam"), emit: sam
@@ -32,11 +32,11 @@ process MAP_MIRNA {
     def software = getSoftwareName(task.process)
     def process_name = task.process.tokenize(':')[-1]
     def index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
-
+    meta.id = "${meta.id}.${suffix}"
     """
 
     bowtie \\
-        $index_base \\
+        -x $index_base \\
         -q <(zcat $reads) \\
         -p ${task.cpus} \\
         -t \\
@@ -45,11 +45,15 @@ process MAP_MIRNA {
         --strata \\
         -e 99999 \\
         --chunkmbs 2048 \\
-        --un ${meta.id}_${name_unmapped}_unmapped.fq -S > ${meta.id}_${name_unmapped}.sam
+        --un ${meta.id}_unmapped.fq -S > ${meta.id}.sam
 
-    gzip ${meta.id}_${name_unmapped}_unmapped.fq
+    if [ ! -f  "${meta.id}_unmapped.fq" ]
+    then
+        touch ${meta.id}_unmapped.fq
+    fi
+    gzip ${meta.id}_unmapped.fq
     mkdir unmapped
-    mv  ${meta.id}_${name_unmapped}_unmapped.fq.gz  unmapped/.
+    mv  ${meta.id}_unmapped.fq.gz  unmapped/.
     """
 
 }
