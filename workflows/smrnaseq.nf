@@ -72,7 +72,8 @@ include { GENOME_QUANT } from '../subworkflows/local/genome_quant' addParams( sa
                                                                             samtools_sort_options: modules['samtools_sort'],
                                                                             samtools_index_options: modules['samtools_index'],
                                                                             samtools_stats_options: modules['samtools_index'] )
-
+include { MIRTRACE } from '../subworkflows/local/mirtrace'
+include { MIRDEEP2 } from '../subworkflows/local/mirdeep2'
 
 
 /*
@@ -125,20 +126,6 @@ workflow SMRNASEQ {
     }
     .set { ch_fastq }
 
-    // //
-    // // MODULE: Run FastQC
-    // //
-    // FASTQC (
-    //     INPUT_CHECK.out.reads
-    // )
-    // ch_software_versions = ch_software_versions.mix(FASTQC.out.version.first().ifEmpty(null))
-
-    //
-    // MODULE: Run trimming
-    // //
-    // INPUT_TRIM (
-    //     INPUT_CHECK.out.reads
-    // )
     //
     // MODULE: Concatenate FastQ files from same sample if required
     //
@@ -148,6 +135,13 @@ workflow SMRNASEQ {
     .mix(ch_fastq.single)
     .dump(tag:'cat')
     .set { ch_cat_fastq }
+
+    //
+    // SUBWORKFLOW: mirtrace QC
+    //
+    MIRTRACE (ch_cat_fastq)
+    ch_software_versions = ch_software_versions.mix(MIRTRACE.out.version.ifEmpty(null))
+
 
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters
@@ -160,13 +154,17 @@ workflow SMRNASEQ {
     ch_software_versions = ch_software_versions.mix(FASTQC_TRIMGALORE.out.fastqc_version.first().ifEmpty(null))
     ch_software_versions = ch_software_versions.mix(FASTQC_TRIMGALORE.out.trimgalore_version.first().ifEmpty(null))
 
-
+    reads_for_mirna = FASTQC_TRIMGALORE.out.reads
     MIRNA_QUANT (
         reference_mature,
         reference_hairpin,
         mirna_gtf,
-        FASTQC_TRIMGALORE.out.reads
+        reads_for_mirna
     )
+    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.bowtie_version.ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.samtools_version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.seqcluster_version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.mirtop_version.ifEmpty(null))
 
     //
     // GENOME
@@ -174,8 +172,11 @@ workflow SMRNASEQ {
     if (fasta){
         fasta_ch = file(fasta)
         GENOME_QUANT ( fasta_ch, bt_index, MIRNA_QUANT.out.unmapped)
-    }
 
+        MIRDEEP2 (FASTQC_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta , GENOME_QUANT.out.indeces, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
+        ch_software_versions = ch_software_versions.mix(MIRDEEP2.out.version.first().ifEmpty(null))
+
+    }
 
     // MODULE: Pipeline reporting
     //

@@ -22,24 +22,27 @@ workflow GENOME_QUANT {
     main:
 
     if (!bt_index){
-        bt_indices = INDEX_GENOME( fasta ).bt_indeces
+        INDEX_GENOME( fasta )
+        bt_indices = INDEX_GENOME.out.bt_indeces
+        fasta_formatted = INDEX_GENOME.out.fasta
     } else {
         bt_indices = Channel.fromPath("${bt_index}**ebwt", checkIfExists: true).ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_index}" }
-
+        fasta_formatted = fasta
     }
     // else {
     //   bt_indeces = Channel.empty()
     //}
 
     if (bt_indices){
-        MAP_GENOME ( reads, bt_indices.collect() , 'genome' )
+        MAP_GENOME ( reads, bt_indices.collect() )
         SAMTOOLS_VIEW_GENOME ( MAP_GENOME.out.sam )
         BAM_STATS_GENOME ( SAMTOOLS_VIEW_GENOME.out.bam )
 
     }
 
-    //emit:
-    // fasta_mirna   = mirna_formatted
+    emit:
+        fasta   = fasta_formatted
+        indeces = bt_indices
 
 
 }

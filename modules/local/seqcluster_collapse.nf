@@ -24,15 +24,16 @@ process SEQCLUSTER_SEQUENCES {
 
     output:
     tuple val(meta), path("final/*.fastq.gz")    , emit: collapsed
+    path "*.version.txt" , emit: version
 
     script:
     def software = getSoftwareName(task.process)
     """
     seqcluster collapse -f $reads -m 1 --min_size 15 -o collapsed
-    gzip collapsed/${meta.id}_trimmed_trimmed.fastq
+    gzip collapsed/*_trimmed.fastq
     mkdir final
-    mv collapsed/${meta.id}_trimmed_trimmed.fastq.gz final/${meta.id}.fastq.gz
-    # echo \$(seqcluster --version 2>&1) | sed 's/^.*version //; s/Last.*\$//' > ${software}.version.txt
+    mv collapsed/*.fastq.gz final/.
+    echo \$(seqcluster --version 2>&1) | sed 's/^.*seqcluster //' > ${software}.version.txt
     """
 
 }

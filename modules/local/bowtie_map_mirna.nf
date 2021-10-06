@@ -10,7 +10,7 @@ process MAP_MIRNA {
 
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:meta, publish_by_meta:['id']) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"getSoftwareName(task.process)/${suffix}", meta:meta, publish_by_meta:['id']) }
 
     conda (params.enable_conda ? 'bioconda::bowtie=1.3.0-2' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
@@ -22,7 +22,6 @@ process MAP_MIRNA {
     input:
     tuple val(meta), path(reads)
     path index
-    val suffix
 
     output:
     tuple val(meta), path("*sam"), emit: sam
@@ -32,7 +31,6 @@ process MAP_MIRNA {
     def software = getSoftwareName(task.process)
     def process_name = task.process.tokenize(':')[-1]
     def index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
-    meta.id = "${meta.id}.${suffix}"
     """
 
     bowtie \\

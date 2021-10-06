@@ -41,36 +41,66 @@ workflow MIRNA_QUANT {
 
     main:
     PARSE_MATURE ( mature ).parsed_fasta.set { mirna_parsed }
-    FORMAT_MATURE ( mirna_parsed ).formatted_fasta.set { mirna_formatted }
+    FORMAT_MATURE ( mirna_parsed )
 
     PARSE_HAIRPIN ( hairpin ).parsed_fasta.set { hairpin_parsed }
-    FORMAT_HAIRPIN ( hairpin_parsed ).formatted_fasta.set { hairpin_formatted }
+    FORMAT_HAIRPIN ( hairpin_parsed )
 
-    INDEX_MATURE ( mirna_formatted ).bt_indeces.set { mature_bowtie }
-    INDEX_HAIRPIN ( hairpin_formatted ).bt_indeces.set { hairpin_bowtie }
+    INDEX_MATURE ( FORMAT_MATURE.out.formatted_fasta ).bt_indeces.set { mature_bowtie }
+    INDEX_HAIRPIN ( FORMAT_HAIRPIN.out.formatted_fasta ).bt_indeces.set { hairpin_bowtie }
 
-    MAP_MATURE ( reads, mature_bowtie.collect() , 'mature' )
+    reads
+        .map { add_suffix(it, "mature") }
+        .dump (tag:'msux')
+        .set { reads_mirna }
+
+    MAP_MATURE ( reads_mirna, mature_bowtie.collect() )
     SAMTOOLS_VIEW_MATURE ( MAP_MATURE.out.sam )
-    MAP_HAIRPIN ( MAP_MATURE.out.unmapped, hairpin_bowtie.collect() , 'hairpin')
+
+    MAP_MATURE.out.unmapped
+        .map { add_suffix(it, "hairpin") }
+        .dump (tag:'hsux')
+        .set { reads_hairpin }
+
+    MAP_HAIRPIN ( reads_hairpin, hairpin_bowtie.collect() )
     SAMTOOLS_VIEW_HAIRPIN ( MAP_HAIRPIN.out.sam )
 
     BAM_STATS_MATURE ( SAMTOOLS_VIEW_MATURE.out.bam )
     BAM_STATS_HAIRPIN ( SAMTOOLS_VIEW_HAIRPIN.out.bam )
 
-    SEQCLUSTER_SEQUENCES ( reads ).collapsed.set { reads_collapsed }
-    MAP_SEQCLUSTER ( reads_collapsed, hairpin_bowtie.collect() , 'seqcluster' )
+    reads
+        .map { add_suffix(it, "seqcluster") }
+        .dump (tag:'ssux')
+        .set { reads_seqcluster }
+
+    SEQCLUSTER_SEQUENCES ( reads_seqcluster ).collapsed.set { reads_collapsed }
+    MAP_SEQCLUSTER ( reads_collapsed, hairpin_bowtie.collect() )
     SAMTOOLS_VIEW_SEQCLUSTER ( MAP_SEQCLUSTER.out.sam )
 
     if (params.mirtrace_species){
-        MIRTOP_QUANT ( SAMTOOLS_VIEW_SEQCLUSTER.out.bam.collect{it[1]}, hairpin_formatted.collect(), gtf )
+        MIRTOP_QUANT ( SAMTOOLS_VIEW_SEQCLUSTER.out.bam.collect{it[1]}, FORMAT_HAIRPIN.out.formatted_fasta, gtf )
     }
-    emit:
-    fasta_mature   = mirna_formatted
-    fasta_hairpin = hairpin_formatted
-    unmapped = MAP_HAIRPIN.out.unmapped
-    // bidx_mirna    = mature_bowtie
-    // bidx_hairpin  = hairpin_bowtie
-    //bam_mirna     = SAMTOOLS_VIEW_MATURE.out.bam
-    // bam_hairpin   = hairpin_bam
+    MAP_HAIRPIN.out.unmapped
+        .map { add_suffix(it, "genome") }
+        .dump (tag:'gsux')
+        .set { reads_genome }
 
+    emit:
+    fasta_mature     = FORMAT_MATURE.out.formatted_fasta
+    fasta_hairpin    = FORMAT_HAIRPIN.out.formatted_fasta
+    unmapped         = reads_genome
+    bowtie_version   = INDEX_MATURE.out.version
+    samtools_version = BAM_STATS_MATURE.out.version
+    seqcluster_version     = SEQCLUSTER_SEQUENCES.out.version
+    mirtop_version   = MIRTOP_QUANT.out.version
+
+}
+
+
+def add_suffix(row, suffix) {
+    def meta = [:]
+    meta.id           = "${row[0].id}_${suffix}"
+    def array = []
+    array = [ meta, row[1] ]
+    return array
 }

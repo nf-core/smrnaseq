@@ -23,6 +23,7 @@ process INDEX_GENOME {
 
     output:
     path 'genome*ebwt' , emit: bt_indeces
+    path 'genome.edited.fa' , emit: fasta
 
     script:
     """
