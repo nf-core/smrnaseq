@@ -143,7 +143,7 @@
         "trimming_options": {
             "title": "Trimming options",
             "type": "object",
-            "description": "",
+            "description": "Options for trimming reads and primers.",
             "default": "",
             "fa_icon": "fas fa-cut",
             "properties": {
@@ -190,29 +190,33 @@
         "skipping_pipeline_steps": {
             "title": "Skipping pipeline steps",
             "type": "object",
-            "description": "",
+            "description": "Switches to skip specific pipeline steps, if desired.",
             "default": "",
             "fa_icon": "fas fa-fast-forward",
             "properties": {
                 "skip_qc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip all QC steps"
+                    "description": "Skip all QC steps",
+                    "default": false
                 },
                 "skip_fastqc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip FastQC"
+                    "description": "Skip FastQC",
+                    "default": false
                 },
                 "skip_mirdeep": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip miRDeep"
+                    "description": "Skip miRDeep",
+                    "default": false
                 },
                 "skip_multiqc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip MultiQC"
+                    "description": "Skip MultiQC",
+                    "default": false
                 }
             }
         },
@@ -416,6 +420,12 @@
         },
         {
             "$ref": "#/definitions/reference_genome_options"
+        },
+        {
+            "$ref": "#/definitions/trimming_options"
+        },
+        {
+            "$ref": "#/definitions/skipping_pipeline_steps"
         },
         {
             "$ref": "#/definitions/institutional_config_options"
