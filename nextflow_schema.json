@@ -73,23 +73,25 @@
                 "clip_r1": {
                     "type": "integer",
                     "fa_icon": "fas fa-cut",
-                    "description": "Bp to remove from the 5' end of read 1"
+                    "description": "The number of basepairs to remove from the 5' end of read 1."
                 },
                 "three_prime_clip_r1": {
                     "type": "integer",
                     "fa_icon": "fas fa-cut",
-                    "description": "Bp to remove from the 3' end of read 1 AFTER adapter/quality trimming has been performed"
+                    "description": "The number of basepairs to remove from the 3' end of read 1 AFTER adapter/quality trimming has been performed."
                 },
                 "three_prime_adapter": {
                     "type": "string",
                     "default": "TGGAATTCTCGGGTGCCAAGG",
                     "fa_icon": "fas fa-text-width",
-                    "description": "Sequencing adapter sequence to search for and remove."
+                    "description": "Sequencing adapter sequence to use for trimming."
                 },
                 "mirtrace_protocol": {
                     "type": "string",
                     "default": "illumina",
-                    "description": "protocol to be used for the mirtrace process",
+                    "fa_icon": "fas fa-vial",
+                    "description": "The miRTrace protocol for QC reporting.", 
+					"help": "miRTrace can handle four protocols, each with their own primer-read structure. See the protocol descriptions [here](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/doc/manual/mirtrace_manual.pdf).",
                     "enum": [
                         "illumina",
                         "cats",
@@ -100,7 +102,8 @@
                 "trim_galore_max_length": {
                     "type": "integer",
                     "default": 40,
-                    "description": "trimgalore max-length parameter"
+                    "description": "The `--max-length` parameter used for trimming with `trim_galore`.",
+                    "fa_icon": "fas fa-ruler"
                 }
             }
         },
