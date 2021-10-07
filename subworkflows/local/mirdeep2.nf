@@ -12,7 +12,7 @@ workflow MIRDEEP2 {
     take:
     reads        // channel: [ val(meta), [ reads ] ]
     fasta
-    indeces
+    indices
     hairpin
     mature
 
@@ -20,12 +20,12 @@ workflow MIRDEEP2 {
 
     MIRDEEP2_PIGZ ( reads )
 
-    MIRDEEP2_MAPPER ( MIRDEEP2_PIGZ.out.reads, indeces )
+    MIRDEEP2_MAPPER ( MIRDEEP2_PIGZ.out.reads, indices )
 
     MIRDEEP2_RUN ( fasta, MIRDEEP2_MAPPER.out.mirdeep2_inputs, hairpin, mature )
 
     emit:
-        version   = MIRDEEP2_MAPPER.out.version
+	version   = MIRDEEP2_MAPPER.out.version
 
 
 }

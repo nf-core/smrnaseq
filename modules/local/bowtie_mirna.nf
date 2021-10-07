@@ -22,7 +22,7 @@ process INDEX_MIRNA {
     path fasta
 
     output:
-    path 'fasta_bidx*' , emit: bt_indeces
+    path 'fasta_bidx*' , emit: bt_indices
     path "*.version.txt" , emit: version
 
     script:

@@ -11,7 +11,7 @@ process MIRTRACE_RUN {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:".", meta:[:], publish_by_meta:[]) }
 
-    conda (params.enable_conda ? 'bioconda::mirtrace:1.0.1' : null)
+    conda (params.enable_conda ? 'bioconda::mirtrace=1.0.1' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
         container "https://depot.galaxyproject.org/singularity/mirtrace:1.0.1--hdfd78af_1"
     } else {

@@ -23,7 +23,7 @@ if( !params.mirtrace_species ){
 }
 // Genome options
 bt_index_from_species = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
-bt_index = params.bt_indeces ?: bt_index_from_species
+bt_index = params.bt_indices ?: bt_index_from_species
 mirtrace_species_from_species = params.genome ? params.genomes[ params.genome ].mirtrace_species ?: false : false
 mirtrace_species = params.mirtrace_species ?: mirtrace_species_from_species
 fasta_from_species = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
@@ -173,7 +173,7 @@ workflow SMRNASEQ {
         fasta_ch = file(fasta)
         GENOME_QUANT ( fasta_ch, bt_index, MIRNA_QUANT.out.unmapped)
 
-        MIRDEEP2 (FASTQC_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta , GENOME_QUANT.out.indeces, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
+        MIRDEEP2 (FASTQC_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta , GENOME_QUANT.out.indices, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
         ch_software_versions = ch_software_versions.mix(MIRDEEP2.out.version.first().ifEmpty(null))
 
     }

@@ -2,7 +2,9 @@
 
 ## v1.3.0dev - [2021-09-15]
 
-* Adapt DSL 2.0
+* Adapted DSL 2.0
+* Updated `nextflow_schema.json` should now display correctly on Nextflow Tower
+
 
 ## [v1.2.0dev](https://github.com/nf-core/smrnaseq/releases/tag/1.2.0)
 
