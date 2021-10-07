@@ -173,7 +173,7 @@ workflow SMRNASEQ {
         fasta_ch = file(fasta)
         GENOME_QUANT ( fasta_ch, bt_index, MIRNA_QUANT.out.unmapped)
 
-        MIRDEEP2 (FASTQC_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta , GENOME_QUANT.out.indeces, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
+        MIRDEEP2 (FASTQC_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta , GENOME_QUANT.out.indices, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
         ch_software_versions = ch_software_versions.mix(MIRDEEP2.out.version.first().ifEmpty(null))
 
     }

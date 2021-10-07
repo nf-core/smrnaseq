@@ -41,8 +41,8 @@ workflow GENOME_QUANT {
     }
 
     emit:
-        fasta   = fasta_formatted
-        indeces = bt_indices
+	fasta   = fasta_formatted
+	indices = bt_indices
 
 
 }
