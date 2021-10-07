@@ -175,6 +175,7 @@
                 "mirtrace_protocol": {
                     "type": "string",
                     "default": "illumina",
+                    "fa_icon": "fas fa-ruler-combined",
                     "description": "protocol to be used for the mirtrace process",
                     "enum": [
                         "illumina",
@@ -185,8 +186,9 @@
                 },
                 "trim_galore_max_length": {
                     "type": "integer",
+                    "fa_icon": "fas fa-ruler",
                     "default": 40,
-                    "description": "trimgalore max-length parameter"
+                    "description": "`trimgalore --max-length` parameter"
                 }
             }
         },
@@ -422,12 +424,6 @@
         },
         {
             "$ref": "#/definitions/reference_genome_options"
-        },
-        {
-            "$ref": "#/definitions/trimming_options"
-        },
-        {
-            "$ref": "#/definitions/skipping_pipeline_steps"
         },
         {
             "$ref": "#/definitions/institutional_config_options"
