@@ -107,6 +107,52 @@
                 }
             }
         },
+        "reference_genome_options": {
+            "title": "Reference genome options",
+            "type": "object",
+            "fa_icon": "fas fa-dna",
+            "description": "Reference genome related files and options required for the workflow.",
+            "properties": {
+                "genome": {
+                    "type": "string",
+                    "description": "Name of iGenomes reference.",
+                    "fa_icon": "fas fa-book",
+                    "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
+                },
+                "mirtrace_species": {
+                    "type": "string",
+                    "description": "Species for miRTrace.",
+                    "help_text": "This is automatically set when using `--genome`. Example values: `hsa`, `mmu`...\n Note that mirTrace relies on miRBase for its species reference. See available references [here](ftp://mirbase.org/pub/mirbase/CURRENT/genomes/).",
+                    "fa_icon": "fas fa-journal-whills"
+                },
+                "fasta": {
+                    "type": "string",
+                    "fa_icon": "fas fa-font",
+                    "description": "Path to reference genome FASTA genome file.",
+                    "help_text": "If you have no genome reference available, the pipeline can build one using a FASTA file. This requires additional time and resources, so it's better to use a pre-build index if possible."
+                },
+                "mirna_gtf": {
+                    "type": "string",
+                    "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
+                    "help_text": "miRBase `.gff3` file, typically downloaded from [`ftp://mirbase.org/pub/mirbase/CURRENT/genomes/`](ftp://mirbase.org/pub/mirbase/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
+                    "fa_icon": "fas fa-address-book"
+                },
+                "mature": {
+                    "type": "string",
+                    "description": "Path to FASTA file with mature miRNAs.",
+                    "fa_icon": "fas fa-wheelchair",
+                    "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
+                    "default": "ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz"
+                },
+                "hairpin": {
+                    "type": "string",
+                    "description": "Path to FASTA file with miRNAs precursors.",
+                    "fa_icon": "fab fa-cuttlefish",
+                    "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
+                    "default": "ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz"
+                }
+            }
+        },
         "skipping_pipeline_steps": {
             "title": "Skipping pipeline steps",
             "type": "object",
