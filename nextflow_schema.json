@@ -91,7 +91,7 @@
                     "default": "illumina",
                     "fa_icon": "fas fa-vial",
                     "description": "The miRTrace protocol for QC reporting.", 
-					"help": "miRTrace can handle four protocols, each with their own primer-read structure. See the protocol descriptions [here](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/doc/manual/mirtrace_manual.pdf).",
+					"help_text": "miRTrace can handle four protocols, each with their own primer-read structure. See the protocol descriptions [here](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/doc/manual/mirtrace_manual.pdf).",
                     "enum": [
                         "illumina",
                         "cats",
@@ -102,7 +102,7 @@
                 "trim_galore_max_length": {
                     "type": "integer",
                     "default": 40,
-                    "description": "The `--max-length` parameter used for trimming with `trim_galore`.",
+                    "description": "The max-length parameter used for trimming with TrimGalore!.",
                     "fa_icon": "fas fa-ruler"
                 }
             }
@@ -336,6 +336,9 @@
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/reference_genome_options"
         },
         {
             "$ref": "#/definitions/trimming_options"

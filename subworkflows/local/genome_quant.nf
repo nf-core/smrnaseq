@@ -23,14 +23,14 @@ workflow GENOME_QUANT {
 
     if (!bt_index){
         INDEX_GENOME( fasta )
-        bt_indices = INDEX_GENOME.out.bt_indeces
+        bt_indices = INDEX_GENOME.out.bt_indices
         fasta_formatted = INDEX_GENOME.out.fasta
     } else {
         bt_indices = Channel.fromPath("${bt_index}**ebwt", checkIfExists: true).ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_index}" }
         fasta_formatted = fasta
     }
     // else {
-    //   bt_indeces = Channel.empty()
+    //   bt_indices = Channel.empty()
     //}
 
     if (bt_indices){

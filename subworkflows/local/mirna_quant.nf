@@ -46,8 +46,8 @@ workflow MIRNA_QUANT {
     PARSE_HAIRPIN ( hairpin ).parsed_fasta.set { hairpin_parsed }
     FORMAT_HAIRPIN ( hairpin_parsed )
 
-    INDEX_MATURE ( FORMAT_MATURE.out.formatted_fasta ).bt_indeces.set { mature_bowtie }
-    INDEX_HAIRPIN ( FORMAT_HAIRPIN.out.formatted_fasta ).bt_indeces.set { hairpin_bowtie }
+    INDEX_MATURE ( FORMAT_MATURE.out.formatted_fasta ).bt_indices.set { mature_bowtie }
+    INDEX_HAIRPIN ( FORMAT_HAIRPIN.out.formatted_fasta ).bt_indices.set { hairpin_bowtie }
 
     reads
         .map { add_suffix(it, "mature") }
