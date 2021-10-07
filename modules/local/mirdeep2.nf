@@ -8,7 +8,7 @@ process MIRDEEP2_PIGZ {
     label 'process_low'
     tag "$meta.id"
 
-    conda (params.enable_conda ? 'bioconda::bioconvert:0.4.3' : null)
+    conda (params.enable_conda ? 'bioconda::bioconvert=0.4.3' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
         container "https://depot.galaxyproject.org/singularity/bioconvert:0.4.3--py_0"
     } else {
@@ -37,7 +37,7 @@ process MIRDEEP2_MAPPER {
     tag "$meta.id"
     //publishDir "${params.outdir}/mirdeep/${meta.id}"
 
-    conda (params.enable_conda ? 'bioconda::mirdeep2:2.0.1' : null)
+    conda (params.enable_conda ? 'bioconda::mirdeep2=2.0.1' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
         container "https://depot.galaxyproject.org/singularity/mirdeep2:2.0.1.3--hdfd78af_1"
     } else {

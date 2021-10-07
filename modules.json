@@ -4,19 +4,34 @@
     "repos": {
         "nf-core/modules": {
             "cat/fastq": {
-                "git_sha": "e937c7950af70930d1f34bb961403d9d2aa81c7d"
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
             },
             "fastqc": {
-                "git_sha": "e937c7950af70930d1f34bb961403d9d2aa81c7d"
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
             },
             "multiqc": {
-                "git_sha": "e937c7950af70930d1f34bb961403d9d2aa81c7d"
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
+            },
+            "samtools/flagstat": {
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
+            },
+            "samtools/idxstats": {
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
+            },
+            "samtools/index": {
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
+            },
+            "samtools/sort": {
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
+            },
+            "samtools/stats": {
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
             },
             "samtools/view": {
-                "git_sha": "c5235a983d454787fa0c3247b02086969217163b"
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
             },
             "trimgalore": {
-                "git_sha": "c5235a983d454787fa0c3247b02086969217163b"
+                "git_sha": "49da8642876ae4d91128168cd0db4f1c858d7792"
             }
         }
     }
