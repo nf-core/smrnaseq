@@ -211,6 +211,12 @@
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip MultiQC",
                     "default": false
+                },
+                "skip_trimming": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip all trimming steps.",
+                    "default": false
                 }
             }
         },
