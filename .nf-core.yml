@@ -1,5 +1,14 @@
 lint:
   - actions_awsfulltest: False
   - pipeline_todos: False
+  files_unchanged:
+    - .markdownlint.yml
+    - assets/email_template.html
+    - assets/email_template.txt
+    - lib/NfcoreTemplate.groovy
+    - assets/multiqc_config.yaml
+  files_exist:
+    - bin/scrape_software_versions.py
+    - modules/local/get_software_versions.nf
 files_unchanged:
   - lib/NfcoreSchema.groovy
