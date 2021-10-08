@@ -24,7 +24,7 @@ process SEQCLUSTER_SEQUENCES {
 
     output:
     tuple val(meta), path("final/*.fastq.gz")    , emit: collapsed
-    path "*.version.txt" , emit: version
+    path "*.version.txt" , emit: versions
 
     script:
     def software = getSoftwareName(task.process)

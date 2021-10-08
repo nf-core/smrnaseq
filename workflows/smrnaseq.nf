@@ -9,7 +9,6 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 // Validate input parameters
 WorkflowSmrnaseq.initialise(params, log)
 
-// TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
 def checkPathParamList = [ params.input, params.multiqc_config ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
@@ -132,15 +131,15 @@ workflow SMRNASEQ {
     CAT_FASTQ (
         ch_fastq.multiple
     )
+    CAT_FASTQ.out.reads
     .mix(ch_fastq.single)
-    .dump(tag:'cat')
     .set { ch_cat_fastq }
 
     //
     // SUBWORKFLOW: mirtrace QC
     //
     MIRTRACE (ch_cat_fastq)
-    ch_software_versions = ch_software_versions.mix(MIRTRACE.out.version.ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
 
 
     //
@@ -151,8 +150,8 @@ workflow SMRNASEQ {
         params.skip_fastqc || params.skip_qc,
         params.skip_trimming
     )
-    ch_software_versions = ch_software_versions.mix(FASTQC_TRIMGALORE.out.fastqc_version.first().ifEmpty(null))
-    ch_software_versions = ch_software_versions.mix(FASTQC_TRIMGALORE.out.trimgalore_version.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(FASTQC_TRIMGALORE.out.fastqc_versions.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(FASTQC_TRIMGALORE.out.trimgalore_versions.first().ifEmpty(null))
 
     reads_for_mirna = FASTQC_TRIMGALORE.out.reads
     MIRNA_QUANT (
@@ -161,23 +160,26 @@ workflow SMRNASEQ {
         mirna_gtf,
         reads_for_mirna
     )
-    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.bowtie_version.ifEmpty(null))
-    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.samtools_version.first().ifEmpty(null))
-    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.seqcluster_version.first().ifEmpty(null))
-    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.mirtop_version.ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.bowtie_versions.ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.samtools_versions.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.seqcluster_versions.first().ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.mirtop_versions.ifEmpty(null))
 
     //
     // GENOME
     //
+    genome_stats = Channel.empty()
     if (fasta){
         fasta_ch = file(fasta)
-        GENOME_QUANT ( fasta_ch, bt_index, MIRNA_QUANT.out.unmapped)
-
+        GENOME_QUANT ( fasta_ch, bt_index, MIRNA_QUANT.out.unmapped )
+        GENOME_QUANT.out.stats
+            .set { genome_stats }
         MIRDEEP2 (FASTQC_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta , GENOME_QUANT.out.indices, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
-        ch_software_versions = ch_software_versions.mix(MIRDEEP2.out.version.first().ifEmpty(null))
+        ch_software_versions = ch_software_versions.mix(MIRDEEP2.out.versions.first().ifEmpty(null))
 
     }
 
+    //
     // MODULE: Pipeline reporting
     //
     ch_software_versions
@@ -204,12 +206,15 @@ workflow SMRNASEQ {
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
     ch_multiqc_files = ch_multiqc_files.mix(GET_SOFTWARE_VERSIONS.out.yaml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
+    ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
 
     MULTIQC (
         ch_multiqc_files.collect()
     )
     multiqc_report       = MULTIQC.out.report.toList()
-    ch_software_versions = ch_software_versions.mix(MULTIQC.out.version.ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(MULTIQC.out.versions.ifEmpty(null))
 }
 
 /*

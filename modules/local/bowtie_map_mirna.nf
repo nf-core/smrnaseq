@@ -4,7 +4,7 @@ include { saveFiles; initOptions; getSoftwareName } from './functions'
 params.options = [:]
 options        = initOptions(params.options)
 
-process MAP_MIRNA {
+process BOWTIE_MAP_SEQ {
     label 'process_medium'
     tag "$meta.id"
 
@@ -26,6 +26,7 @@ process MAP_MIRNA {
     output:
     tuple val(meta), path("*sam"), emit: sam
     tuple val(meta), path('unmapped/*fq.gz') , emit: unmapped
+    path "*.version.txt" , emit: versions
 
     script:
     def software = getSoftwareName(task.process)
@@ -52,6 +53,8 @@ process MAP_MIRNA {
     gzip ${meta.id}_unmapped.fq
     mkdir unmapped
     mv  ${meta.id}_unmapped.fq.gz  unmapped/.
+    bowtie --version 2>&1 | head -1 | sed 's/^.*version //' > ${software}.version.txt
+
     """
 
 }

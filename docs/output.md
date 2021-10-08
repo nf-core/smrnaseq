@@ -61,39 +61,25 @@ This is an example of the output we can get:
 
 ![cutadapt](images/cutadapt_plot.png)
 
-## Bowtie - miRNAs
+## Bowtie
 
 [Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) in [miRBase](http://www.mirbase.org/).
 
-**Output directory: `results/bowtie`**
+**Output directory: `results/samtools`**
 
-* `miRBase_mature/sample.mature.bam`
-  * The aligned BAM file of alignment against mature miRNAs
-* `miRBase_mature/sample.mature_unmapped.fq.gz`
-  * Unmapped reads against mature miRNAs *This file will be used as input for the alignment against miRNA precursors (hairpins)*
-* `miRBase_hairpin/sample.hairpin.bam`
-  * The aligned BAM file of alignment against miRNA precursors (hairpins)
-* `miRBase_hairpin/sample.hairpin_unmapped.fq.gz`
-  * Unmapped reads against miRNA precursors (hairpins)
+* `sample_mature.bam`: The aligned BAM file of alignment against mature miRNAs
+* `sample_mature_unmapped.fq.gz`: Unmapped reads against mature miRNAs *This file will be used as input for the alignment against miRNA precursors (hairpins)*
+* `sample_mature_hairpin.bam`: The aligned BAM file of alignment against miRNA precursors (hairpins) that didn't map to the mature
+* `sample_mature_hairpin_unmapped.fq.gz`: Unmapped reads against miRNA precursors (hairpins)
+* `sample_mature_hairpin_genome.bam`: The aligned BAM file of alignment against that didn't map to the precursor.
 
 ## SAMtools
 
 [SAMtools](http://samtools.sourceforge.net/) is used for sorting and indexing the output BAM files from Bowtie. In addition, the numbers of features are counted with the `idxstats` option.
 
-**Output directory: `results/bowtie`**
+**Output directory: `results/samtools/samtools_stats`**
 
-* `miRBase_mature/sample.mature.stats|idxstats|flagstat`
-  * Raw mapped read counts and stats of mature miRNAs
-* `miRBase_mature/sample.mature.sorted.bam`
-  * The sorted BAM file of alignment against mature miRNAs
-* `miRBase_mature/sample.mature.sorted.bam.bai`
-  * The index file of alignment against mature miRNAs
-* `miRBase_hairpin/sample.hairpin.stats|idxstats|flagstat`
-  * Raw mapped read counts and stats of miRNA precursors (hairpins)
-* `miRBase_hairpin/sample.hairpin.sorted.bam`
-  * The sorted BAM file of alignment against miRNA precursors (hairpins)
-* `miRBase_hairpin/sample.hairpin.sorted.bam.bai`
-  * The index file of alignment against miRNA precursors (hairpins)
+* `stats|idxstats|flagstat`: BAM stats for each of the files listed above.
 
 ![samtools](images/samtools_alignment_plot.png)
 
@@ -119,17 +105,6 @@ This is an example of the output we can get:
 
 **Example**: Heatmap of tumor and normal samples based on the top differentially expressed mature miRNAs.
 ![edgeR](images/Example_heatmap.png)
-
-## Bowtie - QC
-
-[Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the reference genome for quality control purposes.
-
-**Output directory: `results/bowtie_ref`**
-
-* `sample.genome.bam`
-  * The aligned BAM file against reference genome
-* `sample.genome.stats|idxstats|flagstat`
-  * Raw mapped read counts and stats of mature miRNAs
 
 ## mirtop
 
@@ -159,7 +134,7 @@ This is an example of the output we can get:
 
 [miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts).
 
-**Output directory: `results/miRTrace`**
+**Output directory: `results/mirtrace`**
 
 * `mirtrace-report.html`
   * An interactive HTML report summarizing all output statistics from miRTrace

@@ -25,7 +25,7 @@ process TRIMGALORE {
     output:
     tuple val(meta), path("*.fq.gz")    , emit: reads
     tuple val(meta), path("*report.txt"), emit: log
-    path "*.version.txt"                , emit: version
+    path "*.version.txt"                , emit: versions
 
     tuple val(meta), path("*.html"), emit: html optional true
     tuple val(meta), path("*.zip") , emit: zip optional true

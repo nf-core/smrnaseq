@@ -29,7 +29,7 @@ process MIRTOP_QUANT {
     path "mirtop/mirtop.tsv", emit: mirtop_table
     // path "mirtop/mirna.tsv"
     path "mirtop/mirtop_rawData.tsv"
-    path "*.version.txt" , emit: version
+    path "*.version.txt" , emit: versions
 
     script:
     def software = getSoftwareName(task.process)

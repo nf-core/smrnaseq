@@ -54,7 +54,7 @@ process MIRDEEP2_MAPPER {
 
     output:
     tuple path('*_collapsed.fa'), path('*reads_vs_refdb.arf'), emit: mirdeep2_inputs
-    path "*.version.txt" , emit: version
+    path "*.version.txt" , emit: versions
 
     script:
     def index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]

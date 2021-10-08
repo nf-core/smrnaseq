@@ -24,7 +24,7 @@ process MIRTRACE_RUN {
 
     output:
     path "mirtrace/*", emit: mirtrace
-    path "*.version.txt" , emit: version
+    path "*.version.txt" , emit: versions
 
 
     script:

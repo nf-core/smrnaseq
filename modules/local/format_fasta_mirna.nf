@@ -23,6 +23,7 @@ process FORMAT_FASTA_MIRNA {
 
     output:
     path '*_idx.fa' , emit: formatted_fasta
+    //path "*.version.txt" , emit: versions
 
     script:
     def software = getSoftwareName(task.process)

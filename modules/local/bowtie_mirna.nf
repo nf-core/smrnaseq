@@ -23,7 +23,6 @@ process INDEX_MIRNA {
 
     output:
     path 'fasta_bidx*' , emit: bt_indices
-    path "*.version.txt" , emit: version
 
     script:
     def software = getSoftwareName(task.process)
@@ -31,7 +30,6 @@ process INDEX_MIRNA {
 
     bowtie-build ${fasta} fasta_bidx --threads ${task.cpus}
 
-    bowtie --version 2>&1 | head -1 | sed 's/^.*version //' > ${software}.version.txt
     """
 
 }

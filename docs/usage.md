@@ -6,7 +6,30 @@
 
 ## Introduction
 
-<!-- TODO nf-core: Add documentation about anything specific to running your pipeline. For general topics, please point to (and add to) the main nf-core website. -->
+### `protocol`
+
+This option indicates the experimental protocol used for the sample preparation. Currently supporting:
+
+* 'illumina': adapter (`TGGAATTCTCGGGTGCCAAGG`)
+* 'nextflex': adapter (`TGGAATTCTCGGGTGCCAAGG), clip_r1 (`4`), three_prime_clip_r1 (`4`)
+* 'qiaseq': adapter (`AACTGTAGGCACCATCAAT)
+* 'cats': adapter (`GATCGGAAGAGCACACGTCTG), clip_r1(`3)
+* 'custom' (where the ser can indicate the `three_prime_adapter`, `clip_r1` and three_prime_clip_r1`)
+
+### `mirtrace_species`
+
+It should point to the 3 letters species used by `miRBase`.
+
+### miRNA related files
+
+* `mirna_gtf`: If not given, it would point to the latest GFF3 file in miRBAseq: `ftp://mirbase.org/pub/mirbase/CURRENT/genomes/${params.mirtrace_species}.gff3`
+* `mature`: pointing to the mature miRNA sequences. `ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz`
+* `hairpin`: pointing to the precursor miRNA sequences. `ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz`
+
+### Genome
+
+* `fasta`: genome fasta file
+* `bt_indices`:  folder containing the bowtie2 indices for the given fasta. **Note** if this parameter is giving the fasta files should be the same file used to generate these indices, otherwise the pipeline will fail.
 
 ## Samplesheet input
 
@@ -21,7 +44,7 @@ You will need to create a samplesheet with information about the samples you wou
 The `sample` identifiers have to be the same when you have re-sequenced the same sample more than once e.g. to increase sequencing depth. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
 
 ```console
-sample,fastq_1,fastq_2
+sample,fastq_1
 CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz
 CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz
 CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz
@@ -34,7 +57,7 @@ The pipeline will auto-detect whether a sample is single- or paired-end using th
 A final samplesheet file consisting of both single- and paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
 
 ```console
-sample,fastq_1,fastq_2
+sample,fastq_1
 CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz
 CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz
 CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz
@@ -48,7 +71,6 @@ TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz
 |----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `sample`       | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
 | `fastq_1`      | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
-| `fastq_2`      | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
@@ -91,8 +113,7 @@ This version number will be logged in reports when you run the pipeline, so that
 
 The `bin` directory contains some scripts used by the pipeline which may also be run manually:
 
-* `edgeR_miRBase.r`
-  * R script using for processing reads counts of mature miRNAs and miRNA precursors (hairpins).
+* `edgeR_miRBase.r`: R script using for processing reads counts of mature miRNAs and miRNA precursors (hairpins).
 
 ## Core Nextflow arguments
 

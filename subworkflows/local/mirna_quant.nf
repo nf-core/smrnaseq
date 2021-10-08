@@ -17,9 +17,9 @@ include { FORMAT_FASTA_MIRNA  as FORMAT_MATURE
 include { INDEX_MIRNA  as INDEX_MATURE
           INDEX_MIRNA  as INDEX_HAIRPIN        } from '../../modules/local/bowtie_mirna'
 
-include { MAP_MIRNA  as MAP_MATURE
-          MAP_MIRNA  as MAP_HAIRPIN
-          MAP_MIRNA  as MAP_SEQCLUSTER        } from '../../modules/local/bowtie_map_mirna' addParams(options: params.map_options)
+include { BOWTIE_MAP_SEQ  as BOWTIE_MAP_MATURE
+          BOWTIE_MAP_SEQ  as BOWTIE_MAP_HAIRPIN
+          BOWTIE_MAP_SEQ  as BOWTIE_MAP_SEQCLUSTER        } from '../../modules/local/bowtie_map_mirna' addParams(options: params.map_options)
 
 include { SAMTOOLS_VIEW  as SAMTOOLS_VIEW_MATURE
           SAMTOOLS_VIEW  as SAMTOOLS_VIEW_HAIRPIN
@@ -54,16 +54,16 @@ workflow MIRNA_QUANT {
         .dump (tag:'msux')
         .set { reads_mirna }
 
-    MAP_MATURE ( reads_mirna, mature_bowtie.collect() )
-    SAMTOOLS_VIEW_MATURE ( MAP_MATURE.out.sam )
+    BOWTIE_MAP_MATURE ( reads_mirna, mature_bowtie.collect() )
+    SAMTOOLS_VIEW_MATURE ( BOWTIE_MAP_MATURE.out.sam )
 
-    MAP_MATURE.out.unmapped
+    BOWTIE_MAP_MATURE.out.unmapped
         .map { add_suffix(it, "hairpin") }
         .dump (tag:'hsux')
         .set { reads_hairpin }
 
-    MAP_HAIRPIN ( reads_hairpin, hairpin_bowtie.collect() )
-    SAMTOOLS_VIEW_HAIRPIN ( MAP_HAIRPIN.out.sam )
+    BOWTIE_MAP_HAIRPIN ( reads_hairpin, hairpin_bowtie.collect() )
+    SAMTOOLS_VIEW_HAIRPIN ( BOWTIE_MAP_HAIRPIN.out.sam )
 
     BAM_STATS_MATURE ( SAMTOOLS_VIEW_MATURE.out.bam )
     BAM_STATS_HAIRPIN ( SAMTOOLS_VIEW_HAIRPIN.out.bam )
@@ -74,13 +74,13 @@ workflow MIRNA_QUANT {
         .set { reads_seqcluster }
 
     SEQCLUSTER_SEQUENCES ( reads_seqcluster ).collapsed.set { reads_collapsed }
-    MAP_SEQCLUSTER ( reads_collapsed, hairpin_bowtie.collect() )
-    SAMTOOLS_VIEW_SEQCLUSTER ( MAP_SEQCLUSTER.out.sam )
+    BOWTIE_MAP_SEQCLUSTER ( reads_collapsed, hairpin_bowtie.collect() )
+    SAMTOOLS_VIEW_SEQCLUSTER ( BOWTIE_MAP_SEQCLUSTER.out.sam )
 
     if (params.mirtrace_species){
         MIRTOP_QUANT ( SAMTOOLS_VIEW_SEQCLUSTER.out.bam.collect{it[1]}, FORMAT_HAIRPIN.out.formatted_fasta, gtf )
     }
-    MAP_HAIRPIN.out.unmapped
+    BOWTIE_MAP_HAIRPIN.out.unmapped
         .map { add_suffix(it, "genome") }
         .dump (tag:'gsux')
         .set { reads_genome }
@@ -89,10 +89,12 @@ workflow MIRNA_QUANT {
     fasta_mature     = FORMAT_MATURE.out.formatted_fasta
     fasta_hairpin    = FORMAT_HAIRPIN.out.formatted_fasta
     unmapped         = reads_genome
-    bowtie_version   = INDEX_MATURE.out.version
-    samtools_version = BAM_STATS_MATURE.out.version
-    seqcluster_version     = SEQCLUSTER_SEQUENCES.out.version
-    mirtop_version   = MIRTOP_QUANT.out.version
+    bowtie_versions   = BOWTIE_MAP_MATURE.out.versions
+    samtools_versions = BAM_STATS_MATURE.out.versions
+    seqcluster_versions     = SEQCLUSTER_SEQUENCES.out.versions
+    mirtop_versions   = MIRTOP_QUANT.out.versions
+    mature_stats      = BAM_STATS_MATURE.out.stats
+    hairpin_stats      = BAM_STATS_HAIRPIN.out.stats
 
 }
 

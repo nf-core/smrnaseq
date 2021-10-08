@@ -21,7 +21,7 @@ workflow MIRTRACE {
     MIRTRACE_RUN ( all_reads.collect() )
 
     emit:
-    version   = MIRTRACE_RUN.out.version
+    versions   = MIRTRACE_RUN.out.versions
 
 
 }

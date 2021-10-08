@@ -26,6 +26,8 @@ process INDEX_GENOME {
     path 'genome.edited.fa' , emit: fasta
 
     script:
+    def software = getSoftwareName(task.process)
+
     """
 
     # Remove any special base characters from reference genome FASTA file

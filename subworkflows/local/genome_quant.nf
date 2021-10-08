@@ -9,7 +9,7 @@ params.samtools_index_options = [:]
 params.samtools_stats_options = [:]
 
 include { INDEX_GENOME } from '../../modules/local/bowtie_genome'
-include { MAP_MIRNA as MAP_GENOME } from '../../modules/local/bowtie_map_mirna' addParams( options: params.map_options)
+include { BOWTIE_MAP_SEQ as BOWTIE_MAP_GENOME } from '../../modules/local/bowtie_map_mirna' addParams( options: params.map_options)
 include { SAMTOOLS_VIEW  as SAMTOOLS_VIEW_GENOME } from '../../modules/nf-core/modules/samtools/view/main' addParams( options: params.samtools_options )
 include { BAM_SORT_SAMTOOLS as BAM_STATS_GENOME } from './bam_sort' addParams( sort_options: params.samtools_sort_options, index_options: params.samtools_index_options, stats_options: params.samtools_stats_options )
 
@@ -34,8 +34,8 @@ workflow GENOME_QUANT {
     //}
 
     if (bt_indices){
-        MAP_GENOME ( reads, bt_indices.collect() )
-        SAMTOOLS_VIEW_GENOME ( MAP_GENOME.out.sam )
+        BOWTIE_MAP_GENOME ( reads, bt_indices.collect() )
+        SAMTOOLS_VIEW_GENOME ( BOWTIE_MAP_GENOME.out.sam )
         BAM_STATS_GENOME ( SAMTOOLS_VIEW_GENOME.out.bam )
 
     }
@@ -43,6 +43,7 @@ workflow GENOME_QUANT {
     emit:
 	fasta   = fasta_formatted
 	indices = bt_indices
+    stats   = BAM_STATS_GENOME.out.stats
 
 
 }
