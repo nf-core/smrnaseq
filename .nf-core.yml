@@ -1,2 +1,5 @@
+lint:
+  - actions_awsfulltest: False
+  - pipeline_todos: False:
 files_unchanged:
   - lib/NfcoreSchema.groovy
