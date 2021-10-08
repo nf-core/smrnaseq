@@ -1,6 +1,4 @@
 lint:
-  - actions_awsfulltest: False
-  - pipeline_todos: False
   files_unchanged:
     - .markdownlint.yml
     - assets/email_template.html
@@ -10,5 +8,3 @@ lint:
   files_exist:
     - bin/scrape_software_versions.py
     - modules/local/get_software_versions.nf
-files_unchanged:
-  - lib/NfcoreSchema.groovy
