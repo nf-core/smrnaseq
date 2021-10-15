@@ -29,6 +29,7 @@ process MIRTOP_QUANT {
     path "mirtop/mirtop.tsv", emit: mirtop_table
     // path "mirtop/mirna.tsv"
     path "mirtop/mirtop_rawData.tsv"
+    path "mirtop/stats/*", emit: logs
     path "*.version.txt" , emit: versions
 
     script:
@@ -37,6 +38,8 @@ process MIRTOP_QUANT {
     mirtop gff --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species ./bams/*
     mirtop counts --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species --add-extra --gff mirtop/mirtop.gff
     mirtop export --format isomir --hairpin $hairpin --gtf $gtf --sps $params.mirtrace_species -o mirtop mirtop/mirtop.gff
+    mirtop stats mirtop/mirtop.gff --out mirtop/stats
+    mv mirtop/stats/mirtop_stats.log mirtop/stats/full_mirtop_stats.log
     #collapse_mirtop.r mirtop/mirtop.tsv
     echo \$(mirtop --version 2>&1) | sed 's/^.*mirtop //' > ${software}.version.txt
     """

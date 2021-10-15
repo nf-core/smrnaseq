@@ -94,7 +94,8 @@ workflow MIRNA_QUANT {
     seqcluster_versions     = SEQCLUSTER_SEQUENCES.out.versions
     mirtop_versions   = MIRTOP_QUANT.out.versions
     mature_stats      = BAM_STATS_MATURE.out.stats
-    hairpin_stats      = BAM_STATS_HAIRPIN.out.stats
+    hairpin_stats     = BAM_STATS_HAIRPIN.out.stats
+    mirtop_logs       = MIRTOP_QUANT.out.logs
 
 }
 
