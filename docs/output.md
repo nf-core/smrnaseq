@@ -49,13 +49,10 @@ MultiQC reports the percentage of bases removed by TrimGalore in the _General St
 
 Contains FastQ files with quality and adapter trimmed reads for each sample, along with a log file describing the trimming.
 
-* `sample_trimmed.fq.gz`
-  * Trimmed FastQ data
-* `sample.fastq.gz_trimming_report.txt`
-  * Trimming report (describes which parameters that were used)
+* `sample_trimmed.fq.gz` Trimmed FastQ data
+* `sample.fastq.gz_trimming_report.txt` Trimming report (describes which parameters that were used)
 * `sample_trimmed_fastqc.html`
-* `sample_trimmed_fastqc.zip`
-  * FastQC report for trimmed reads
+* `sample_trimmed_fastqc.zip` FastQC report for trimmed reads
 
 This is an example of the output we can get:
 
@@ -89,16 +86,11 @@ This is an example of the output we can get:
 
 **Output directory: `results/edgeR`**
 
-* `[mature/hairpin]_normalized_CPM.txt`
-  * TMM normalized counts of reads aligned to mature miRNAs/miRNA precursors (hairpins)
-* `[mature/hairpin]_edgeR_MDS_plot.pdf`
-  * Multidimensional scaling plot of all samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
-* `[mature/hairpin]_CPM_heatmap.pdf`
-  * Heatmap based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
-* `[mature/hairpin]_log2CPM_sample_distances_dendrogram.pdf`
-  * Dendrograms of distance among samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
-* `[mature/hairpin]_log2CPM_sample_distances_heatmap.pdf`
-  * Pairwise correlation of samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
+* `[mature/hairpin]_normalized_CPM.txt` TMM normalized counts of reads aligned to mature miRNAs/miRNA precursors (hairpins)
+* `[mature/hairpin]_edgeR_MDS_plot.pdf` Multidimensional scaling plot of all samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
+* `[mature/hairpin]_CPM_heatmap.pdf` Heatmap based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
+* `[mature/hairpin]_log2CPM_sample_distances_dendrogram.pdf` Dendrograms of distance among samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
+* `[mature/hairpin]_log2CPM_sample_distances_heatmap.pdf` Pairwise correlation of samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
 
 **Example**: MDS plot of 10 samples based on their expression profiles of mature miRNAs. Here we can see that samples cluster based on different sample types and library preparation kits.
 ![edgeR](images/Example_MDS_plot.png)
@@ -123,12 +115,9 @@ This is an example of the output we can get:
 
 **Output directory: `results/mirdeep2`**
 
-* `mirdeep/timestamp_sample.bed`
-  * File with the known and novel miRNAs in bed format.
-* `mirdeep/timestamp_sample.csv`
-  * File with an overview of all detected miRNAs (known and novel) in csv format.
-* `mirdeep/timestamp_sample.html`
-  * A HTML report with an overview of all detected miRNAs (known and novel) in html format.
+* `mirdeep/timestamp_sample.bed` File with the known and novel miRNAs in bed format.
+* `mirdeep/timestamp_sample.csv` File with an overview of all detected miRNAs (known and novel) in csv format.
+* `mirdeep/timestamp_sample.html` A HTML report with an overview of all detected miRNAs (known and novel) in html format.
 
 ## miRTrace
 
@@ -136,16 +125,11 @@ This is an example of the output we can get:
 
 **Output directory: `results/mirtrace`**
 
-* `mirtrace-report.html`
-  * An interactive HTML report summarizing all output statistics from miRTrace
-* `mirtrace-results.json`
-  * A JSON file with all output statistics from miRTrace
-* `mirtrace-stats-*.tsv`
-  * Tab-separated statistics files
-* `qc_passed_reads.all.collapsed`
-  * FASTA file per sample with sequence reads that passed QC in miRTrace
-* `qc_passed_reads.rnatype_unknown.collapsed`
-  * FASTA file per sample with unknown reads in the RNA type analysis
+* `mirtrace-report.html` An interactive HTML report summarizing all output statistics from miRTrace
+* `mirtrace-results.json` A JSON file with all output statistics from miRTrace
+* `mirtrace-stats-*.tsv` Tab-separated statistics files
+* `qc_passed_reads.all.collapsed` FASTA file per sample with sequence reads that passed QC in miRTrace
+* `qc_passed_reads.rnatype_unknown.collapsed` FASTA file per sample with unknown reads in the RNA type analysis
 
 Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/manual.pdf) for detailed specifications about output files. Here is an example of the RNA types plot that you will see:
 
