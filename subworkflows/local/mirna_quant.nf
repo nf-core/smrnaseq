@@ -8,25 +8,25 @@ params.samtools_sort_options  = [:]
 params.samtools_index_options = [:]
 params.samtools_stats_options = [:]
 
-include { PARSE_FASTA_MIRNA  as PARSE_MATURE
-          PARSE_FASTA_MIRNA  as PARSE_HAIRPIN        } from '../../modules/local/parse_fasta_mirna'
+include {   PARSE_FASTA_MIRNA  as PARSE_MATURE
+            PARSE_FASTA_MIRNA  as PARSE_HAIRPIN        } from '../../modules/local/parse_fasta_mirna'
 
-include { FORMAT_FASTA_MIRNA  as FORMAT_MATURE
-          FORMAT_FASTA_MIRNA  as FORMAT_HAIRPIN        } from '../../modules/local/format_fasta_mirna'
+include {   FORMAT_FASTA_MIRNA  as FORMAT_MATURE
+            FORMAT_FASTA_MIRNA  as FORMAT_HAIRPIN        } from '../../modules/local/format_fasta_mirna'
 
-include { INDEX_MIRNA  as INDEX_MATURE
-          INDEX_MIRNA  as INDEX_HAIRPIN        } from '../../modules/local/bowtie_mirna'
+include {   INDEX_MIRNA  as INDEX_MATURE
+            INDEX_MIRNA  as INDEX_HAIRPIN        } from '../../modules/local/bowtie_mirna'
 
-include { BOWTIE_MAP_SEQ  as BOWTIE_MAP_MATURE
-          BOWTIE_MAP_SEQ  as BOWTIE_MAP_HAIRPIN
-          BOWTIE_MAP_SEQ  as BOWTIE_MAP_SEQCLUSTER        } from '../../modules/local/bowtie_map_mirna' addParams(options: params.map_options)
+include {   BOWTIE_MAP_SEQ  as BOWTIE_MAP_MATURE
+            BOWTIE_MAP_SEQ  as BOWTIE_MAP_HAIRPIN
+            BOWTIE_MAP_SEQ  as BOWTIE_MAP_SEQCLUSTER        } from '../../modules/local/bowtie_map_mirna' addParams(options: params.map_options)
 
-include { SAMTOOLS_VIEW  as SAMTOOLS_VIEW_MATURE
-          SAMTOOLS_VIEW  as SAMTOOLS_VIEW_HAIRPIN
-          SAMTOOLS_VIEW  as SAMTOOLS_VIEW_SEQCLUSTER  } from '../../modules/nf-core/modules/samtools/view/main' addParams( options: params.samtools_options )
+include {   SAMTOOLS_VIEW  as SAMTOOLS_VIEW_MATURE
+            SAMTOOLS_VIEW  as SAMTOOLS_VIEW_HAIRPIN
+            SAMTOOLS_VIEW  as SAMTOOLS_VIEW_SEQCLUSTER  } from '../../modules/nf-core/modules/samtools/view/main' addParams( options: params.samtools_options )
 
-include { BAM_SORT_SAMTOOLS as BAM_STATS_MATURE
-          BAM_SORT_SAMTOOLS as BAM_STATS_HAIRPIN } from './bam_sort' addParams( sort_options: params.samtools_sort_options, index_options: params.samtools_index_options, stats_options: params.samtools_stats_options )
+include {   BAM_SORT_SAMTOOLS as BAM_STATS_MATURE
+            BAM_SORT_SAMTOOLS as BAM_STATS_HAIRPIN } from './bam_sort' addParams( sort_options: params.samtools_sort_options, index_options: params.samtools_index_options, stats_options: params.samtools_stats_options )
 
 include { SEQCLUSTER_SEQUENCES } from '../../modules/local/seqcluster_collapse.nf'
 include { MIRTOP_QUANT } from '../../modules/local/mirtop_quant.nf'

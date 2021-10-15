@@ -74,14 +74,14 @@ for (i in 1:2) {
     if (nr_keep > 0){
         data<-data[!row_sub,]
     }
-    
+
     write.csv(t(data),file=paste(header,"_counts.csv",sep=""))
 
     # Normalization
     dataDGE<-DGEList(counts=data,genes=rownames(data))
     o <- order(rowSums(dataDGE$counts), decreasing=TRUE)
     dataDGE <- dataDGE[o,]
-                    
+
     # Save log10(TPM)
     tpm = cpm(dataDGE, normalized.lib.sizes=F, log = F, prior.count = 0.001)
     tpm = tpm + 0.001
@@ -89,7 +89,7 @@ for (i in 1:2) {
     ttpm = t(tpm)
     write.table(ttpm,file=paste(header,"_logtpm.txt",sep=""),sep='\t',quote=FALSE)
     write.csv(ttpm,file=paste(header,"_logtpm.csv",sep=""))
-                    
+
     # TMM
     dataNorm <- calcNormFactors(dataDGE)
 

@@ -25,7 +25,7 @@ workflow MIRDEEP2 {
     MIRDEEP2_RUN ( fasta, MIRDEEP2_MAPPER.out.mirdeep2_inputs, hairpin, mature )
 
     emit:
-	versions   = MIRDEEP2_MAPPER.out.versions
+	versions = MIRDEEP2_MAPPER.out.versions
 
 
 }
