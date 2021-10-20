@@ -166,7 +166,7 @@
                     "default": "illumina",
                     "fa_icon": "fas fa-vial",
                     "description": "The miRTrace protocol for QC reporting.",
-					"help_text": "miRTrace can handle four protocols, each with their own primer-read structure. See the protocol descriptions [here](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/doc/manual/mirtrace_manual.pdf).",
+                    "help_text": "miRTrace can handle four protocols, each with their own primer-read structure. See the protocol descriptions [here](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/doc/manual/mirtrace_manual.pdf).",
                     "enum": [
                         "illumina",
                         "cats",
