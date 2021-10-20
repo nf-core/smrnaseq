@@ -18,7 +18,7 @@ This option indicates the experimental protocol used for the sample preparation.
 
 ### `mirtrace_species`
 
-It should point to the 3 letters species used by `miRBase`.
+It should point to the 3-letter species name used by `miRBase`.
 
 ### miRNA related files
 
