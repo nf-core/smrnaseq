@@ -29,7 +29,7 @@ It should point to the 3-letter species name used by `miRBase`.
 ### Genome
 
 * `fasta`: the reference genome FASTA file
-* `bt_indices`:  folder containing the bowtie2 indices for the given fasta. **Note** if this parameter is giving the fasta files should be the same file used to generate these indices, otherwise the pipeline will fail.
+* `bt_indices`:  points to the folder containing the `bowtie2` indices for the genome reference specified by `fasta`. **Note:** if the FASTA file in `fasta` is not the same file used to generate the `bowtie2` indices, then the pipeline will fail.
 
 ## Samplesheet input
 
