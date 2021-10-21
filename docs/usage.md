@@ -22,7 +22,7 @@ It should point to the 3-letter species name used by `miRBase`.
 
 ### miRNA related files
 
-* `mirna_gtf`: If not given, it would point to the latest GFF3 file in miRBAseq: `ftp://mirbase.org/pub/mirbase/CURRENT/genomes/${params.mirtrace_species}.gff3`
+* `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRbase: `ftp://mirbase.org/pub/mirbase/CURRENT/genomes/${params.mirtrace_species}.gff3`
 * `mature`: pointing to the mature miRNA sequences. `ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz`
 * `hairpin`: pointing to the precursor miRNA sequences. `ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz`
 
