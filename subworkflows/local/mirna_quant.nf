@@ -7,6 +7,7 @@ params.map_options = [:]
 params.samtools_sort_options  = [:]
 params.samtools_index_options = [:]
 params.samtools_stats_options = [:]
+params.table_merge_options = [:]
 
 include {   PARSE_FASTA_MIRNA  as PARSE_MATURE
             PARSE_FASTA_MIRNA  as PARSE_HAIRPIN        } from '../../modules/local/parse_fasta_mirna'
@@ -30,6 +31,7 @@ include {   BAM_SORT_SAMTOOLS as BAM_STATS_MATURE
 
 include { SEQCLUSTER_SEQUENCES } from '../../modules/local/seqcluster_collapse.nf'
 include { MIRTOP_QUANT } from '../../modules/local/mirtop_quant.nf'
+include { TABLE_MERGE } from '../../modules/local/mirtop_quant.nf' addParams( options: params.table_merge_options )
 
 
 workflow MIRNA_QUANT {
@@ -79,6 +81,7 @@ workflow MIRNA_QUANT {
 
     if (params.mirtrace_species){
         MIRTOP_QUANT ( SAMTOOLS_VIEW_SEQCLUSTER.out.bam.collect{it[1]}, FORMAT_HAIRPIN.out.formatted_fasta, gtf )
+        TABLE_MERGE ( MIRTOP_QUANT.out.mirtop_table )
     }
     BOWTIE_MAP_HAIRPIN.out.unmapped
         .map { add_suffix(it, "genome") }
@@ -96,6 +99,7 @@ workflow MIRNA_QUANT {
     mature_stats      = BAM_STATS_MATURE.out.stats
     hairpin_stats     = BAM_STATS_HAIRPIN.out.stats
     mirtop_logs       = MIRTOP_QUANT.out.logs
+    merge_versions    = TABLE_MERGE.out.versions
 
 }
 

@@ -66,7 +66,8 @@ include { FASTQC_TRIMGALORE } from '../subworkflows/nf-core/fastqc_trimgalore' a
 include { MIRNA_QUANT } from '../subworkflows/local/mirna_quant' addParams( samtools_options: modules['samtools_view'], map_options: modules['map_mirna'],
                                                                             samtools_sort_options: modules['samtools_sort'],
                                                                             samtools_index_options: modules['samtools_index'],
-                                                                            samtools_stats_options: modules['samtools_index'] )
+                                                                            samtools_stats_options: modules['samtools_index'],
+                                                                            table_merge_options: modules['table_merge'] )
 include { GENOME_QUANT } from '../subworkflows/local/genome_quant' addParams( samtools_options: modules['samtools_view'], map_options: modules['map_mirna'],
                                                                             samtools_sort_options: modules['samtools_sort'],
                                                                             samtools_index_options: modules['samtools_index'],
@@ -164,6 +165,7 @@ workflow SMRNASEQ {
     ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.samtools_versions.first().ifEmpty(null))
     ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.seqcluster_versions.first().ifEmpty(null))
     ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.mirtop_versions.ifEmpty(null))
+    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.merge_versions.ifEmpty(null))
 
     //
     // GENOME

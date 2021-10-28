@@ -1,5 +1,5 @@
 #!/usr/bin/env Rscript
-
+library(data.table)
 # Command line arguments
 args = commandArgs(trailingOnly=TRUE)
 
