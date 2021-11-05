@@ -69,7 +69,7 @@ workflow MIRNA_QUANT {
         .mix(BAM_STATS_HAIRPIN.out.stats.collect{it[1]})
         .dump(tag:'edger')
         .set { edger_input }
-    EDGER ( edger_input.flatten().collect() )
+    // TODO EDGER ( edger_input.flatten().collect() )
 
     reads
         .map { add_suffix(it, "seqcluster") }
