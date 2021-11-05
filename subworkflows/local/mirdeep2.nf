@@ -4,9 +4,9 @@
 
 params.options = [:]
 
-include { MIRDEEP2_PIGZ } from '../../modules/local/mirdeep2'
-include { MIRDEEP2_MAPPER } from '../../modules/local/mirdeep2'
-include { MIRDEEP2_RUN } from '../../modules/local/mirdeep2'
+include { MIRDEEP2_PIGZ } from '../../modules/local/mirdeep2_prepare'
+include { MIRDEEP2_MAPPER } from '../../modules/local/mirdeep2_mapper'
+include { MIRDEEP2_RUN } from '../../modules/local/mirdeep2_run'
 
 workflow MIRDEEP2 {
     take:
@@ -25,7 +25,8 @@ workflow MIRDEEP2 {
     MIRDEEP2_RUN ( fasta, MIRDEEP2_MAPPER.out.mirdeep2_inputs, hairpin, mature )
 
     emit:
-    versions = MIRDEEP2_MAPPER.out.versions
-
+    versions_prepare = MIRDEEP2_PIGZ.out.versions
+    versions_mapper  = MIRDEEP2_MAPPER.out.versions
+    versions_run     = MIRDEEP2_RUN.out.versions
 
 }

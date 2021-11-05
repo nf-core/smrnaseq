@@ -36,6 +36,8 @@ jobs:
           sudo mv nextflow /usr/local/bin/
 
       - name: Run pipeline with test data
-        # TODO: Add more run variants with different pipeline flags?
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile test,docker
+      - name: Run pipeline with test data and not genome
+        run: |
+          nextflow run ${GITHUB_WORKSPACE} -profile test_no_genome,docker

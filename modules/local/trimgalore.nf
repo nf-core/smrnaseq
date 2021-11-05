@@ -73,7 +73,6 @@ process TRIMGALORE {
     def tg_length = "--length ${params.min_length}"
     def c_r1 = clip_r1 > 0 ? "--clip_r1 ${clip_r1}" : ''
     def tpc_r1 = three_prime_clip_r1 > 0 ? "--three_prime_clip_r1 ${three_prime_clip_r1}" : ''
-    // def tpa = (protocol == "qiaseq" | protocol == "cats") ? "--adapter ${three_prime_adapter}" : '--small_rna'
     """
     [ ! -f  ${prefix}.fastq.gz ] && ln -s $reads ${prefix}.fastq.gz
     trim_galore --cores $cores --adapter ${three_prime_adapter} $tg_length $c_r1 $tpc_r1 --max_length ${params.trim_galore_max_length} --gzip ${prefix}.fastq.gz

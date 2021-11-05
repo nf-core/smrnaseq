@@ -57,7 +57,6 @@ include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' 
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 def trimgalore_options    = modules['trimgalore']
-// TODO if (params.save_trimmed)  { trimgalore_options.publish_files.put('fq.gz','') }
 if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
 if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
 
@@ -176,25 +175,28 @@ workflow SMRNASEQ {
         GENOME_QUANT ( fasta_ch, bt_index, MIRNA_QUANT.out.unmapped )
         GENOME_QUANT.out.stats
             .set { genome_stats }
-        MIRDEEP2 (FASTQC_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta , GENOME_QUANT.out.indices, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
-        ch_software_versions = ch_software_versions.mix(MIRDEEP2.out.versions.first().ifEmpty(null))
+        MIRDEEP2 (FASTQC_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta, GENOME_QUANT.out.indices, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
+
+        ch_software_versions = ch_software_versions.mix(MIRDEEP2.out.versions_prepare.first().ifEmpty(null))
+        ch_software_versions = ch_software_versions.mix(MIRDEEP2.out.versions_mapper.first().ifEmpty(null))
+        ch_software_versions = ch_software_versions.mix(MIRDEEP2.out.versions_run.first().ifEmpty(null))
 
     }
 
     //
     // MODULE: Pipeline reporting
     //
-    ch_software_versions
-        .map { it -> if (it) [ it.baseName, it ] }
-        .groupTuple()
-        .map { it[1][0] }
-        .flatten()
-        .collect()
-        .set { ch_software_versions }
+    // ch_software_versions
+    //     .map { it -> if (it) [ it.baseName, it ] }
+    //     .groupTuple()
+    //     .map { it[1][0] }
+    //     .flatten()
+    //     .collect()
+    //     .set { ch_software_versions }
 
-    GET_SOFTWARE_VERSIONS (
-        ch_software_versions.map { it }.collect()
-    )
+    // GET_SOFTWARE_VERSIONS (
+    //     ch_software_versions.map { it }.collect()
+    // )
 
     //
     // MODULE: MultiQC
@@ -206,7 +208,7 @@ workflow SMRNASEQ {
     ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-    ch_multiqc_files = ch_multiqc_files.mix(GET_SOFTWARE_VERSIONS.out.yaml.collect())
+    // ch_multiqc_files = ch_multiqc_files.mix(GET_SOFTWARE_VERSIONS.out.yaml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))

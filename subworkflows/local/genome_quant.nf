@@ -10,7 +10,6 @@ params.samtools_stats_options = [:]
 
 include { INDEX_GENOME } from '../../modules/local/bowtie_genome'
 include { BOWTIE_MAP_SEQ as BOWTIE_MAP_GENOME } from '../../modules/local/bowtie_map_mirna' addParams( options: params.map_options)
-include { SAMTOOLS_VIEW  as SAMTOOLS_VIEW_GENOME } from '../../modules/nf-core/modules/samtools/view/main' addParams( options: params.samtools_options )
 include { BAM_SORT_SAMTOOLS as BAM_STATS_GENOME } from './bam_sort' addParams( sort_options: params.samtools_sort_options, index_options: params.samtools_index_options, stats_options: params.samtools_stats_options )
 
 workflow GENOME_QUANT {
@@ -29,14 +28,10 @@ workflow GENOME_QUANT {
         bt_indices = Channel.fromPath("${bt_index}**ebwt", checkIfExists: true).ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_index}" }
         fasta_formatted = fasta
     }
-    // else {
-    //   bt_indices = Channel.empty()
-    //}
 
     if (bt_indices){
         BOWTIE_MAP_GENOME ( reads, bt_indices.collect() )
-        SAMTOOLS_VIEW_GENOME ( BOWTIE_MAP_GENOME.out.sam )
-        BAM_STATS_GENOME ( SAMTOOLS_VIEW_GENOME.out.bam )
+        BAM_STATS_GENOME ( BOWTIE_MAP_GENOME.out.bam, Channel.empty()  )
 
     }
 

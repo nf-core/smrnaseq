@@ -12,11 +12,11 @@ process BOWTIE_MAP_SEQ {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"getSoftwareName(task.process)/${suffix}", meta:meta, publish_by_meta:['id']) }
 
-    conda (params.enable_conda ? 'bioconda::bowtie=1.3.0-2' : null)
+    conda (params.enable_conda ? 'bioconda::bowtie=1.3.0-2 bioconda::samtools=1.13' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/bowtie:1.3.0--py38hcf49a77_2"
+        container "https://depot.galaxyproject.org/singularity/mulled-v2-ffbf83a6b0ab6ec567a336cf349b80637135bca3:ceb75475f8597dac517752704af5a11715e6878f-0"
     } else {
-        container "quay.io/biocontainers/bowtie:1.3.0--py38hcf49a77_2"
+        container "quay.io/biocontainers/mulled-v2-ffbf83a6b0ab6ec567a336cf349b80637135bca3:40128b496751b037e2bd85f6789e83d4ff8a4837-0"
     }
 
     input:
@@ -24,7 +24,7 @@ process BOWTIE_MAP_SEQ {
     path index
 
     output:
-    tuple val(meta), path("*sam"), emit: sam
+    tuple val(meta), path("*bam"), emit: bam
     tuple val(meta), path('unmapped/*fq.gz') , emit: unmapped
     path "*.version.txt" , emit: versions
 
@@ -46,6 +46,8 @@ process BOWTIE_MAP_SEQ {
         --chunkmbs 2048 \\
         --un ${meta.id}_unmapped.fq -S > ${meta.id}.sam
 
+    samtools view -bS ${meta.id}.sam > ${meta.id}.bam
+
     if [ ! -f  "${meta.id}_unmapped.fq" ]
     then
         touch ${meta.id}_unmapped.fq
@@ -54,7 +56,6 @@ process BOWTIE_MAP_SEQ {
     mkdir unmapped
     mv  ${meta.id}_unmapped.fq.gz  unmapped/.
     bowtie --version 2>&1 | head -1 | sed 's/^.*version //' > ${software}.version.txt
-
     """
 
 }
