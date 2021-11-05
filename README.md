@@ -79,7 +79,7 @@ The nf-core/smrnaseq pipeline comes with documentation about the pipeline [usage
 
 nf-core/smrnaseq was originally written for use at the [National Genomics Infrastructure](https://portal.scilifelab.se/genomics/) at [SciLifeLab](http://www.scilifelab.se/) in Stockholm, Sweden, by Phil Ewels ([@ewels](https://github.com/ewels)), Chuan Wang ([@chuan-wang](https://github.com/chuan-wang)) and Rickard Hammarén ([@Hammarn](https://github.com/hammarn)).
 
-Lorena Pantano (@lpantano) from MIT updated the pipeline to Nextflow DSL2.
+Lorena Pantano ([@lpantano](https://github.com/lpantano)) from MIT updated the pipeline to Nextflow DSL2.
 
 ## Contributions and Support
 
