@@ -1,5 +1,5 @@
 // Import generic module functions
-include { saveFiles; initOptions; getSoftwareName } from './functions'
+include { saveFiles; initOptions; getSoftwareName; getProcessName } from './functions'
 
 params.options = [:]
 options        = initOptions(params.options)
@@ -19,17 +19,20 @@ process SEQCLUSTER_SEQUENCES {
     tuple val(meta), path(reads)
 
     output:
-    tuple val(meta), path("final/*.fastq.gz")    , emit: collapsed
-    path "*.version.txt" , emit: versions
+    tuple val(meta), path("final/*.fastq.gz"), emit: collapsed
+    path "versions.yml"                      , emit: versions
 
     script:
-    def software = getSoftwareName(task.process)
     """
     seqcluster collapse -f $reads -m 1 --min_size 15 -o collapsed
     gzip collapsed/*_trimmed.fastq
     mkdir final
     mv collapsed/*.fastq.gz final/.
-    echo \$(seqcluster --version 2>&1) | sed 's/^.*seqcluster //' > ${software}.version.txt
+
+    cat <<-END_VERSIONS > versions.yml
+    ${getProcessName(task.process)}:
+        ${getSoftwareName(task.process)}: \$(echo \$(seqcluster --version 2>&1) | sed 's/^.*seqcluster //')
+    END_VERSIONS
     """
 
 }

@@ -1,15 +1,13 @@
 // Import generic module functions
-include { saveFiles; initOptions; getSoftwareName } from './functions'
+include { saveFiles; getSoftwareName; getProcessName } from './functions'
 
 params.options = [:]
-options        = initOptions(params.options)
 
 process BOWTIE_MAP_SEQ {
-    label 'process_medium'
     tag "$meta.id"
-
+    label 'process_medium'
     publishDir "${params.outdir}",
-        mode: params.publish_dir_mode,
+        mode: params.publish_dir_mode, //TODO check for suffix, is working? needs initOptions?
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"getSoftwareName(task.process)/${suffix}", meta:meta, publish_by_meta:['id']) }
 
     conda (params.enable_conda ? 'bioconda::bowtie=1.3.0-2 bioconda::samtools=1.13' : null)
@@ -24,16 +22,14 @@ process BOWTIE_MAP_SEQ {
     path index
 
     output:
-    tuple val(meta), path("*bam"), emit: bam
-    tuple val(meta), path('unmapped/*fq.gz') , emit: unmapped
-    path "*.version.txt" , emit: versions
+    tuple val(meta), path("*bam")           , emit: bam
+    tuple val(meta), path('unmapped/*fq.gz'), emit: unmapped
+    path "versions.yml"                     , emit: versions
 
     script:
-    def software = getSoftwareName(task.process)
-    def process_name = task.process.tokenize(':')[-1]
+    // def process_name = task.process.tokenize(':')[-1] //TODO check if is still needed
     def index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     """
-
     bowtie \\
         -x $index_base \\
         -q <(zcat $reads) \\
@@ -55,7 +51,12 @@ process BOWTIE_MAP_SEQ {
     gzip ${meta.id}_unmapped.fq
     mkdir unmapped
     mv  ${meta.id}_unmapped.fq.gz  unmapped/.
-    bowtie --version 2>&1 | head -1 | sed 's/^.*version //' > ${software}.version.txt
+
+    cat <<-END_VERSIONS > versions.yml
+    ${getProcessName(task.process)}:
+        ${getSoftwareName(task.process)}: \$(echo \$(bowtie --version 2>&1) | sed 's/^.*bowtie-align-s version //; s/ .*\$//')
+        samtools: \$(echo \$(samtools --version 2>&1) | sed 's/^.*samtools //; s/Using.*\$//')
+    END_VERSIONS
     """
 
 }

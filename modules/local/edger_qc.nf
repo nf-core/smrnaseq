@@ -22,18 +22,17 @@ process EDGER {
     path input_files
 
     output:
-    path '*.{txt,pdf,csv}' , emit: edger_files
-    path "*version.txt" , emit: versions
+    path '*.{txt,pdf,csv}', emit: edger_files
+    path "versions.yml"   , emit: versions
 
     script:
-    def software = getSoftwareName(task.process)
     """
     edgeR_miRBase.r $input_files
-    cat <<-END_VERSIONS >> edgeR.version.txt
-    \$(Rscript -e "library(edgeR); cat(as.character(packageVersion('edgeR')))")
-    END_VERSIONS
-    cat <<-END_VERSIONS >> limma.version.txt
-    \$(Rscript -e "library(limma); cat(as.character(packageVersion('limma')))")
+
+    cat <<-END_VERSIONS > versions.yml
+    ${getProcessName(task.process)}:
+        r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
+        limma: \$(Rscript -e "library(limma); cat(as.character(packageVersion('limma')))")
     END_VERSIONS
     """
 

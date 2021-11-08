@@ -49,31 +49,25 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 def modules = params.modules.clone()
 
 //
-// MODULE: Local to the pipeline
-//
-include { GET_SOFTWARE_VERSIONS } from '../modules/local/get_software_versions' addParams( options: [publish_files : ['tsv':'']] )
-
-//
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
 def trimgalore_options    = modules['trimgalore']
 if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
 if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
 
-include { INPUT_CHECK } from '../subworkflows/local/input_check' addParams( options: [:] )
+include { INPUT_CHECK       } from '../subworkflows/local/input_check' addParams( options: [:] )
 include { FASTQC_TRIMGALORE } from '../subworkflows/nf-core/fastqc_trimgalore' addParams( fastqc_options: modules['fastqc'], trimgalore_options: trimgalore_options )
-include { MIRNA_QUANT } from '../subworkflows/local/mirna_quant' addParams( samtools_options: modules['samtools_view'], map_options: modules['map_mirna'],
-                                                                            samtools_sort_options: modules['samtools_sort'],
-                                                                            samtools_index_options: modules['samtools_index'],
-                                                                            samtools_stats_options: modules['samtools_index'],
-                                                                            table_merge_options: modules['table_merge'] )
-include { GENOME_QUANT } from '../subworkflows/local/genome_quant' addParams( samtools_options: modules['samtools_view'], map_options: modules['map_mirna'],
-                                                                            samtools_sort_options: modules['samtools_sort'],
-                                                                            samtools_index_options: modules['samtools_index'],
-                                                                            samtools_stats_options: modules['samtools_index'] )
+include { MIRNA_QUANT       } from '../subworkflows/local/mirna_quant'         addParams( samtools_options: modules['samtools_view'], map_options: modules['map_mirna'],
+                                                                                samtools_sort_options: modules['samtools_sort'],
+                                                                                samtools_index_options: modules['samtools_index'],
+                                                                                samtools_stats_options: modules['samtools_index'],
+                                                                                table_merge_options: modules['table_merge'] )
+include { GENOME_QUANT      } from '../subworkflows/local/genome_quant'        addParams( samtools_options: modules['samtools_view'], map_options: modules['map_mirna'],
+                                                                                samtools_sort_options: modules['samtools_sort'],
+                                                                                samtools_index_options: modules['samtools_index'],
+                                                                                samtools_stats_options: modules['samtools_index'] )
 include { MIRTRACE } from '../subworkflows/local/mirtrace'
 include { MIRDEEP2 } from '../subworkflows/local/mirdeep2'
-
 
 /*
 ========================================================================================
@@ -84,12 +78,14 @@ include { MIRDEEP2 } from '../subworkflows/local/mirdeep2'
 def multiqc_options   = modules['multiqc']
 multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
 def cat_fastq_options          = modules['cat_fastq']
+
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main' addParams( options: cat_fastq_options   )
-include { FASTQC  } from '../modules/nf-core/modules/fastqc/main'  addParams( options: modules['fastqc'] )
-include { MULTIQC } from '../modules/nf-core/modules/multiqc/main' addParams( options: multiqc_options   )
+include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main' addParams( options: cat_fastq_options )
+include { FASTQC    } from '../modules/nf-core/modules/fastqc/main'    addParams( options: modules['fastqc'] )
+include { MULTIQC   } from '../modules/nf-core/modules/multiqc/main'   addParams( options: multiqc_options )
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main' addParams( options: [publish_files : ['_versions.yml':'']] )
 
 /*
 ========================================================================================
@@ -102,14 +98,16 @@ def multiqc_report = []
 
 workflow SMRNASEQ {
 
-    ch_software_versions = Channel.empty()
+    ch_versions = Channel.empty()
 
     //
     // SUBWORKFLOW: Read in samplesheet, validate and stage input files
     //
     INPUT_CHECK (
         ch_input
-    ).map {
+    )
+    .reads
+    .map {
         meta, fastq ->
             meta.id = meta.id.split('_')[0..-2].join('_')
             [ meta, fastq ] }
@@ -124,6 +122,7 @@ workflow SMRNASEQ {
                 return [ meta, fastq.flatten() ]
     }
     .set { ch_fastq }
+    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
 
     //
     // MODULE: Concatenate FastQ files from same sample if required
@@ -131,15 +130,16 @@ workflow SMRNASEQ {
     CAT_FASTQ (
         ch_fastq.multiple
     )
-    CAT_FASTQ.out.reads
+    .reads
     .mix(ch_fastq.single)
     .set { ch_cat_fastq }
+    ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
     //
     // SUBWORKFLOW: mirtrace QC
     //
     MIRTRACE (ch_cat_fastq)
-    ch_software_versions = ch_software_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
+    ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
 
 
     //
@@ -150,8 +150,7 @@ workflow SMRNASEQ {
         params.skip_fastqc || params.skip_qc,
         params.skip_trimming
     )
-    ch_software_versions = ch_software_versions.mix(FASTQC_TRIMGALORE.out.fastqc_versions.first().ifEmpty(null))
-    ch_software_versions = ch_software_versions.mix(FASTQC_TRIMGALORE.out.trimgalore_versions.first().ifEmpty(null))
+    ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
     reads_for_mirna = FASTQC_TRIMGALORE.out.reads
     MIRNA_QUANT (
@@ -160,11 +159,7 @@ workflow SMRNASEQ {
         mirna_gtf,
         reads_for_mirna
     )
-    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.bowtie_versions.ifEmpty(null))
-    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.samtools_versions.first().ifEmpty(null))
-    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.seqcluster_versions.first().ifEmpty(null))
-    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.mirtop_versions.ifEmpty(null))
-    ch_software_versions = ch_software_versions.mix(MIRNA_QUANT.out.merge_versions.ifEmpty(null))
+    ch_versions = ch_versions.mix(MIRNA_QUANT.out.versions.ifEmpty(null))
 
     //
     // GENOME
@@ -175,28 +170,20 @@ workflow SMRNASEQ {
         GENOME_QUANT ( fasta_ch, bt_index, MIRNA_QUANT.out.unmapped )
         GENOME_QUANT.out.stats
             .set { genome_stats }
+        ch_versions = ch_versions.mix(GENOME_QUANT.out.versions.first().ifEmpty(null))
+
         MIRDEEP2 (FASTQC_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta, GENOME_QUANT.out.indices, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
-
-        ch_software_versions = ch_software_versions.mix(MIRDEEP2.out.versions_prepare.first().ifEmpty(null))
-        ch_software_versions = ch_software_versions.mix(MIRDEEP2.out.versions_mapper.first().ifEmpty(null))
-        ch_software_versions = ch_software_versions.mix(MIRDEEP2.out.versions_run.first().ifEmpty(null))
-
+        ch_versions = ch_versions.mix(MIRDEEP2.out.versions.first().ifEmpty(null))
     }
+
+    ch_versions.unique().collectFile().view()
 
     //
     // MODULE: Pipeline reporting
     //
-    // ch_software_versions
-    //     .map { it -> if (it) [ it.baseName, it ] }
-    //     .groupTuple()
-    //     .map { it[1][0] }
-    //     .flatten()
-    //     .collect()
-    //     .set { ch_software_versions }
-
-    // GET_SOFTWARE_VERSIONS (
-    //     ch_software_versions.map { it }.collect()
-    // )
+    CUSTOM_DUMPSOFTWAREVERSIONS (
+        ch_versions.unique().collectFile()
+    )
 
     //
     // MODULE: MultiQC
@@ -206,9 +193,10 @@ workflow SMRNASEQ {
 
     ch_multiqc_files = Channel.empty()
     ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
+    ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
     ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-    // ch_multiqc_files = ch_multiqc_files.mix(GET_SOFTWARE_VERSIONS.out.yaml.collect())
+
     ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
     ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
@@ -220,7 +208,6 @@ workflow SMRNASEQ {
         ch_multiqc_files.collect()
     )
     multiqc_report       = MULTIQC.out.report.toList()
-    ch_software_versions = ch_software_versions.mix(MULTIQC.out.versions.ifEmpty(null))
 }
 
 /*

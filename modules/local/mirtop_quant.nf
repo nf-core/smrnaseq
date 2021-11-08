@@ -1,8 +1,7 @@
 // Import generic module functions
-include { saveFiles; initOptions; getSoftwareName } from './functions'
+include { saveFiles; getSoftwareName; getProcessName } from './functions'
 
 params.options = [:]
-options        = initOptions(params.options)
 
 process MIRTOP_QUANT {
     label 'process_medium'
@@ -26,20 +25,23 @@ process MIRTOP_QUANT {
 
     output:
     path "mirtop/mirtop.gff"
-    path "mirtop/mirtop.tsv", emit: mirtop_table
+    path "mirtop/mirtop.tsv"        , emit: mirtop_table
     path "mirtop/mirtop_rawData.tsv"
-    path "mirtop/stats/*", emit: logs
-    path "*.version.txt" , emit: versions
+    path "mirtop/stats/*"           , emit: logs
+    path "versions.yml"             , emit: versions
 
     script:
-    def software = getSoftwareName(task.process)
     """
     mirtop gff --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species ./bams/*
     mirtop counts --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species --add-extra --gff mirtop/mirtop.gff
     mirtop export --format isomir --hairpin $hairpin --gtf $gtf --sps $params.mirtrace_species -o mirtop mirtop/mirtop.gff
     mirtop stats mirtop/mirtop.gff --out mirtop/stats
     mv mirtop/stats/mirtop_stats.log mirtop/stats/full_mirtop_stats.log
-    echo \$(mirtop --version 2>&1) | sed 's/^.*mirtop //' > ${software}.version.txt
+
+    cat <<-END_VERSIONS > versions.yml
+    ${getProcessName(task.process)}:
+        ${getSoftwareName(task.process)}: \$(echo \$(mirtop --version 2>&1) | sed 's/^.*mirtop //')
+    END_VERSIONS
     """
 
 }
