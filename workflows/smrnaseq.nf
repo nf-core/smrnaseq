@@ -170,13 +170,13 @@ workflow SMRNASEQ {
         GENOME_QUANT ( fasta_ch, bt_index, MIRNA_QUANT.out.unmapped )
         GENOME_QUANT.out.stats
             .set { genome_stats }
-        ch_versions = ch_versions.mix(GENOME_QUANT.out.versions.first().ifEmpty(null))
+        ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
-        MIRDEEP2 (FASTQC_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta, GENOME_QUANT.out.indices, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
-        ch_versions = ch_versions.mix(MIRDEEP2.out.versions.first().ifEmpty(null))
+        if (!params.skip_mirdeep) {
+            MIRDEEP2 (FASTQC_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta, GENOME_QUANT.out.indices, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
+            ch_versions = ch_versions.mix(MIRDEEP2.out.versions)
+        }
     }
-
-    ch_versions.unique().collectFile().view()
 
     //
     // MODULE: Pipeline reporting

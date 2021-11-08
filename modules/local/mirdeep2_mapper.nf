@@ -20,9 +20,6 @@ process MIRDEEP2_MAPPER {
         container "quay.io/biocontainers/mirdeep2:2.0.1.3--hdfd78af_1"
     }
 
-    when:
-    !params.skip_mirdeep  // TODO ? I think it would be better to have this logic outside the module
-
     input:
     tuple val(meta), path(reads)
     path index

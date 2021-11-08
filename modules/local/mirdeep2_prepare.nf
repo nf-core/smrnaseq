@@ -1,5 +1,5 @@
 // Import generic module functions
-include { saveFiles; initOptions; getSoftwareName } from './functions'
+include { saveFiles; initOptions; getProcessName } from './functions'
 
 params.options = [:]
 
@@ -14,8 +14,6 @@ process MIRDEEP2_PIGZ {
     } else {
         container "quay.io/biocontainers/bioconvert:0.4.3--py_0"
     }
-    when:
-    !params.skip_mirdeep  // TODO ? I think it would be better to have this logic outside the module
 
     input:
     tuple val(meta), path(reads)
@@ -29,6 +27,7 @@ process MIRDEEP2_PIGZ {
     """
     pigz -f -d -p $task.cpus $reads
 
+    cat <<-END_VERSIONS > versions.yml
     ${getProcessName(task.process)}:
         pigz: \$( pigz --version 2>&1 | sed 's/pigz //g' )
     END_VERSIONS

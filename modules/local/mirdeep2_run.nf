@@ -20,9 +20,6 @@ process MIRDEEP2_RUN {
         container "quay.io/biocontainers/mirdeep2:2.0.1.3--hdfd78af_1"
     }
 
-    when:
-    !params.skip_mirdeep // TODO ? I think it would be better to have this logic outside the module
-
     input:
     path fasta
     tuple path(reads), path(arf)
@@ -30,8 +27,8 @@ process MIRDEEP2_RUN {
     path mature
 
     output:
-    path 'result*.{bed,csv,html}'
-    path "*.version.txt" , emit: versions
+    path 'result*.{bed,csv,html}', emit: result
+    path "versions.yml"          , emit: versions
 
     script:
     """

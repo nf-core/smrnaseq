@@ -4,9 +4,9 @@
 
 params.options = [:]
 
-include { MIRDEEP2_PIGZ } from '../../modules/local/mirdeep2_prepare'
+include { MIRDEEP2_PIGZ   } from '../../modules/local/mirdeep2_prepare'
 include { MIRDEEP2_MAPPER } from '../../modules/local/mirdeep2_mapper'
-include { MIRDEEP2_RUN } from '../../modules/local/mirdeep2_run'
+include { MIRDEEP2_RUN    } from '../../modules/local/mirdeep2_run'
 
 workflow MIRDEEP2 {
     take:
@@ -19,6 +19,7 @@ workflow MIRDEEP2 {
     main:
 
     ch_versions = Channel.empty()
+
     MIRDEEP2_PIGZ ( reads )
     ch_versions = ch_versions.mix(MIRDEEP2_PIGZ.out.versions.first())
 
