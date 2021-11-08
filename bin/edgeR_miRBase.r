@@ -4,44 +4,44 @@
 args = commandArgs(trailingOnly=TRUE)
 
 input <- as.character(args[1:length(args)])
+# .libPaths( c( ".",  .libPaths()) )
+# install.packages("BiocManager", dependencies=TRUE, repos='http://cloud.r-project.org/')
 
-# Load / install required packages
-if (!require("limma")){
-    source("http://bioconductor.org/biocLite.R")
-    biocLite("limma", suppressUpdates=TRUE)
-    library("limma")
-}
+# # Load / install required packages
+# if (!require("limma")){
+#     BiocManager::install("limma", suppressUpdates=TRUE)
+#     library("limma")
+# }
 
-if (!require("edgeR")){
-    source("http://bioconductor.org/biocLite.R")
-    biocLite("edgeR", suppressUpdates=TRUE)
-    library("edgeR")
-}
+# if (!require("edgeR")){
+#     BiocManager::install("edgeR", suppressUpdates=TRUE)
+#     library("edgeR")
+# }
 
-if (!require("statmod")){
-    install.packages("statmod", dependencies=TRUE, repos='http://cloud.r-project.org/')
-    library("statmod")
-}
+# if (!require("statmod")){
+#     install.packages("statmod", dependencies=TRUE, repos='http://cloud.r-project.org/')
+#     library("statmod")
+# }
 
-if (!require("data.table")){
-    install.packages("data.table", dependencies=TRUE, repos='http://cloud.r-project.org/')
-    library("data.table")
-}
+# if (!require("data.table")){
+#     install.packages("data.table", dependencies=TRUE, repos='http://cloud.r-project.org/')
+#     library("data.table")
+# }
 
-if (!require("gplots")) {
-    install.packages("gplots", dependencies=TRUE, repos='http://cloud.r-project.org/')
-    library("gplots")
-}
+# if (!require("gplots")) {
+#     install.packages("gplots", dependencies=TRUE, repos='http://cloud.r-project.org/')
+#     library("gplots")
+# }
 
-if (!require("methods")) {
-    install.packages("methods", dependencies=TRUE, repos='http://cloud.r-project.org/')
-    library("methods")
-}
+# if (!require("methods")) {
+#     install.packages("methods", dependencies=TRUE, repos='http://cloud.r-project.org/')
+#     library("methods")
+# }
 
 # Put mature and hairpin count files in separated file lists
 filelist<-list()
-filelist[[1]]<-input[grep(".mature.stats",input)]
-filelist[[2]]<-input[grep(".hairpin.stats",input)]
+filelist[[1]]<-input[grep(".mature.*stats",input)]
+filelist[[2]]<-input[grep(".hairpin.*stats",input)]
 names(filelist)<-c("mature","hairpin")
 print(filelist)
 
@@ -74,14 +74,14 @@ for (i in 1:2) {
     if (nr_keep > 0){
         data<-data[!row_sub,]
     }
-    
+
     write.csv(t(data),file=paste(header,"_counts.csv",sep=""))
 
     # Normalization
     dataDGE<-DGEList(counts=data,genes=rownames(data))
     o <- order(rowSums(dataDGE$counts), decreasing=TRUE)
     dataDGE <- dataDGE[o,]
-                    
+
     # Save log10(TPM)
     tpm = cpm(dataDGE, normalized.lib.sizes=F, log = F, prior.count = 0.001)
     tpm = tpm + 0.001
@@ -89,7 +89,7 @@ for (i in 1:2) {
     ttpm = t(tpm)
     write.table(ttpm,file=paste(header,"_logtpm.txt",sep=""),sep='\t',quote=FALSE)
     write.csv(ttpm,file=paste(header,"_logtpm.csv",sep=""))
-                    
+
     # TMM
     dataNorm <- calcNormFactors(dataDGE)
 
