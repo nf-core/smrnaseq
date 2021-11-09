@@ -4,11 +4,6 @@
 ========================================================================================
 */
 
-def valid_params = [
-    protocol          : ['illumina', 'cats', 'qiaseq', 'nextflex'],
-    mirtrace_protocol : ['illumina', 'cats', 'qiaseq', 'nextflex']
-]
-
 def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 
 // Validate input parameters
