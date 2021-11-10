@@ -1,14 +1,15 @@
 // Import generic module functions
-include { saveFiles; getSoftwareName; getProcessName } from './functions'
+include { saveFiles; initOptions; getSoftwareName; getProcessName } from './functions'
 
 params.options = [:]
+options        = initOptions(params.options)
 
 process BOWTIE_MAP_SEQ {
     tag "$meta.id"
     label 'process_medium'
     publishDir "${params.outdir}",
-        mode: params.publish_dir_mode, //TODO check for suffix, is working? needs initOptions?
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"getSoftwareName(task.process)/${suffix}", meta:meta, publish_by_meta:['id']) }
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"index/${options.suffix}", meta:meta, publish_by_meta:['id']) }
 
     conda (params.enable_conda ? 'bioconda::bowtie=1.3.0-2 bioconda::samtools=1.13' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
@@ -27,7 +28,6 @@ process BOWTIE_MAP_SEQ {
     path "versions.yml"                     , emit: versions
 
     script:
-    // def process_name = task.process.tokenize(':')[-1] //TODO check if is still needed
     def index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     """
     bowtie \\
