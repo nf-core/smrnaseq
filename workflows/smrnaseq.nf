@@ -27,7 +27,7 @@ mirtrace_species_from_species = params.genome ? params.genomes[ params.genome ].
 mirtrace_species = params.mirtrace_species ?: mirtrace_species_from_species
 fasta_from_species = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 fasta = params.fasta ?: fasta_from_species
-mirna_gtf_from_species = params.mirtrace_species ? "ftp://mirbase.org/pub/mirbase/CURRENT/genomes/${params.mirtrace_species}.gff3" : false
+mirna_gtf_from_species = params.mirtrace_species ? "https://mirbase.org/ftp/CURRENT/genomes/${params.mirtrace_species}.gff3" : false
 mirna_gtf = params.mirna_gtf ? params.mirna_gtf : mirna_gtf_from_species
 
 /*
