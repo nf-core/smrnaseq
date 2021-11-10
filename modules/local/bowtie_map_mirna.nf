@@ -13,7 +13,7 @@ process BOWTIE_MAP_SEQ {
 
     conda (params.enable_conda ? 'bioconda::bowtie=1.3.0-2 bioconda::samtools=1.13' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/mulled-v2-ffbf83a6b0ab6ec567a336cf349b80637135bca3:ceb75475f8597dac517752704af5a11715e6878f-0"
+        container "https://depot.galaxyproject.org/singularity/mulled-v2-ffbf83a6b0ab6ec567a336cf349b80637135bca3:40128b496751b037e2bd85f6789e83d4ff8a4837-0"
     } else {
         container "quay.io/biocontainers/mulled-v2-ffbf83a6b0ab6ec567a336cf349b80637135bca3:40128b496751b037e2bd85f6789e83d4ff8a4837-0"
     }
