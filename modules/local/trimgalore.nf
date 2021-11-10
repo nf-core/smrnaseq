@@ -1,8 +1,7 @@
 // Import generic module functions
-include { saveFiles; initOptions; getSoftwareName; getProcessName } from './functions'
+include { saveFiles; getSoftwareName; getProcessName } from './functions'
 
 params.options = [:]
-options        = initOptions(params.options)
 
 process TRIMGALORE {
     tag "$meta.id"
