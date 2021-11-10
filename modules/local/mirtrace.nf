@@ -28,7 +28,7 @@ process MIRTRACE_RUN {
     script:
     def three_prime_adapter = params.three_prime_adapter
     // Presets
-    if (params.protocol == "illumina"){
+    if (params.protocol == "illumina"){ //TODO
         three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"
     } else if (params.protocol == "nextflex"){
         three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"

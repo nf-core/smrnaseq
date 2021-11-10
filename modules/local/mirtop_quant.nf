@@ -14,7 +14,6 @@ process MIRTOP_QUANT {
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
         container "https://depot.galaxyproject.org/singularity/mulled-v2-1f73c7bc18ac86871db9ef0a657fb39d6cbe1cf5:dd7c9649e165d535c1dd2c162ec900e7206398ec-0"
     } else {
-        // container "nfcore/smrnaseq:dev"
         container "quay.io/biocontainers/mulled-v2-1f73c7bc18ac86871db9ef0a657fb39d6cbe1cf5:dd7c9649e165d535c1dd2c162ec900e7206398ec-0"
     }
 
