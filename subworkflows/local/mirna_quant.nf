@@ -29,7 +29,7 @@ include { SEQCLUSTER_SEQUENCES } from '../../modules/local/seqcluster_collapse.n
 include { MIRTOP_QUANT } from '../../modules/local/mirtop_quant.nf'
 include { TABLE_MERGE } from '../../modules/local/datatable_merge.nf' addParams( options: params.table_merge_options )
 
-include { EDGER }  from '../../modules/local/edger_qc.nf'
+include { EDGER_QC }  from '../../modules/local/edger_qc.nf'
 
 workflow MIRNA_QUANT {
     take:
@@ -66,7 +66,6 @@ workflow MIRNA_QUANT {
         .set { reads_mirna }
 
     BOWTIE_MAP_MATURE ( reads_mirna, mature_bowtie.collect() )
-    // SAMTOOLS_VIEW_MATURE ( BOWTIE_MAP_MATURE.out.sam, FORMAT_MATURE.out.formatted_fasta  )
     ch_versions = ch_versions.mix(BOWTIE_MAP_MATURE.out.versions)
 
     BOWTIE_MAP_MATURE.out.unmapped
@@ -84,11 +83,13 @@ workflow MIRNA_QUANT {
     BAM_STATS_HAIRPIN ( BOWTIE_MAP_HAIRPIN.out.bam, FORMAT_HAIRPIN.out.formatted_fasta )
     ch_versions = ch_versions.mix(BAM_STATS_HAIRPIN.out.versions)
 
-    BAM_STATS_MATURE.out.stats.collect{it[1]}
-        .mix(BAM_STATS_HAIRPIN.out.stats.collect{it[1]})
+    BAM_STATS_MATURE.out.idxstats.collect{it[1]}
+        .mix(BAM_STATS_HAIRPIN.out.idxstats.collect{it[1]})
         .dump(tag:'edger')
+        .flatten()
+        .collect()
         .set { edger_input }
-    // TODO EDGER ( edger_input.flatten().collect() )
+    EDGER_QC ( edger_input )
 
     reads
         .map { add_suffix(it, "seqcluster") }

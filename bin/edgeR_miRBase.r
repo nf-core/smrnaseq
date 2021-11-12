@@ -4,44 +4,17 @@
 args = commandArgs(trailingOnly=TRUE)
 
 input <- as.character(args[1:length(args)])
-# .libPaths( c( ".",  .libPaths()) )
-# install.packages("BiocManager", dependencies=TRUE, repos='http://cloud.r-project.org/')
-
-# # Load / install required packages
-# if (!require("limma")){
-#     BiocManager::install("limma", suppressUpdates=TRUE)
-#     library("limma")
-# }
-
-# if (!require("edgeR")){
-#     BiocManager::install("edgeR", suppressUpdates=TRUE)
-#     library("edgeR")
-# }
-
-# if (!require("statmod")){
-#     install.packages("statmod", dependencies=TRUE, repos='http://cloud.r-project.org/')
-#     library("statmod")
-# }
-
-# if (!require("data.table")){
-#     install.packages("data.table", dependencies=TRUE, repos='http://cloud.r-project.org/')
-#     library("data.table")
-# }
-
-# if (!require("gplots")) {
-#     install.packages("gplots", dependencies=TRUE, repos='http://cloud.r-project.org/')
-#     library("gplots")
-# }
-
-# if (!require("methods")) {
-#     install.packages("methods", dependencies=TRUE, repos='http://cloud.r-project.org/')
-#     library("methods")
-# }
+library("limma")
+library("edgeR")
+library("statmod")
+library("data.table")
+library("gplots")
+library("methods")
 
 # Put mature and hairpin count files in separated file lists
 filelist<-list()
-filelist[[1]]<-input[grep(".mature.*stats",input)]
-filelist[[2]]<-input[grep(".hairpin.*stats",input)]
+filelist[[1]]<-input[grep(".mature.sorted",input)]
+filelist[[2]]<-input[grep(".hairpin.sorted",input)]
 names(filelist)<-c("mature","hairpin")
 print(filelist)
 
@@ -53,12 +26,11 @@ for (i in 1:2) {
     unmapped<-do.call("cbind", lapply(filelist[[i]], fread, header=FALSE, select=c(4)))
     data<-as.data.frame(data)
     unmapped<-as.data.frame(unmapped)
-
     temp <- fread(filelist[[i]][1],header=FALSE, select=c(1))
     rownames(data)<-temp$V1
     rownames(unmapped)<-temp$V1
-    colnames(data)<-gsub(".stats","",basename(filelist[[i]]))
-    colnames(unmapped)<-gsub(".stats","",basename(filelist[[i]]))
+    colnames(data)<-gsub("_mature.*","",basename(filelist[[i]]))
+    colnames(unmapped)<-gsub("_mature.*","",basename(filelist[[i]]))
 
     data<-data[rownames(data)!="*",,drop=FALSE]
     unmapped<-unmapped[rownames(unmapped)=="*",,drop=FALSE]
@@ -114,7 +86,7 @@ for (i in 1:2) {
         write.table(MDSdata$distance.matrix, paste(header,"_edgeR_MDS_distance_matrix.txt",sep=""), quote=FALSE, sep="\t")
 
         # Print plot x,y co-ordinates to file
-        MDSxy = MDSdata$cmdscale.out
+        MDSxy = data.frame(x=MDSdata$x, y=MDSdata$y)
         colnames(MDSxy) = c(paste(MDSdata$axislabel, '1'), paste(MDSdata$axislabel, '2'))
 
         write.table(MDSxy, paste(header,"_edgeR_MDS_plot_coordinates.txt",sep=""), quote=FALSE, sep="\t")
