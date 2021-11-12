@@ -1,5 +1,5 @@
 //
-// Run SAMtools stats, flagstat and idxstats
+// Sort, index BAM file and run samtools stats, flagstat and idxstats
 //
 
 params.sort_options  = [:]
@@ -8,7 +8,7 @@ params.stats_options = [:]
 
 include { SAMTOOLS_SORT      } from '../../modules/nf-core/modules/samtools/sort/main'  addParams( options: params.sort_options  )
 include { SAMTOOLS_INDEX     } from '../../modules/nf-core/modules/samtools/index/main' addParams( options: params.index_options )
-include { BAM_STATS_SAMTOOLS } from './bam_stats'                                       addParams( options: params.stats_options )
+include { BAM_STATS_SAMTOOLS } from './bam_stats_samtools'                              addParams( options: params.stats_options )
 
 workflow BAM_SORT_SAMTOOLS {
     take:
@@ -25,7 +25,6 @@ workflow BAM_SORT_SAMTOOLS {
     SAMTOOLS_INDEX ( SAMTOOLS_SORT.out.bam )
     ch_versions = ch_versions.mix(SAMTOOLS_INDEX.out.versions.first())
 
-
     SAMTOOLS_SORT.out.bam
         .join(SAMTOOLS_INDEX.out.bai, by: [0], remainder: true)
         .join(SAMTOOLS_INDEX.out.csi, by: [0], remainder: true)
@@ -38,11 +37,18 @@ workflow BAM_SORT_SAMTOOLS {
                 }
         }
         .set { ch_bam_bai }
-    BAM_STATS_SAMTOOLS    ( ch_bam_bai, fasta )
+
+    BAM_STATS_SAMTOOLS ( ch_bam_bai, fasta )
+    ch_versions = ch_versions.mix(BAM_STATS_SAMTOOLS.out.versions)
 
     emit:
-    stats    = BAM_STATS_SAMTOOLS.out.stats       // channel: [ val(meta), [ stats ] ]
+    bam      = SAMTOOLS_SORT.out.bam           // channel: [ val(meta), [ bam ] ]
+    bai      = SAMTOOLS_INDEX.out.bai          // channel: [ val(meta), [ bai ] ]
+    csi      = SAMTOOLS_INDEX.out.csi          // channel: [ val(meta), [ csi ] ]
+
+    stats    = BAM_STATS_SAMTOOLS.out.stats    // channel: [ val(meta), [ stats ] ]
     flagstat = BAM_STATS_SAMTOOLS.out.flagstat // channel: [ val(meta), [ flagstat ] ]
     idxstats = BAM_STATS_SAMTOOLS.out.idxstats // channel: [ val(meta), [ idxstats ] ]
-    versions  = BAM_STATS_SAMTOOLS.out.versions     //    path: *.version.txt
+
+    versions = ch_versions                     // channel: [ versions.yml ]
 }

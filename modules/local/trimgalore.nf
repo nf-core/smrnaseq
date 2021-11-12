@@ -1,8 +1,7 @@
 // Import generic module functions
-include { saveFiles; initOptions; getSoftwareName } from './functions'
+include { saveFiles; getSoftwareName; getProcessName } from './functions'
 
 params.options = [:]
-options        = initOptions(params.options)
 
 process TRIMGALORE {
     tag "$meta.id"
@@ -25,7 +24,7 @@ process TRIMGALORE {
     output:
     tuple val(meta), path("*.fq.gz")    , emit: reads
     tuple val(meta), path("*report.txt"), emit: log
-    path "*.version.txt"                , emit: versions
+    path "versions.yml"                 , emit: versions
 
     tuple val(meta), path("*.html"), emit: html optional true
     tuple val(meta), path("*.zip") , emit: zip optional true
@@ -38,7 +37,6 @@ process TRIMGALORE {
         if (cores < 1) cores = 1
         if (cores > 4) cores = 4
     }
-    def software = getSoftwareName(task.process)
     def prefix   = "${meta.id}"
     // Define regular variables so that they can be overwritten
     def clip_r1 = params.clip_r1
@@ -76,6 +74,11 @@ process TRIMGALORE {
     """
     [ ! -f  ${prefix}.fastq.gz ] && ln -s $reads ${prefix}.fastq.gz
     trim_galore --cores $cores --adapter ${three_prime_adapter} $tg_length $c_r1 $tpc_r1 --max_length ${params.trim_galore_max_length} --gzip ${prefix}.fastq.gz
-    echo \$(trim_galore --version 2>&1) | sed 's/^.*version //; s/Last.*\$//' > ${software}.version.txt
+
+    cat <<-END_VERSIONS > versions.yml
+    ${getProcessName(task.process)}:
+        ${getSoftwareName(task.process)}: \$(echo \$(trim_galore --version 2>&1) | sed 's/^.*version //; s/Last.*\$//')
+        cutadapt: \$(cutadapt --version)
+    END_VERSIONS
     """
 }

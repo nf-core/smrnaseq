@@ -1,8 +1,7 @@
 // Import generic module functions
-include { saveFiles; initOptions; getSoftwareName } from './functions'
+include { saveFiles; getSoftwareName; getProcessName } from './functions'
 
 params.options = [:]
-options        = initOptions(params.options)
 
 process PARSE_FASTA_MIRNA {
     label 'process_medium'
@@ -18,10 +17,10 @@ process PARSE_FASTA_MIRNA {
     path fasta
 
     output:
-    path '*_igenome.fa' , emit: parsed_fasta
+    path '*_igenome.fa', emit: parsed_fasta
+    path "versions.yml", emit: versions
 
     script:
-    def software = getSoftwareName(task.process)
     """
     # Uncompress FASTA reference files if necessary
     FASTA="$fasta"
@@ -38,7 +37,10 @@ process PARSE_FASTA_MIRNA {
     seqkit grep -r --pattern \".*${params.mirtrace_species}-.*\" \${FASTA}_parsed.fa > \${FASTA}_sps.fa
     seqkit seq --rna2dna \${FASTA}_sps.fa > \${FASTA}_igenome.fa
 
-    #echo \$(seqkit --version 2>&1) | sed 's/^.*version //; s/Last.*\$//' > ${software}.version.txt
+    cat <<-END_VERSIONS > versions.yml
+    ${getProcessName(task.process)}:
+        seqkit: \$(echo \$(seqkit 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
+    END_VERSIONS
     """
 
 }

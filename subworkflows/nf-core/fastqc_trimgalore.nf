@@ -15,13 +15,14 @@ workflow FASTQC_TRIMGALORE {
     skip_trimming // boolean: true/false
 
     main:
-    fastqc_html    = Channel.empty()
-    fastqc_zip     = Channel.empty()
-    fastqc_versions = Channel.empty()
+
+    ch_versions = Channel.empty()
+    fastqc_html = Channel.empty()
+    fastqc_zip  = Channel.empty()
     if (!skip_fastqc) {
         FASTQC ( reads ).html.set { fastqc_html }
-        fastqc_zip     = FASTQC.out.zip
-        fastqc_versions = FASTQC.out.versions
+        fastqc_zip  = FASTQC.out.zip
+        ch_versions = ch_versions.mix(FASTQC.out.versions.first())
     }
 
     trim_reads = reads
@@ -31,21 +32,21 @@ workflow FASTQC_TRIMGALORE {
     trimgalore_versions = Channel.empty()
     if (!skip_trimming) {
         TRIMGALORE ( reads ).reads.set { trim_reads }
-        trim_html  = TRIMGALORE.out.html
-        trim_zip   = TRIMGALORE.out.zip
-        trim_log   = TRIMGALORE.out.log
-        trimgalore_versions = TRIMGALORE.out.versions
+        trim_html   = TRIMGALORE.out.html
+        trim_zip    = TRIMGALORE.out.zip
+        trim_log    = TRIMGALORE.out.log
+        ch_versions = ch_versions.mix(TRIMGALORE.out.versions.first())
     }
 
     emit:
-    reads = trim_reads // channel: [ val(meta), [ reads ] ]
+    reads = trim_reads     // channel: [ val(meta), [ reads ] ]
 
-    fastqc_html        // channel: [ val(meta), [ html ] ]
-    fastqc_zip         // channel: [ val(meta), [ zip ] ]
-    fastqc_versions     //    path: *.version.txt
+    fastqc_html            // channel: [ val(meta), [ html ] ]
+    fastqc_zip             // channel: [ val(meta), [ zip ] ]
 
-    trim_html          // channel: [ val(meta), [ html ] ]
-    trim_zip           // channel: [ val(meta), [ zip ] ]
-    trim_log           // channel: [ val(meta), [ txt ] ]
-    trimgalore_versions //    path: *.version.txt
+    trim_html              // channel: [ val(meta), [ html ] ]
+    trim_zip               // channel: [ val(meta), [ zip ] ]
+    trim_log               // channel: [ val(meta), [ txt ] ]
+
+    versions = ch_versions // channel: [ versions.yml ]
 }

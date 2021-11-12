@@ -1,11 +1,16 @@
 // Import generic module functions
-include { saveFiles; initOptions; getSoftwareName } from './functions'
+include { saveFiles; getProcessName } from './functions'
 
 params.options = [:]
-options        = initOptions(params.options)
+
+def VERSION = '0.0.14'
 
 process FORMAT_FASTA_MIRNA {
+    tag "$fasta"
     label 'process_medium'
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'genome', meta:[:], publish_by_meta:[]) }
 
     conda (params.enable_conda ? 'bioconda::fastx_toolkit=0.0.14-9' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
@@ -18,15 +23,16 @@ process FORMAT_FASTA_MIRNA {
     path fasta
 
     output:
-    path '*_idx.fa' , emit: formatted_fasta
-    //path "*.version.txt" , emit: versions
+    path '*_idx.fa'    , emit: formatted_fasta
+    path "versions.yml", emit: versions
 
     script:
-    def software = getSoftwareName(task.process)
     """
     fasta_formatter -w 0 -i $fasta -o ${fasta}_idx.fa
 
-    #echo \$(fasta_formatter --version 2>&1) | sed 's/^.*version //; s/Last.*\$//' > ${software}.version.txt
+    cat <<-END_VERSIONS > versions.yml
+    ${getProcessName(task.process)}:
+        fastx_toolkit:  \$(echo "$VERSION")
+    END_VERSIONS
     """
-
 }

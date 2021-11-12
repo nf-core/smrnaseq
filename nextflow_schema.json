@@ -73,7 +73,7 @@
                 "mirtrace_species": {
                     "type": "string",
                     "description": "Species for miRTrace.",
-                    "help_text": "This is automatically set when using `--genome`. Example values: `hsa`, `mmu`...\n Note that mirTrace relies on miRBase for its species reference. See available references [here](ftp://mirbase.org/pub/mirbase/CURRENT/genomes/).",
+                    "help_text": "This is automatically set when using `--genome`. Example values: `hsa`, `mmu`...\n Note that mirTrace relies on miRBase for its species reference. See available references [here](https://mirbase.org/ftp/CURRENT/genomes/).",
                     "fa_icon": "fas fa-journal-whills"
                 },
                 "fasta": {
@@ -85,7 +85,7 @@
                 "mirna_gtf": {
                     "type": "string",
                     "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
-                    "help_text": "miRBase `.gff3` file, typically downloaded from [`ftp://mirbase.org/pub/mirbase/CURRENT/genomes/`](ftp://mirbase.org/pub/mirbase/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
+                    "help_text": "miRBase `.gff3` file, typically downloaded from [`https://mirbase.org/ftp/CURRENT/genomes/`](https://mirbase.org/ftp/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
                     "fa_icon": "fas fa-address-book"
                 },
                 "mature": {
@@ -93,14 +93,14 @@
                     "description": "Path to FASTA file with mature miRNAs.",
                     "fa_icon": "fas fa-wheelchair",
                     "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
-                    "default": "ftp://mirbase.org/pub/mirbase/CURRENT/mature.fa.gz"
+                    "default": "https://mirbase.org/ftp/CURRENT/mature.fa.gz"
                 },
                 "hairpin": {
                     "type": "string",
                     "description": "Path to FASTA file with miRNAs precursors.",
                     "fa_icon": "fab fa-cuttlefish",
                     "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
-                    "default": "ftp://mirbase.org/pub/mirbase/CURRENT/hairpin.fa.gz"
+                    "default": "https://mirbase.org/ftp/CURRENT/hairpin.fa.gz"
                 },
                 "bt_indices": {
                     "type": "string",

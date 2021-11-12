@@ -1,5 +1,6 @@
 lint:
   files_unchanged:
+    - .github/CONTRIBUTING.md
     - .markdownlint.yml
     - assets/email_template.html
     - assets/email_template.txt
@@ -8,3 +9,4 @@ lint:
   files_exist:
     - bin/scrape_software_versions.py
     - modules/local/get_software_versions.nf
+
