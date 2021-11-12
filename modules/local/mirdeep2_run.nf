@@ -1,8 +1,9 @@
 // Import generic module functions
-include { saveFiles; initOptions; getSoftwareName } from './functions'
+include { saveFiles; getSoftwareName; getProcessName } from './functions'
 
 params.options = [:]
-options        = initOptions(params.options)
+
+def VERSION = '2.0.1'
 
 process MIRDEEP2_RUN {
     label 'process_medium'
@@ -10,7 +11,7 @@ process MIRDEEP2_RUN {
 
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:[:], publish_by_meta:[]) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:[:], publish_by_meta:['id']) }
 
     conda (params.enable_conda ? 'bioconda::mirdeep2:2.0.1' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
@@ -19,9 +20,6 @@ process MIRDEEP2_RUN {
         container "quay.io/biocontainers/mirdeep2:2.0.1.3--hdfd78af_1"
     }
 
-    when:
-    !params.skip_mirdeep
-
     input:
     path fasta
     tuple path(reads), path(arf)
@@ -29,11 +27,10 @@ process MIRDEEP2_RUN {
     path mature
 
     output:
-    path 'result*.{bed,csv,html}'
-    path "*.version.txt" , emit: versions
+    path 'result*.{bed,csv,html}', emit: result
+    path "versions.yml"          , emit: versions
 
     script:
-    def software = getSoftwareName(task.process)
     """
     miRDeep2.pl \\
     $reads \\
@@ -44,7 +41,11 @@ process MIRDEEP2_RUN {
     $hairpin \\
     -d \\
     -z _${reads.simpleName}
-    echo "2.0.1" > ${software}.version.txt
+
+    cat <<-END_VERSIONS > versions.yml
+    ${getProcessName(task.process)}:
+        ${getSoftwareName(task.process)}: \$(echo "$VERSION")
+    END_VERSIONS
     """
 }
 

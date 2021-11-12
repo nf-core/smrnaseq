@@ -23,6 +23,4 @@ workflow MIRTRACE {
     emit:
     results    = MIRTRACE_RUN.out.mirtrace
     versions   = MIRTRACE_RUN.out.versions
-
-
 }

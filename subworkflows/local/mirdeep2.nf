@@ -4,9 +4,9 @@
 
 params.options = [:]
 
-include { MIRDEEP2_PIGZ } from '../../modules/local/mirdeep2_prepare'
+include { MIRDEEP2_PIGZ   } from '../../modules/local/mirdeep2_prepare'
 include { MIRDEEP2_MAPPER } from '../../modules/local/mirdeep2_mapper'
-include { MIRDEEP2_RUN } from '../../modules/local/mirdeep2_run'
+include { MIRDEEP2_RUN    } from '../../modules/local/mirdeep2_run'
 
 workflow MIRDEEP2 {
     take:
@@ -18,15 +18,17 @@ workflow MIRDEEP2 {
 
     main:
 
+    ch_versions = Channel.empty()
+
     MIRDEEP2_PIGZ ( reads )
+    ch_versions = ch_versions.mix(MIRDEEP2_PIGZ.out.versions.first())
 
     MIRDEEP2_MAPPER ( MIRDEEP2_PIGZ.out.reads, indices )
+    ch_versions = ch_versions.mix(MIRDEEP2_MAPPER.out.versions.first())
 
     MIRDEEP2_RUN ( fasta, MIRDEEP2_MAPPER.out.mirdeep2_inputs, hairpin, mature )
+    ch_versions = ch_versions.mix(MIRDEEP2_RUN.out.versions.first())
 
     emit:
-    versions_prepare = MIRDEEP2_PIGZ.out.versions
-    versions_mapper  = MIRDEEP2_MAPPER.out.versions
-    versions_run     = MIRDEEP2_RUN.out.versions
-
+    versions = ch_versions // channel: [ versions.yml ]
 }
