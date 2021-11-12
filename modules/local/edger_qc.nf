@@ -33,6 +33,11 @@ process EDGER_QC {
     ${getProcessName(task.process)}:
         r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
         limma: \$(Rscript -e "library(limma); cat(as.character(packageVersion('limma')))")
+        edgeR: \$(Rscript -e "library(edgeR); cat(as.character(packageVersion('edgeR')))")
+        data.table: \$(Rscript -e "library(data.table); cat(as.character(packageVersion('data.table')))")
+        gplots: \$(Rscript -e "library(gplots); cat(as.character(packageVersion('gplots')))")
+        methods: \$(Rscript -e "library(methods); cat(as.character(packageVersion('methods')))")
+        statmod: \$(Rscript -e "library(statmod); cat(as.character(packageVersion('statmod')))")
     END_VERSIONS
     """
 
