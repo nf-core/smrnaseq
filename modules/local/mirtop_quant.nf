@@ -10,11 +10,11 @@ process MIRTOP_QUANT {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:".", meta:[:], publish_by_meta:[]) }
 
-    conda (params.enable_conda ? 'bioconda::mirtop=0.4.23 bioconda::samtools=1.13 conda-base::r-base=4.0.3' : null)
+    conda (params.enable_conda ? 'bioconda::mirtop=0.4.24 bioconda::samtools=1.13 conda-base::r-base=4.0.3' : null)
     if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/mulled-v2-1f73c7bc18ac86871db9ef0a657fb39d6cbe1cf5:dd7c9649e165d535c1dd2c162ec900e7206398ec-0"
+        container "https://depot.galaxyproject.org/singularity/mulled-v2-0c13ef770dd7cc5c76c2ce23ba6669234cf03385:c8b426b3677a47f58bbbc443c0cf67bf8d53a97b-0"
     } else {
-        container "quay.io/biocontainers/mulled-v2-1f73c7bc18ac86871db9ef0a657fb39d6cbe1cf5:dd7c9649e165d535c1dd2c162ec900e7206398ec-0"
+        container "quay.io/biocontainers/mulled-v2-0c13ef770dd7cc5c76c2ce23ba6669234cf03385:c8b426b3677a47f58bbbc443c0cf67bf8d53a97b-0"
     }
 
     input:
