@@ -1,7 +1,9 @@
 # nf-core/smrnaseq: Changelog
 
-## v1.3.0dev - [2021-09-15]
+## v2.0.0dev - [2021-09-15]
 
+* Point to the proper test data branch
+* Update mirtop container
 * Software version(s) will now be reported for every module imported during a given pipeline execution
 * Adapted DSL 2.0
 * Updated `nextflow_schema.json` should now display correctly on Nextflow Tower
