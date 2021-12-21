@@ -29,7 +29,7 @@
 * [mirtrace](https://pubmed.ncbi.nlm.nih.gov/30514392/)
     > Kang W, Eldfjell Y, Fromm B, Estivill X, Biryukova I, Friedländer MR. miRTrace reveals the organismal origins of microRNA sequencing data. Genome Biol. 2018 Dec 4;19(1):213. doi: 10.1186/s13059-018-1588-9. PMID: 30514392; PMCID: PMC6280396.
 
-* [MultiQC](https://www.ncbi.nlm.nih.gov/pubmed/27312411/)
+* [MultiQC](https://pubmed.ncbi.nlm.nih.gov/27312411/)
     > Ewels P, Magnusson M, Lundin S, Käller M. MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics. 2016 Oct 1;32(19):3047-8. doi: 10.1093/bioinformatics/btw354. Epub 2016 Jun 16. PubMed PMID: 27312411; PubMed Central PMCID: PMC5039924.
 
 * [Bioconductor](https://www.bioconductor.org/) and [R](https://cran.r-project.org/)

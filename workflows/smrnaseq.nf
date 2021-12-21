@@ -45,9 +45,6 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 ========================================================================================
 */
 
-// Don't overwrite global params.modules, create a copy instead and use that within the main script.
-def modules = params.modules.clone()
-
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
@@ -182,7 +179,7 @@ workflow SMRNASEQ {
     // MODULE: Pipeline reporting
     //
     CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile()
+        ch_versions.unique().collectFile(name: 'collated_versions.yml')
     )
 
     //
@@ -207,7 +204,8 @@ workflow SMRNASEQ {
     MULTIQC (
         ch_multiqc_files.collect()
     )
-    multiqc_report       = MULTIQC.out.report.toList()
+
+    multiqc_report = MULTIQC.out.report.toList()
 }
 
 /*

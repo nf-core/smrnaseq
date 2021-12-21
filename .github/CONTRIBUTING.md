@@ -61,21 +61,20 @@ For further information/help, please consult the [nf-core/smrnaseq documentation
 
 To make the nf-core/smrnaseq code and processing logic more understandable for new contributors and to ensure quality, we semi-standardise the way the code and other contributions are written.
 
-### Adding a new step or module
+### Adding a new step
 
-If you wish to contribute a new step or module please see the [official guidelines](https://nf-co.re/developers/adding_modules#new-module-guidelines-and-pr-review-checklist) and use the following coding standards:
+If you wish to contribute a new step, please use the following coding standards:
 
-1. Add any new flags/options to `nextflow.config` with a default (see section below).
-2. Add any new flags/options to `nextflow_schema.json` with help text via `nf-core schema build`.
-3. Add sanity checks for all relevant parameters.
-4. Perform local tests to validate that the new code works as expected.
-5. If applicable, add a new test command in `.github/workflow/ci.yml`.
-6. Add any descriptions of output files to `docs/output.md`.
-7. Do local tests that the new code works properly and as expected.
-8. Add a new test command in `.github/workflow/ci.yml`.
-9. If applicable add a [MultiQC](https://https://multiqc.info/) module.
-10. Update MultiQC config `assets/multiqc_config.yaml` so relevant suffixes, name clean up, General Statistics Table column order, and module figures are in the right order.
-11. Optional: Add any descriptions of MultiQC report sections and output files to `docs/output.md`.
+1. Define the corresponding input channel into your new process from the expected previous process channel
+2. Write the process block (see below).
+3. Define the output channel if needed (see below).
+4. Add any new parameters to `nextflow.config` with a default (see below).
+5. Add any new parameters to `nextflow_schema.json` with help text (via the `nf-core schema build` tool).
+6. Add sanity checks and validation for all relevant parameters.
+7. Perform local tests to validate that the new code works as expected.
+8. If applicable, add a new test command in `.github/workflow/ci.yml`.
+9. Update MultiQC config `assets/multiqc_config.yaml` so relevant suffixes, file name clean up and module plots are in the appropriate order. If applicable, add a [MultiQC](https://https://multiqc.info/) module.
+10. Add a description of the output files and if relevant any appropriate images from the MultiQC report to `docs/output.md`.
 
 ### Default values
 
