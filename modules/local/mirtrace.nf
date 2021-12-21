@@ -1,22 +1,10 @@
-// Import generic module functions
-include { saveFiles; getSoftwareName; getProcessName } from './functions'
-
-params.options = [:]
-
 process MIRTRACE_RUN {
     label 'process_medium'
 
-    publishDir "${params.outdir}",
-        mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:".", meta:[:], publish_by_meta:[]) }
-
     conda (params.enable_conda ? 'bioconda::mirtrace=1.0.1' : null)
-    if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/mirtrace:1.0.1--hdfd78af_1"
-    } else {
-        // container "nfcore/smrnaseq:dev"
-        container "quay.io/biocontainers/mirtrace:1.0.1--hdfd78af_1"
-    }
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/mirtrace:1.0.1--hdfd78af_1' :
+        'quay.io/biocontainers/mirtrace:1.0.1--hdfd78af_1' }"
 
     input:
     path reads
@@ -28,7 +16,7 @@ process MIRTRACE_RUN {
     script:
     def three_prime_adapter = params.three_prime_adapter
     // Presets
-    if (params.protocol == "illumina"){ //TODO
+    if (params.protocol == "illumina"){
         three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"
     } else if (params.protocol == "nextflex"){
         three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"
@@ -71,8 +59,8 @@ process MIRTRACE_RUN {
         --force
 
     cat <<-END_VERSIONS > versions.yml
-    ${getProcessName(task.process)}:
-        ${getSoftwareName(task.process)}: \$(echo \$(mirtrace -v 2>&1))
+    ${task.process}":
+        mirtrace: \$(echo \$(mirtrace -v 2>&1))
     END_VERSIONS
     """
 

@@ -1,22 +1,11 @@
-// Import generic module functions
-include { saveFiles; getSoftwareName; getProcessName } from './functions'
-
-params.options = [:]
-
 process TRIMGALORE {
     tag "$meta.id"
     label 'process_high'
 
-    publishDir "${params.outdir}",
-        mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'trimmed', meta:[:], publish_by_meta:[]) }
-
     conda (params.enable_conda ? 'bioconda::trim-galore=0.6.7' : null)
-    if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/trim-galore:0.6.7--hdfd78af_0"
-    } else {
-        container "quay.io/biocontainers/trim-galore:0.6.7--hdfd78af_0"
-    }
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/trim-galore:0.6.7--hdfd78af_0' :
+        'quay.io/biocontainers/trim-galore:0.6.7--hdfd78af_0' }"
 
     input:
     tuple val(meta), path(reads)
@@ -76,8 +65,8 @@ process TRIMGALORE {
     trim_galore --cores $cores --adapter ${three_prime_adapter} $tg_length $c_r1 $tpc_r1 --max_length ${params.trim_galore_max_length} --gzip ${prefix}.fastq.gz
 
     cat <<-END_VERSIONS > versions.yml
-    ${getProcessName(task.process)}:
-        ${getSoftwareName(task.process)}: \$(echo \$(trim_galore --version 2>&1) | sed 's/^.*version //; s/Last.*\$//')
+    ${task.process}":
+        trimgalore: \$(echo \$(trim_galore --version 2>&1) | sed 's/^.*version //; s/Last.*\$//')
         cutadapt: \$(cutadapt --version)
     END_VERSIONS
     """

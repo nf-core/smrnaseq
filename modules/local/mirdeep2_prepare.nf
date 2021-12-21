@@ -1,19 +1,12 @@
-// Import generic module functions
-include { saveFiles; initOptions; getProcessName } from './functions'
-
-params.options = [:]
-
 process MIRDEEP2_PIGZ {
     label 'process_low'
     tag "$meta.id"
 
     // TODO maybe create a mulled container and uncompress within mirdeep2_mapper?
     conda (params.enable_conda ? 'bioconda::bioconvert=0.4.3' : null)
-    if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/bioconvert:0.4.3--py_0"
-    } else {
-        container "quay.io/biocontainers/bioconvert:0.4.3--py_0"
-    }
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/bioconvert:0.4.3--py_0' :
+        'quay.io/biocontainers/bioconvert:0.4.3--py_0' }"
 
     input:
     tuple val(meta), path(reads)
@@ -28,7 +21,7 @@ process MIRDEEP2_PIGZ {
     pigz -f -d -p $task.cpus $reads
 
     cat <<-END_VERSIONS > versions.yml
-    ${getProcessName(task.process)}:
+    ${task.process}":
         pigz: \$( pigz --version 2>&1 | sed 's/pigz //g' )
     END_VERSIONS
     """
