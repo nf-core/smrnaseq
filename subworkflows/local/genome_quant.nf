@@ -2,16 +2,15 @@
 // Quantify mirna with bowtie and mirtop
 //
 
-params.samtools_options       = [:]
-params.map_options            = [:]
-params.samtools_sort_options  = [:]
-params.samtools_index_options = [:]
-params.samtools_stats_options = [:]
+// params.samtools_options       = [:]
+// params.map_options            = [:]
+// params.samtools_sort_options  = [:]
+// params.samtools_index_options = [:]
+// params.samtools_stats_options = [:]
 
 include { INDEX_GENOME      } from '../../modules/local/bowtie_genome'
-include { BAM_SORT_SAMTOOLS } from '../nf-core/bam_sort_samtools'      addParams( sort_options: params.samtools_sort_options, index_options: params.samtools_index_options, stats_options: params.samtools_stats_options )
-include { BOWTIE_MAP_SEQ as BOWTIE_MAP_GENOME } from '../../modules/local/bowtie_map_mirna' addParams( options: params.map_options)
-
+include { BAM_SORT_SAMTOOLS } from '../nf-core/bam_sort_samtools'      //addParams( sort_options: params.samtools_sort_options, index_options: params.samtools_index_options, stats_options: params.samtools_stats_options )
+include { BOWTIE_MAP_SEQ as BOWTIE_MAP_GENOME } from '../../modules/local/bowtie_map_mirna' //addParams( options: params.map_options)
 
 workflow GENOME_QUANT {
     take:

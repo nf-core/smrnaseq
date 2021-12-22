@@ -10,14 +10,17 @@ def summary_params = NfcoreSchema.paramsSummaryMap(workflow, params)
 WorkflowSmrnaseq.initialise(params, log)
 
 // Check input path parameters to see if they exist
-def checkPathParamList = [ params.input, params.multiqc_config ]
+def checkPathParamList = [
+    params.input,
+    params.multiqc_config
+]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
 // Check optional parameters
-if( !params.mirtrace_species ){
+if (!params.mirtrace_species){
     exit 1, "Reference species for miRTrace is not defined."
 }
 // Genome options
@@ -48,21 +51,22 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-def trimgalore_options    = modules['trimgalore']
 if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
 if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
 
-include { INPUT_CHECK       } from '../subworkflows/local/input_check' addParams( options: [:] )
-include { FASTQC_TRIMGALORE } from '../subworkflows/nf-core/fastqc_trimgalore' addParams( fastqc_options: modules['fastqc'], trimgalore_options: trimgalore_options )
-include { MIRNA_QUANT       } from '../subworkflows/local/mirna_quant'         addParams( samtools_options: modules['samtools_view'], map_options: modules['map_mirna'],
-                                                                                samtools_sort_options: modules['samtools_sort'],
-                                                                                samtools_index_options: modules['samtools_index'],
-                                                                                samtools_stats_options: modules['samtools_index'],
-                                                                                table_merge_options: modules['table_merge'] )
-include { GENOME_QUANT      } from '../subworkflows/local/genome_quant'        addParams( samtools_options: modules['samtools_view'], map_options: modules['map_mirna'],
-                                                                                samtools_sort_options: modules['samtools_sort'],
-                                                                                samtools_index_options: modules['samtools_index'],
-                                                                                samtools_stats_options: modules['samtools_index'] )
+include { INPUT_CHECK       } from '../subworkflows/local/input_check'
+include { FASTQC_TRIMGALORE } from '../subworkflows/nf-core/fastqc_trimgalore' //addParams( fastqc_options: modules['fastqc'], trimgalore_options: trimgalore_options )
+include { MIRNA_QUANT       } from '../subworkflows/local/mirna_quant'         //addParams( samtools_options: modules['samtools_view'],
+                                                                                // map_options: modules['map_mirna'],
+                                                                                // samtools_sort_options: modules['samtools_sort'],
+                                                                                // samtools_index_options: modules['samtools_index'],
+                                                                                // samtools_stats_options: modules['samtools_index'],
+                                                                                // table_merge_options: modules['table_merge'] )
+include { GENOME_QUANT      } from '../subworkflows/local/genome_quant'        //addParams( samtools_options: modules['samtools_view'],
+                                                                                // map_options: modules['map_mirna'],
+                                                                                // samtools_sort_options: modules['samtools_sort'],
+                                                                                // samtools_index_options: modules['samtools_index'],
+                                                                                // samtools_stats_options: modules['samtools_index'] )
 include { MIRTRACE } from '../subworkflows/local/mirtrace'
 include { MIRDEEP2 } from '../subworkflows/local/mirdeep2'
 
@@ -72,17 +76,17 @@ include { MIRDEEP2 } from '../subworkflows/local/mirdeep2'
 ========================================================================================
 */
 
-def multiqc_options   = modules['multiqc']
-multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
-def cat_fastq_options          = modules['cat_fastq']
+// def multiqc_options   = modules['multiqc']
+// multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
+// def cat_fastq_options = modules['cat_fastq']
 
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main' addParams( options: cat_fastq_options )
-include { FASTQC    } from '../modules/nf-core/modules/fastqc/main'    addParams( options: modules['fastqc'] )
-include { MULTIQC   } from '../modules/nf-core/modules/multiqc/main'   addParams( options: multiqc_options )
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main' addParams( options: [publish_files : ['_versions.yml':'']] )
+include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main' //addParams( options: cat_fastq_options )
+include { FASTQC    } from '../modules/nf-core/modules/fastqc/main'    //addParams( options: modules['fastqc'] )
+include { MULTIQC   } from '../modules/nf-core/modules/multiqc/main'   //addParams( options: multiqc_options )
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main' //addParams( options: [publish_files : ['_versions.yml':'']] )
 
 /*
 ========================================================================================
@@ -144,7 +148,7 @@ workflow SMRNASEQ {
     //
     FASTQC_TRIMGALORE (
         ch_cat_fastq,
-        params.skip_fastqc || params.skip_qc,
+        params.skip_fastqc || params.skip_qc, //TODO check
         params.skip_trimming
     )
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
@@ -185,27 +189,29 @@ workflow SMRNASEQ {
     //
     // MODULE: MultiQC
     //
-    workflow_summary    = WorkflowSmrnaseq.paramsSummaryMultiqc(workflow, summary_params)
-    ch_workflow_summary = Channel.value(workflow_summary)
+    if (!params.skip_multiqc) {
+        workflow_summary    = WorkflowSmrnaseq.paramsSummaryMultiqc(workflow, summary_params)
+        ch_workflow_summary = Channel.value(workflow_summary)
 
-    ch_multiqc_files = Channel.empty()
-    ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
-    ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+        ch_multiqc_files = Channel.empty()
+        ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
+        ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
+        ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
 
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect().ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect().ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([]))
 
-    MULTIQC (
-        ch_multiqc_files.collect()
-    )
+        MULTIQC (
+            ch_multiqc_files.collect()
+        )
 
-    multiqc_report = MULTIQC.out.report.toList()
+        multiqc_report = MULTIQC.out.report.toList()
+    }
 }
 
 /*
