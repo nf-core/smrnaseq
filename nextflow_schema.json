@@ -110,7 +110,6 @@
                 },
                 "save_reference": {
                     "type": "boolean",
-                    "default": true,
                     "description": "Save generated reference genome files to results.",
                     "help_text": "Saving generated references means that you can use them for future pipeline runs, reducing processing times.",
                     "fa_icon": "fas fa-save"
