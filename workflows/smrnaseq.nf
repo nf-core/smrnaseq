@@ -55,20 +55,11 @@ if (params.mature) { reference_mature = file(params.mature, checkIfExists: true)
 if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
 
 include { INPUT_CHECK       } from '../subworkflows/local/input_check'
-include { FASTQC_TRIMGALORE } from '../subworkflows/nf-core/fastqc_trimgalore' //addParams( fastqc_options: modules['fastqc'], trimgalore_options: trimgalore_options )
-include { MIRNA_QUANT       } from '../subworkflows/local/mirna_quant'         //addParams( samtools_options: modules['samtools_view'],
-                                                                                // map_options: modules['map_mirna'],
-                                                                                // samtools_sort_options: modules['samtools_sort'],
-                                                                                // samtools_index_options: modules['samtools_index'],
-                                                                                // samtools_stats_options: modules['samtools_index'],
-                                                                                // table_merge_options: modules['table_merge'] )
-include { GENOME_QUANT      } from '../subworkflows/local/genome_quant'        //addParams( samtools_options: modules['samtools_view'],
-                                                                                // map_options: modules['map_mirna'],
-                                                                                // samtools_sort_options: modules['samtools_sort'],
-                                                                                // samtools_index_options: modules['samtools_index'],
-                                                                                // samtools_stats_options: modules['samtools_index'] )
-include { MIRTRACE } from '../subworkflows/local/mirtrace'
-include { MIRDEEP2 } from '../subworkflows/local/mirdeep2'
+include { FASTQC_TRIMGALORE } from '../subworkflows/nf-core/fastqc_trimgalore'
+include { MIRNA_QUANT       } from '../subworkflows/local/mirna_quant'
+include { GENOME_QUANT      } from '../subworkflows/local/genome_quant'
+include { MIRTRACE          } from '../subworkflows/local/mirtrace'
+include { MIRDEEP2          } from '../subworkflows/local/mirdeep2'
 
 /*
 ========================================================================================
@@ -83,10 +74,10 @@ include { MIRDEEP2 } from '../subworkflows/local/mirdeep2'
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main' //addParams( options: cat_fastq_options )
-include { FASTQC    } from '../modules/nf-core/modules/fastqc/main'    //addParams( options: modules['fastqc'] )
-include { MULTIQC   } from '../modules/nf-core/modules/multiqc/main'   //addParams( options: multiqc_options )
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main' //addParams( options: [publish_files : ['_versions.yml':'']] )
+include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main'
+include { FASTQC    } from '../modules/nf-core/modules/fastqc/main'
+include { MULTIQC   } from '../modules/nf-core/modules/multiqc/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
 /*
 ========================================================================================
