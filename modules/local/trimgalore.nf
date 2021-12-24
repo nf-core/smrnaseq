@@ -19,6 +19,7 @@ process TRIMGALORE {
     tuple val(meta), path("*.zip") , emit: zip optional true
 
     script:
+    def args  = task.ext.args ?: ''
     def cores = 1
     if (task.cpus) {
         cores = (task.cpus as int) - 4
@@ -62,7 +63,7 @@ process TRIMGALORE {
     def tpc_r1 = three_prime_clip_r1 > 0 ? "--three_prime_clip_r1 ${three_prime_clip_r1}" : ''
     """
     [ ! -f  ${prefix}.fastq.gz ] && ln -s $reads ${prefix}.fastq.gz
-    trim_galore --cores $cores --adapter ${three_prime_adapter} $tg_length $c_r1 $tpc_r1 --max_length ${params.trim_galore_max_length} --gzip ${prefix}.fastq.gz
+    trim_galore $args --cores $cores --adapter ${three_prime_adapter} $tg_length $c_r1 $tpc_r1 --max_length ${params.trim_galore_max_length} --gzip ${prefix}.fastq.gz
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process}":
