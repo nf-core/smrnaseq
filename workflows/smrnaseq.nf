@@ -67,16 +67,12 @@ include { MIRDEEP2          } from '../subworkflows/local/mirdeep2'
 ========================================================================================
 */
 
-// def multiqc_options   = modules['multiqc']
-// multiqc_options.args += params.multiqc_title ? Utils.joinModuleArgs(["--title \"$params.multiqc_title\""]) : ''
-// def cat_fastq_options = modules['cat_fastq']
-
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { CAT_FASTQ } from '../modules/nf-core/modules/cat/fastq/main'
-include { FASTQC    } from '../modules/nf-core/modules/fastqc/main'
-include { MULTIQC   } from '../modules/nf-core/modules/multiqc/main'
+include { CAT_FASTQ                   } from '../modules/nf-core/modules/cat/fastq/main'
+include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
+include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
 /*
@@ -139,7 +135,7 @@ workflow SMRNASEQ {
     //
     FASTQC_TRIMGALORE (
         ch_cat_fastq,
-        params.skip_fastqc || params.skip_qc, //TODO check
+        params.skip_fastqc || params.skip_qc,
         params.skip_trimming
     )
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
