@@ -2,6 +2,10 @@
 
 ## v2.0.0dev - [2021-09-15]
 
+* Port pipeline to the updated Nextflow DSL2 syntax adopted on nf-core/modules
+    * Removed `--publish_dir_mode` as it is no longer required for the new syntax
+* Bump minimum Nextflow version from `21.04.0` -> `21.10.3`
+* Updated pipeline template to [nf-core/tools 2.2](https://github.com/nf-core/tools/releases/tag/2.2)
 * Point to the proper test data branch
 * Update mirtop container
 * Software version(s) will now be reported for every module imported during a given pipeline execution

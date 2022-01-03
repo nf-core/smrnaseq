@@ -2,13 +2,6 @@
 // Quantify mirna with bowtie and mirtop
 //
 
-params.samtools_options       = [:]
-params.map_options            = [:]
-params.samtools_sort_options  = [:]
-params.samtools_index_options = [:]
-params.samtools_stats_options = [:]
-params.table_merge_options    = [:]
-
 include {   PARSE_FASTA_MIRNA  as PARSE_MATURE
             PARSE_FASTA_MIRNA  as PARSE_HAIRPIN      } from '../../modules/local/parse_fasta_mirna'
 
@@ -20,16 +13,15 @@ include {   INDEX_MIRNA  as INDEX_MATURE
 
 include {   BOWTIE_MAP_SEQ  as BOWTIE_MAP_MATURE
             BOWTIE_MAP_SEQ  as BOWTIE_MAP_HAIRPIN
-            BOWTIE_MAP_SEQ  as BOWTIE_MAP_SEQCLUSTER } from '../../modules/local/bowtie_map_mirna' addParams(options: params.map_options)
+            BOWTIE_MAP_SEQ  as BOWTIE_MAP_SEQCLUSTER } from '../../modules/local/bowtie_map_mirna'
 
 include {   BAM_SORT_SAMTOOLS as BAM_STATS_MATURE
-            BAM_SORT_SAMTOOLS as BAM_STATS_HAIRPIN   } from '../nf-core/bam_sort_samtools'         addParams( sort_options: params.samtools_sort_options, index_options: params.samtools_index_options, stats_options: params.samtools_stats_options )
+            BAM_SORT_SAMTOOLS as BAM_STATS_HAIRPIN   } from '../nf-core/bam_sort_samtools'
 
 include { SEQCLUSTER_SEQUENCES } from '../../modules/local/seqcluster_collapse.nf'
-include { MIRTOP_QUANT } from '../../modules/local/mirtop_quant.nf'
-include { TABLE_MERGE } from '../../modules/local/datatable_merge.nf' addParams( options: params.table_merge_options )
-
-include { EDGER_QC }  from '../../modules/local/edger_qc.nf'
+include { MIRTOP_QUANT         } from '../../modules/local/mirtop_quant.nf'
+include { TABLE_MERGE          } from '../../modules/local/datatable_merge.nf'
+include { EDGER_QC             } from '../../modules/local/edger_qc.nf'
 
 workflow MIRNA_QUANT {
     take:

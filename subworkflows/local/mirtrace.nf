@@ -2,8 +2,6 @@
 // Quantify mirna with bowtie and mirtop
 //
 
-params.options = [:]
-
 include { MIRTRACE_RUN } from '../../modules/local/mirtrace'
 
 workflow MIRTRACE {

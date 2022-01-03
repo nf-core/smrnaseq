@@ -1,24 +1,13 @@
-// Import generic module functions
-include { saveFiles; getSoftwareName; getProcessName } from './functions'
-
-params.options = [:]
-
 def VERSION = '2.0.1'
 
 process MIRDEEP2_MAPPER {
     label 'process_medium'
     tag "$meta.id"
 
-    publishDir "${params.outdir}",
-        mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:getSoftwareName(task.process), meta:[:], publish_by_meta:['id']) }
-
     conda (params.enable_conda ? 'bioconda::mirdeep2=2.0.1' : null)
-    if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-        container "https://depot.galaxyproject.org/singularity/mirdeep2:2.0.1.3--hdfd78af_1"
-    } else {
-        container "quay.io/biocontainers/mirdeep2:2.0.1.3--hdfd78af_1"
-    }
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://depot.galaxyproject.org/singularity/mirdeep2:2.0.1.3--hdfd78af_1' :
+        'quay.io/biocontainers/mirdeep2:2.0.1.3--hdfd78af_1' }"
 
     input:
     tuple val(meta), path(reads)
@@ -45,8 +34,8 @@ process MIRDEEP2_MAPPER {
     -o 4
 
     cat <<-END_VERSIONS > versions.yml
-    ${getProcessName(task.process)}:
-        ${getSoftwareName(task.process)}: \$(echo "$VERSION")
+    "${task.process}":
+        mapper: \$(echo "$VERSION")
     END_VERSIONS
     """
 }
