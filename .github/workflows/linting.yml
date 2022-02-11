@@ -12,7 +12,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '10'
       - name: Install markdownlint
         run: npm install -g markdownlint-cli
       - name: Run Markdownlint
@@ -49,7 +51,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '10'
 
       - name: Install editorconfig-checker
         run: npm install -g editorconfig-checker
@@ -61,11 +65,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '10'
       - name: Install yaml-lint
         run: npm install -g yaml-lint
       - name: Run yaml-lint
-        run: yamllint $(find ${GITHUB_WORKSPACE} -type f -name "*.yml" -o -name "*.yaml") -c ${GITHUB_WORKSPACE}/.markdownlint.yml
+        run: yamllint $(find ${GITHUB_WORKSPACE} -type f -name "*.yml" -o -name "*.yaml")
 
       # If the above check failed, post a comment on the PR explaining the failure
       - name: Post PR comment
