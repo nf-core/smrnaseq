@@ -13,7 +13,7 @@
                 "git_sha": "9d0cad583b9a71a6509b754fdf589cbfbed08961"
             },
             "multiqc": {
-                "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
+                "git_sha": "d1f33be04f5d3e402398707037f56f13166df4fe"
             },
             "samtools/flagstat": {
                 "git_sha": "20d8250d9f39ddb05dfb437603aaf99b5c0b2b41"
