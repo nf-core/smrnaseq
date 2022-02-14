@@ -1,25 +1,66 @@
 # nf-core/smrnaseq: Changelog
 
-## v2.0.0dev - [2021-09-15]
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [Unpublished Version / DEV]
+
+### Major enhancements
 
 * Port pipeline to the updated Nextflow DSL2 syntax adopted on nf-core/modules
     * Removed `--publish_dir_mode` as it is no longer required for the new syntax
-* Bump minimum Nextflow version from `21.04.0` -> `21.10.3`
+* Bump minimum Nextflow version from `20.04.0` -> `21.10.3`
 * Updated pipeline template to [nf-core/tools 2.2](https://github.com/nf-core/tools/releases/tag/2.2)
 * Point to the proper test data branch
 * Update mirtop container
 * Software version(s) will now be reported for every module imported during a given pipeline execution
-* Adapted DSL 2.0
 * Updated `nextflow_schema.json` should now display correctly on Nextflow Tower
 * Added mirtop logs to multiqc
-
-## [v1.2.0dev](https://github.com/nf-core/smrnaseq/releases/tag/1.2.0)
-
-### Added
-
 * Allow a gene to be associated to a non null number of reads in all samples (in `edgeR_miRBase.r` script)
 
-### Packaged software updates
+### Other enhancements & fixes
+
+### Parameters
+
+| Old parameter                | New parameter              |
+|------------------------------|----------------------------|
+| `--clusterOptions`           |                            |
+| `--conda`                    | `--enable_conda`           |
+
+> **NB:** Parameter has been **updated** if both old and new parameter information is present.
+> **NB:** Parameter has been **added** if just the new parameter information is present.
+> **NB:** Parameter has been **removed** if parameter information isn't present.
+
+### Software dependencies
+
+Note, since the pipeline is now using Nextflow DSL2, each process will be run with its own [Biocontainer](https://biocontainers.pro/#/registry). This means that on occasion it is entirely possible for the pipeline to be using different versions of the same tool. However, the overall software dependency changes compared to the last release have been listed below for reference.
+
+| Dependency           | Old version  | New version |
+|----------------------|--------------|-------------|
+| `bioconductor-edger` | 3.26.5       | 3.36.0      |
+| `bioconductor-limma` | 3.40.2       |3.50.0      |
+| `mirdeep2`           | 2.0.1.2      | 2.0.1.3     |
+| `mirtop`             | 0.4.23       | 0.4.24      |
+| `multiqc`            | 1.10.1       | 1.12.0      |
+| `python`             | 3.7.3        | 3.8.3       |
+| `r-base`             | 3.6.3        | 4.0.3       |
+| `r-data.table`       | 1.12.4       | 1.14.2      |
+| `r-gplots`           | 3.0.1.1      | 3.1.1       |
+| `r-statmod`          | 1.4.32       | 1.4.36      |
+| `samtools`           | 1.12         | 1.13        |
+| `seqcluster`         | 1.2.7        | 1.2.8       |
+| `seqkit`             | 0.16.0       | 2.0.0       |
+| `trim-galore`        | 0.6.6        | 0.6.7       |
+| `bioconvert`         | -            | 0.4.3       |
+| `htseq`              | -            | -           |
+| `markdown`           | -            | -           |
+| `pymdown-extensions` | -            | -           |
+| `pygments`           | -            | -           |
+| `r-r.methodss3`      | -            | -           |
+
+> **NB:** Dependency has been **updated** if both old and new version information is present.
+> **NB:** Dependency has been **added** if just the new version information is present.
+> **NB:** Dependency has been **removed** if version information isn't present.
 
 ## [v1.1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.1.0) - 2021-06-15
 

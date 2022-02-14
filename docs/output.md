@@ -65,7 +65,7 @@ This is an example of the output we can get:
 **Output directory: `results/samtools`**
 
 * `sample_mature.bam`: The aligned BAM file of alignment against mature miRNAs
-* `sample_mature_unmapped.fq.gz`: Unmapped reads against mature miRNAs *This file will be used as input for the alignment against miRNA precursors (hairpins)*
+* `sample_mature_unmapped.fq.gz`: Unmapped reads against mature miRNAs _This file will be used as input for the alignment against miRNA precursors (hairpins)_
 * `sample_mature_hairpin.bam`: The aligned BAM file of alignment against miRNA precursors (hairpins) that didn't map to the mature
 * `sample_mature_hairpin_unmapped.fq.gz`: Unmapped reads against miRNA precursors (hairpins)
 * `sample_mature_hairpin_genome.bam`: The aligned BAM file of alignment against that didn't map to the precursor.
