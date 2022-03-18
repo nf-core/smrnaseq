@@ -41,11 +41,13 @@ for (i in 1:2) {
     # Remove genes with 0 reads in all samples
     row_sub = apply(data, 1, function(row) all(row ==0 ))
     # Only subset if at least one sample is remaining
-    nr_keep <- table(row_sub)
-    nr_keep <- sum(nr_keep == TRUE)
+    nr_keep <- sum(row_sub)
     if (nr_keep > 0){
         data<-data[!row_sub,]
     }
+    #Also check for colSums > 0, otherwise DGEList will fail if samples have entirely colSum == 0 #Fixes #134
+    drop_colsum_zero <- (colSums(data, na.rm=T) != 0) # T if colSum is not 0, F otherwise
+    data <- data[, drop_colsum_zero] # all the non-zero columns
 
     write.csv(t(data),file=paste(header,"_counts.csv",sep=""))
 
