@@ -1,5 +1,5 @@
 extends: default
 
 rules:
-    document-start: disable
-    line-length: disable
+  document-start: disable
+  line-length: disable
