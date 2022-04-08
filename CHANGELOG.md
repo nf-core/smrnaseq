@@ -7,10 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Major enhancements
 
+- Updated pipeline template to [nf-core/tools 2.3](https://github.com/nf-core/tools/releases/tag/2.3)
 - Port pipeline to the updated Nextflow DSL2 syntax adopted on nf-core/modules
-  - Removed `--publish_dir_mode` as it is no longer required for the new syntax
+- Removed `--publish_dir_mode` as it is no longer required for the new syntax
 - Bump minimum Nextflow version from `20.04.0` -> `21.10.3`
-- Updated pipeline template to [nf-core/tools 2.2](https://github.com/nf-core/tools/releases/tag/2.2)
 - Point to the proper test data branch
 - Update mirtop container
 - Software version(s) will now be reported for every module imported during a given pipeline execution
