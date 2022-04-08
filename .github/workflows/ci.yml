@@ -45,5 +45,3 @@ jobs:
       - name: Run pipeline with test data
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile test_no_genome,docker --outdir ./results
-
-#
