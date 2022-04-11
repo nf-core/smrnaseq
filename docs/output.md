@@ -12,26 +12,26 @@ The directories listed below will be created in the results directory after the 
 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
 
-* [FastQC](#fastqc) - read quality control
-* [TrimGalore](#trimgalore) - adapter trimming
-* [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
-* [SAMtools](#samtools) - alignment result processing and feature counting
-* [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
-* [Bowtie](#bowtie) - alignment against reference genome for QC purpose
-* [mirtop](#mirtop) - miRNA and isomiR annotation
-* [miRDeep2](#mirdeep2) - known and novel miRNA annotation
-* [miRTrace](#mirtrace) - a comprehensive tool for QC purpose
-* [MultiQC](#multiqc) - aggregate report, describing results of the whole pipeline
-* [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
+- [FastQC](#fastqc) - read quality control
+- [TrimGalore](#trimgalore) - adapter trimming
+- [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
+- [SAMtools](#samtools) - alignment result processing and feature counting
+- [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
+- [Bowtie](#bowtie) - alignment against reference genome for QC purpose
+- [mirtop](#mirtop) - miRNA and isomiR annotation
+- [miRDeep2](#mirdeep2) - known and novel miRNA annotation
+- [miRTrace](#mirtrace) - a comprehensive tool for QC purpose
+- [MultiQC](#multiqc) - aggregate report, describing results of the whole pipeline
+- [Pipeline information](#pipeline-information) - Report metrics generated during the workflow execution
 
 ### FastQC
 
 <details markdown="1">
 <summary>Output files</summary>
 
-* `fastqc/`
-    * `*_fastqc.html`: FastQC report containing quality metrics.
-    * `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images.
+- `fastqc/`
+  - `*_fastqc.html`: FastQC report containing quality metrics.
+  - `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images.
 
 </details>
 
@@ -49,10 +49,10 @@ MultiQC reports the percentage of bases removed by TrimGalore in the _General St
 
 Contains FastQ files with quality and adapter trimmed reads for each sample, along with a log file describing the trimming.
 
-* `sample_trimmed.fq.gz` Trimmed FastQ data
-* `sample.fastq.gz_trimming_report.txt` Trimming report (describes which parameters that were used)
-* `sample_trimmed_fastqc.html`
-* `sample_trimmed_fastqc.zip` FastQC report for trimmed reads
+- `sample_trimmed.fq.gz` Trimmed FastQ data
+- `sample.fastq.gz_trimming_report.txt` Trimming report (describes which parameters that were used)
+- `sample_trimmed_fastqc.html`
+- `sample_trimmed_fastqc.zip` FastQC report for trimmed reads
 
 This is an example of the output we can get:
 
@@ -64,11 +64,11 @@ This is an example of the output we can get:
 
 **Output directory: `results/samtools`**
 
-* `sample_mature.bam`: The aligned BAM file of alignment against mature miRNAs
-* `sample_mature_unmapped.fq.gz`: Unmapped reads against mature miRNAs _This file will be used as input for the alignment against miRNA precursors (hairpins)_
-* `sample_mature_hairpin.bam`: The aligned BAM file of alignment against miRNA precursors (hairpins) that didn't map to the mature
-* `sample_mature_hairpin_unmapped.fq.gz`: Unmapped reads against miRNA precursors (hairpins)
-* `sample_mature_hairpin_genome.bam`: The aligned BAM file of alignment against that didn't map to the precursor.
+- `sample_mature.bam`: The aligned BAM file of alignment against mature miRNAs
+- `sample_mature_unmapped.fq.gz`: Unmapped reads against mature miRNAs _This file will be used as input for the alignment against miRNA precursors (hairpins)_
+- `sample_mature_hairpin.bam`: The aligned BAM file of alignment against miRNA precursors (hairpins) that didn't map to the mature
+- `sample_mature_hairpin_unmapped.fq.gz`: Unmapped reads against miRNA precursors (hairpins)
+- `sample_mature_hairpin_genome.bam`: The aligned BAM file of alignment against that didn't map to the precursor.
 
 ## SAMtools
 
@@ -76,7 +76,7 @@ This is an example of the output we can get:
 
 **Output directory: `results/samtools/samtools_stats`**
 
-* `stats|idxstats|flagstat`: BAM stats for each of the files listed above.
+- `stats|idxstats|flagstat`: BAM stats for each of the files listed above.
 
 ![samtools](images/samtools_alignment_plot.png)
 
@@ -86,11 +86,11 @@ This is an example of the output we can get:
 
 **Output directory: `results/edgeR`**
 
-* `[mature/hairpin]_normalized_CPM.txt` TMM normalized counts of reads aligned to mature miRNAs/miRNA precursors (hairpins)
-* `[mature/hairpin]_edgeR_MDS_plot.pdf` Multidimensional scaling plot of all samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
-* `[mature/hairpin]_CPM_heatmap.pdf` Heatmap based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
-* `[mature/hairpin]_log2CPM_sample_distances_dendrogram.pdf` Dendrograms of distance among samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
-* `[mature/hairpin]_log2CPM_sample_distances_heatmap.pdf` Pairwise correlation of samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
+- `[mature/hairpin]_normalized_CPM.txt` TMM normalized counts of reads aligned to mature miRNAs/miRNA precursors (hairpins)
+- `[mature/hairpin]_edgeR_MDS_plot.pdf` Multidimensional scaling plot of all samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
+- `[mature/hairpin]_CPM_heatmap.pdf` Heatmap based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
+- `[mature/hairpin]_log2CPM_sample_distances_dendrogram.pdf` Dendrograms of distance among samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
+- `[mature/hairpin]_log2CPM_sample_distances_heatmap.pdf` Pairwise correlation of samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
 
 **Example**: MDS plot of 10 samples based on their expression profiles of mature miRNAs. Here we can see that samples cluster based on different sample types and library preparation kits.
 ![edgeR](images/Example_MDS_plot.png)
@@ -104,10 +104,10 @@ This is an example of the output we can get:
 
 **Output directory: `results/mirtop`**
 
-* `mirtop.gff`: [mirgff3](https://github.com/miRTop/mirGFF3) file
-* `mirtop.tsv`: tabular file of the previous file for easy integration with downstream analysis.
-* `mirtop_rawData.tsv`: File compatible with [isomiRs](http://lpantano.github.io/isomiRs/reference/IsomirDataSeqFromMirtop.html) Bioconductor package to perform isomiRs analysis.
-* `mirna.tsv`: tabular file with miRNA counts after summarizing unique isomiRs for each miRNA
+- `mirtop.gff`: [mirgff3](https://github.com/miRTop/mirGFF3) file
+- `mirtop.tsv`: tabular file of the previous file for easy integration with downstream analysis.
+- `mirtop_rawData.tsv`: File compatible with [isomiRs](http://lpantano.github.io/isomiRs/reference/IsomirDataSeqFromMirtop.html) Bioconductor package to perform isomiRs analysis.
+- `mirna.tsv`: tabular file with miRNA counts after summarizing unique isomiRs for each miRNA
 
 ## miRDeep2
 
@@ -115,9 +115,9 @@ This is an example of the output we can get:
 
 **Output directory: `results/mirdeep2`**
 
-* `mirdeep/timestamp_sample.bed` File with the known and novel miRNAs in bed format.
-* `mirdeep/timestamp_sample.csv` File with an overview of all detected miRNAs (known and novel) in csv format.
-* `mirdeep/timestamp_sample.html` A HTML report with an overview of all detected miRNAs (known and novel) in html format.
+- `mirdeep/timestamp_sample.bed` File with the known and novel miRNAs in bed format.
+- `mirdeep/timestamp_sample.csv` File with an overview of all detected miRNAs (known and novel) in csv format.
+- `mirdeep/timestamp_sample.html` A HTML report with an overview of all detected miRNAs (known and novel) in html format.
 
 ## miRTrace
 
@@ -125,11 +125,11 @@ This is an example of the output we can get:
 
 **Output directory: `results/mirtrace`**
 
-* `mirtrace-report.html` An interactive HTML report summarizing all output statistics from miRTrace
-* `mirtrace-results.json` A JSON file with all output statistics from miRTrace
-* `mirtrace-stats-*.tsv` Tab-separated statistics files
-* `qc_passed_reads.all.collapsed` FASTA file per sample with sequence reads that passed QC in miRTrace
-* `qc_passed_reads.rnatype_unknown.collapsed` FASTA file per sample with unknown reads in the RNA type analysis
+- `mirtrace-report.html` An interactive HTML report summarizing all output statistics from miRTrace
+- `mirtrace-results.json` A JSON file with all output statistics from miRTrace
+- `mirtrace-stats-*.tsv` Tab-separated statistics files
+- `qc_passed_reads.all.collapsed` FASTA file per sample with sequence reads that passed QC in miRTrace
+- `qc_passed_reads.rnatype_unknown.collapsed` FASTA file per sample with unknown reads in the RNA type analysis
 
 Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/manual.pdf) for detailed specifications about output files. Here is an example of the RNA types plot that you will see:
 
@@ -146,10 +146,10 @@ Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/maste
 <details markdown="1">
 <summary>Output files</summary>
 
-* `multiqc/`
-    * `multiqc_report.html`: a standalone HTML file that can be viewed in your web browser.
-    * `multiqc_data/`: directory containing parsed statistics from the different tools used in the pipeline.
-    * `multiqc_plots/`: directory containing static images from the report in various formats.
+- `multiqc/`
+  - `multiqc_report.html`: a standalone HTML file that can be viewed in your web browser.
+  - `multiqc_data/`: directory containing parsed statistics from the different tools used in the pipeline.
+  - `multiqc_plots/`: directory containing static images from the report in various formats.
 
 </details>
 
@@ -162,10 +162,10 @@ Results generated by MultiQC collate pipeline QC from supported tools e.g. FastQ
 <details markdown="1">
 <summary>Output files</summary>
 
-* `pipeline_info/`
-    * Reports generated by Nextflow: `execution_report.html`, `execution_timeline.html`, `execution_trace.txt` and `pipeline_dag.dot`/`pipeline_dag.svg`.
-    * Reports generated by the pipeline: `pipeline_report.html`, `pipeline_report.txt` and `software_versions.yml`. The `pipeline_report*` files will only be present if the `--email` / `--email_on_fail` parameter's are used when running the pipeline.
-    * Reformatted samplesheet files used as input to the pipeline: `samplesheet.valid.csv`.
+- `pipeline_info/`
+  - Reports generated by Nextflow: `execution_report.html`, `execution_timeline.html`, `execution_trace.txt` and `pipeline_dag.dot`/`pipeline_dag.svg`.
+  - Reports generated by the pipeline: `pipeline_report.html`, `pipeline_report.txt` and `software_versions.yml`. The `pipeline_report*` files will only be present if the `--email` / `--email_on_fail` parameter's are used when running the pipeline.
+  - Reformatted samplesheet files used as input to the pipeline: `samplesheet.valid.csv`.
 
 </details>
 
