@@ -3,7 +3,7 @@ process TABLE_MERGE {
 
     conda (params.enable_conda ? 'conda-base::r-data.table=1.12.2' : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/r-data.table:1.12.2 :
+        'https://depot.galaxyproject.org/singularity/r-data.table:1.12.2' :
         'quay.io/biocontainers/r-data.table:1.12.2' }"
 
     input:
