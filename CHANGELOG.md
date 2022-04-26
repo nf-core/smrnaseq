@@ -7,12 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Major enhancements
 
+- [[#137](https://github.com/nf-core/smrnaseq/issues/137)] - Update mirtop container to version `0.4.25` to fix multiqc error
 - Updated pipeline template to [nf-core/tools 2.3](https://github.com/nf-core/tools/releases/tag/2.3)
 - Port pipeline to the updated Nextflow DSL2 syntax adopted on nf-core/modules
 - Removed `--publish_dir_mode` as it is no longer required for the new syntax
 - Bump minimum Nextflow version from `20.04.0` -> `21.10.3`
 - Point to the proper test data branch
-- Update mirtop container
 - Software version(s) will now be reported for every module imported during a given pipeline execution
 - Updated `nextflow_schema.json` should now display correctly on Nextflow Tower
 - Added mirtop logs to multiqc
@@ -43,7 +43,7 @@ Note, since the pipeline is now using Nextflow DSL2, each process will be run wi
 | `bioconductor-edger` | 3.26.5      | 3.36.0      |
 | `bioconductor-limma` | 3.40.2      | 3.50.0      |
 | `mirdeep2`           | 2.0.1.2     | 2.0.1.3     |
-| `mirtop`             | 0.4.23      | 0.4.24      |
+| `mirtop`             | 0.4.23      | 0.4.25      |
 | `multiqc`            | 1.10.1      | 1.12.0      |
 | `python`             | 3.7.3       | 3.8.3       |
 | `r-base`             | 3.6.3       | 4.0.3       |
