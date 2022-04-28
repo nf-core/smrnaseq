@@ -25,7 +25,7 @@ if (!params.mirtrace_species){
 }
 // Genome options
 bt_index_from_species = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
-bt_index              = params.bt_indices ?: bt_index_from_species
+bt_index = params.bt_indices ?: bt_index_from_species
 mirtrace_species_from_species = params.genome ? params.genomes[ params.genome ].mirtrace_species ?: false : false
 mirtrace_species = params.mirtrace_species ?: mirtrace_species_from_species
 fasta_from_species = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
@@ -51,12 +51,12 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-if (!params.MirGeneDB) {
+if (!params.mirGeneDB) {
     if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
     if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
 } else {
-    if (params.MirGeneDR_mature) { reference_mature = file(params.MirGeneDB_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
-    if (params.MirGeneDB_hairpin) { reference_hairpin = file(params.MirGeneDB_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }  
+    if (params.mirGeneDR_mature) { reference_mature = file(params.mirGeneDB_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
+    if (params.mirGeneDB_hairpin) { reference_hairpin = file(params.mirGeneDB_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }  
 }
 
 include { INPUT_CHECK       } from '../subworkflows/local/input_check'

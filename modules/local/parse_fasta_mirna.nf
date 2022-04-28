@@ -9,6 +9,8 @@ process PARSE_FASTA_MIRNA {
     input:
     path fasta
 
+    if (!params.mirGeneDB) {species = params.mirtrace_species} else {species = params.mirGeneDB_species}
+
     output:
     path '*_igenome.fa', emit: parsed_fasta
     path "versions.yml", emit: versions
