@@ -51,8 +51,13 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
-if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
+if (!params.MirGeneDB) {
+    if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
+    if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
+} else {
+    if (params.MirGeneDR_mature) { reference_mature = file(params.MirGeneDB_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
+    if (params.MirGeneDB_hairpin) { reference_hairpin = file(params.MirGeneDB_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }  
+}
 
 include { INPUT_CHECK       } from '../subworkflows/local/input_check'
 include { FASTQC_TRIMGALORE } from '../subworkflows/nf-core/fastqc_trimgalore'
