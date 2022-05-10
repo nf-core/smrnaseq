@@ -55,7 +55,7 @@ if (params.mature) { reference_mature = file(params.mature, checkIfExists: true)
 if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
 
 include { INPUT_CHECK       } from '../subworkflows/local/input_check'
-include { FASTQC_TRIMGALORE } from '../subworkflows/nf-core/fastqc_trimgalore'
+include { FASTQC_UMITOOLS_TRIMGALORE } from '../subworkflows/nf-core/fastqc_umitools_trimgalore'
 include { MIRNA_QUANT       } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT      } from '../subworkflows/local/genome_quant'
 include { MIRTRACE          } from '../subworkflows/local/mirtrace'
@@ -133,14 +133,16 @@ workflow SMRNASEQ {
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters
     //
-    FASTQC_TRIMGALORE (
+    FASTQC_UMITOOLS_TRIMGALORE (
         ch_cat_fastq,
+        params.with_umi,
+        params.umi_discard_read,
         params.skip_fastqc || params.skip_qc,
         params.skip_trimming
     )
-    ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
+    ch_versions = ch_versions.mix(FASTQC_UMITOOLS_TRIMGALORE.out.versions)
 
-    reads_for_mirna = FASTQC_TRIMGALORE.out.reads
+    reads_for_mirna = FASTQC_UMITOOLS_TRIMGALORE.out.reads
     MIRNA_QUANT (
         reference_mature,
         reference_hairpin,
@@ -161,7 +163,7 @@ workflow SMRNASEQ {
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
         if (!params.skip_mirdeep) {
-            MIRDEEP2 (FASTQC_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta, GENOME_QUANT.out.indices, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
+            MIRDEEP2 (FASTQC_UMITOOLS_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta, GENOME_QUANT.out.indices, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
             ch_versions = ch_versions.mix(MIRDEEP2.out.versions)
         }
     }
@@ -186,7 +188,7 @@ workflow SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
 
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_UMITOOLS_TRIMGALORE.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
