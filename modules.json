@@ -32,6 +32,12 @@
             },
             "trimgalore": {
                 "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
+            },
+            "umitools/dedup": {
+                "git_sha": "f425aa3cea10015fe9b345b9d6dcc2336b53155f"
+            },
+            "umitools/extract": {
+                "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
             }
         }
     }
