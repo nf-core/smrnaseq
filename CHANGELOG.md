@@ -21,14 +21,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Other enhancements & fixes
 
 - [#134](https://github.com/nf-core/smrnaseq/issues/134) - Fixed colSum of zero issues for edgeR_miRBase.R script
+- [#55](https://github.com/nf-core/smrnaseq/issues/12) - Enabled the use of `MirGeneDB` as an alternative database insted of `miRBase`
 
 ### Parameters
 
-| Old parameter        | New parameter    |
-| -------------------- | ---------------- |
-| `--conda`            | `--enable_conda` |
-| `--clusterOptions`   |                  |
-| `--publish_dir_mode` |                  |
+| Old parameter        | New parameter         |
+| -------------------- | --------------------- |
+| `--conda`            | `--enable_conda`      |
+| `--clusterOptions`   |                       |
+| `--publish_dir_mode` |                       |
+|                      | `--mirGeneDB`         |
+|                      | `--mirGeneDB_species` |
+|                      | `--mirGeneDB_gff`     |
+|                      | `--mirGeneDB_mature`  |
+|                      | `--mirGeneDB_hairpin` |
+
 
 > **NB:** Parameter has been **updated** if both old and new parameter information is present.
 > **NB:** Parameter has been **added** if just the new parameter information is present.
