@@ -9,7 +9,7 @@ process PARSE_FASTA_MIRNA {
     input:
     path fasta
 
-    if (!params.mirGeneDB) {params.filterSpecies = params.mirtrace_species} else {params.filterSpecies = params.mirGeneDB_species}
+    //if (!params.mirGeneDB) {params.filterSpecies = params.mirtrace_species} else {params.filterSpecies = params.mirGeneDB_species}
 
     output:
     path '*_igenome.fa', emit: parsed_fasta
