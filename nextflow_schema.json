@@ -50,6 +50,48 @@
                 }
             }
         },
+        "umi_options": {
+            "title": "UMI options",
+            "type": "object",
+            "description": "Options for processing reads with unique molecular identifiers",
+            "default": "",
+            "properties": {
+                "with_umi": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-barcode",
+                    "description": "Enable UMI-based read deduplication."
+                },
+                "umitools_extract_method": {
+                    "type": "string",
+                    "default": "string",
+                    "fa_icon": "fas fa-barcode",
+                    "description": "UMI pattern to use. Can be either 'string' (default) or 'regex'.",
+                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).\n"
+                },
+                "skip_umi_extract": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-compress-alt",
+                    "description": "Skip the UMI extraction from the read in case the UMIs have been moved to the headers in advance of the pipeline run."
+                },
+                "umitools_bc_pattern": {
+                    "type": "string",
+                    "fa_icon": "fas fa-barcode",
+                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).",
+                    "description": "The UMI barcode pattern to use e.g. 'NNNNNN' indicates that the first 6 nucleotides of the read are from the UMI."
+                },
+                "umi_discard_read": {
+                    "type": "integer",
+                    "fa_icon": "fas fa-barcode",
+                    "description": "After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively."
+                },
+                "save_umi_intermeds": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-save",
+                    "description": "If this option is specified, intermediate FastQ and BAM files produced by UMI-tools are also saved in the results directory."
+                }
+            },
+            "fa_icon": "fas fa-barcode"
+        },
         "reference_genome_options": {
             "title": "Reference genome options",
             "type": "object",
@@ -378,6 +420,9 @@
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/umi_options"
         },
         {
             "$ref": "#/definitions/reference_genome_options"

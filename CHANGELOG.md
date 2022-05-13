@@ -21,14 +21,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Other enhancements & fixes
 
 - [#134](https://github.com/nf-core/smrnaseq/issues/134) - Fixed colSum of zero issues for edgeR_miRBase.R script
+- [#49](https://github.com/nf-core/smrnaseq/issues/49) - Integrated the existing umitools modules into the pipeline.
 
 ### Parameters
 
-| Old parameter        | New parameter    |
-| -------------------- | ---------------- |
-| `--conda`            | `--enable_conda` |
-| `--clusterOptions`   |                  |
-| `--publish_dir_mode` |                  |
+| Old parameter        | New parameter               |
+| -------------------- | --------------------------- |
+| `--conda`            | `--enable_conda`            |
+| `--clusterOptions`   |                             |
+| `--publish_dir_mode` |                             |
+|                      | `--with_umi`                |
+|                      | `--umitools_extract_method` |
+|                      | `--umitools_bc_pattern`     |
+|                      | `--umi_discard_read`        |
+|                      | `--save_umi_intermeds`      |
 
 > **NB:** Parameter has been **updated** if both old and new parameter information is present.
 > **NB:** Parameter has been **added** if just the new parameter information is present.
