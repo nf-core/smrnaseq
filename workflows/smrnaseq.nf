@@ -1,3 +1,11 @@
+params.rrna                 = '/Users/chriskub/software/Q2687/Q2687/02_testdata/01_BI_data/contaminants/rRNACollection.fas'
+params.trna                 = ''
+params.cdna                 = '/Users/chriskub/software/Q2687/Q2687/02_testdata/01_BI_data/contaminants/Homo_sapiens.GRCh38.cdna.all.fa'
+params.ncrna                = '/Users/chriskub/software/Q2687/Q2687/02_testdata/01_BI_data/contaminants/Homo_sapiens.GRCh38.ncrna.fa'
+params.pirna                = ''
+params.filter_contamination = 'true'
+
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     VALIDATE INPUTS
@@ -54,12 +62,13 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
 if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
 
-include { INPUT_CHECK       } from '../subworkflows/local/input_check'
-include { FASTQC_TRIMGALORE } from '../subworkflows/nf-core/fastqc_trimgalore'
-include { MIRNA_QUANT       } from '../subworkflows/local/mirna_quant'
-include { GENOME_QUANT      } from '../subworkflows/local/genome_quant'
-include { MIRTRACE          } from '../subworkflows/local/mirtrace'
-include { MIRDEEP2          } from '../subworkflows/local/mirdeep2'
+include { INPUT_CHECK        } from '../subworkflows/local/input_check'
+include { FASTQC_TRIMGALORE  } from '../subworkflows/nf-core/fastqc_trimgalore'
+include { CONTAMINANT_FILTER } from '../subworkflows/local/contaminant_filter'
+include { MIRNA_QUANT        } from '../subworkflows/local/mirna_quant'
+include { GENOME_QUANT       } from '../subworkflows/local/genome_quant'
+include { MIRTRACE           } from '../subworkflows/local/mirtrace'
+include { MIRDEEP2           } from '../subworkflows/local/mirdeep2'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -141,6 +150,24 @@ workflow SMRNASEQ {
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
     reads_for_mirna = FASTQC_TRIMGALORE.out.reads
+    //
+    // SUBWORKFLOW: remove contaminants from reads
+    //
+    if (params.filter_contamination){
+        CONTAMINANT_FILTER ( 
+            reference_hairpin,
+            params.rrna, 
+            params.trna, 
+            params.cdna, 
+            params.ncrna, 
+            params.pirna, 
+            FASTQC_TRIMGALORE.out.reads 
+        )
+        
+        reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
+        ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
+    }
+
     MIRNA_QUANT (
         reference_mature,
         reference_hairpin,
