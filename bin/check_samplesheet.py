@@ -40,12 +40,10 @@ def print_error(error, context="Line", context_str=""):
 def check_samplesheet(file_in, file_out):
     """
     This function checks that the samplesheet follows the following structure:
-
     sample,fastq_1
     SAMPLE_PE,SAMPLE_PE_RUN1_1.fastq.gz
     SAMPLE_PE,SAMPLE_PE_RUN2_1.fastq.gz
     SAMPLE_SE,SAMPLE_SE_RUN1_1.fastq.gz
-
     For an example see:
     https://raw.githubusercontent.com/nf-core/test-datasets/viralrecon/samplesheet/samplesheet_test_illumina_amplicon.csv
     """
