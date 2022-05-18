@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Major enhancements
 
+- Updated pipeline template to [nf-core/tools 2.4.1](https://github.com/nf-core/tools/releases/tag/2.4.1)
 - [[#137](https://github.com/nf-core/smrnaseq/issues/137)] - Update mirtop container to version `0.4.25` to fix multiqc error
-- Updated pipeline template to [nf-core/tools 2.3](https://github.com/nf-core/tools/releases/tag/2.3)
 - Port pipeline to the updated Nextflow DSL2 syntax adopted on nf-core/modules
 - Removed `--publish_dir_mode` as it is no longer required for the new syntax
 - Bump minimum Nextflow version from `20.04.0` -> `21.10.3`
