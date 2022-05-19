@@ -8,16 +8,18 @@ process FILTER_STATS {
         'quay.io/biocontainers/bowtie2:2.4.5--py36hfca12d5_2' }"
 
     input:
-    path reads
-    file stats
+    tuple val(meta), path(reads)
+    path stats_files
 
     output:
     path "*_mqc.yaml"                                         , emit: stats
 
     script:
     """
-    echo filtered*
-    touch test_mqc.yaml
+    for file in ./filtered.${meta.id}_*.stats
+    do
+        echo \$file
+    done
     """
 
 }
