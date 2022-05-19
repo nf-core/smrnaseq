@@ -10,11 +10,13 @@ process BOWTIE_MAP_CONTAMINANTS {
     input:
     tuple val(meta), path(reads) 
     path index
+    val contaminant_type
 
     output:
     tuple val(meta), path("*sam")                               , emit: bam
     tuple val(meta), path('*.filter.unmapped.contaminant.fastq'), emit: unmapped
     path "versions.yml"                                         , emit: versions
+    path "filtered.*.stats"                                   , emit: stats
 
     script:
     def index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
@@ -29,7 +31,7 @@ process BOWTIE_MAP_CONTAMINANTS {
         -S ${meta.id}.filter.contaminant.sam > ${meta.id}.contaminant_bowtie.log 2>&1
 
     # extracting number of reads from bowtie logs
-    awk 'BEGIN{tot=0} {if(NR==4 || NR == 5){tot += \$1}} END {print tot }' ${meta.id}.contaminant_bowtie.log | tr -d , > ${meta.id}.contaminants.txt
+    awk -v type=${contaminant_type} 'BEGIN{tot=0} {if(NR==4 || NR == 5){tot += \$1}} END {print type": "tot }' ${meta.id}.contaminant_bowtie.log | tr -d , > filtered.${meta.id}.stats
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
