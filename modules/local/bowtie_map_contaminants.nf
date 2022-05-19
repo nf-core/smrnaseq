@@ -31,7 +31,7 @@ process BOWTIE_MAP_CONTAMINANTS {
         -S ${meta.id}.filter.contaminant.sam > ${meta.id}.contaminant_bowtie.log 2>&1
 
     # extracting number of reads from bowtie logs
-    awk -v type=${contaminant_type} 'BEGIN{tot=0} {if(NR==4 || NR == 5){tot += \$1}} END {print type": "tot }' ${meta.id}.contaminant_bowtie.log | tr -d , > filtered.${meta.id}.stats
+    awk -v type=${contaminant_type} 'BEGIN{tot=0} {if(NR==4 || NR == 5){tot += \$1}} END {print type": "tot }' ${meta.id}.contaminant_bowtie.log | tr -d , > filtered.${meta.id}_${contaminant_type}.stats
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

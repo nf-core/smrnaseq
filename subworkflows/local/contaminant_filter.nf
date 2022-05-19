@@ -38,8 +38,8 @@ workflow CONTAMINANT_FILTER {
     rrna_reads = reads
 
     reads
-        .map { add_suffix(it, "rrna") }
-        .dump (tag:'rrna')
+        .map {}
+        .dump ()
         .set { rrna_reads }
 
 
@@ -51,14 +51,14 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(MAP_RRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_RRNA.out.stats.ifEmpty(null))
         MAP_RRNA.out.unmapped
-            .map { add_suffix(it, "rrna") }
-            .dump (tag:'rrna')
+            .map {}
+            .dump ()
             .set { rrna_reads }
     }
 
     rrna_reads
-        .map { add_suffix(it, "rrna") }
-        .dump (tag:'rrna')
+        .map {}
+        .dump ()
         .set { trna_reads }
 
     if (params.trna) {
@@ -69,14 +69,14 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(MAP_TRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_TRNA.out.stats.ifEmpty(null))
         MAP_TRNA.out.unmapped
-            .map { add_suffix(it, "trna") }
-            .dump (tag:'trna')
+            .map {}
+            .dump ()
             .set { trna_reads }
     }
 
     trna_reads
-        .map { add_suffix(it, "cdna") }
-        .dump (tag:'cdna')
+        .map {}
+        .dump ()
         .set { cdna_reads }
 
 
@@ -89,14 +89,14 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(MAP_CDNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_CDNA.out.stats.ifEmpty(null))
         MAP_CDNA.out.unmapped
-            .map { add_suffix(it, "cdna") }
-            .dump (tag:'cdna')
+            .map {}
+            .dump ()
             .set { cdna_reads }
     }
 
     cdna_reads
-        .map { add_suffix(it, "ncrna") }
-        .dump (tag:'ncrna')
+        .map {}
+        .dump ()
         .set { ncrna_reads }
 
     if (params.ncrna) {
@@ -108,14 +108,14 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(MAP_NCRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_NCRNA.out.stats.ifEmpty(null))
         MAP_NCRNA.out.unmapped
-            .map { add_suffix(it, "ncrna") }
-            .dump (tag:'ncrna')
+            .map {}
+            .dump ()
             .set { ncrna_reads }
     }
 
     ncrna_reads
-        .map { add_suffix(it, "pirna") }
-        .dump (tag:'pirna')
+        .map {}
+        .dump ()
         .set { pirna_reads }
 
     if (params.pirna) {
@@ -127,8 +127,8 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(MAP_PIRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_PIRNA.out.stats.ifEmpty(null))
         MAP_PIRNA.out.unmapped
-            .map { add_suffix(it, "pirna") }
-            .dump (tag:'pirna')
+            .map {}
+            .dump ()
             .set { pirna_reads }
     }
 
