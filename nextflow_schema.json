@@ -204,7 +204,7 @@
                     "description": "Path to an additional fasta file to be used as contamination database."
                 }
             }
-        }
+        },
         "skipping_pipeline_steps": {
             "title": "Skipping pipeline steps",
             "type": "object",
