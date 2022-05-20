@@ -168,6 +168,43 @@
                 }
             }
         },
+        "contamination_filtering": {
+            "title": "Contamination filter options",
+            "type": "object",
+            "description": "Options to remove contamination from the reads.",
+            "fa_icon": "fas fa-cut",
+            "properties": {
+                "filter_contamination": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Enables the contamination filtering."
+                },
+                "rrna": {
+                    "type": "file-path",
+                    "description": "Path to the rRNA fasta file to be used as contamination database."
+                },
+                "trna": {
+                    "type": "file-path",
+                    "description": "Path to the tRNA fasta file to be used as contamination database."
+                },
+                "cdna": {
+                    "type": "file-path",
+                    "description": "Path to the cDNA fasta file to be used as contamination database."
+                },
+                "ncrna": {
+                    "type": "file-path",
+                    "description": "Path to the ncRNA fasta file to be used as contamination database."
+                },
+                "pirna": {
+                    "type": "file-path",
+                    "description": "Path to the piRNA fasta file to be used as contamination database."
+                },
+                "other_contamination": {
+                    "type": "file-path",
+                    "description": "Path to an additional fasta file to be used as contamination database."
+                }
+            }
+        }
         "skipping_pipeline_steps": {
             "title": "Skipping pipeline steps",
             "type": "object",
