@@ -145,6 +145,7 @@ workflow SMRNASEQ {
     //
     // SUBWORKFLOW: remove contaminants from reads
     //
+    contamination_stats = Channel.empty()
     if (params.filter_contamination){
         CONTAMINANT_FILTER ( 
             reference_hairpin,
@@ -159,6 +160,8 @@ workflow SMRNASEQ {
         
         reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
         ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
+        CONTAMINANT_FILTER.out.filter_stats
+            .set { contamination_stats }
         
     }
 
@@ -208,7 +211,7 @@ workflow SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
 
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(CONTAMINANT_FILTER.out.filter_stats.collect().ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
