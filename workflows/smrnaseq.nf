@@ -1,11 +1,3 @@
-params.rrna                 = '/Users/chriskub/software/Q2687/Q2687/02_testdata/01_BI_data/contaminants/rRNACollection.fas'
-params.trna                 = ''
-params.cdna                 = '/Users/chriskub/software/Q2687/Q2687/02_testdata/01_BI_data/contaminants/Homo_sapiens.GRCh38.cdna.all.fa'
-params.ncrna                = '/Users/chriskub/software/Q2687/Q2687/02_testdata/01_BI_data/contaminants/Homo_sapiens.GRCh38.ncrna.fa'
-params.pirna                = ''
-params.filter_contamination = 'true'
-
-
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     VALIDATE INPUTS
@@ -161,6 +153,7 @@ workflow SMRNASEQ {
             params.cdna, 
             params.ncrna, 
             params.pirna, 
+            params.other_contamination
             FASTQC_TRIMGALORE.out.reads 
         )
         
@@ -214,6 +207,7 @@ workflow SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
 
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(CONTAMINANT_FILTER.out.filter_stats.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
