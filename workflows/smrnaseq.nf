@@ -1,3 +1,12 @@
+params.rrna                 = '/Users/chriskub/software/Q2687/Q2687/02_testdata/01_BI_data/contaminants/rRNACollection.fas'
+params.trna                 = '/Users/chriskub/software/Q2687/Q2687/02_testdata/01_BI_data/contaminants/hg38-tRNAs.fa'
+params.cdna                 = '/Users/chriskub/software/Q2687/Q2687/02_testdata/01_BI_data/contaminants/hsa.cdna.10000.fa'
+params.ncrna                = '/Users/chriskub/software/Q2687/Q2687/02_testdata/01_BI_data/contaminants/hsa.ncrna.10000.fa'
+params.pirna                = '/Users/chriskub/software/Q2687/Q2687/02_testdata/01_BI_data/contaminants/hsa.pirna.10000.fa'
+params.other_contamination  = ''
+params.filter_contamination = 'true'
+
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     VALIDATE INPUTS
@@ -153,7 +162,7 @@ workflow SMRNASEQ {
             params.cdna, 
             params.ncrna, 
             params.pirna, 
-            params.other_contamination
+            params.other_contamination,
             FASTQC_TRIMGALORE.out.reads 
         )
         
