@@ -12,8 +12,8 @@ process FILTER_STATS {
     path stats_files
 
     output:
-    path "*_mqc.yaml"                                         , emit: stats
-    tuple val(meta), path('*.filtered.fastq')                 , emit: reads
+    path "*_mqc.yaml"                                            , emit: stats
+    tuple val(meta), path('*.filtered.fastq.gz')                 , emit: reads
 
     script:
     """
@@ -21,7 +21,7 @@ process FILTER_STATS {
     cat ./filtered.${meta.id}_*.stats | \\
     tr '\n' ', ' | \\
     awk -v sample=${meta.id} -v readnumber=\$readnumber '{ print "id: \\"my_pca_section\\"\\nsection_name: \\"Contamination Filtering\\"\\ndescription: \\"This plot shows the amount of reads filtered by contaminant type.\\"\\nplot_type: \\"bargraph\\"\\npconfig:\\n  id: \\"contamination_filter_plot\\"\\n  title: \\"Contamination Plot\\"\\n  ylab: \\"Number of reads\\"\\ndata:\\n    "sample": {"\$0"\\"remaining reads\\": "readnumber"}" }' > ${meta.id}.contamination_mqc.yaml
-    cat ${reads} > ${meta.id}.filtered.fastq
+    gzip -c ${reads} > ${meta.id}.filtered.fastq.gz
     """
 
 }
