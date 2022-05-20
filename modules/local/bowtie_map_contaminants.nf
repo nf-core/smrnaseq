@@ -26,12 +26,12 @@ process BOWTIE_MAP_CONTAMINANTS {
         --very-sensitive-local \\
         -k 1 \\
         -x $index_base \\
-        --un ${meta.id}.filter.unmapped.contaminant.fastq \\
+        --un ${meta.id}.${contaminant_type}.filter.unmapped.contaminant.fastq \\
         ${reads} \\
         -S ${meta.id}.filter.contaminant.sam > ${meta.id}.contaminant_bowtie.log 2>&1
 
     # extracting number of reads from bowtie logs
-    awk -v type=${contaminant_type} 'BEGIN{tot=0} {if(NR==4 || NR == 5){tot += \$1}} END {print type": "tot }' ${meta.id}.contaminant_bowtie.log | tr -d , > filtered.${meta.id}_${contaminant_type}.stats
+    awk -v type=${contaminant_type} 'BEGIN{tot=0} {if(NR==4 || NR == 5){tot += \$1}} END {print "\\""type"\\": "tot }' ${meta.id}.contaminant_bowtie.log | tr -d , > filtered.${meta.id}_${contaminant_type}.stats
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
