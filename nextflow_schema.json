@@ -429,6 +429,9 @@
             "$ref": "#/definitions/trimming_options"
         },
         {
+            "$ref": "#/definitions/contamination_filtering"
+        },
+        {
             "$ref": "#/definitions/skipping_pipeline_steps"
         },
         {
