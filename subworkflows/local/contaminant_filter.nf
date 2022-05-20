@@ -127,11 +127,3 @@ workflow CONTAMINANT_FILTER {
     versions = ch_versions
     filter_stats = FILTER_STATS.out.stats
 }
-
-def add_suffix(row, suffix) {
-    def meta = [:]
-    meta.id           = "${row[0].id}_${suffix}"
-    def array = []
-    array = [ meta, row[1] ]
-    return array
-}
