@@ -38,6 +38,7 @@ workflow CONTAMINANT_FILTER {
 
     ch_versions = Channel.empty()
     ch_filter_stats = Channel.empty()
+    ch_mqc_results = Channel.empty()
 
     rrna_reads = reads
 
@@ -120,7 +121,6 @@ workflow CONTAMINANT_FILTER {
     }
 
     FILTER_STATS ( other_cont_reads, ch_filter_stats.collect() )
-
 
     emit:
     filtered_reads = FILTER_STATS.out.reads
