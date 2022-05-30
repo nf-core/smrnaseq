@@ -129,7 +129,6 @@ workflow SMRNASEQ {
     MIRTRACE (ch_cat_fastq)
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
 
-
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters
     //
