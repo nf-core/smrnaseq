@@ -31,7 +31,6 @@ workflow MIRNA_QUANT {
     reads      // channel: [ val(meta), [ reads ] ]
 
     main:
-
     ch_versions = Channel.empty()
 
     PARSE_MATURE ( mature ).parsed_fasta.set { mirna_parsed }
