@@ -22,14 +22,14 @@ process MIRDEEP2_RUN {
     script:
     """
     miRDeep2.pl \\
-    $reads \\
-    $fasta \\
-    $arf \\
-    $mature \\
-    none \\
-    $hairpin \\
-    -d \\
-    -z _${reads.simpleName}
+      $reads \\
+      $fasta \\
+      $arf \\
+      $mature \\
+      none \\
+      $hairpin \\
+      -d \\
+      -z _${reads.simpleName}
 
     cat <<-END_VERSIONS > versions.yml
     ${task.process}":
