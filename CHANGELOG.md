@@ -24,10 +24,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Parameters
 
-| Old parameter        | New parameter    |
-| -------------------- | ---------------- |
-| `--conda`            | `--enable_conda` |
-| `--clusterOptions`   |                  |
+| Old parameter      | New parameter    |
+| ------------------ | ---------------- |
+| `--conda`          | `--enable_conda` |
+| `--clusterOptions` |                  |
 
 > **NB:** Parameter has been **updated** if both old and new parameter information is present.
 > **NB:** Parameter has been **added** if just the new parameter information is present.
