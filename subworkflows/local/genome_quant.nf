@@ -13,7 +13,6 @@ workflow GENOME_QUANT {
     reads      // channel: [ val(meta), [ reads ] ]
 
     main:
-
     ch_versions = Channel.empty()
 
     if (!bt_index){
