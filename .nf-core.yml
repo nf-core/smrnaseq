@@ -1,0 +1,8 @@
+repository_type: pipeline
+lint:
+  files_unchanged:
+    - .github/workflows/linting.yml
+    - .github/workflows/branch.yml
+    - .github/workflows/ci.yml
+    - .github/workflows/linting.yml
+    - .github/workflows/linting_comment.yml
