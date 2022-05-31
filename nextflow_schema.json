@@ -94,7 +94,7 @@
                     "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
                     "default": "https://mirbase.org/ftp/CURRENT/hairpin.fa.gz"
                 },
-                "bt_indices": {
+                "bowtie_indices": {
                     "type": "string",
                     "description": "Path to a Bowtie 1 index directory",
                     "fa_icon": "fas fa-book",

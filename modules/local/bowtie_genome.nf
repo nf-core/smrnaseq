@@ -11,7 +11,7 @@ process INDEX_GENOME {
     path fasta
 
     output:
-    path 'genome*ebwt'     , emit: bt_indices
+    path 'genome*ebwt'     , emit: bowtie_indices
     path 'genome.edited.fa', emit: fasta
     path "versions.yml"    , emit: versions
 

@@ -17,16 +17,16 @@ workflow GENOME_QUANT {
 
     if (!bt_index){
         INDEX_GENOME ( fasta )
-        bt_indices      = INDEX_GENOME.out.bt_indices
+        bowtie_indices      = INDEX_GENOME.out.bowtie_indices
         fasta_formatted = INDEX_GENOME.out.fasta
         ch_versions     = ch_versions.mix(INDEX_GENOME.out.versions)
     } else {
-        bt_indices      = Channel.fromPath("${bt_index}**ebwt", checkIfExists: true).ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_index}" }
+        bowtie_indices      = Channel.fromPath("${bt_index}**ebwt", checkIfExists: true).ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_index}" }
         fasta_formatted = fasta
     }
 
-    if (bt_indices){
-        BOWTIE_MAP_GENOME ( reads, bt_indices.collect() )
+    if (bowtie_indices){
+        BOWTIE_MAP_GENOME ( reads, bowtie_indices.collect() )
         ch_versions = ch_versions.mix(BOWTIE_MAP_GENOME.out.versions)
 
         BAM_SORT_SAMTOOLS ( BOWTIE_MAP_GENOME.out.bam, Channel.empty()  )
@@ -35,7 +35,7 @@ workflow GENOME_QUANT {
 
     emit:
     fasta    = fasta_formatted
-    indices  = bt_indices
+    indices  = bowtie_indices
     stats    = BAM_SORT_SAMTOOLS.out.stats
 
     versions = ch_versions
