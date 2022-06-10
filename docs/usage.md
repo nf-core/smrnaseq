@@ -42,12 +42,13 @@ If `MirGeneDB` should be used instead it needs to be specified using `--mirGeneD
 ### Contamination filtering
 
 Contamination filtering of the sequencing reads is optional and can be invoked using `filter_contamination`. FASTA files with contamination sequences to use need to be supplied, otherwise the contamination filtering of the specific type will be omitted. using the following commands:
-- `rrna`: Used to supply a FASTA file containing rRNA conatminations sequence. 
+
+- `rrna`: Used to supply a FASTA file containing rRNA conatminations sequence.
 - `trna`: Used to supply a FASTA file containing tRNA conatminations sequence. e.g. `http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/hg38-tRNAs.fa`
-- `cdna`: Used to supply a FASTA file containing cDNA conatminations sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed. 
-- `ncrna`: Used to supply a FASTA file containing ncRNA conatminations sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed. 
-- `pirna`: Used to supply a FASTA file containing piRNA conatminations sequence. e.g. The FASTA file is first compared to the available miRNA sequences and overlaps are removed. 
-- `other_contamination`: Used to supply an additional filtering set. The FASTA file is first compared to the available miRNA sequences and overlaps are removed. 
+- `cdna`: Used to supply a FASTA file containing cDNA conatminations sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `ncrna`: Used to supply a FASTA file containing ncRNA conatminations sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `pirna`: Used to supply a FASTA file containing piRNA conatminations sequence. e.g. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `other_contamination`: Used to supply an additional filtering set. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 
 ## Samplesheet input
 

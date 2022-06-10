@@ -14,7 +14,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 - [FastQC](#fastqc) - read quality control
 - [TrimGalore](#trimgalore) - adapter trimming
-- [Bowtie2](#bowtie2) - contamination filtering 
+- [Bowtie2](#bowtie2) - contamination filtering
 - [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
 - [SAMtools](#samtools) - alignment result processing and feature counting
 - [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap

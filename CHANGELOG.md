@@ -14,21 +14,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Parameters
 
-| Old parameter | New parameter         |
-| ------------- | --------------------- |
-|               | `--mirGeneDB`         |
-|               | `--mirGeneDB_species` |
-|               | `--mirGeneDB_gff`     |
-|               | `--mirGeneDB_mature`  |
-|               | `--mirGeneDB_hairpin` |
-|                      | `--contamination_filter` |
-|                      | `--rrna`                 |
-|                      | `--trna`                 |
-|                      | `--cdna`                 |
-|                      | `--ncrna`                |
-|                      | `--pirna`                |
-|                      | `--other_contamination`  |
-
+| Old parameter | New parameter            |
+| ------------- | ------------------------ |
+|               | `--mirGeneDB`            |
+|               | `--mirGeneDB_species`    |
+|               | `--mirGeneDB_gff`        |
+|               | `--mirGeneDB_mature`     |
+|               | `--mirGeneDB_hairpin`    |
+|               | `--contamination_filter` |
+|               | `--rrna`                 |
+|               | `--trna`                 |
+|               | `--cdna`                 |
+|               | `--ncrna`                |
+|               | `--pirna`                |
+|               | `--other_contamination`  |
 
 ## [v2.0.0](https://github.com/nf-core/smrnaseq/releases/tag/2.0.0) - 2022-05-31 Aqua Zinc Chihuahua
 
@@ -51,11 +50,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Parameters
 
-| Old parameter      | New parameter    |
-| ------------------ | ---------------- |
-| `--conda`            | `--enable_conda`         |
-| `--clusterOptions`   |                          |
-| `--publish_dir_mode` |                          |
+| Old parameter        | New parameter    |
+| -------------------- | ---------------- |
+| `--conda`            | `--enable_conda` |
+| `--clusterOptions`   |                  |
+| `--publish_dir_mode` |                  |
 
 > **NB:** Parameter has been **updated** if both old and new parameter information is present.
 > **NB:** Parameter has been **added** if just the new parameter information is present.
