@@ -34,7 +34,6 @@ If `MirGeneDB` should be used instead it needs to be specified using `--mirGeneD
 - `mirGeneDB_mature`: points to the FASTA file of mature miRNA sequences. Download from `https://mirgenedb.org/download`.
 - `mirGeneDB_hairpin`: points to the FASTA file of precursor miRNA sequences. Download from `https://mirgenedb.org/download`. Note that `MirGeneDB` does not have a dedicated `hairpin` file, but the `Precursor sequences` are to be used.
 
-
 ### Genome
 
 - `fasta`: the reference genome FASTA file
