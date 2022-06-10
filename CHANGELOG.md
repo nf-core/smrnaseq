@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Enhancements & fixes
 
+| Old parameter | New parameter         |
+| ------------- | --------------------- |
+|               | `--mirGeneDB`         |
+|               | `--mirGeneDB_species` |
+|               | `--mirGeneDB_gff`     |
+|               | `--mirGeneDB_mature`  |
+|               | `--mirGeneDB_hairpin` |
+
+### Other enhancements
+
+- [#55](https://github.com/nf-core/smrnaseq/issues/12) - Enabled the use of `MirGeneDB` as an alternative database insted of `miRBase`
+
 ### Parameters
 
 ## [v2.0.0](https://github.com/nf-core/smrnaseq/releases/tag/2.0.0) - 2022-05-31 Aqua Zinc Chihuahua

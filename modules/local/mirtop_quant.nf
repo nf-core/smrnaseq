@@ -11,6 +11,8 @@ process MIRTOP_QUANT {
     path hairpin
     path gtf
 
+    //if (!params.mirGeneDB) {params.filterSpecies = params.mirtrace_species} else {params.filterSpecies = params.mirGeneDB_species}
+
     output:
     path "mirtop/mirtop.gff"
     path "mirtop/mirtop.tsv"        , emit: mirtop_table
@@ -20,9 +22,9 @@ process MIRTOP_QUANT {
 
     script:
     """
-    mirtop gff --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species ./bams/*
-    mirtop counts --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species --add-extra --gff mirtop/mirtop.gff
-    mirtop export --format isomir --hairpin $hairpin --gtf $gtf --sps $params.mirtrace_species -o mirtop mirtop/mirtop.gff
+    mirtop gff --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.filterSpecies ./bams/*
+    mirtop counts --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.filterSpecies --add-extra --gff mirtop/mirtop.gff
+    mirtop export --format isomir --hairpin $hairpin --gtf $gtf --sps $params.filterSpecies -o mirtop mirtop/mirtop.gff
     mirtop stats mirtop/mirtop.gff --out mirtop/stats
     mv mirtop/stats/mirtop_stats.log mirtop/stats/full_mirtop_stats.log
 

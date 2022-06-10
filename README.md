@@ -31,13 +31,13 @@ On release, automated continuous integration tests run the pipeline on a full-si
 2. Adapter trimming ([`Trim Galore!`](https://www.bioinformatics.babraham.ac.uk/projects/trim_galore/))
    1. Insert Size calculation
    2. Collapse reads ([`seqcluster`](https://seqcluster.readthedocs.io/mirna_annotation.html#processing-of-reads))
-3. Alignment against miRBase mature miRNA ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
-4. Alignment against miRBase hairpin
+3. Alignment against miRBase or MirGeneDB mature miRNA ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
+4. Alignment against miRBase or MirGeneDB hairpin
    1. Unaligned reads from step 3 ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
    2. Collapsed reads from step 2.2 ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
-5. Post-alignment processing of miRBase hairpin
+5. Post-alignment processing of miRBase, or MirGeneDB hairpin
    1. Basic statistics from step 3 and step 4.1 ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-   2. Analysis on miRBase hairpin counts ([`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html))
+   2. Analysis on miRBase, or MirGeneDB hairpin counts ([`edgeR`](https://bioconductor.org/packages/release/bioc/html/edgeR.html))
       - TMM normalization and a table of top expression hairpin
       - MDS plot clustering samples
       - Heatmap of sample similarities
