@@ -5,12 +5,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unpublished Version / DEV]
 
+### Enhancements & fixes
+
+| Old parameter        | New parameter         |
+| -------------------- | --------------------- |
+|                      | `--mirGeneDB`         |
+|                      | `--mirGeneDB_species` |
+|                      | `--mirGeneDB_gff`     |
+|                      | `--mirGeneDB_mature`  |
+|                      | `--mirGeneDB_hairpin` |
+### Parameters
+
+## [v2.0.0](https://github.com/nf-core/smrnaseq/releases/tag/2.0.0) - 2022-05-31 Aqua Zinc Chihuahua
+
 ### Major enhancements
 
 - Updated pipeline template to [nf-core/tools 2.4.1](https://github.com/nf-core/tools/releases/tag/2.4.1)
 - [[#137](https://github.com/nf-core/smrnaseq/issues/137)] - Update mirtop container to version `0.4.25` to fix multiqc error
 - Port pipeline to the updated Nextflow DSL2 syntax adopted on nf-core/modules
-- Removed `--publish_dir_mode` as it is no longer required for the new syntax
 - Bump minimum Nextflow version from `20.04.0` -> `21.10.3`
 - Point to the proper test data branch
 - Software version(s) will now be reported for every module imported during a given pipeline execution
@@ -26,17 +38,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Parameters
 
-| Old parameter        | New parameter         |
-| -------------------- | --------------------- |
-| `--conda`            | `--enable_conda`      |
-| `--clusterOptions`   |                       |
-| `--publish_dir_mode` |                       |
-|                      | `--mirGeneDB`         |
-|                      | `--mirGeneDB_species` |
-|                      | `--mirGeneDB_gff`     |
-|                      | `--mirGeneDB_mature`  |
-|                      | `--mirGeneDB_hairpin` |
-
+| Old parameter      | New parameter    |
+| ------------------ | ---------------- |
+| `--conda`          | `--enable_conda` |
+| `--clusterOptions` |                  |
 
 > **NB:** Parameter has been **updated** if both old and new parameter information is present.
 > **NB:** Parameter has been **added** if just the new parameter information is present.

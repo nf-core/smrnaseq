@@ -9,7 +9,6 @@ workflow MIRTRACE {
     reads      // channel: [ val(meta), [ reads ] ]
 
     main:
-
     reads
         .map { it[1] }
         .flatten()

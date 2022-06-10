@@ -25,7 +25,8 @@ if (!params.mirtrace_species){
 }
 // Genome options
 bt_index_from_species = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
-bt_index = params.bt_indices ?: bt_index_from_species
+bt_index              = params.bowtie_indices ?: bt_index_from_species
+
 mirtrace_species_from_species = params.genome ? params.genomes[ params.genome ].mirtrace_species ?: false : false
 mirtrace_species = params.mirtrace_species ?: mirtrace_species_from_species
 fasta_from_species = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
@@ -136,7 +137,6 @@ workflow SMRNASEQ {
     //
     MIRTRACE (ch_cat_fastq)
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
-
 
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters
