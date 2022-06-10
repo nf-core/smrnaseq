@@ -15,6 +15,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 |               | `--mirGeneDB_mature`  |
 |               | `--mirGeneDB_hairpin` |
 
+### Other enhancements
+
+- [#55](https://github.com/nf-core/smrnaseq/issues/12) - Enabled the use of `MirGeneDB` as an alternative database insted of `miRBase`
+
 ### Parameters
 
 ## [v2.0.0](https://github.com/nf-core/smrnaseq/releases/tag/2.0.0) - 2022-05-31 Aqua Zinc Chihuahua
@@ -34,7 +38,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Other enhancements & fixes
 
 - [#134](https://github.com/nf-core/smrnaseq/issues/134) - Fixed colSum of zero issues for edgeR_miRBase.R script
-- [#55](https://github.com/nf-core/smrnaseq/issues/12) - Enabled the use of `MirGeneDB` as an alternative database insted of `miRBase`
 - [#55](https://github.com/lpantano/seqcluster/pull/55) - update seqcluster to fix UMI-detecting bug
 
 ### Parameters
