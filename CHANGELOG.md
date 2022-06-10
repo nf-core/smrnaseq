@@ -23,7 +23,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 |               | `--mirGeneDB_mature`  |
 |               | `--mirGeneDB_hairpin` |
 
-
 ## [v2.0.0](https://github.com/nf-core/smrnaseq/releases/tag/2.0.0) - 2022-05-31 Aqua Zinc Chihuahua
 
 ### Major enhancements
