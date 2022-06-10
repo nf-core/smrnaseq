@@ -67,7 +67,7 @@ MultiQC reports the number of reads that were removed by each of the contaminant
 
 ## Bowtie
 
-[Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) in [miRBase](http://www.mirbase.org/).
+[Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) of the chosen database [miRBase](http://www.mirbase.org/) or [MirGeneDB](https://mirgenedb.org/).
 
 **Output directory: `results/samtools`**
 

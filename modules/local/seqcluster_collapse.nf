@@ -2,9 +2,9 @@ process SEQCLUSTER_SEQUENCES {
     label 'process_medium'
     tag "$meta.id"
 
-    conda (params.enable_conda ? 'bioconda::seqcluster=1.2.8-0' : null)
+    conda (params.enable_conda ? 'bioconda::seqcluster=1.2.9-0' : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/seqcluster:1.2.8--pyh5e36f6f_0' :
+        'https://depot.galaxyproject.org/singularity/seqcluster:1.2.9--pyh5e36f6f_0' :
         'quay.io/biocontainers/seqcluster:1.2.8--pyh5e36f6f_0' }"
 
     input:

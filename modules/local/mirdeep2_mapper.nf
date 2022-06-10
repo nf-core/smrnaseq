@@ -23,15 +23,15 @@ process MIRDEEP2_MAPPER {
     """
     mapper.pl \\
     $reads \\
-    -e \\
-    -h \\
-    -i \\
-    -j \\
-    -m \\
-    -p $index_base \\
-    -s ${meta.id}_collapsed.fa \\
-    -t ${meta.id}_reads_vs_refdb.arf \\
-    -o 4
+        -e \\
+        -h \\
+        -i \\
+        -j \\
+        -m \\
+        -p $index_base \\
+        -s ${meta.id}_collapsed.fa \\
+        -t ${meta.id}_reads_vs_refdb.arf \\
+        -o 4
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

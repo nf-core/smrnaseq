@@ -16,15 +16,23 @@ This option indicates the experimental protocol used for the sample preparation.
 - 'cats': adapter (`GATCGGAAGAGCACACGTCTG), clip_r1(`3)
 - 'custom' (where the ser can indicate the `three_prime_adapter`, `clip_r1` and three_prime_clip_r1`)
 
-### `mirtrace_species`
+### `mirtrace_species or mirGeneDB_species`
 
-It should point to the 3-letter species name used by `miRBase`.
+It should point to the 3-letter species name used by `miRBase`, or `MirGeneDB`. Note the difference in case for the two databases.
 
 ### miRNA related files
+
+Different parameters can be set for the two supported datbases. By default `miRBase` will be used with the parameters below.
 
 - `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRbase: `https://mirbase.org/ftp/CURRENT/genomes/${params.mirtrace_species}.gff3`
 - `mature`: points to the FASTA file of mature miRNA sequences. `https://mirbase.org/ftp/CURRENT/mature.fa.gz`
 - `hairpin`: points to the FASTA file of precursor miRNA sequences. `https://mirbase.org/ftp/CURRENT/hairpin.fa.gz`
+
+If `MirGeneDB` should be used instead it needs to be specified using `--mirGeneDB` and use the parameters below .
+
+- `mirGeneDB_gff`: The data can not be downloaded automatically, thus the user needs to supply the gff file for either his species, or all species downloaded from `https://mirgenedb.org/download`. The total set will automatically be subsetted to the species specified with `mirGeneDB_species`.
+- `mirGeneDB_mature`: points to the FASTA file of mature miRNA sequences. Download from `https://mirgenedb.org/download`.
+- `mirGeneDB_hairpin`: points to the FASTA file of precursor miRNA sequences. Download from `https://mirgenedb.org/download`. Note that `MirGeneDB` does not have a dedicated `hairpin` file, but the `Precursor sequences` are to be used.
 
 ### Genome
 

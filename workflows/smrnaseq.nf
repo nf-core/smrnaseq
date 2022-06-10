@@ -25,7 +25,8 @@ if (!params.mirtrace_species){
 }
 // Genome options
 bt_index_from_species = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
-bt_index              = params.bt_indices ?: bt_index_from_species
+bt_index              = params.bowtie_indices ?: bt_index_from_species
+
 mirtrace_species_from_species = params.genome ? params.genomes[ params.genome ].mirtrace_species ?: false : false
 mirtrace_species = params.mirtrace_species ?: mirtrace_species_from_species
 fasta_from_species = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
@@ -51,8 +52,16 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
-if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
+if (!params.mirGeneDB) {
+    if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
+    if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
+    params.filterSpecies = params.mirtrace_species
+} else {
+    if (params.mirGeneDB_mature) { reference_mature = file(params.mirGeneDB_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mirGeneDB_mature}" }
+    if (params.mirGeneDB_hairpin) { reference_hairpin = file(params.mirGeneDB_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.mirGeneDB_hairpin}" }
+    if (params.mirGeneDB_gff) { mirna_gtf = file(params.mirGeneDB_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found: ${params.mirGeneDB_gff}"}  
+    params.filterSpecies = params.mirGeneDB_species
+}
 
 include { INPUT_CHECK        } from '../subworkflows/local/input_check'
 include { FASTQC_TRIMGALORE  } from '../subworkflows/nf-core/fastqc_trimgalore'
@@ -129,7 +138,6 @@ workflow SMRNASEQ {
     //
     MIRTRACE (ch_cat_fastq)
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
-
 
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters

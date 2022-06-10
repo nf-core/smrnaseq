@@ -15,7 +15,6 @@ workflow MIRDEEP2 {
     mature
 
     main:
-
     ch_versions = Channel.empty()
 
     MIRDEEP2_PIGZ ( reads )

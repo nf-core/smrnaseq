@@ -5,14 +5,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unpublished Version / DEV]
 
+### Enhancements & fixes
+
+### Other enhancements
+
+- [#55](https://github.com/nf-core/smrnaseq/issues/12) - Enabled the use of `MirGeneDB` as an alternative database insted of `miRBase`
+- [#113](https://github.com/nf-core/smrnaseq/issues/113) - Added a optional contamination filtering step, including MultiQC plot.
+
+### Parameters
+
+| Old parameter | New parameter         |
+| ------------- | --------------------- |
+|               | `--mirGeneDB`         |
+|               | `--mirGeneDB_species` |
+|               | `--mirGeneDB_gff`     |
+|               | `--mirGeneDB_mature`  |
+|               | `--mirGeneDB_hairpin` |
+|                      | `--contamination_filter` |
+|                      | `--rrna`                 |
+|                      | `--trna`                 |
+|                      | `--cdna`                 |
+|                      | `--ncrna`                |
+|                      | `--pirna`                |
+|                      | `--other_contamination`  |
+
+
+## [v2.0.0](https://github.com/nf-core/smrnaseq/releases/tag/2.0.0) - 2022-05-31 Aqua Zinc Chihuahua
+
 ### Major enhancements
 
-- Updated pipeline template to [nf-core/tools 2.3](https://github.com/nf-core/tools/releases/tag/2.3)
+- Updated pipeline template to [nf-core/tools 2.4.1](https://github.com/nf-core/tools/releases/tag/2.4.1)
+- [[#137](https://github.com/nf-core/smrnaseq/issues/137)] - Update mirtop container to version `0.4.25` to fix multiqc error
 - Port pipeline to the updated Nextflow DSL2 syntax adopted on nf-core/modules
-- Removed `--publish_dir_mode` as it is no longer required for the new syntax
 - Bump minimum Nextflow version from `20.04.0` -> `21.10.3`
 - Point to the proper test data branch
-- Update mirtop container
 - Software version(s) will now be reported for every module imported during a given pipeline execution
 - Updated `nextflow_schema.json` should now display correctly on Nextflow Tower
 - Added mirtop logs to multiqc
@@ -21,22 +47,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Other enhancements & fixes
 
 - [#134](https://github.com/nf-core/smrnaseq/issues/134) - Fixed colSum of zero issues for edgeR_miRBase.R script
-- [#113](https://github.com/nf-core/smrnaseq/issues/113) - Added a optional contamination filtering step, including MultiQC plot.
+- [#55](https://github.com/lpantano/seqcluster/pull/55) - update seqcluster to fix UMI-detecting bug
 
 ### Parameters
 
-| Old parameter        | New parameter            |
-| -------------------- | ------------------------ |
+| Old parameter      | New parameter    |
+| ------------------ | ---------------- |
 | `--conda`            | `--enable_conda`         |
 | `--clusterOptions`   |                          |
 | `--publish_dir_mode` |                          |
-|                      | `--contamination_filter` |
-|                      | `--rrna`                 |
-|                      | `--trna`                 |
-|                      | `--cdna`                 |
-|                      | `--ncrna`                |
-|                      | `--pirna`                |
-|                      | `--other_contamination`  |
 
 > **NB:** Parameter has been **updated** if both old and new parameter information is present.
 > **NB:** Parameter has been **added** if just the new parameter information is present.
@@ -51,7 +70,7 @@ Note, since the pipeline is now using Nextflow DSL2, each process will be run wi
 | `bioconductor-edger` | 3.26.5      | 3.36.0      |
 | `bioconductor-limma` | 3.40.2      | 3.50.0      |
 | `mirdeep2`           | 2.0.1.2     | 2.0.1.3     |
-| `mirtop`             | 0.4.23      | 0.4.24      |
+| `mirtop`             | 0.4.23      | 0.4.25      |
 | `multiqc`            | 1.10.1      | 1.12.0      |
 | `python`             | 3.7.3       | 3.8.3       |
 | `r-base`             | 3.6.3       | 4.0.3       |
@@ -59,7 +78,7 @@ Note, since the pipeline is now using Nextflow DSL2, each process will be run wi
 | `r-gplots`           | 3.0.1.1     | 3.1.1       |
 | `r-statmod`          | 1.4.32      | 1.4.36      |
 | `samtools`           | 1.12        | 1.13        |
-| `seqcluster`         | 1.2.7       | 1.2.8       |
+| `seqcluster`         | 1.2.7       | 1.2.9       |
 | `seqkit`             | 0.16.0      | 2.0.0       |
 | `trim-galore`        | 0.6.6       | 0.6.7       |
 | `bioconvert`         | -           | 0.4.3       |
