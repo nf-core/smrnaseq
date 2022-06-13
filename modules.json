@@ -15,6 +15,9 @@
             "multiqc": {
                 "git_sha": "49b18b1639f4f7104187058866a8fab33332bdfe"
             },
+            "samtools/bam2fq": {
+                "git_sha": "5510ea39fe638594bc26ac34cadf4a84bf27d159"
+            },
             "samtools/flagstat": {
                 "git_sha": "1ad73f1b2abdea9398680d6d20014838135c9a35"
             },
