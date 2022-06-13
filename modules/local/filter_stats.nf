@@ -1,5 +1,4 @@
 process FILTER_STATS {
-//    tag "$meta.id"
     label 'process_medium'
 
     conda (params.enable_conda ? 'bowtie2=2.4.5' : null)

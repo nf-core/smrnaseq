@@ -1,5 +1,4 @@
 process BOWTIE_MAP_CONTAMINANTS {
-//    tag "$meta.id"
     label 'process_medium'
 
     conda (params.enable_conda ? 'bowtie2=2.4.5' : null)
@@ -8,7 +7,7 @@ process BOWTIE_MAP_CONTAMINANTS {
         'quay.io/biocontainers/bowtie2:2.4.5--py36hfca12d5_2' }"
 
     input:
-    tuple val(meta), path(reads) 
+    tuple val(meta), path(reads)
     path index
     val contaminant_type
 

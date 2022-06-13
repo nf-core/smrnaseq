@@ -10,8 +10,8 @@ process INDEX_CONTAMINANTS {
     path fasta
 
     output:
-    path 'fasta_bidx*' , emit: bt_indices
-    path "versions.yml", emit: versions
+    path 'fasta_bidx*'  , emit: bt_indices
+    path "versions.yml" , emit: versions
 
     script:
     """
