@@ -54,12 +54,13 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
 if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
 
-include { INPUT_CHECK       } from '../subworkflows/local/input_check'
+include { INPUT_CHECK                } from '../subworkflows/local/input_check'
 include { FASTQC_UMITOOLS_TRIMGALORE } from '../subworkflows/nf-core/fastqc_umitools_trimgalore'
-include { MIRNA_QUANT       } from '../subworkflows/local/mirna_quant'
-include { GENOME_QUANT      } from '../subworkflows/local/genome_quant'
-include { MIRTRACE          } from '../subworkflows/local/mirtrace'
-include { MIRDEEP2          } from '../subworkflows/local/mirdeep2'
+include { DEDUPLICATE_UMIS           } from '../subworkflows/local/umi_dedup'
+include { MIRNA_QUANT                } from '../subworkflows/local/mirna_quant'
+include { GENOME_QUANT               } from '../subworkflows/local/genome_quant'
+include { MIRTRACE                   } from '../subworkflows/local/mirtrace'
+include { MIRDEEP2                   } from '../subworkflows/local/mirdeep2'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -135,14 +136,26 @@ workflow SMRNASEQ {
     //
     FASTQC_UMITOOLS_TRIMGALORE (
         ch_cat_fastq,
-        params.with_umi,
-        params.umi_discard_read,
         params.skip_fastqc || params.skip_qc,
-        params.skip_trimming
+        params.with_umi,
+        params.skip_trimming,
+        params.umi_discard_read
     )
     ch_versions = ch_versions.mix(FASTQC_UMITOOLS_TRIMGALORE.out.versions)
 
     reads_for_mirna = FASTQC_UMITOOLS_TRIMGALORE.out.reads
+
+    reads_for_mirna.view()
+
+    if (params.with_umi){
+        if (fasta){
+            fasta_ch = file(fasta)
+            DEDUPLICATE_UMIS (fasta_ch, bt_index, FASTQC_UMITOOLS_TRIMGALORE.out.reads)
+            reads_for_mirna = DEDUPLICATE_UMIS.out.reads
+            ch_versions = ch_versions.mix(DEDUPLICATE_UMIS.out.versions)
+        }
+    }
+
     MIRNA_QUANT (
         reference_mature,
         reference_hairpin,
