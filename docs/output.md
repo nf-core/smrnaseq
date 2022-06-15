@@ -15,6 +15,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [FastQC](#fastqc) - read quality control
 - [UMI-tools extract](#umi-tools-extract) - UMI barcode extraction
 - [TrimGalore](#trimgalore) - adapter trimming
+- [UMI-tools deduplicate](#umi-tools-deduplicate) - read deduplication
 - [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
 - [SAMtools](#samtools) - alignment result processing and feature counting
 - [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
@@ -51,7 +52,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 </details>
 
-[UMI-tools](https://github.com/CGATOxford/UMI-tools) deduplicates reads based on unique molecular identifiers (UMIs) to address PCR-bias. Firstly, the UMI-tools `extract` command removes the UMI barcode information from the read sequence and adds it to the read name. Secondly, reads are deduplicated based on UMI identifier after mapping as highlighted in the [UMI-tools dedup](#umi-tools-dedup) section.
+[UMI-tools](https://github.com/CGATOxford/UMI-tools) deduplicates reads based on unique molecular identifiers (UMIs) to address PCR-bias. Firstly, the UMI-tools `extract` command removes the UMI barcode information from the read sequence and adds it to the read name. Secondly, reads are deduplicated based on UMI identifier after mapping as highlighted in the [UMI-tools deduplicate](#umi-tools-deduplicate) section.
 
 To facilitate processing of input data which has the UMI barcode already embedded in the read name from the start, `--skip_umi_extract` can be specified in conjunction with `--with_umi`.
 
@@ -73,6 +74,20 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 This is an example of the output we can get:
 
 ![cutadapt](images/cutadapt_plot.png)
+
+## UMI-tools deduplicate
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `umi_dedup/`
+  - `*.tsv`: Results statistics files detailing the UMI deduplication results.
+  - `*.bam`: If `--save_umi_intermeds` is specified, the deduplicated bam files **after** UMI deduplication will be placed in this directory. In addition the sorted and indexed files will be placed there as well.
+  - `samtools_stats/`
+    - `*.{stats,flagstat,idxstats}:` Statistics on the mappings underlying the UMI deduplication.
+</details>
+
+[UMI-tools](https://github.com/CGATOxford/UMI-tools) deduplicates reads based on unique molecular identifiers (UMIs) to address PCR-bias. Firstly, the UMI-tools `extract` command removes the UMI barcode information from the read sequence and adds it to the read name as highlighted in the [UMI-tools extract](#umi-tools-extract) section. The reads are deduplicated based on an alignment against the full genome of the species. The deduplicated reads are converted into fastq format and then used in the pipeline.
 
 ## Bowtie
 
