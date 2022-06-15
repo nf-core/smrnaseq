@@ -30,8 +30,6 @@ workflow DEDUPLICATE_UMIS {
     }
 
     if (bt_indices){
-
-        reads.view()
         
         BOWTIE_MAP_GENOME ( reads, bt_indices.collect() )
         ch_versions = ch_versions.mix(BOWTIE_MAP_GENOME.out.versions)
@@ -39,11 +37,7 @@ workflow DEDUPLICATE_UMIS {
         BAM_SORT_SAMTOOLS ( BOWTIE_MAP_GENOME.out.bam, Channel.empty() )
         ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
 
-        BAM_SORT_SAMTOOLS.out.bam.view()
         ch_umi_dedup = BAM_SORT_SAMTOOLS.out.bam.join(BAM_SORT_SAMTOOLS.out.bai)
-
-        ch_umi_dedup.view()
-
         UMITOOLS_DEDUP ( ch_umi_dedup )
         ch_versions = ch_versions.mix(UMITOOLS_DEDUP.out.versions)
         ch_dedup_stats = ch_dedup_stats.mix(UMITOOLS_DEDUP.out.tsv_edit_distance).join(UMITOOLS_DEDUP.out.tsv_per_umi).join(UMITOOLS_DEDUP.out.tsv_umi_per_position)
