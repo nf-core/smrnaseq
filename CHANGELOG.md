@@ -21,7 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Other enhancements & fixes
 
 - [#134](https://github.com/nf-core/smrnaseq/issues/134) - Fixed colSum of zero issues for edgeR_miRBase.R script
-- [#49](https://github.com/nf-core/smrnaseq/issues/49) - Integrated the existing umitools modules into the pipeline.
+- [#49](https://github.com/nf-core/smrnaseq/issues/49) - Integrated the existing umitools modules into the pipeline and extend the deduplication step.
 
 ### Parameters
 
@@ -61,6 +61,7 @@ Note, since the pipeline is now using Nextflow DSL2, each process will be run wi
 | `seqkit`             | 0.16.0      | 2.0.0       |
 | `trim-galore`        | 0.6.6       | 0.6.7       |
 | `bioconvert`         | -           | 0.4.3       |
+| `umi_tools`          | -           | 1.1.2       |
 | `htseq`              | -           | -           |
 | `markdown`           | -           | -           |
 | `pymdown-extensions` | -           | -           |
