@@ -46,7 +46,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 MultiQC reports the percentage of bases removed by TrimGalore in the _General Statistics_ table, along with a line plot showing where reads were trimmed.
 
-**Output directory: `results/trim_galore`**
+**Output directory: `results/trimmed`**
 
 Contains FastQ files with quality and adapter trimmed reads for each sample, along with a log file describing the trimming.
 
