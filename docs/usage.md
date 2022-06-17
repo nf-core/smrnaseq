@@ -39,6 +39,19 @@ If `MirGeneDB` should be used instead it needs to be specified using `--mirGeneD
 - `fasta`: the reference genome FASTA file
 - `bt_indices`: points to the folder containing the `bowtie2` indices for the genome reference specified by `fasta`. **Note:** if the FASTA file in `fasta` is not the same file used to generate the `bowtie2` indices, then the pipeline will fail.
 
+### Contamination filtering
+
+This step has, until now, only been tested for human data. Unexpected behaviour can occur when using it with a different species.
+
+Contamination filtering of the sequencing reads is optional and can be invoked using `filter_contamination`. FASTA files with contamination sequences to use need to be supplied using the following commands. Otherwise the contamination filtering of the specific type will be omitted.
+
+- `rrna`: Used to supply a FASTA file containing rRNA contamination sequence.
+- `trna`: Used to supply a FASTA file containing tRNA contamination sequence. e.g. `http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/hg38-tRNAs.fa`
+- `cdna`: Used to supply a FASTA file containing cDNA contamination sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `ncrna`: Used to supply a FASTA file containing ncRNA contamination sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `pirna`: Used to supply a FASTA file containing piRNA contamination sequence. e.g. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `other_contamination`: Used to supply an additional filtering set. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+
 ## Samplesheet input
 
 You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row as shown in the examples below.

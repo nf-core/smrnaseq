@@ -63,12 +63,13 @@ if (!params.mirGeneDB) {
     params.filterSpecies = params.mirGeneDB_species
 }
 
-include { INPUT_CHECK       } from '../subworkflows/local/input_check'
-include { FASTQC_TRIMGALORE } from '../subworkflows/nf-core/fastqc_trimgalore'
-include { MIRNA_QUANT       } from '../subworkflows/local/mirna_quant'
-include { GENOME_QUANT      } from '../subworkflows/local/genome_quant'
-include { MIRTRACE          } from '../subworkflows/local/mirtrace'
-include { MIRDEEP2          } from '../subworkflows/local/mirdeep2'
+include { INPUT_CHECK        } from '../subworkflows/local/input_check'
+include { FASTQC_TRIMGALORE  } from '../subworkflows/nf-core/fastqc_trimgalore'
+include { CONTAMINANT_FILTER } from '../subworkflows/local/contaminant_filter'
+include { MIRNA_QUANT        } from '../subworkflows/local/mirna_quant'
+include { GENOME_QUANT       } from '../subworkflows/local/genome_quant'
+include { MIRTRACE           } from '../subworkflows/local/mirtrace'
+include { MIRDEEP2           } from '../subworkflows/local/mirdeep2'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -149,6 +150,29 @@ workflow SMRNASEQ {
     ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
     reads_for_mirna = FASTQC_TRIMGALORE.out.reads
+    //
+    // SUBWORKFLOW: remove contaminants from reads
+    //
+    contamination_stats = Channel.empty()
+    if (params.filter_contamination){
+        CONTAMINANT_FILTER ( 
+            reference_hairpin,
+            params.rrna, 
+            params.trna, 
+            params.cdna, 
+            params.ncrna, 
+            params.pirna, 
+            params.other_contamination,
+            FASTQC_TRIMGALORE.out.reads 
+        )
+        
+        reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
+        ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
+        CONTAMINANT_FILTER.out.filter_stats
+            .set { contamination_stats }
+        
+    }
+
     MIRNA_QUANT (
         reference_mature,
         reference_hairpin,
@@ -195,6 +219,7 @@ workflow SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
 
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))

@@ -12,16 +12,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Other enhancements
 
 - [#55](https://github.com/nf-core/smrnaseq/issues/12) - Enabled the use of `MirGeneDB` as an alternative database insted of `miRBase`
+- [#113](https://github.com/nf-core/smrnaseq/issues/113) - Added a optional contamination filtering step, including MultiQC plot.
 
 ### Parameters
 
-| Old parameter | New parameter         |
-| ------------- | --------------------- |
-|               | `--mirGeneDB`         |
-|               | `--mirGeneDB_species` |
-|               | `--mirGeneDB_gff`     |
-|               | `--mirGeneDB_mature`  |
-|               | `--mirGeneDB_hairpin` |
+| Old parameter | New parameter            |
+| ------------- | ------------------------ |
+|               | `--mirGeneDB`            |
+|               | `--mirGeneDB_species`    |
+|               | `--mirGeneDB_gff`        |
+|               | `--mirGeneDB_mature`     |
+|               | `--mirGeneDB_hairpin`    |
+|               | `--contamination_filter` |
+|               | `--rrna`                 |
+|               | `--trna`                 |
+|               | `--cdna`                 |
+|               | `--ncrna`                |
+|               | `--pirna`                |
+|               | `--other_contamination`  |
 
 ## [v2.0.0](https://github.com/nf-core/smrnaseq/releases/tag/2.0.0) - 2022-05-31 Aqua Zinc Chihuahua
 
@@ -44,10 +52,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Parameters
 
-| Old parameter      | New parameter    |
-| ------------------ | ---------------- |
-| `--conda`          | `--enable_conda` |
-| `--clusterOptions` |                  |
+| Old parameter        | New parameter    |
+| -------------------- | ---------------- |
+| `--conda`            | `--enable_conda` |
+| `--clusterOptions`   |                  |
+| `--publish_dir_mode` |                  |
 
 > **NB:** Parameter has been **updated** if both old and new parameter information is present.
 > **NB:** Parameter has been **added** if just the new parameter information is present.
@@ -79,6 +88,8 @@ Note, since the pipeline is now using Nextflow DSL2, each process will be run wi
 | `pymdown-extensions` | -           | -           |
 | `pygments`           | -           | -           |
 | `r-r.methodss3`      | -           | -           |
+| `bowtie2`            | -           | 2.4.5       |
+| `blat`               | -           | 36          |
 
 > **NB:** Dependency has been **updated** if both old and new version information is present.
 > **NB:** Dependency has been **added** if just the new version information is present.

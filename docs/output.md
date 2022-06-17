@@ -14,6 +14,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 - [FastQC](#fastqc) - read quality control
 - [TrimGalore](#trimgalore) - adapter trimming
+- [Bowtie2](#bowtie2) - contamination filtering
 - [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
 - [SAMtools](#samtools) - alignment result processing and feature counting
 - [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
@@ -57,6 +58,12 @@ Contains FastQ files with quality and adapter trimmed reads for each sample, alo
 This is an example of the output we can get:
 
 ![cutadapt](images/cutadapt_plot.png)
+
+## Bowtie2
+
+[Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) is used to align the reads to user-defined databases of contaminants.
+
+MultiQC reports the number of reads that were removed by each of the contaminant databases.
 
 ## Bowtie
 
