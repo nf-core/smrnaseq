@@ -61,7 +61,7 @@ This is an example of the output we can get:
 
 ## Bowtie2
 
-[Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) is used to align the reads to user defined databases of contaminants.
+[Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) is used to align the reads to user-defined databasesof contaminants.
 
 MultiQC reports the number of reads that were removed by each of the contaminant databases.
 
