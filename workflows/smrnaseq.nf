@@ -144,9 +144,7 @@ workflow SMRNASEQ {
     ch_versions = ch_versions.mix(FASTQC_UMITOOLS_TRIMGALORE.out.versions)
 
     reads_for_mirna = FASTQC_UMITOOLS_TRIMGALORE.out.reads
-
-    reads_for_mirna.view()
-
+    
     if (params.with_umi){
         if (fasta){
             fasta_ch = file(fasta)

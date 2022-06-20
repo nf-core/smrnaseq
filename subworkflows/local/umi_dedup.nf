@@ -3,10 +3,11 @@
 //
 
 include { INDEX_GENOME                        } from '../../modules/local/bowtie_genome'
-include { BOWTIE_MAP_SEQ as BOWTIE_MAP_GENOME } from '../../modules/local/bowtie_map_mirna'
+include { BOWTIE_MAP_SEQ as UMI_MAP_GENOME    } from '../../modules/local/bowtie_map_mirna'
 include { BAM_SORT_SAMTOOLS                   } from '../../subworkflows/nf-core/bam_sort_samtools'
 include { UMITOOLS_DEDUP                      } from '../../modules/nf-core/modules/umitools/dedup/main'
 include { SAMTOOLS_BAM2FQ                     } from '../../modules/nf-core/modules/samtools/bam2fq/main'
+include { JOIN_FASTQS                         } from '../../modules/local/join_reads'
 
 workflow DEDUPLICATE_UMIS {
     take:
@@ -31,10 +32,10 @@ workflow DEDUPLICATE_UMIS {
 
     if (bt_indices){
         
-        BOWTIE_MAP_GENOME ( reads, bt_indices.collect() )
-        ch_versions = ch_versions.mix(BOWTIE_MAP_GENOME.out.versions)
+        UMI_MAP_GENOME ( reads, bt_indices.collect() )
+        ch_versions = ch_versions.mix(UMI_MAP_GENOME.out.versions)
 
-        BAM_SORT_SAMTOOLS ( BOWTIE_MAP_GENOME.out.bam, Channel.empty() )
+        BAM_SORT_SAMTOOLS ( UMI_MAP_GENOME.out.bam, Channel.empty() )
         ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
 
         ch_umi_dedup = BAM_SORT_SAMTOOLS.out.bam.join(BAM_SORT_SAMTOOLS.out.bai)
@@ -44,12 +45,24 @@ workflow DEDUPLICATE_UMIS {
 
         SAMTOOLS_BAM2FQ ( UMITOOLS_DEDUP.out.bam, false )
         ch_versions = ch_versions.mix(SAMTOOLS_BAM2FQ.out.versions)
+
+        ch_dedup_reads = SAMTOOLS_BAM2FQ.out.reads
+
+        if ( params.umi_merge_unmapped ) {
+    
+            JOIN_FASTQS ( 
+                SAMTOOLS_BAM2FQ.out.reads,
+                UMI_MAP_GENOME.out.unmapped 
+            )
+            ch_dedup_reads = JOIN_FASTQS.out.merged
+        }
     }
 
     emit:
-    reads    = SAMTOOLS_BAM2FQ.out.reads // channel: [ val(meta), [ reads ] ]
+//    reads    = SAMTOOLS_BAM2FQ.out.reads // channel: [ val(meta), [ reads ] ]
+    reads    = ch_dedup_reads
     indices  = bt_indices
-    stats    = ch_dedup_stats
+//    stats    = ch_dedup_stats
     versions = ch_versions
 }
 
