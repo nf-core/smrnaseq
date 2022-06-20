@@ -37,4 +37,3 @@ process MIRDEEP2_RUN {
     END_VERSIONS
     """
 }
-
