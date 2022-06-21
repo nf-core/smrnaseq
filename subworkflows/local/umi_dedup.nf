@@ -59,18 +59,8 @@ workflow DEDUPLICATE_UMIS {
     }
 
     emit:
-//    reads    = SAMTOOLS_BAM2FQ.out.reads // channel: [ val(meta), [ reads ] ]
     reads    = ch_dedup_reads
     indices  = bt_indices
-//    stats    = ch_dedup_stats
+    stats    = ch_dedup_stats
     versions = ch_versions
-}
-
-
-def add_suffix(row, suffix) {
-    def meta = [:]
-    meta.id           = "${row[0].id}_${suffix}"
-    def array = []
-    array = [ meta, row[1] ]
-    return array
 }
