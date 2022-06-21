@@ -16,27 +16,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Parameters
 
-| Old parameter | New parameter            |
-| ------------- | ------------------------ |
-|               | `--mirGeneDB`            |
-|               | `--mirGeneDB_species`    |
-|               | `--mirGeneDB_gff`        |
-|               | `--mirGeneDB_mature`     |
-|               | `--mirGeneDB_hairpin`    |
-|               | `--contamination_filter` |
-|               | `--rrna`                 |
-|               | `--trna`                 |
-|               | `--cdna`                 |
-|               | `--ncrna`                |
-|               | `--pirna`                |
-|               | `--other_contamination`  |
+| Old parameter | New parameter               |
+| ------------- | --------------------------- |
+|               | `--mirGeneDB`               |
+|               | `--mirGeneDB_species`       |
+|               | `--mirGeneDB_gff`           |
+|               | `--mirGeneDB_mature`        |
+|               | `--mirGeneDB_hairpin`       |
+|               | `--contamination_filter`    |
+|               | `--rrna`                    |
+|               | `--trna`                    |
+|               | `--cdna`                    |
+|               | `--ncrna`                   |
+|               | `--pirna`                   |
+|               | `--other_contamination`     |
 |               | `--with_umi`                |
 |               | `--umitools_extract_method` |
 |               | `--umitools_bc_pattern`     |
 |               | `--umi_discard_read`        |
 |               | `--save_umi_intermeds`      |
 |               | `--umi_merge_unmapped`      |
-
 
 ## [v2.0.0](https://github.com/nf-core/smrnaseq/releases/tag/2.0.0) - 2022-05-31 Aqua Zinc Chihuahua
 

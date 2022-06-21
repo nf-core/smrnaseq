@@ -48,10 +48,10 @@ On release, automated continuous integration tests run the pipeline on a full-si
 9. Alignment against host reference genome ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
    1. Post-alignment processing of alignment against host reference genome ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
 10. Novel miRNAs and known miRNAs discovery ([`MiRDeep2`](https://www.mdc-berlin.de/content/mirdeep2-documentation))
-   1. Mapping against reference genome with the mapper module
-   2. Known and novel miRNA discovery with the mirdeep2 module
-11. miRNA quality control ([`mirtrace`](https://github.com/friedlanderlab/mirtrace))
-12. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
+11. Mapping against reference genome with the mapper module
+12. Known and novel miRNA discovery with the mirdeep2 module
+13. miRNA quality control ([`mirtrace`](https://github.com/friedlanderlab/mirtrace))
+14. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
 
 ## Quick Start
 
