@@ -83,9 +83,8 @@ This is an example of the output we can get:
 - `umi_dedup/`
   - `*.tsv`: Results statistics files detailing the UMI deduplication results.
   - `*.bam`: If `--save_umi_intermeds` is specified, the deduplicated bam files **after** UMI deduplication will be placed in this directory. In addition the sorted and indexed files will be placed there as well.
-  - `samtools_stats/`
-    - `*.{stats,flagstat,idxstats}:` Statistics on the mappings underlying the UMI deduplication.
-</details>
+  - `samtools_stats/` - `*.{stats,flagstat,idxstats}:` Statistics on the mappings underlying the UMI deduplication.
+  </details>
 
 [UMI-tools](https://github.com/CGATOxford/UMI-tools) deduplicates reads based on unique molecular identifiers (UMIs) to address PCR-bias. Firstly, the UMI-tools `extract` command removes the UMI barcode information from the read sequence and adds it to the read name as highlighted in the [UMI-tools extract](#umi-tools-extract) section. The reads are deduplicated based on an alignment against the full genome of the species. The deduplicated reads are then converted into fastq format and merged with the reads that remained unmapped in order to reduce potential reference bias. This behavior can be stopped by setting `--umi_merge_unmapped false`. The resulting fastq files are used in the remaining steps of the pipeline.
 
