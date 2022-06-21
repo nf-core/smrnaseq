@@ -166,7 +166,7 @@ workflow SMRNASEQ {
         }
     }
 
-    reads_for_mirna = FASTQC_TRIMGALORE.out.reads
+    reads_for_mirna = FASTQC_UMITOOLS_TRIMGALORE.out.reads
     //
     // SUBWORKFLOW: remove contaminants from reads
     //
