@@ -16,20 +16,41 @@ This option indicates the experimental protocol used for the sample preparation.
 - 'cats': adapter (`GATCGGAAGAGCACACGTCTG), clip_r1(`3)
 - 'custom' (where the ser can indicate the `three_prime_adapter`, `clip_r1` and three_prime_clip_r1`)
 
-### `mirtrace_species`
+### `mirtrace_species or mirGeneDB_species`
 
-It should point to the 3-letter species name used by `miRBase`.
+It should point to the 3-letter species name used by `miRBase`, or `MirGeneDB`. Note the difference in case for the two databases.
 
 ### miRNA related files
+
+Different parameters can be set for the two supported datbases. By default `miRBase` will be used with the parameters below.
 
 - `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRbase: `https://mirbase.org/ftp/CURRENT/genomes/${params.mirtrace_species}.gff3`
 - `mature`: points to the FASTA file of mature miRNA sequences. `https://mirbase.org/ftp/CURRENT/mature.fa.gz`
 - `hairpin`: points to the FASTA file of precursor miRNA sequences. `https://mirbase.org/ftp/CURRENT/hairpin.fa.gz`
 
+If `MirGeneDB` should be used instead it needs to be specified using `--mirGeneDB` and use the parameters below .
+
+- `mirGeneDB_gff`: The data can not be downloaded automatically, thus the user needs to supply the gff file for either his species, or all species downloaded from `https://mirgenedb.org/download`. The total set will automatically be subsetted to the species specified with `mirGeneDB_species`.
+- `mirGeneDB_mature`: points to the FASTA file of mature miRNA sequences. Download from `https://mirgenedb.org/download`.
+- `mirGeneDB_hairpin`: points to the FASTA file of precursor miRNA sequences. Download from `https://mirgenedb.org/download`. Note that `MirGeneDB` does not have a dedicated `hairpin` file, but the `Precursor sequences` are to be used.
+
 ### Genome
 
 - `fasta`: the reference genome FASTA file
 - `bt_indices`: points to the folder containing the `bowtie2` indices for the genome reference specified by `fasta`. **Note:** if the FASTA file in `fasta` is not the same file used to generate the `bowtie2` indices, then the pipeline will fail.
+
+### Contamination filtering
+
+This step has, until now, only been tested for human data. Unexpected behaviour can occur when using it with a different species.
+
+Contamination filtering of the sequencing reads is optional and can be invoked using `filter_contamination`. FASTA files with contamination sequences to use need to be supplied using the following commands. Otherwise the contamination filtering of the specific type will be omitted.
+
+- `rrna`: Used to supply a FASTA file containing rRNA contamination sequence.
+- `trna`: Used to supply a FASTA file containing tRNA contamination sequence. e.g. `http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/hg38-tRNAs.fa`
+- `cdna`: Used to supply a FASTA file containing cDNA contamination sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `ncrna`: Used to supply a FASTA file containing ncRNA contamination sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `pirna`: Used to supply a FASTA file containing piRNA contamination sequence. e.g. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `other_contamination`: Used to supply an additional filtering set. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 
 ## Samplesheet input
 

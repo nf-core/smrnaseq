@@ -16,6 +16,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [UMI-tools extract](#umi-tools-extract) - UMI barcode extraction
 - [TrimGalore](#trimgalore) - adapter trimming
 - [UMI-tools deduplicate](#umi-tools-deduplicate) - read deduplication
+- [Bowtie2](#bowtie2) - contamination filtering
 - [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
 - [SAMtools](#samtools) - alignment result processing and feature counting
 - [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
@@ -62,7 +63,7 @@ To facilitate processing of input data which has the UMI barcode already embedde
 
 MultiQC reports the percentage of bases removed by TrimGalore in the _General Statistics_ table, along with a line plot showing where reads were trimmed.
 
-**Output directory: `results/trim_galore`**
+**Output directory: `results/trimmed`**
 
 Contains FastQ files with quality and adapter trimmed reads for each sample, along with a log file describing the trimming.
 
@@ -88,9 +89,15 @@ This is an example of the output we can get:
 
 [UMI-tools](https://github.com/CGATOxford/UMI-tools) deduplicates reads based on unique molecular identifiers (UMIs) to address PCR-bias. Firstly, the UMI-tools `extract` command removes the UMI barcode information from the read sequence and adds it to the read name as highlighted in the [UMI-tools extract](#umi-tools-extract) section. The reads are deduplicated based on an alignment against the full genome of the species. The deduplicated reads are then converted into fastq format and merged with the reads that remained unmapped in order to reduce potential reference bias. This behavior can be stopped by setting `--umi_merge_unmapped false`. The resulting fastq files are used in the remaining steps of the pipeline.
 
+## Bowtie2
+
+[Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) is used to align the reads to user-defined databases of contaminants.
+
+MultiQC reports the number of reads that were removed by each of the contaminant databases.
+
 ## Bowtie
 
-[Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) in [miRBase](http://www.mirbase.org/).
+[Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) of the chosen database [miRBase](http://www.mirbase.org/) or [MirGeneDB](https://mirgenedb.org/).
 
 **Output directory: `results/samtools`**
 

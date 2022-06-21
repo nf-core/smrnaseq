@@ -12,7 +12,6 @@ workflow FASTQC_TRIMGALORE {
     skip_trimming // boolean: true/false
 
     main:
-
     ch_versions = Channel.empty()
     fastqc_html = Channel.empty()
     fastqc_zip  = Channel.empty()

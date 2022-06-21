@@ -12,7 +12,6 @@ workflow BAM_SORT_SAMTOOLS {
     fasta
 
     main:
-
     ch_versions = Channel.empty()
 
     SAMTOOLS_SORT ( ch_bam )

@@ -25,7 +25,8 @@ if (!params.mirtrace_species){
 }
 // Genome options
 bt_index_from_species = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
-bt_index              = params.bt_indices ?: bt_index_from_species
+bt_index              = params.bowtie_indices ?: bt_index_from_species
+
 mirtrace_species_from_species = params.genome ? params.genomes[ params.genome ].mirtrace_species ?: false : false
 mirtrace_species = params.mirtrace_species ?: mirtrace_species_from_species
 fasta_from_species = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
@@ -51,12 +52,21 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
-if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
+if (!params.mirGeneDB) {
+    if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
+    if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
+    params.filterSpecies = params.mirtrace_species
+} else {
+    if (params.mirGeneDB_mature) { reference_mature = file(params.mirGeneDB_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mirGeneDB_mature}" }
+    if (params.mirGeneDB_hairpin) { reference_hairpin = file(params.mirGeneDB_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.mirGeneDB_hairpin}" }
+    if (params.mirGeneDB_gff) { mirna_gtf = file(params.mirGeneDB_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found: ${params.mirGeneDB_gff}"}  
+    params.filterSpecies = params.mirGeneDB_species
+}
 
 include { INPUT_CHECK                } from '../subworkflows/local/input_check'
 include { FASTQC_UMITOOLS_TRIMGALORE } from '../subworkflows/nf-core/fastqc_umitools_trimgalore'
 include { DEDUPLICATE_UMIS           } from '../subworkflows/local/umi_dedup'
+include { CONTAMINANT_FILTER         } from '../subworkflows/local/contaminant_filter'
 include { MIRNA_QUANT                } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT               } from '../subworkflows/local/genome_quant'
 include { MIRTRACE                   } from '../subworkflows/local/mirtrace'
@@ -130,7 +140,6 @@ workflow SMRNASEQ {
     MIRTRACE (ch_cat_fastq)
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
 
-
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters
     //
@@ -155,6 +164,30 @@ workflow SMRNASEQ {
             reads_for_mirna = DEDUPLICATE_UMIS.out.reads
             ch_versions = ch_versions.mix(DEDUPLICATE_UMIS.out.versions)
         }
+    }
+
+    reads_for_mirna = FASTQC_TRIMGALORE.out.reads
+    //
+    // SUBWORKFLOW: remove contaminants from reads
+    //
+    contamination_stats = Channel.empty()
+    if (params.filter_contamination){
+        CONTAMINANT_FILTER ( 
+            reference_hairpin,
+            params.rrna, 
+            params.trna, 
+            params.cdna, 
+            params.ncrna, 
+            params.pirna, 
+            params.other_contamination,
+            FASTQC_TRIMGALORE.out.reads 
+        )
+        
+        reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
+        ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
+        CONTAMINANT_FILTER.out.filter_stats
+            .set { contamination_stats }
+        
     }
 
     MIRNA_QUANT (
@@ -203,6 +236,7 @@ workflow SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
 
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC_UMITOOLS_TRIMGALORE.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))

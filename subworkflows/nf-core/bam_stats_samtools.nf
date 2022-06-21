@@ -12,7 +12,6 @@ workflow BAM_STATS_SAMTOOLS {
     fasta
 
     main:
-
     ch_versions = Channel.empty()
 
     SAMTOOLS_STATS    ( ch_bam_bai, fasta )
