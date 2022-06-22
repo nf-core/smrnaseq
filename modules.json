@@ -3,6 +3,9 @@
     "homePage": "https://github.com/nf-core/smrnaseq",
     "repos": {
         "nf-core/modules": {
+            "cat/cat": {
+                "git_sha": "eeda4136c096688d04cc40bb3c70d948213ed641"
+            },
             "cat/fastq": {
                 "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
             },
