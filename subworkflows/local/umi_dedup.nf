@@ -7,7 +7,7 @@ include { BOWTIE_MAP_SEQ as UMI_MAP_GENOME    } from '../../modules/local/bowtie
 include { BAM_SORT_SAMTOOLS                   } from '../../subworkflows/nf-core/bam_sort_samtools'
 include { UMITOOLS_DEDUP                      } from '../../modules/nf-core/modules/umitools/dedup/main'
 include { SAMTOOLS_BAM2FQ                     } from '../../modules/nf-core/modules/samtools/bam2fq/main'
-include { JOIN_FASTQS                         } from '../../modules/local/join_reads'
+include { CAT_CAT                             } from '../../modules/nf-core/modules/cat/cat/main'
 
 workflow DEDUPLICATE_UMIS {
     take:
@@ -22,17 +22,17 @@ workflow DEDUPLICATE_UMIS {
 
     if (!bt_index){
         INDEX_GENOME ( fasta )
-        bt_indices      = INDEX_GENOME.out.bt_indices
+        bt_index      = INDEX_GENOME.out.bowtie_indices
         fasta_formatted = INDEX_GENOME.out.fasta
         ch_versions     = ch_versions.mix(INDEX_GENOME.out.versions)
     } else {
-        bt_indices      = Channel.fromPath("${bt_index}**ebwt", checkIfExists: true).ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_index}" }
+        bt_index     = Channel.fromPath("${bt_index}**ebwt", checkIfExists: true).ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_index}" }
         fasta_formatted = fasta
     }
 
-    if (bt_indices){
+    if (bt_index){
         
-        UMI_MAP_GENOME ( reads, bt_indices.collect() )
+        UMI_MAP_GENOME ( reads, bt_index.collect() )
         ch_versions = ch_versions.mix(UMI_MAP_GENOME.out.versions)
 
         BAM_SORT_SAMTOOLS ( UMI_MAP_GENOME.out.bam, Channel.empty() )
@@ -49,18 +49,20 @@ workflow DEDUPLICATE_UMIS {
         ch_dedup_reads = SAMTOOLS_BAM2FQ.out.reads
 
         if ( params.umi_merge_unmapped ) {
+
+            SAMTOOLS_BAM2FQ.out.reads
+                .join(UMI_MAP_GENOME.out.unmapped)
+                .map { meta, file1, file2 -> [meta, [file1, file2]]}
+                .set { ch_cat }
     
-            JOIN_FASTQS ( 
-                SAMTOOLS_BAM2FQ.out.reads,
-                UMI_MAP_GENOME.out.unmapped 
-            )
-            ch_dedup_reads = JOIN_FASTQS.out.merged
+            CAT_CAT ( ch_cat )
+            ch_dedup_reads = CAT_CAT.out.file_out
         }
     }
 
     emit:
     reads    = ch_dedup_reads
-    indices  = bt_indices
+    indices  = bt_index
     stats    = ch_dedup_stats
     versions = ch_versions
 }

@@ -160,13 +160,16 @@ workflow SMRNASEQ {
     if (params.with_umi){
         if (fasta){
             fasta_ch = file(fasta)
-            DEDUPLICATE_UMIS (fasta_ch, bt_index, FASTQC_UMITOOLS_TRIMGALORE.out.reads)
+            DEDUPLICATE_UMIS (
+                fasta_ch, 
+                bt_index, 
+                FASTQC_UMITOOLS_TRIMGALORE.out.reads
+            )
             reads_for_mirna = DEDUPLICATE_UMIS.out.reads
             ch_versions = ch_versions.mix(DEDUPLICATE_UMIS.out.versions)
         }
     }
 
-    reads_for_mirna = FASTQC_UMITOOLS_TRIMGALORE.out.reads
     //
     // SUBWORKFLOW: remove contaminants from reads
     //
