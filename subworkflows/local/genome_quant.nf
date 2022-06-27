@@ -17,7 +17,7 @@ workflow GENOME_QUANT {
 
     if (!bt_index){
         INDEX_GENOME ( fasta )
-        bowtie_indices      = INDEX_GENOME.out.bowtie_indices
+        bowtie_indices  = INDEX_GENOME.out.bowtie_indices
         fasta_formatted = INDEX_GENOME.out.fasta
         ch_versions     = ch_versions.mix(INDEX_GENOME.out.versions)
     } else {
