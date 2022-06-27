@@ -59,7 +59,7 @@ if (!params.mirGeneDB) {
 } else {
     if (params.mirGeneDB_mature) { reference_mature = file(params.mirGeneDB_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mirGeneDB_mature}" }
     if (params.mirGeneDB_hairpin) { reference_hairpin = file(params.mirGeneDB_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.mirGeneDB_hairpin}" }
-    if (params.mirGeneDB_gff) { mirna_gtf = file(params.mirGeneDB_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found: ${params.mirGeneDB_gff}"}  
+    if (params.mirGeneDB_gff) { mirna_gtf = file(params.mirGeneDB_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found: ${params.mirGeneDB_gff}"}
     params.filterSpecies = params.mirGeneDB_species
 }
 
@@ -169,7 +169,13 @@ workflow SMRNASEQ {
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
         if (!params.skip_mirdeep) {
-            MIRDEEP2 (FASTQC_TRIMGALORE.out.reads, GENOME_QUANT.out.fasta, GENOME_QUANT.out.indices, MIRNA_QUANT.out.fasta_hairpin, MIRNA_QUANT.out.fasta_mature)
+            MIRDEEP2 (
+                FASTQC_TRIMGALORE.out.reads,
+                GENOME_QUANT.out.fasta,
+                GENOME_QUANT.out.indices.collect(),
+                MIRNA_QUANT.out.fasta_hairpin,
+                MIRNA_QUANT.out.fasta_mature
+            )
             ch_versions = ch_versions.mix(MIRDEEP2.out.versions)
         }
     }
