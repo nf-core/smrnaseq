@@ -42,7 +42,7 @@ mirna_gtf = params.mirna_gtf ? params.mirna_gtf : mirna_gtf_from_species
 
 ch_multiqc_config        = file("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
 ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config) : Channel.empty()
-ch_multiqc_image = file("$projectDir/assets/smrnaseq_logo.png", checkIfExists: true)
+ch_multiqc_image         = file("$projectDir/assets/smrnaseq_logo.png", checkIfExists: true)
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
