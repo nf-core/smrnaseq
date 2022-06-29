@@ -17,10 +17,10 @@ process BOWTIE_MAP_SEQ {
     path "versions.yml"                     , emit: versions
 
     script:
-    def index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     """
+    INDEX=`find -L ./ -name "*.3.ebwt" | sed 's/.3.ebwt//'`
     bowtie \\
-        -x $index_base \\
+        -x \$INDEX \\
         -q <(zcat $reads) \\
         -p ${task.cpus} \\
         -t \\
