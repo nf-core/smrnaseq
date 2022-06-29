@@ -42,6 +42,7 @@ mirna_gtf = params.mirna_gtf ? params.mirna_gtf : mirna_gtf_from_species
 
 ch_multiqc_config        = file("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
 ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multiqc_config) : Channel.empty()
+ch_multiqc_image         = file("$projectDir/assets/smrnaseq_logo.png", checkIfExists: true)
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -155,22 +156,22 @@ workflow SMRNASEQ {
     //
     contamination_stats = Channel.empty()
     if (params.filter_contamination){
-        CONTAMINANT_FILTER ( 
+        CONTAMINANT_FILTER (
             reference_hairpin,
-            params.rrna, 
-            params.trna, 
-            params.cdna, 
-            params.ncrna, 
-            params.pirna, 
+            params.rrna,
+            params.trna,
+            params.cdna,
+            params.ncrna,
+            params.pirna,
             params.other_contamination,
-            FASTQC_TRIMGALORE.out.reads 
+            FASTQC_TRIMGALORE.out.reads
         )
-        
+
         reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
         ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
         CONTAMINANT_FILTER.out.filter_stats
             .set { contamination_stats }
-        
+
     }
 
     MIRNA_QUANT (
@@ -233,7 +234,8 @@ workflow SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([]))
 
         MULTIQC (
-            ch_multiqc_files.collect()
+            ch_multiqc_files.collect(),
+            [ch_multiqc_config, ch_multiqc_image]
         )
 
         multiqc_report = MULTIQC.out.report.toList()
