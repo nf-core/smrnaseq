@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Index files were not collected when `bowtie_indices` was used and thus mapping was failing [#159](https://github.com/nf-core/smrnaseq/issues/159)
 - Fixed issue with mirTop and MultiQC by upgrading to MultiQC V1.13dev [#137](https://github.com/nf-core/smrnaseq/issues/137)
 - Improved Bowtie index handling which should be more stable now and follow nf-core/modules approach
+- Removed `mirtrace_protocol` as the parameter was redundant and `params.protocol` is entirely sufficient [#168](https://github.com/nf-core/smrnaseq/issues/168)
 
 ### Other enhancements
 

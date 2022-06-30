@@ -30,11 +30,8 @@ process MIRTRACE_RUN {
         three_prime_adapter = params.three_prime_adapter
     }
     // mirtrace protocol defaults to 'params.protocol' if not set
-    def mirtrace_protocol = params.mirtrace_protocol
-    if (!params.mirtrace_protocol){
-        mirtrace_protocol = params.protocol
-    }
-    def primer = (mirtrace_protocol=="cats") ? " " : " --adapter $three_prime_adapter "
+    def protocol = params.protocol
+    def primer = (protocol=="cats") ? " " : " --adapter $three_prime_adapter "
     def java_mem = ''
     if(task.memory){
         tmem = task.memory.toBytes()
@@ -52,7 +49,7 @@ process MIRTRACE_RUN {
     java $java_mem -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace qc  \\
         --species $params.mirtrace_species \\
         $primer \\
-        --protocol $mirtrace_protocol \\
+        --protocol $protocol \\
         --config mirtrace_config \\
         --write-fasta \\
         --output-dir mirtrace \\
