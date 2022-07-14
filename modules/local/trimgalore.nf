@@ -51,12 +51,11 @@ process TRIMGALORE {
         three_prime_clip_r1 = 0
         // three_prime_adapter = "GATCGGAAGAGCACACGTCTG"
         three_prime_adapter = "AAAAAAAA"
-    } else {
+    } else if (params.protocol == "custom"){
         //custom protocol
         clip_r1 = params.clip_r1
         three_prime_clip_r1 = params.three_prime_clip_r1
         three_prime_adapter = params.three_prime_adapter
-        protocol = params.protocol
     }
     def tg_length = "--length ${params.min_length}"
     def c_r1 = clip_r1 > 0 ? "--clip_r1 ${clip_r1}" : ''

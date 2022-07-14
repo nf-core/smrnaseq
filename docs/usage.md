@@ -14,7 +14,9 @@ This option indicates the experimental protocol used for the sample preparation.
 - 'nextflex': adapter (`TGGAATTCTCGGGTGCCAAGG), clip_r1 (`4`), three_prime_clip_r1 (`4`)
 - 'qiaseq': adapter (`AACTGTAGGCACCATCAAT`)
 - 'cats': adapter (`GATCGGAAGAGCACACGTCTG), clip_r1(`3)
-- 'custom' (where the ser can indicate the `three_prime_adapter`, `clip_r1` and three_prime_clip_r1`)
+- 'custom' (where the user can indicate the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` manually)
+
+:warning: At least the `custom` protocol has to be specified, otherwise the pipeline won't run.
 
 ### `mirtrace_species or mirGeneDB_species`
 
