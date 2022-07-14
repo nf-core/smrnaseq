@@ -29,8 +29,8 @@ process MIRTRACE_RUN {
     }
 
     // mirtrace protocol defaults to 'params.protocol' if not set
-    def primer = (protocol=="cats") ? " " : " --adapter $three_prime_adapter "
-    def protocol = (protocol=="custom") ? "" : "--protocol $params.protocol"
+    def primer = (params.protocol=="cats") ? " " : " --adapter $three_prime_adapter "
+    def protocol = (params.protocol=="custom") ? " " : "--protocol $params.protocol"
     def java_mem = ''
     if(task.memory){
         tmem = task.memory.toBytes()
