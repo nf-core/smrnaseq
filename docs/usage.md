@@ -12,7 +12,7 @@ This option indicates the experimental protocol used for the sample preparation.
 
 - 'illumina': adapter (`TGGAATTCTCGGGTGCCAAGG`)
 - 'nextflex': adapter (`TGGAATTCTCGGGTGCCAAGG), clip_r1 (`4`), three_prime_clip_r1 (`4`)
-- 'qiaseq': adapter (`AACTGTAGGCACCATCAAT)
+- 'qiaseq': adapter (`AACTGTAGGCACCATCAAT`)
 - 'cats': adapter (`GATCGGAAGAGCACACGTCTG), clip_r1(`3)
 - 'custom' (where the ser can indicate the `three_prime_adapter`, `clip_r1` and three_prime_clip_r1`)
 
