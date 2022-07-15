@@ -24,14 +24,13 @@ process MIRTRACE_RUN {
         three_prime_adapter = "AACTGTAGGCACCATCAAT"
     } else if (params.protocol == "cats"){
         three_prime_adapter = "AAAAAAAA"
-    }
-    if (params.three_prime_adapter){
-        // to allow replace of 3' primer using one of the previous protocols
+    } else if (params.protocol == "custom"){
         three_prime_adapter = params.three_prime_adapter
     }
+
     // mirtrace protocol defaults to 'params.protocol' if not set
-    def protocol = params.protocol
-    def primer = (protocol=="cats") ? " " : " --adapter $three_prime_adapter "
+    def primer = (params.protocol=="cats") ? " " : " --adapter $three_prime_adapter "
+    def protocol = (params.protocol=="custom") ? " " : "--protocol $params.protocol"
     def java_mem = ''
     if(task.memory){
         tmem = task.memory.toBytes()
@@ -49,7 +48,7 @@ process MIRTRACE_RUN {
     java $java_mem -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace qc  \\
         --species $params.mirtrace_species \\
         $primer \\
-        --protocol $protocol \\
+        $protocol \\
         --config mirtrace_config \\
         --write-fasta \\
         --output-dir mirtrace \\
