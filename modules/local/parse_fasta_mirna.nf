@@ -9,7 +9,7 @@ process PARSE_FASTA_MIRNA {
     input:
     path fasta
 
-    //if (!params.mirGeneDB) {params.filterSpecies = params.mirtrace_species} else {params.filterSpecies = params.mirGeneDB_species}
+    //if (!params.mirgenedb) {params.filter_species = params.mirtrace_species} else {params.filter_species = params.mirgenedb_species}
 
     output:
     path '*_igenome.fa', emit: parsed_fasta
@@ -29,7 +29,7 @@ process PARSE_FASTA_MIRNA {
     # TODO perl -ane 's/[ybkmrsw]/N/ig;print;' \${FASTA}_parsed_tmp.fa > \${FASTA}_parsed.fa
 
     sed -i 's/\s.*//' \${FASTA}_parsed.fa
-    seqkit grep -r --pattern \".*${params.filterSpecies}-.*\" \${FASTA}_parsed.fa > \${FASTA}_sps.fa
+    seqkit grep -r --pattern \".*${params.filter_species}-.*\" \${FASTA}_parsed.fa > \${FASTA}_sps.fa
     seqkit seq --rna2dna \${FASTA}_sps.fa > \${FASTA}_igenome.fa
 
     cat <<-END_VERSIONS > versions.yml

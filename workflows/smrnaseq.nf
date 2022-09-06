@@ -53,15 +53,15 @@ ch_multiqc_image         = file("$projectDir/assets/smrnaseq_logo.png", checkIfE
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-if (!params.mirGeneDB) {
+if (!params.mirgenedb) {
     if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
     if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
-    params.filterSpecies = params.mirtrace_species
+    params.filter_species = params.mirtrace_species
 } else {
-    if (params.mirGeneDB_mature) { reference_mature = file(params.mirGeneDB_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mirGeneDB_mature}" }
-    if (params.mirGeneDB_hairpin) { reference_hairpin = file(params.mirGeneDB_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.mirGeneDB_hairpin}" }
-    if (params.mirGeneDB_gff) { mirna_gtf = file(params.mirGeneDB_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found: ${params.mirGeneDB_gff}"}
-    params.filterSpecies = params.mirGeneDB_species
+    if (params.mirgenedb_mature) { reference_mature = file(params.mirgenedb_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mirgenedb_mature}" }
+    if (params.mirgenedb_hairpin) { reference_hairpin = file(params.mirgenedb_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.mirgenedb_hairpin}" }
+    if (params.mirgenedb_gff) { mirna_gtf = file(params.mirgenedb_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found: ${params.mirgenedb_gff}"}
+    params.filter_species = params.mirgenedb_species
 }
 
 include { INPUT_CHECK        } from '../subworkflows/local/input_check'
