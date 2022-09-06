@@ -22,6 +22,9 @@ jobs:
         NXF_VER:
           - "21.10.3"
           - "latest-everything"
+        profile:
+          - "test"
+          - "test_no_genome"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v2
@@ -33,5 +36,4 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile test,docker --outdir ./results
-          nextflow run ${GITHUB_WORKSPACE} -profile test_no_genome,docker --outdir ./results
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }},docker --outdir ./results
