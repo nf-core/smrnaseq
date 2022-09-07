@@ -5,17 +5,45 @@
         "nf-core/modules": {
             "git_url": "https://github.com/nf-core/modules.git",
             "modules": {
+                "cat/fastq": {
+                    "branch": "master",
+                    "git_sha": "9aadd9a6d3f5964476582319b3a1c54a3e3fe7c9"
+                },
                 "custom/dumpsoftwareversions": {
-                    "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d",
-                    "branch": "master"
+                    "branch": "master",
+                    "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
                 },
                 "fastqc": {
-                    "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d",
-                    "branch": "master"
+                    "branch": "master",
+                    "git_sha": "49b18b1639f4f7104187058866a8fab33332bdfe"
                 },
                 "multiqc": {
-                    "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d",
-                    "branch": "master"
+                    "branch": "master",
+                    "git_sha": "08376da6843b14c82d84d444784c0b3635bb7fd5"
+                },
+                "samtools/flagstat": {
+                    "branch": "master",
+                    "git_sha": "ecece498f10b47b7c9d06f53a310cea5811b4c5f"
+                },
+                "samtools/idxstats": {
+                    "branch": "master",
+                    "git_sha": "ecece498f10b47b7c9d06f53a310cea5811b4c5f"
+                },
+                "samtools/index": {
+                    "branch": "master",
+                    "git_sha": "897c33d5da084b61109500ee44c01da2d3e4e773"
+                },
+                "samtools/sort": {
+                    "branch": "master",
+                    "git_sha": "897c33d5da084b61109500ee44c01da2d3e4e773"
+                },
+                "samtools/stats": {
+                    "branch": "master",
+                    "git_sha": "ecece498f10b47b7c9d06f53a310cea5811b4c5f"
+                },
+                "trimgalore": {
+                    "branch": "master",
+                    "git_sha": "85ec13ff1fc2196c5a507ea497de468101baabed"
                 }
             }
         }

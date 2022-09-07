@@ -1,4 +1,5 @@
 process SAMPLESHEET_CHECK {
+    label 'process_low'
     tag "$samplesheet"
 
     conda (params.enable_conda ? "conda-forge::python=3.8.3" : null)
