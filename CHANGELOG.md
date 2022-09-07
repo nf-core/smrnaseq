@@ -22,11 +22,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Old parameter | New parameter            |
 | ------------- | ------------------------ |
-|               | `--mirGeneDB`            |
-|               | `--mirGeneDB_species`    |
-|               | `--mirGeneDB_gff`        |
-|               | `--mirGeneDB_mature`     |
-|               | `--mirGeneDB_hairpin`    |
+|               | `--mirgenedb`            |
+|               | `--mirgenedb_species`    |
+|               | `--mirgenedb_gff`        |
+|               | `--mirgenedb_mature`     |
+|               | `--mirgenedb_hairpin`    |
 |               | `--contamination_filter` |
 |               | `--rrna`                 |
 |               | `--trna`                 |
