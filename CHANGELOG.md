@@ -3,20 +3,17 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unpublished Version / DEV]
+## v2.1.0dev - [date]
 
 ### Enhancements & fixes
 
-- Trimmed output was not as documented and not correctly published [#161](https://github.com/nf-core/smrnaseq/issues/161)
-- Index files were not collected when `bowtie_indices` was used and thus mapping was failing [#159](https://github.com/nf-core/smrnaseq/issues/159)
-- Fixed issue with mirTop and MultiQC by upgrading to MultiQC V1.13dev [#137](https://github.com/nf-core/smrnaseq/issues/137)
-- Improved Bowtie index handling which should be more stable now and follow nf-core/modules approach
-- Removed `mirtrace_protocol` as the parameter was redundant and `params.protocol` is entirely sufficient [#168](https://github.com/nf-core/smrnaseq/issues/168)
-
-### Other enhancements
-
-- [#55](https://github.com/nf-core/smrnaseq/issues/12) - Enabled the use of `MirGeneDB` as an alternative database insted of `miRBase`
-- [#113](https://github.com/nf-core/smrnaseq/issues/113) - Added a optional contamination filtering step, including MultiQC plot.
+- [[#12](https://github.com/nf-core/smrnaseq/issues/12)] - Enabled the use of `MirGeneDB` as an alternative database insted of `miRBase`
+- [[#113](https://github.com/nf-core/smrnaseq/issues/113)] - Added a optional contamination filtering step, including MultiQC plot
+- [[#137](https://github.com/nf-core/smrnaseq/issues/137)] - Fixed issue with mirTop and MultiQC by upgrading to MultiQC V1.13dev
+- [[#159](https://github.com/nf-core/smrnaseq/issues/159)] - Index files were not collected when `bowtie_indices` was used and thus mapping was failing
+- [[#161](https://github.com/nf-core/smrnaseq/issues/161)] - Trimmed output was not as documented and not correctly published
+- [[#168](https://github.com/nf-core/smrnaseq/issues/168)] - Removed `mirtrace_protocol` as the parameter was redundant and `params.protocol` is entirely sufficient
+- Updated pipeline template to [nf-core/tools 2.5.1](https://github.com/nf-core/tools/releases/tag/2.5.1)
 
 ### Parameters
 
