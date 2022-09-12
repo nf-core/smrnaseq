@@ -235,7 +235,8 @@ workflow SMRNASEQ {
 
         MULTIQC (
             ch_multiqc_files.collect(),
-            [ch_multiqc_config, ch_multiqc_image]
+            ch_multiqc_config,
+            ch_multiqc_image
         )
 
         multiqc_report = MULTIQC.out.report.toList()
