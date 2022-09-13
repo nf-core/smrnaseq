@@ -10,7 +10,7 @@ process INDEX_MIRNA {
     path fasta
 
     output:
-    path 'fasta_bidx*' , emit: bowtie_indices
+    path 'fasta_bidx*' , emit: index
     path "versions.yml", emit: versions
 
     script:

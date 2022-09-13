@@ -4,7 +4,7 @@
     nf-core/smrnaseq
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Github : https://github.com/nf-core/smrnaseq
-Website: https://nf-co.re/smrnaseq
+    Website: https://nf-co.re/smrnaseq
     Slack  : https://nfcore.slack.com/channels/smrnaseq
 ----------------------------------------------------------------------------------------
 */
@@ -16,6 +16,10 @@ nextflow.enable.dsl = 2
     GENOME PARAMETER VALUES
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+
+params.fasta            = WorkflowMain.getGenomeAttribute(params, 'fasta')
+params.mirtrace_species = WorkflowMain.getGenomeAttribute(params, 'mirtrace_species')
+params.bowtie_index     = WorkflowMain.getGenomeAttribute(params, 'bowtie')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
