@@ -11,8 +11,6 @@ process MIRTOP_QUANT {
     path hairpin
     path gtf
 
-    //if (!params.mirgenedb) {params.filter_species = params.mirtrace_species} else {params.filter_species = params.mirgenedb_species}
-
     output:
     path "mirtop/mirtop.gff"
     path "mirtop/mirtop.tsv"        , emit: mirtop_table
@@ -21,10 +19,11 @@ process MIRTOP_QUANT {
     path "versions.yml"             , emit: versions
 
     script:
+    def filter_species = params.mirgenedb ? params.mirgenedb_species : params.mirtrace_species
     """
-    mirtop gff --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.filter_species ./bams/*
-    mirtop counts --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.filter_species --add-extra --gff mirtop/mirtop.gff
-    mirtop export --format isomir --hairpin $hairpin --gtf $gtf --sps $params.filter_species -o mirtop mirtop/mirtop.gff
+    mirtop gff --hairpin $hairpin --gtf $gtf -o mirtop --sps $filter_species ./bams/*
+    mirtop counts --hairpin $hairpin --gtf $gtf -o mirtop --sps $filter_species --add-extra --gff mirtop/mirtop.gff
+    mirtop export --format isomir --hairpin $hairpin --gtf $gtf --sps $filter_species -o mirtop mirtop/mirtop.gff
     mirtop stats mirtop/mirtop.gff --out mirtop/stats
     mv mirtop/stats/mirtop_stats.log mirtop/stats/full_mirtop_stats.log
 

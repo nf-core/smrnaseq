@@ -65,8 +65,7 @@
                 "mirgenedb": {
                     "type": "boolean",
                     "description": "Boolean whether MirGeneDB should be used instead of miRBase",
-                    "help_text": "This allows you to use MirGeneDB instead of miRBase as the database. \n Note that you will need to set the additional flags `--mirgenedb_species`, `--mirgenedb_gff`, `--mirgenedb_mature` and `--mirgenedb_hairpin`",
-                    "default": "false"
+                    "help_text": "This allows you to use MirGeneDB instead of miRBase as the database. \n Note that you will need to set the additional flags `--mirgenedb_species`, `--mirgenedb_gff`, `--mirgenedb_mature` and `--mirgenedb_hairpin`"
                 },
                 "mirtrace_species": {
                     "type": "string",
@@ -120,7 +119,7 @@
                     "description": "Path to FASTA file with miRNAs precursors.",
                     "help_text": "This file needs to be downloaded from [`https://mirgenedb.org/download`]. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\nNote that MirGeneDB does not have a dedicated hairpin file. The equivalent is the `Precursor sequences`."
                 },
-                "bowtie_indices": {
+                "bowtie_index": {
                     "type": "string",
                     "description": "Path to a Bowtie 1 index directory",
                     "fa_icon": "fas fa-book",

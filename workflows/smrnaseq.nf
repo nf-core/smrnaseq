@@ -20,19 +20,13 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
 
 // Check optional parameters
-if (!params.mirtrace_species){
-    exit 1, "Reference species for miRTrace is not defined."
+if (!params.mirtrace_species) {
+    exit 1, "Reference species for miRTrace is not defined via the --mirtrace_species parameter."
 }
-// Genome options
-bt_index_from_species = params.genome ? params.genomes[ params.genome ].bowtie ?: false : false
-bt_index              = params.bowtie_indices ?: bt_index_from_species
 
-mirtrace_species_from_species = params.genome ? params.genomes[ params.genome ].mirtrace_species ?: false : false
-mirtrace_species = params.mirtrace_species ?: mirtrace_species_from_species
-fasta_from_species = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
-fasta = params.fasta ?: fasta_from_species
-mirna_gtf_from_species = params.mirtrace_species ? "https://mirbase.org/ftp/CURRENT/genomes/${params.mirtrace_species}.gff3" : false
-mirna_gtf = params.mirna_gtf ? params.mirna_gtf : mirna_gtf_from_species
+// Genome options
+def mirna_gtf_from_species = params.mirtrace_species ? "https://mirbase.org/ftp/CURRENT/genomes/${params.mirtrace_species}.gff3" : false
+def mirna_gtf = params.mirna_gtf ?: mirna_gtf_from_species
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -56,12 +50,10 @@ ch_multiqc_image         = file("$projectDir/assets/smrnaseq_logo.png", checkIfE
 if (!params.mirgenedb) {
     if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
     if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
-    params.filter_species = params.mirtrace_species
 } else {
     if (params.mirgenedb_mature) { reference_mature = file(params.mirgenedb_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mirgenedb_mature}" }
     if (params.mirgenedb_hairpin) { reference_hairpin = file(params.mirgenedb_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.mirgenedb_hairpin}" }
     if (params.mirgenedb_gff) { mirna_gtf = file(params.mirgenedb_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found: ${params.mirgenedb_gff}"}
-    params.filter_species = params.mirgenedb_species
 }
 
 include { INPUT_CHECK        } from '../subworkflows/local/input_check'
@@ -186,9 +178,9 @@ workflow SMRNASEQ {
     // GENOME
     //
     genome_stats = Channel.empty()
-    if (fasta){
-        fasta_ch = file(fasta)
-        GENOME_QUANT ( fasta_ch, bt_index, MIRNA_QUANT.out.unmapped )
+    if (params.fasta){
+        ch_fasta = file(params.fasta)
+        GENOME_QUANT ( ch_fasta, params.bowtie_index, MIRNA_QUANT.out.unmapped )
         GENOME_QUANT.out.stats
             .set { genome_stats }
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
@@ -197,7 +189,7 @@ workflow SMRNASEQ {
             MIRDEEP2 (
                 FASTQC_TRIMGALORE.out.reads,
                 GENOME_QUANT.out.fasta,
-                GENOME_QUANT.out.indices.collect(),
+                GENOME_QUANT.out.index.collect(),
                 MIRNA_QUANT.out.fasta_hairpin,
                 MIRNA_QUANT.out.fasta_mature
             )

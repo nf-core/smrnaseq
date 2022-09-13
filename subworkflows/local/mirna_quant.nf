@@ -45,10 +45,10 @@ workflow MIRNA_QUANT {
     FORMAT_HAIRPIN ( hairpin_parsed )
     ch_versions = ch_versions.mix(FORMAT_HAIRPIN.out.versions)
 
-    INDEX_MATURE ( FORMAT_MATURE.out.formatted_fasta ).bowtie_indices.set { mature_bowtie }
+    INDEX_MATURE ( FORMAT_MATURE.out.formatted_fasta ).index.set { mature_bowtie }
     ch_versions = ch_versions.mix(INDEX_MATURE.out.versions)
 
-    INDEX_HAIRPIN ( FORMAT_HAIRPIN.out.formatted_fasta ).bowtie_indices.set { hairpin_bowtie }
+    INDEX_HAIRPIN ( FORMAT_HAIRPIN.out.formatted_fasta ).index.set { hairpin_bowtie }
     ch_versions = ch_versions.mix(INDEX_HAIRPIN.out.versions)
 
     reads
