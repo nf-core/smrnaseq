@@ -61,10 +61,7 @@ class WorkflowSmrnaseq {
     * this function formats the protocol such that it is fit for the respective
     * subworkflow
     */
-    static formatProtocol(protocol) {
-        Int clip_r1 = protocol
-        Int three_prime_clip_r1 = ''
-        String three_prime_adapter = ''
+    public static void formatProtocol(protocol) {
 
     switch(protocol){
         case 'illumina':
