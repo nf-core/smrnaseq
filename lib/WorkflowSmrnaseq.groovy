@@ -64,22 +64,27 @@ class WorkflowSmrnaseq {
     public static void formatProtocol(protocol) {
 
     switch(protocol){
+        log.info "Running with Protocol ${params.protocol} \n Clipping ${params.clip_r1} bases \n Clipping ${params.three_prime_clip_r1} 3' bases \n with Adapter ${params.three_prime_adapter}"
         case 'illumina':
-            params.replace("clip_r1", 0)
-            params.replace("three_prime_clip_r1",0)
-            params.replace("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG")
+            params.replace("clip_r1", 0);
+            params.replace("three_prime_clip_r1",0);
+            params.replace("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG");
+            break
         case 'nextflex':
-            params.replace("clip_r1", 4)
-            params.replace("three_prime_clip_r1", 4)
-            params.replace("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG")
+            params.replace("clip_r1", 4);
+            params.replace("three_prime_clip_r1", 4);
+            params.replace("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG");
+            break
         case 'qiaseq':
-            params.replace("clip_r1",0)
-            params.replace("three_prime_clip_r1",0)
-            params.replace("three_prime_adapter","AACTGTAGGCACCATCAAT")
+            params.replace("clip_r1",0);
+            params.replace("three_prime_clip_r1",0);
+            params.replace("three_prime_adapter","AACTGTAGGCACCATCAAT");
+            break
         case 'cats':
-            params.replace("clip_r1",3)
-            params.replace("three_prime_clip_r1", 0)
-            params.replace("three_prime_adapter", "AAAAAAAA")
+            params.replace("clip_r1",3);
+            params.replace("three_prime_clip_r1", 0);
+            params.replace("three_prime_adapter", "AAAAAAAA");
+            break
         default: log.warn("No protocol specified, please ensure that you specified parameters for clipping/trimming or otherwise only auto-detection of adapters will be performed.")
     }
 }
