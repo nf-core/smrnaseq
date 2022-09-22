@@ -180,8 +180,8 @@
                     "description": "Sequencing adapter sequence to use for trimming."
                 },
                 "trim_fastq": {
-                    "type": "string",
-                    "default": "true",
+                    "type": "boolean",
+                    "default": true,
                     "fa_icon": "fas fa-hand-scissors",
                     "description": "Trim FastQ files"
                 },
@@ -271,6 +271,11 @@
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip MultiQC"
+                },
+                "skip_fastp": {
+                    "type": "boolean",
+                    "description": "Skip FastP",
+                    "fa_icon": "fas fa-forward"
                 }
             }
         },
@@ -475,11 +480,5 @@
         {
             "$ref": "#/definitions/generic_options"
         }
-    ],
-    "properties": {
-        "skip_fastp": {
-            "type": "string",
-            "default": "false"
-        }
-    }
+    ]
 }
