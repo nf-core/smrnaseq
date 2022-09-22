@@ -57,7 +57,7 @@ if (!params.mirgenedb) {
 }
 
 include { INPUT_CHECK        } from '../subworkflows/local/input_check'
-include { FASTP_FASTQC       } from '../subworkflows/nf-core/fastp_fastqc'
+include { FASTQC_FASTP       } from '../subworkflows/nf-core/fastqc_fastp'
 include { CONTAMINANT_FILTER } from '../subworkflows/local/contaminant_filter'
 include { MIRNA_QUANT        } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT       } from '../subworkflows/local/genome_quant'
@@ -135,16 +135,15 @@ workflow SMRNASEQ {
     // SUBWORKFLOW: Read QC and trim adapters
     //
 
-    WorkflowSmrnaseq.formatProtocol(params.protocol)
-
-    FASTP_FASTQC (
+    FASTQC_FASTP (
         ch_cat_fastq,
+        false,
         false
     )
 
-    ch_versions = ch_versions.mix(FASTP_FASTQC.out.versions)
+    ch_versions = ch_versions.mix(FASTQC_FASTP.out.versions)
 
-    reads_for_mirna = FASTP_FASTQC.out.reads
+    reads_for_mirna = FASTQC_FASTP.out.reads
     //
     // SUBWORKFLOW: remove contaminants from reads
     //
@@ -158,7 +157,7 @@ workflow SMRNASEQ {
             params.ncrna,
             params.pirna,
             params.other_contamination,
-            FASTP_FASTQC.out.reads
+            FASTQC_FASTP.out.reads
         )
 
         reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
@@ -189,7 +188,7 @@ workflow SMRNASEQ {
 
         if (!params.skip_mirdeep) {
             MIRDEEP2 (
-                FASTP_FASTQC.out.reads,
+                FASTQC_FASTP.out.reads,
                 GENOME_QUANT.out.fasta,
                 GENOME_QUANT.out.index.collect(),
                 MIRNA_QUANT.out.fasta_hairpin,

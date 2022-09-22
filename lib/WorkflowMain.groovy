@@ -77,6 +77,9 @@ class WorkflowMain {
             log.error "Please provide an input samplesheet to the pipeline e.g. '--input samplesheet.csv'"
             System.exit(1)
         }
+
+        //Detect Protocol setting
+        WorkflowSmrnaseq.formatProtocol(params,log)
     }
     //
     // Get attribute from genome config file e.g. fasta

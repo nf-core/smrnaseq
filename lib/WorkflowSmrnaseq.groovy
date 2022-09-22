@@ -61,10 +61,10 @@ class WorkflowSmrnaseq {
     * this function formats the protocol such that it is fit for the respective
     * subworkflow
     */
-    public static void formatProtocol(protocol) {
+    public static String formatProtocol(params,log) {
 
-    switch(protocol){
-        log.info "Running with Protocol ${params.protocol} \n Clipping ${params.clip_r1} bases \n Clipping ${params.three_prime_clip_r1} 3' bases \n with Adapter ${params.three_prime_adapter}"
+    switch(params.protocol){
+        //log.warn("Running with Protocol ${params.protocol} \n Clipping ${params.clip_r1} bases \n Clipping ${params.three_prime_clip_r1} 3' bases \n with Adapter ${params.three_prime_adapter}")
         case 'illumina':
             params.replace("clip_r1", 0);
             params.replace("three_prime_clip_r1",0);
@@ -85,6 +85,6 @@ class WorkflowSmrnaseq {
             params.replace("three_prime_clip_r1", 0);
             params.replace("three_prime_adapter", "AAAAAAAA");
             break
-        default: log.warn("No protocol specified, please ensure that you specified parameters for clipping/trimming or otherwise only auto-detection of adapters will be performed.")
+            }
     }
 }
