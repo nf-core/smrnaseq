@@ -164,12 +164,6 @@
             "description": "Options for trimming reads and primers.",
             "fa_icon": "fas fa-cut",
             "properties": {
-                "min_length": {
-                    "type": "integer",
-                    "default": 17,
-                    "description": "Discard reads that are shorter than this after quality / adapter trimming.",
-                    "fa_icon": "fas fa-ruler"
-                },
                 "clip_r1": {
                     "type": "integer",
                     "fa_icon": "fas fa-cut",
@@ -185,12 +179,6 @@
                     "default": "TGGAATTCTCGGGTGCCAAGG",
                     "fa_icon": "fas fa-text-width",
                     "description": "Sequencing adapter sequence to use for trimming."
-                },
-                "trim_galore_max_length": {
-                    "type": "integer",
-                    "default": 40,
-                    "description": "The max-length parameter used for trimming with TrimGalore!.",
-                    "fa_icon": "fas fa-ruler"
                 }
             }
         },
@@ -475,6 +463,18 @@
         "skip_fastp": {
             "type": "string",
             "default": "false"
+        },
+        "trim_fastq": {
+            "type": "string",
+            "default": "true"
+        },
+        "fastp_min_length": {
+            "type": "integer",
+            "default": 17
+        },
+        "fastp_max_length": {
+            "type": "integer",
+            "default": 40
         }
     }
 }
