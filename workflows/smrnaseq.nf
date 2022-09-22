@@ -135,12 +135,13 @@ workflow SMRNASEQ {
     // SUBWORKFLOW: Read QC and trim adapters
     //
 
-    (clip_r1, three_prime_clip_r1, three_prime_adapter) = WorkflowSmrnaseq.formatProtocol(params.protocol)
+    WorkflowSmrnaseq.formatProtocol(params.protocol)
 
     FASTP_FASTQC (
         ch_cat_fastq,
         false
     )
+
     ch_versions = ch_versions.mix(FASTP_FASTQC.out.versions)
 
     reads_for_mirna = FASTP_FASTQC.out.reads

@@ -68,26 +68,21 @@ class WorkflowSmrnaseq {
 
     switch(protocol){
         case 'illumina':
-            clip_r1  = 0
-            three_prime_clip_r1 = 0
-            three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"
+            params.replace("clip_r1", 0)
+            params.replace("three_prime_clip_r1",0)
+            params.replace("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG")
         case 'nextflex':
-            clip_r1 = 4
-            three_prime_clip_r1 = 4
-            three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"
+            params.replace("clip_r1", 4)
+            params.replace("three_prime_clip_r1", 4)
+            params.replace("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG")
         case 'qiaseq':
-            clip_r1 = 0
-            three_prime_clip_r1 = 0
-            three_prime_adapter = "AACTGTAGGCACCATCAAT"
+            params.replace("clip_r1",0)
+            params.replace("three_prime_clip_r1",0)
+            params.replace("three_prime_adapter","AACTGTAGGCACCATCAAT")
         case 'cats':
-            clip_r1 = 3
-            three_prime_clip_r1 = 0
-            three_prime_adapter = "AAAAAAAA"
-        case 'custom':
-            clip_r1 = params.clip_r1
-            three_prime_clip_r1 = params.three_prime_clip_r1
-            three_prime_adapter = params.three_prime_adapter
-        }
-        return [clip_r1, three_prime_clip_r1, three_prime_adapter]
+            params.replace("clip_r1",3)
+            params.replace("three_prime_clip_r1", 0)
+            params.replace("three_prime_adapter", "AAAAAAAA")
+        default: log.warn("No protocol specified, please ensure that you specified parameters for clipping/trimming or otherwise only auto-detection of adapters will be performed.")
     }
 }
