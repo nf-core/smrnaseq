@@ -57,7 +57,7 @@ if (!params.mirgenedb) {
 }
 
 include { INPUT_CHECK        } from '../subworkflows/local/input_check'
-include { FASTQC_TRIMGALORE  } from '../subworkflows/nf-core/fastqc_trimgalore'
+include { FASTP_FASTQC       } from '../subworkflows/nf-core/fastp_fastqc'
 include { CONTAMINANT_FILTER } from '../subworkflows/local/contaminant_filter'
 include { MIRNA_QUANT        } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT       } from '../subworkflows/local/genome_quant'
@@ -74,7 +74,6 @@ include { MIRDEEP2           } from '../subworkflows/local/mirdeep2'
 // MODULE: Installed directly from nf-core/modules
 //
 include { CAT_FASTQ                   } from '../modules/nf-core/modules/cat/fastq/main'
-include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 
@@ -133,16 +132,18 @@ workflow SMRNASEQ {
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
 
     //
-    // SUBWORKFLOW: Read QC, extract UMI and trim adapters
+    // SUBWORKFLOW: Read QC and trim adapters
     //
-    FASTQC_TRIMGALORE (
-        ch_cat_fastq,
-        params.skip_fastqc || params.skip_qc,
-        params.skip_trimming
-    )
-    ch_versions = ch_versions.mix(FASTQC_TRIMGALORE.out.versions)
 
-    reads_for_mirna = FASTQC_TRIMGALORE.out.reads
+    (clip_r1, three_prime_clip_r1, three_prime_adapter) = WorkflowSmrnaseq.formatProtocol(params.protocol)
+
+    FASTP_FASTQC (
+        ch_cat_fastq,
+        false
+    )
+    ch_versions = ch_versions.mix(FASTP_FASTQC.out.versions)
+
+    reads_for_mirna = FASTP_FASTQC.out.reads
     //
     // SUBWORKFLOW: remove contaminants from reads
     //
@@ -156,7 +157,7 @@ workflow SMRNASEQ {
             params.ncrna,
             params.pirna,
             params.other_contamination,
-            FASTQC_TRIMGALORE.out.reads
+            FASTP_FASTQC.out.reads
         )
 
         reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
@@ -187,7 +188,7 @@ workflow SMRNASEQ {
 
         if (!params.skip_mirdeep) {
             MIRDEEP2 (
-                FASTQC_TRIMGALORE.out.reads,
+                FASTP_FASTQC.out.reads,
                 GENOME_QUANT.out.fasta,
                 GENOME_QUANT.out.index.collect(),
                 MIRNA_QUANT.out.fasta_hairpin,
@@ -217,7 +218,8 @@ workflow SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
 
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_TRIMGALORE.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([])),
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.trim_json.collect{it[1]}.ifEmpty([])),
         ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))

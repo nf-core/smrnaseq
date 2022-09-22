@@ -13,6 +13,10 @@
                     "branch": "master",
                     "git_sha": "5e7b1ef9a5a2d9258635bcbf70fcf37dacd1b247"
                 },
+                "fastp": {
+                    "branch": "master",
+                    "git_sha": "2c70c1c1951aaf884d2e8d8d9c871db79f7b35aa"
+                },
                 "fastqc": {
                     "branch": "master",
                     "git_sha": "49b18b1639f4f7104187058866a8fab33332bdfe"

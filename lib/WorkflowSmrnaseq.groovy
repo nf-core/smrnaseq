@@ -54,4 +54,40 @@ class WorkflowSmrnaseq {
             System.exit(1)
         }
     }
+
+    /*
+    * Format the protocol
+    * Given the protocol parameter (params.protocol),
+    * this function formats the protocol such that it is fit for the respective
+    * subworkflow
+    */
+    static formatProtocol(protocol) {
+        Int clip_r1 = protocol
+        Int three_prime_clip_r1 = ''
+        String three_prime_adapter = ''
+
+    switch(protocol){
+        case 'illumina':
+            clip_r1  = 0
+            three_prime_clip_r1 = 0
+            three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"
+        case 'nextflex':
+            clip_r1 = 4
+            three_prime_clip_r1 = 4
+            three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"
+        case 'qiaseq':
+            clip_r1 = 0
+            three_prime_clip_r1 = 0
+            three_prime_adapter = "AACTGTAGGCACCATCAAT"
+        case 'cats':
+            clip_r1 = 3
+            three_prime_clip_r1 = 0
+            three_prime_adapter = "AAAAAAAA"
+        case 'custom':
+            clip_r1 = params.clip_r1
+            three_prime_clip_r1 = params.three_prime_clip_r1
+            three_prime_adapter = params.three_prime_adapter
+        }
+        return [clip_r1, three_prime_clip_r1, three_prime_adapter]
+    }
 }
