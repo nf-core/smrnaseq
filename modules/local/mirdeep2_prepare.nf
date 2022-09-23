@@ -12,11 +12,10 @@ process MIRDEEP2_PIGZ {
     tuple val(meta), path(reads)
 
     output:
-    tuple val(meta), path("*.fq"), emit: reads
-    path "versions.yml"          , emit: versions
+    tuple val(meta), path("*.{fastq,fq}"), emit: reads
+    path "versions.yml"                  , emit: versions
 
     script:
-    def unzip = reads.toString() - '.gz'
     """
     pigz -f -d -p $task.cpus $reads
 
