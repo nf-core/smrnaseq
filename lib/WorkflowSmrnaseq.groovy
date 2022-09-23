@@ -84,6 +84,8 @@ class WorkflowSmrnaseq {
                 params.replace("three_prime_clip_r1", 0);
                 params.replace("three_prime_adapter", "AAAAAAAA");
                 break
+            default:
+                log.warn "Please make sure to specify all required clipping and trimming parameters, otherwise only adapter detection will be performed."
             }
 
             log.warn "Running with Protocol ${params.protocol}"
