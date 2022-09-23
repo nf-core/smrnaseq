@@ -63,28 +63,32 @@ class WorkflowSmrnaseq {
     */
     public static String formatProtocol(params,log) {
 
-    switch(params.protocol){
-        //log.warn("Running with Protocol ${params.protocol} \n Clipping ${params.clip_r1} bases \n Clipping ${params.three_prime_clip_r1} 3' bases \n with Adapter ${params.three_prime_adapter}")
-        case 'illumina':
-            params.replace("clip_r1", 0);
-            params.replace("three_prime_clip_r1",0);
-            params.replace("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG");
-            break
-        case 'nextflex':
-            params.replace("clip_r1", 4);
-            params.replace("three_prime_clip_r1", 4);
-            params.replace("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG");
-            break
-        case 'qiaseq':
-            params.replace("clip_r1",0);
-            params.replace("three_prime_clip_r1",0);
-            params.replace("three_prime_adapter","AACTGTAGGCACCATCAAT");
-            break
-        case 'cats':
-            params.replace("clip_r1",3);
-            params.replace("three_prime_clip_r1", 0);
-            params.replace("three_prime_adapter", "AAAAAAAA");
-            break
+        switch(params.protocol){
+            case 'illumina':
+                params.replace("clip_r1", 0);
+                params.replace("three_prime_clip_r1",0);
+                params.replace("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG");
+                break
+            case 'nextflex':
+                params.replace("clip_r1", 4);
+                params.replace("three_prime_clip_r1", 4);
+                params.replace("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG");
+                break
+            case 'qiaseq':
+                params.replace("clip_r1",0);
+                params.replace("three_prime_clip_r1",0);
+                params.replace("three_prime_adapter","AACTGTAGGCACCATCAAT");
+                break
+            case 'cats':
+                params.replace("clip_r1",3);
+                params.replace("three_prime_clip_r1", 0);
+                params.replace("three_prime_adapter", "AAAAAAAA");
+                break
             }
-    }
+
+            log.warn "Running with Protocol ${params.protocol}"
+            log.warn "Therefore using Adapter: ${params.three_prime_adapter}"
+            log.warn "Clipping ${params.clip_r1} bases from R1"
+            log.warn "And clipping ${params.three_prime_clip_r1} bases from 3' end"
+        }
 }
