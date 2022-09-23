@@ -44,10 +44,6 @@
                 "samtools/stats": {
                     "branch": "master",
                     "git_sha": "f4eab7945952dc4934224309701a49913ea05ae6"
-                },
-                "trimgalore": {
-                    "branch": "master",
-                    "git_sha": "85ec13ff1fc2196c5a507ea497de468101baabed"
                 }
             }
         }
