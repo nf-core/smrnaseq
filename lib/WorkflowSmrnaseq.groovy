@@ -65,24 +65,24 @@ class WorkflowSmrnaseq {
 
         switch(params.protocol){
             case 'illumina':
-                params.replace("clip_r1", 0);
-                params.replace("three_prime_clip_r1",0);
-                params.replace("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG");
+                params.putIfAbsent("clip_r1", 1);
+                params.putIfAbsent("three_prime_clip_r1",2);
+                params.putIfAbsent("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG");
                 break
             case 'nextflex':
-                params.replace("clip_r1", 4);
-                params.replace("three_prime_clip_r1", 4);
-                params.replace("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG");
+                params.putIfAbsent("clip_r1", 4);
+                params.putIfAbsent("three_prime_clip_r1", 4);
+                params.putIfAbsent("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG");
                 break
             case 'qiaseq':
-                params.replace("clip_r1",0);
-                params.replace("three_prime_clip_r1",0);
-                params.replace("three_prime_adapter","AACTGTAGGCACCATCAAT");
+                params.putIfAbsent("clip_r1",0);
+                params.putIfAbsent("three_prime_clip_r1",0);
+                params.putIfAbsent("three_prime_adapter","AACTGTAGGCACCATCAAT");
                 break
             case 'cats':
-                params.replace("clip_r1",3);
-                params.replace("three_prime_clip_r1", 0);
-                params.replace("three_prime_adapter", "AAAAAAAA");
+                params.putIfAbsent("clip_r1",3);
+                params.putIfAbsent("three_prime_clip_r1", 0);
+                params.putIfAbsent("three_prime_adapter", "AAAAAAAA");
                 break
             default:
                 log.warn "Please make sure to specify all required clipping and trimming parameters, otherwise only adapter detection will be performed."
