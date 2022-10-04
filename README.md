@@ -62,7 +62,7 @@ The nf-core/smrnaseq pipeline comes with documentation about the pipeline [usage
 
 ## Credits
 
-nf-core/smrnaseq was originally written by P. Ewels <phil.ewels@scilifelab.se>, C. Wang <chuan.wang@scilifelab.se>, R. Hammarén <rickard.hammaren@scilifelab.se>, L. Pantano <lorena.pantano@gmail.com>.
+nf-core/smrnaseq was originally written by P. Ewels, C. Wang, R. Hammarén, L. Pantano.
 
 We thank the following people for their extensive assistance in the development of this pipeline:
 

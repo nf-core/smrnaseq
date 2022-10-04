@@ -4,7 +4,8 @@
     nf-core/smrnaseq
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Github : https://github.com/nf-core/smrnaseq
-Website: https://nf-co.re/smrnaseq
+
+    Website: https://nf-co.re/smrnaseq
     Slack  : https://nfcore.slack.com/channels/smrnaseq
 ----------------------------------------------------------------------------------------
 */
