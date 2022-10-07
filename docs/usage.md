@@ -6,7 +6,53 @@
 
 ## Introduction
 
-<!-- TODO nf-core: Add documentation about anything specific to running your pipeline. For general topics, please point to (and add to) the main nf-core website. -->
+### `protocol`
+
+This option indicates the experimental protocol used for the sample preparation. Currently supporting:
+
+- 'illumina': adapter (`TGGAATTCTCGGGTGCCAAGG`)
+- 'nextflex': adapter (`TGGAATTCTCGGGTGCCAAGG), clip_r1 (`4`), three_prime_clip_r1 (`4`)
+- 'qiaseq': adapter (`AACTGTAGGCACCATCAAT`)
+- 'cats': adapter (`GATCGGAAGAGCACACGTCTG), clip_r1(`3)
+- 'custom' (where the user can indicate the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` manually)
+
+:warning: At least the `custom` protocol has to be specified, otherwise the pipeline won't run.
+
+### `mirtrace_species` or `mirgenedb_species`
+
+It should point to the 3-letter species name used by [miRBase](https://www.mirbase.org/help/genome_summary.shtml) or MirGeneDB. Note the difference in case for the two databases.
+
+### miRNA related files
+
+Different parameters can be set for the two supported datbases. By default `miRBase` will be used with the parameters below.
+
+- `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRbase: `https://mirbase.org/ftp/CURRENT/genomes/${params.mirtrace_species}.gff3`
+- `mature`: points to the FASTA file of mature miRNA sequences. `https://mirbase.org/ftp/CURRENT/mature.fa.gz`
+- `hairpin`: points to the FASTA file of precursor miRNA sequences. `https://mirbase.org/ftp/CURRENT/hairpin.fa.gz`
+
+If MirGeneDB should be used instead it needs to be specified using `--mirgenedb` and use the parameters below .
+
+- `mirgenedb_gff`: The data can not be downloaded automatically, thus the user needs to supply the gff file for either his species, or all species downloaded from `https://mirgenedb.org/download`. The total set will automatically be subsetted to the species specified with `--mirgenedb_species`.
+- `mirgenedb_mature`: points to the FASTA file of mature miRNA sequences. Download from `https://mirgenedb.org/download`.
+- `mirgenedb_hairpin`: points to the FASTA file of precursor miRNA sequences. Download from `https://mirgenedb.org/download`. Note that MirGeneDB does not have a dedicated `hairpin` file, but the `Precursor sequences` are to be used.
+
+### Genome
+
+- `fasta`: the reference genome FASTA file
+- `bt_indices`: points to the folder containing the `bowtie2` indices for the genome reference specified by `fasta`. **Note:** if the FASTA file in `fasta` is not the same file used to generate the `bowtie2` indices, then the pipeline will fail.
+
+### Contamination filtering
+
+This step has, until now, only been tested for human data. Unexpected behaviour can occur when using it with a different species.
+
+Contamination filtering of the sequencing reads is optional and can be invoked using `filter_contamination`. FASTA files with contamination sequences to use need to be supplied using the following commands. Otherwise the contamination filtering of the specific type will be omitted.
+
+- `rrna`: Used to supply a FASTA file containing rRNA contamination sequence.
+- `trna`: Used to supply a FASTA file containing tRNA contamination sequence. e.g. `http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/hg38-tRNAs.fa`
+- `cdna`: Used to supply a FASTA file containing cDNA contamination sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `ncrna`: Used to supply a FASTA file containing ncRNA contamination sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `pirna`: Used to supply a FASTA file containing piRNA contamination sequence. e.g. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `other_contamination`: Used to supply an additional filtering set. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 
 ## Samplesheet input
 
@@ -18,37 +64,36 @@ You will need to create a samplesheet with information about the samples you wou
 
 ### Multiple runs of the same sample
 
-The `sample` identifiers have to be the same when you have re-sequenced the same sample more than once e.g. to increase sequencing depth. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
+The `sample` identifiers should match between runs of resequenced samples. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
 
 ```console
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz,AEG588A1_S1_L003_R2_001.fastq.gz
-CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz,AEG588A1_S1_L004_R2_001.fastq.gz
+sample,fastq_1
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz
+CONTROL_REP1,AEG588A1_S1_L003_R1_001.fastq.gz
+CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz
 ```
 
 ### Full samplesheet
 
-The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire, however, there is a strict requirement for the first 3 columns to match those defined in the table below.
+The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire. However, there is a strict requirement for the first 3 columns to match those defined in the table below.
 
 A final samplesheet file consisting of both single- and paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
 
 ```console
-sample,fastq_1,fastq_2
-CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz,AEG588A1_S1_L002_R2_001.fastq.gz
-CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz,AEG588A2_S2_L002_R2_001.fastq.gz
-CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz,AEG588A3_S3_L002_R2_001.fastq.gz
-TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz,
-TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz,
-TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz,
+sample,fastq_1
+CONTROL_REP1,AEG588A1_S1_L002_R1_001.fastq.gz
+CONTROL_REP2,AEG588A2_S2_L002_R1_001.fastq.gz
+CONTROL_REP3,AEG588A3_S3_L002_R1_001.fastq.gz
+TREATMENT_REP1,AEG588A4_S4_L003_R1_001.fastq.gz
+TREATMENT_REP2,AEG588A5_S5_L003_R1_001.fastq.gz
+TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz
+TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz
 ```
 
 | Column    | Description                                                                                                                                                                            |
 | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
 | `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
-| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
@@ -87,6 +132,12 @@ First, go to the [nf-core/smrnaseq releases page](https://github.com/nf-core/smr
 
 This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future.
 
+## Stand-alone scripts
+
+The `bin` directory contains some scripts used by the pipeline which may also be run manually:
+
+- `edgeR_miRBase.r`: R script using for processing reads counts of mature miRNAs and miRNA precursors (hairpins).
+
 ## Core Nextflow arguments
 
 > **NB:** These options are part of Nextflow and use a _single_ hyphen (pipeline parameters use a double-hyphen).
@@ -95,7 +146,7 @@ This version number will be logged in reports when you run the pipeline, so that
 
 Use this parameter to choose a configuration profile. Profiles can give configuration presets for different compute environments.
 
-Several generic profiles are bundled with the pipeline which instruct the pipeline to use software packaged using different methods (Docker, Singularity, Podman, Shifter, Charliecloud, Conda) - see below. When using Biocontainers, most of these software packaging methods pull Docker containers from quay.io e.g [FastQC](https://quay.io/repository/biocontainers/fastqc) except for Singularity which directly downloads Singularity images via https hosted by the [Galaxy project](https://depot.galaxyproject.org/singularity/) and Conda which downloads and installs software locally from [Bioconda](https://bioconda.github.io/).
+Several generic profiles are bundled with the pipeline. Different profiles instruct the pipeline to use software packaged using different methods (Docker, Singularity, Podman, Shifter, Charliecloud, Conda) - see below. When using Biocontainers, most of these software packaging methods pull Docker containers from `quay.io`, e.g [FastQC](https://quay.io/repository/biocontainers/fastqc). The Singularity profile directly downloads Singularity images via HTTPS hosted by the [Galaxy project](https://depot.galaxyproject.org/singularity/), while the Conda profile downloads and installs software locally from [Bioconda](https://bioconda.github.io/).
 
 > We highly recommend the use of Docker or Singularity containers for full pipeline reproducibility, however when this is not possible, Conda is also supported.
 
@@ -231,7 +282,7 @@ The [Nextflow DSL2](https://www.nextflow.io/docs/latest/dsl2.html) implementatio
 
 ### nf-core/configs
 
-In most cases, you will only need to create a custom config as a one-off but if you and others within your organisation are likely to be running nf-core pipelines regularly and need to use the same settings regularly it may be a good idea to request that your custom config file is uploaded to the `nf-core/configs` git repository. Before you do this please can you test that the config file works with your pipeline of choice using the `-c` parameter. You can then create a pull request to the `nf-core/configs` repository with the addition of your config file, associated documentation file (see examples in [`nf-core/configs/docs`](https://github.com/nf-core/configs/tree/master/docs)), and amending [`nfcore_custom.config`](https://github.com/nf-core/configs/blob/master/nfcore_custom.config) to include your custom profile.
+In most cases, you will only need to create a custom config once. However, if multiple users within an organisation intend to run nf-core pipelines regularly under the same settings, then consider uploading your custom config file to the `nf-core/configs` git repository. Before uploading, ensure that the config file works with your pipeline of choice using the `-c` parameter. You can then create a pull request to the `nf-core/configs` repository with the addition of your config file, associated documentation file (see examples in [`nf-core/configs/docs`](https://github.com/nf-core/configs/tree/master/docs)), and amended [`nfcore_custom.config`](https://github.com/nf-core/configs/blob/master/nfcore_custom.config) to include your custom profile.
 
 See the main [Nextflow documentation](https://www.nextflow.io/docs/latest/config.html) for more information about creating your own configuration files.
 
