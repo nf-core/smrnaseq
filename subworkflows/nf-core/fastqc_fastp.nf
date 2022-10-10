@@ -16,6 +16,11 @@ def getFastpReadsAfterFiltering(json_file) {
     return json['after_filtering']['total_reads'].toInteger()
 }
 
+def getFastpAdapterSequence(json_file){
+    def Map json = (Map) new JsonSlurper().parseText(json_file.text).get('adapter_cutting')
+    return json['read1_adapter_sequence'].toString()
+}
+
 workflow FASTQC_FASTP {
     take:
     reads             // channel: [ val(meta), [ reads ] ]
