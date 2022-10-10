@@ -2,8 +2,7 @@
     "name": "nf-core/smrnaseq",
     "homePage": "https://github.com/nf-core/smrnaseq",
     "repos": {
-        "nf-core/modules": {
-            "git_url": "https://github.com/nf-core/modules.git",
+        "https://github.com/nf-core/modules.git": {
             "modules": {
                 "cat/fastq": {
                     "branch": "master",
