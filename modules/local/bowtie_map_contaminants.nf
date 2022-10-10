@@ -15,8 +15,8 @@ process BOWTIE_MAP_CONTAMINANTS {
     tuple val(meta), path("*sam")                               , emit: bam
     tuple val(meta), path('*.filter.unmapped.contaminant.fastq'), emit: unmapped
     path "versions.yml"                                         , emit: versions
-    path "filtered.*.stats"
-                                    , emit: stats
+    path "filtered.*.stats"                                    , emit: stats
+
     when:
     task.ext.when == null || task.ext.when
 
@@ -30,6 +30,7 @@ process BOWTIE_MAP_CONTAMINANTS {
         -x \$INDEX \\
         --un ${meta.id}.${contaminant_type}.filter.unmapped.contaminant.fastq \\
         ${reads} \\
+        ${args} \\
         -S ${meta.id}.filter.contaminant.sam > ${meta.id}.contaminant_bowtie.log 2>&1
 
     # extracting number of reads from bowtie logs
