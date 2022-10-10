@@ -11,11 +11,6 @@ class WorkflowSmrnaseq {
     //
     public static void initialise(params, log) {
         genomeExistsError(params, log)
-
-        // if (!params.fasta) {
-        //     log.error "Genome fasta file not specified with e.g. '--fasta genome.fa' or via a detectable config file."
-        //     System.exit(1)
-        // }
     }
 
     //
@@ -103,6 +98,9 @@ class WorkflowSmrnaseq {
                 params.putIfAbsent("three_prime_clip_r1", 0);
                 params.putIfAbsent("three_prime_adapter", "AAAAAAAA");
                 break
+            case 'custom':
+                params.putIfAbsent("clip_r1", params.clip_r1)
+                params.putIfAbsent("three_prime_clip_r1", params.three_prime_clip_r1)
             default:
                 log.warn "Please make sure to specify all required clipping and trimming parameters, otherwise only adapter detection will be performed."
             }
