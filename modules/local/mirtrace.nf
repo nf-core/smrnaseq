@@ -7,7 +7,7 @@ process MIRTRACE_RUN {
         'quay.io/biocontainers/mirtrace:1.0.1--hdfd78af_1' }"
 
     input:
-    path reads
+    tuple val(meta), path(reads)
 
     output:
     path "mirtrace/*"  , emit: mirtrace
@@ -18,7 +18,7 @@ process MIRTRACE_RUN {
 
     script:
     // mirtrace protocol defaults to 'params.protocol' if not set
-    def primer = params.protocol == 'cats' ? '' : "--adapter ${params.three_prime_adapter}"
+    def primer = meta.adapter ? "--adapter ${meta.adapter}" : ""
     def protocol = params.protocol == 'custom' ? '' : "--protocol $params.protocol"
     def java_mem = ''
     if(task.memory){
