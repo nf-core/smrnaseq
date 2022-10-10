@@ -2,7 +2,7 @@
 // Read QC, UMI extraction and trimming
 //
 
-include { FASTQC           } from '../../modules/nf-core/modules/fastqc/main'
+include { FASTQC           } from '../../modules/nf-core/fastqc/main'
 include { TRIMGALORE       } from '../../modules/local/trimgalore'
 
 workflow FASTQC_TRIMGALORE {
