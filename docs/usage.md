@@ -56,7 +56,9 @@ Contamination filtering of the sequencing reads is optional and can be invoked u
 
 ## Samplesheet input
 
-You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row as shown in the examples below.
+You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 2 columns ("sample" and "fastq_1"), and a header row as shown in the examples below.
+
+If a second fastq file is provided using another column, the extra data are ignored by this pipeline. The smRNA species should be sufficiently contained in the first read, and so the second read is superfluous data in this smRNA context.
 
 ```bash
 --input '[path to samplesheet file]'
