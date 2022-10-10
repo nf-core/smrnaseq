@@ -12,13 +12,17 @@ include { FASTP                 } from '../../modules/nf-core/fastp/main'
 import groovy.json.JsonSlurper
 
 def getFastpReadsAfterFiltering(json_file) {
-    def Map json = (Map) new JsonSlurper().parseText(json_file.text).get('summary')
-    return json['after_filtering']['total_reads'].toInteger()
+    return new JsonSlurper().parseText(json_file.text)
+    ?.get('summary')
+    ?.get('after_filtering')
+    ?.get('total_reads')
+    ?.toInteger()
 }
 
-def getFastpAdapterSequence(json_file){
-    def Map json = (Map) new JsonSlurper().parseText(json_file.text).get('adapter_cutting')
-    return json['read1_adapter_sequence'].toString()
+String getFastpAdapterSequence(json_file){
+    return new JsonSlurper().parseText(json_file.text)
+    ?.get('adapter_cutting')
+    ?.get('read1_adapter_sequence')
 }
 
 workflow FASTQC_FASTP {
@@ -78,6 +82,10 @@ workflow FASTQC_FASTP {
             }
             .set { trim_reads }
 
+        trim_json
+            .map { meta, json -> [meta, getFastpAdapterSequence(json)] }
+            .set { adapterseq }
+
         if (!params.skip_fastqc) {
             FASTQC_TRIM (
                 trim_reads
@@ -95,6 +103,7 @@ workflow FASTQC_FASTP {
     trim_log           // channel: [ val(meta), [ log ] ]
     trim_reads_fail    // channel: [ val(meta), [ fastq.gz ] ]
     trim_reads_merged  // channel: [ val(meta), [ fastq.gz ] ]
+    adapterseq         // channel: [ val(meat), [ adapterseq ] ]
 
     fastqc_raw_html    // channel: [ val(meta), [ html ] ]
     fastqc_raw_zip     // channel: [ val(meta), [ zip ] ]
