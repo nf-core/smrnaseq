@@ -15,7 +15,10 @@ process BOWTIE_MAP_CONTAMINANTS {
     tuple val(meta), path("*sam")                               , emit: bam
     tuple val(meta), path('*.filter.unmapped.contaminant.fastq'), emit: unmapped
     path "versions.yml"                                         , emit: versions
-    path "filtered.*.stats"                                     , emit: stats
+    path "filtered.*.stats"
+                                    , emit: stats
+    when:
+    task.ext.when == null || task.ext.when
 
     script:
     """

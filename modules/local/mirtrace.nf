@@ -13,6 +13,9 @@ process MIRTRACE_RUN {
     path "mirtrace/*"  , emit: mirtrace
     path "versions.yml", emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     // mirtrace protocol defaults to 'params.protocol' if not set
     def primer = params.protocol == 'cats' ? '' : "--adapter ${params.three_prime_adapter}"

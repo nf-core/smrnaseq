@@ -15,6 +15,9 @@ process INDEX_GENOME {
     path 'genome.edited.fa', emit: fasta
     path "versions.yml"    , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+    
     script:
     """
     # Remove any special base characters from reference genome FASTA file

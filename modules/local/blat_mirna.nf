@@ -17,8 +17,10 @@ process BLAT_MIRNA {
     path 'filtered.fa'  , emit: filtered_set
     path "versions.yml" , emit: versions
 
-    script:
+    when:
+    task.ext.when == null || task.ext.when
 
+    script:
     if ( db_type == "cdna" )
         """
         echo $db_type

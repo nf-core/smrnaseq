@@ -13,6 +13,9 @@ process INDEX_CONTAMINANTS {
     path 'fasta_bidx*'  , emit: index
     path "versions.yml" , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+    
     script:
     """
     bowtie2-build ${fasta} fasta_bidx --threads ${task.cpus}

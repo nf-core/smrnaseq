@@ -16,6 +16,9 @@ process FORMAT_FASTA_MIRNA {
     path '*_idx.fa'    , emit: formatted_fasta
     path "versions.yml", emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     """
     fasta_formatter -w 0 -i $fasta -o ${fasta}_idx.fa

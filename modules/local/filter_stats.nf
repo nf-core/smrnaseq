@@ -14,6 +14,9 @@ process FILTER_STATS {
     path "*_mqc.yaml"                                            , emit: stats
     tuple val(meta), path('*.filtered.fastq.gz')                 , emit: reads
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     """
     readnumber=\$(wc -l ${reads} | awk '{ print \$1/4 }')

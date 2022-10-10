@@ -16,6 +16,9 @@ process BOWTIE_MAP_SEQ {
     tuple val(meta), path('unmapped/*fq.gz'), emit: unmapped
     path "versions.yml"                     , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+    
     script:
     """
     INDEX=`find -L ./ -name "*.3.ebwt" | sed 's/.3.ebwt//'`
