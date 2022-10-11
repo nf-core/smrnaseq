@@ -98,12 +98,6 @@ workflow SMRNASEQ {
         ch_input
     )
     .reads
-    .map {
-        meta, fastq ->
-            meta.id = meta.id.split('_')[0..-2].join('_')
-            [ meta, fastq ] }
-    .dump(tag: 'map')
-    .groupTuple(by: [0])
     .dump(tag: 'group')
     .branch {
         meta, fastq ->
