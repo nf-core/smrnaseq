@@ -1,0 +1,29 @@
+reports:
+  multiqc_report.html:
+    display: "MultiQC HTML report"
+  "**/edger/hairpin_counts.csv":
+    display: "EdgeR Read counts for known hairpins (raw counts)"
+  "**/edger/hairpin_logtpm.csv":
+    display: "EdgeR Read counts for known hairpins (log TPM)"
+  "**/edger/hairpin_normalized_CPM.txt":
+    display: "EdgeR Read counts for known hairpins (normalised)"
+  "**/edger/mature_counts.csv":
+    display: "EdgeR Read counts for known mature miRNAs (raw)"
+  "**/edger/mature_logtpm.csv":
+    display: "EdgeR Read counts for known mature miRNAs (log TPM)"
+  "**/edger/mature_normalized_CPM.txt":
+    display: "EdgeR Read counts for known mature miRNAs (normalised)"
+  "**/edger/hairpin_CPM_heatmap.pdf":
+    display: "EdgeR Heatmap of hairpin sequences for all samples"
+  "**/edger/hairpin_edgeR_MDS_plot.pdf":
+    display: "EdgeR Dimensionality reduction plot of samples from hairpin counts"
+  "**/edger/hairpin_log2CPM_sample_distances_dendrogram.pdf":
+    display: "EdgeR dendrogram from hairpin counts"
+  "**/edger/hairpin_log2CPM_sample_distances_heatmap.pdf":
+    display: "EdgeR distances from hairpin counts"
+  "**/mirtop/mirna.tsv":
+    display: "Mirtop miRNA summary table"
+  "**/mirtop/mirtop.tsv":
+    display: "Mirtop summary table"
+  "**/mirtrace/mirtrace-report.html":
+    display: "Mirtrace report"

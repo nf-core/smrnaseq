@@ -3,6 +3,36 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.1.0dev - [date]
+
+### Enhancements & fixes
+
+- [[#12](https://github.com/nf-core/smrnaseq/issues/12)] - Enabled the use of `MirGeneDB` as an alternative database insted of `miRBase`
+- [[#113](https://github.com/nf-core/smrnaseq/issues/113)] - Added a optional contamination filtering step, including MultiQC plot
+- [[#137](https://github.com/nf-core/smrnaseq/issues/137)] - Fixed issue with mirTop and MultiQC by upgrading to MultiQC V1.13dev
+- [[#159](https://github.com/nf-core/smrnaseq/issues/159)] - Index files were not collected when `bowtie_index` was used and thus mapping was failing
+- [[#161](https://github.com/nf-core/smrnaseq/issues/161)] - Trimmed output was not as documented and not correctly published
+- [[#168](https://github.com/nf-core/smrnaseq/issues/168)] - Removed `mirtrace_protocol` as the parameter was redundant and `params.protocol` is entirely sufficient
+- Updated pipeline template to [nf-core/tools 2.5.1](https://github.com/nf-core/tools/releases/tag/2.5.1)
+- [[#188](https://github.com/nf-core/smrnaseq/pull/188)] - Dropped TrimGalore in favor of fastp QC and adapter trimming, improved handling of adapters and trimming parameters
+
+### Parameters
+
+| Old parameter | New parameter            |
+| ------------- | ------------------------ |
+|               | `--mirgenedb`            |
+|               | `--mirgenedb_species`    |
+|               | `--mirgenedb_gff`        |
+|               | `--mirgenedb_mature`     |
+|               | `--mirgenedb_hairpin`    |
+|               | `--contamination_filter` |
+|               | `--rrna`                 |
+|               | `--trna`                 |
+|               | `--cdna`                 |
+|               | `--ncrna`                |
+|               | `--pirna`                |
+|               | `--other_contamination`  |
+
 ## [v2.0.0](https://github.com/nf-core/smrnaseq/releases/tag/2.0.0) - 2022-05-31 Aqua Zinc Chihuahua
 
 ### Major enhancements
@@ -24,10 +54,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Parameters
 
-| Old parameter      | New parameter    |
-| ------------------ | ---------------- |
-| `--conda`          | `--enable_conda` |
-| `--clusterOptions` |                  |
+| Old parameter        | New parameter    |
+| -------------------- | ---------------- |
+| `--conda`            | `--enable_conda` |
+| `--clusterOptions`   |                  |
+| `--publish_dir_mode` |                  |
 
 > **NB:** Parameter has been **updated** if both old and new parameter information is present.
 > **NB:** Parameter has been **added** if just the new parameter information is present.
@@ -59,6 +90,8 @@ Note, since the pipeline is now using Nextflow DSL2, each process will be run wi
 | `pymdown-extensions` | -           | -           |
 | `pygments`           | -           | -           |
 | `r-r.methodss3`      | -           | -           |
+| `bowtie2`            | -           | 2.4.5       |
+| `blat`               | -           | 36          |
 
 > **NB:** Dependency has been **updated** if both old and new version information is present.
 > **NB:** Dependency has been **added** if just the new version information is present.

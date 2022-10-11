@@ -45,10 +45,10 @@ workflow MIRNA_QUANT {
     FORMAT_HAIRPIN ( hairpin_parsed )
     ch_versions = ch_versions.mix(FORMAT_HAIRPIN.out.versions)
 
-    INDEX_MATURE ( FORMAT_MATURE.out.formatted_fasta ).bowtie_indices.set { mature_bowtie }
+    INDEX_MATURE ( FORMAT_MATURE.out.formatted_fasta ).index.set { mature_bowtie }
     ch_versions = ch_versions.mix(INDEX_MATURE.out.versions)
 
-    INDEX_HAIRPIN ( FORMAT_HAIRPIN.out.formatted_fasta ).bowtie_indices.set { hairpin_bowtie }
+    INDEX_HAIRPIN ( FORMAT_HAIRPIN.out.formatted_fasta ).index.set { hairpin_bowtie }
     ch_versions = ch_versions.mix(INDEX_HAIRPIN.out.versions)
 
     reads
@@ -63,7 +63,6 @@ workflow MIRNA_QUANT {
         .map { add_suffix(it, "hairpin") }
         .dump (tag:'hsux')
         .set { reads_hairpin }
-
 
     BOWTIE_MAP_HAIRPIN ( reads_hairpin, hairpin_bowtie.collect() )
     ch_versions = ch_versions.mix(BOWTIE_MAP_HAIRPIN.out.versions)
@@ -93,8 +92,10 @@ workflow MIRNA_QUANT {
     BOWTIE_MAP_SEQCLUSTER ( reads_collapsed, hairpin_bowtie.collect() )
     ch_versions = ch_versions.mix(BOWTIE_MAP_SEQCLUSTER.out.versions)
 
+    ch_mirtop_logs = Channel.empty()
     if (params.mirtrace_species){
         MIRTOP_QUANT ( BOWTIE_MAP_SEQCLUSTER.out.bam.collect{it[1]}, FORMAT_HAIRPIN.out.formatted_fasta, gtf )
+        ch_mirtop_logs = MIRTOP_QUANT.out.logs
         ch_versions = ch_versions.mix(MIRTOP_QUANT.out.versions)
 
         TABLE_MERGE ( MIRTOP_QUANT.out.mirtop_table )
@@ -109,22 +110,16 @@ workflow MIRNA_QUANT {
     fasta_mature        = FORMAT_MATURE.out.formatted_fasta
     fasta_hairpin       = FORMAT_HAIRPIN.out.formatted_fasta
     unmapped            = reads_genome
-    bowtie_versions     = BOWTIE_MAP_MATURE.out.versions
-    samtools_versions   = BAM_STATS_MATURE.out.versions
-    seqcluster_versions = SEQCLUSTER_SEQUENCES.out.versions
-    mirtop_versions     = MIRTOP_QUANT.out.versions
     mature_stats        = BAM_STATS_MATURE.out.stats
     hairpin_stats       = BAM_STATS_HAIRPIN.out.stats
-    mirtop_logs         = MIRTOP_QUANT.out.logs
-    merge_versions      = TABLE_MERGE.out.versions
+    mirtop_logs         = ch_mirtop_logs
 
     versions            = ch_versions
 }
 
-
 def add_suffix(row, suffix) {
     def meta = [:]
-    meta.id           = "${row[0].id}_${suffix}"
+    meta.id = "${row[0].id}_${suffix}"
     def array = []
     array = [ meta, row[1] ]
     return array

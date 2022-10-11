@@ -13,6 +13,9 @@ process EDGER_QC {
     path '*.{txt,pdf,csv}', emit: edger_files
     path "versions.yml"   , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     """
     edgeR_miRBase.r $input_files

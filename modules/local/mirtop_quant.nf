@@ -18,11 +18,15 @@ process MIRTOP_QUANT {
     path "mirtop/stats/*"           , emit: logs
     path "versions.yml"             , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
+    def filter_species = params.mirgenedb ? params.mirgenedb_species : params.mirtrace_species
     """
-    mirtop gff --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species ./bams/*
-    mirtop counts --hairpin $hairpin --gtf $gtf -o mirtop --sps $params.mirtrace_species --add-extra --gff mirtop/mirtop.gff
-    mirtop export --format isomir --hairpin $hairpin --gtf $gtf --sps $params.mirtrace_species -o mirtop mirtop/mirtop.gff
+    mirtop gff --hairpin $hairpin --gtf $gtf -o mirtop --sps $filter_species ./bams/*
+    mirtop counts --hairpin $hairpin --gtf $gtf -o mirtop --sps $filter_species --add-extra --gff mirtop/mirtop.gff
+    mirtop export --format isomir --hairpin $hairpin --gtf $gtf --sps $filter_species -o mirtop mirtop/mirtop.gff
     mirtop stats mirtop/mirtop.gff --out mirtop/stats
     mv mirtop/stats/mirtop_stats.log mirtop/stats/full_mirtop_stats.log
 

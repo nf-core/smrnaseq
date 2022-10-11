@@ -19,6 +19,9 @@ process MIRDEEP2_RUN {
     path 'result*.{bed,csv,html}', emit: result
     path "versions.yml"          , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     """
     miRDeep2.pl  \\

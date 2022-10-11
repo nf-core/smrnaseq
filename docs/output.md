@@ -14,6 +14,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 - [FastQC](#fastqc) - read quality control
 - [TrimGalore](#trimgalore) - adapter trimming
+- [Bowtie2](#bowtie2) - contamination filtering
 - [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
 - [SAMtools](#samtools) - alignment result processing and feature counting
 - [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
@@ -45,7 +46,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 MultiQC reports the percentage of bases removed by TrimGalore in the _General Statistics_ table, along with a line plot showing where reads were trimmed.
 
-**Output directory: `results/trim_galore`**
+**Output directory: `results/trimmed`**
 
 Contains FastQ files with quality and adapter trimmed reads for each sample, along with a log file describing the trimming.
 
@@ -58,9 +59,15 @@ This is an example of the output we can get:
 
 ![cutadapt](images/cutadapt_plot.png)
 
+## Bowtie2
+
+[Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) is used to align the reads to user-defined databases of contaminants.
+
+MultiQC reports the number of reads that were removed by each of the contaminant databases.
+
 ## Bowtie
 
-[Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) in [miRBase](http://www.mirbase.org/).
+[Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) of the chosen database [miRBase](http://www.mirbase.org/) or [MirGeneDB](https://mirgenedb.org/).
 
 **Output directory: `results/samtools`**
 

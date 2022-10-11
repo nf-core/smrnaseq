@@ -46,6 +46,10 @@ class WorkflowMain {
     // Validate parameters and print summary to screen
     //
     public static void initialise(workflow, params, log) {
+
+        //Detect Protocol setting, set this early before help so help shows proper adapters etc pp
+        WorkflowSmrnaseq.formatProtocol(params,log)
+
         // Print help to screen if required
         if (params.help) {
             log.info help(workflow, params, log)
@@ -58,6 +62,7 @@ class WorkflowMain {
         }
 
         // Print parameter summary log to screen
+
         log.info paramsSummaryLog(workflow, params, log)
 
         // Check that a -profile or Nextflow config has been provided to run the pipeline
@@ -76,18 +81,17 @@ class WorkflowMain {
             log.error "Please provide an input samplesheet to the pipeline e.g. '--input samplesheet.csv'"
             System.exit(1)
         }
-    }
 
+    }
     //
     // Get attribute from genome config file e.g. fasta
     //
-    public static String getGenomeAttribute(params, attribute) {
-        def val = ''
+    public static Object getGenomeAttribute(params, attribute) {
         if (params.genomes && params.genome && params.genomes.containsKey(params.genome)) {
             if (params.genomes[ params.genome ].containsKey(attribute)) {
-                val = params.genomes[ params.genome ][ attribute ]
+                return params.genomes[ params.genome ][ attribute ]
             }
         }
-        return val
+        return null
     }
 }
