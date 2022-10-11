@@ -10,12 +10,7 @@ workflow MIRTRACE {
 
     main:
     reads
-        .map { it[1] }
-        .flatten()
-        .dump(tag:'mirtrace')
-        .set { all_reads }
-
-    MIRTRACE_RUN ( all_reads.collect() )
+    | MIRTRACE_RUN
 
     emit:
     results    = MIRTRACE_RUN.out.mirtrace

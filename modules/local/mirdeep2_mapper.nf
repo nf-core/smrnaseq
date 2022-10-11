@@ -17,6 +17,8 @@ process MIRDEEP2_MAPPER {
     tuple path('*_collapsed.fa'), path('*reads_vs_refdb.arf'), emit: mirdeep2_inputs
     path "versions.yml"                                      , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
 
     script:
     def index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]

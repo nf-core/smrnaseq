@@ -11,11 +11,6 @@ class WorkflowSmrnaseq {
     //
     public static void initialise(params, log) {
         genomeExistsError(params, log)
-
-        // if (!params.fasta) {
-        //     log.error "Genome fasta file not specified with e.g. '--fasta genome.fa' or via a detectable config file."
-        //     System.exit(1)
-        // }
     }
 
     //
@@ -73,4 +68,46 @@ class WorkflowSmrnaseq {
             System.exit(1)
         }
     }
+
+    /*
+    * Format the protocol
+    * Given the protocol parameter (params.protocol),
+    * this function formats the protocol such that it is fit for the respective
+    * subworkflow
+    */
+    public static String formatProtocol(params,log) {
+
+        switch(params.protocol){
+            case 'illumina':
+                params.putIfAbsent("clip_r1", 1);
+                params.putIfAbsent("three_prime_clip_r1",2);
+                params.putIfAbsent("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG");
+                break
+            case 'nextflex':
+                params.putIfAbsent("clip_r1", 4);
+                params.putIfAbsent("three_prime_clip_r1", 4);
+                params.putIfAbsent("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG");
+                break
+            case 'qiaseq':
+                params.putIfAbsent("clip_r1",0);
+                params.putIfAbsent("three_prime_clip_r1",0);
+                params.putIfAbsent("three_prime_adapter","AACTGTAGGCACCATCAAT");
+                break
+            case 'cats':
+                params.putIfAbsent("clip_r1",3);
+                params.putIfAbsent("three_prime_clip_r1", 0);
+                params.putIfAbsent("three_prime_adapter", "AAAAAAAA");
+                break
+            case 'custom':
+                params.putIfAbsent("clip_r1", params.clip_r1)
+                params.putIfAbsent("three_prime_clip_r1", params.three_prime_clip_r1)
+            default:
+                log.warn "Please make sure to specify all required clipping and trimming parameters, otherwise only adapter detection will be performed."
+            }
+
+            log.warn "Running with Protocol ${params.protocol}"
+            log.warn "Therefore using Adapter: ${params.three_prime_adapter}"
+            log.warn "Clipping ${params.clip_r1} bases from R1"
+            log.warn "And clipping ${params.three_prime_clip_r1} bases from 3' end"
+        }
 }

@@ -14,6 +14,9 @@ process SEQCLUSTER_SEQUENCES {
     tuple val(meta), path("final/*.fastq.gz"), emit: collapsed
     path "versions.yml"                      , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     """
     seqcluster collapse -f $reads -m 1 --min_size 15 -o collapsed

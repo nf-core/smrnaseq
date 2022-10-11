@@ -46,6 +46,10 @@ class WorkflowMain {
     // Validate parameters and print summary to screen
     //
     public static void initialise(workflow, params, log) {
+
+        //Detect Protocol setting, set this early before help so help shows proper adapters etc pp
+        WorkflowSmrnaseq.formatProtocol(params,log)
+
         // Print help to screen if required
         if (params.help) {
             log.info help(workflow, params, log)
@@ -77,6 +81,7 @@ class WorkflowMain {
             log.error "Please provide an input samplesheet to the pipeline e.g. '--input samplesheet.csv'"
             System.exit(1)
         }
+
     }
     //
     // Get attribute from genome config file e.g. fasta

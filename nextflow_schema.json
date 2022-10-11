@@ -142,7 +142,6 @@
                 "igenomes_ignore": {
                     "type": "boolean",
                     "description": "Do not load the iGenomes reference config.",
-                    "default": false,
                     "fa_icon": "fas fa-ban",
                     "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`.",
                     "hidden": true
@@ -155,12 +154,6 @@
             "description": "Options for trimming reads and primers.",
             "fa_icon": "fas fa-cut",
             "properties": {
-                "min_length": {
-                    "type": "integer",
-                    "default": 17,
-                    "description": "Discard reads that are shorter than this after quality / adapter trimming.",
-                    "fa_icon": "fas fa-ruler"
-                },
                 "clip_r1": {
                     "type": "integer",
                     "fa_icon": "fas fa-cut",
@@ -177,11 +170,28 @@
                     "fa_icon": "fas fa-text-width",
                     "description": "Sequencing adapter sequence to use for trimming."
                 },
-                "trim_galore_max_length": {
+                "trim_fastq": {
+                    "type": "boolean",
+                    "default": true,
+                    "fa_icon": "fas fa-hand-scissors",
+                    "description": "Trim FastQ files"
+                },
+                "fastp_min_length": {
+                    "type": "integer",
+                    "default": 17,
+                    "description": "Minimum filter length for raw reads.",
+                    "fa_icon": "fas fa-ruler-horizontal"
+                },
+                "fastp_max_length": {
                     "type": "integer",
                     "default": 40,
-                    "description": "The max-length parameter used for trimming with TrimGalore!.",
-                    "fa_icon": "fas fa-ruler"
+                    "description": "Maximum filter length for raw reads.",
+                    "fa_icon": "fas fa-ruler-horizontal"
+                },
+                "save_trimmed_fail": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-cloud-download-alt",
+                    "description": "Save reads failing trimming"
                 }
             }
         },
@@ -193,7 +203,6 @@
             "properties": {
                 "filter_contamination": {
                     "type": "boolean",
-                    "default": false,
                     "description": "Enables the contamination filtering."
                 },
                 "rrna": {
@@ -237,32 +246,27 @@
                 "skip_qc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip all QC steps",
-                    "default": false
+                    "description": "Skip all QC steps"
                 },
                 "skip_fastqc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip FastQC",
-                    "default": false
+                    "description": "Skip FastQC"
                 },
                 "skip_mirdeep": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip miRDeep",
-                    "default": false
+                    "description": "Skip miRDeep"
                 },
                 "skip_multiqc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip MultiQC",
-                    "default": false
+                    "description": "Skip MultiQC"
                 },
-                "skip_trimming": {
+                "skip_fastp": {
                     "type": "boolean",
-                    "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip all trimming steps.",
-                    "default": false
+                    "description": "Skip FastP",
+                    "fa_icon": "fas fa-forward"
                 }
             }
         },

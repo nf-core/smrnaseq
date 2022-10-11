@@ -13,6 +13,9 @@ process PARSE_FASTA_MIRNA {
     path '*_igenome.fa', emit: parsed_fasta
     path "versions.yml", emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
     def filter_species = params.mirgenedb ? params.mirgenedb_species : params.mirtrace_species
     """
