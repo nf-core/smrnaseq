@@ -1,10 +1,10 @@
 process PARSE_FASTA_MIRNA {
     label 'process_medium'
 
-    conda (params.enable_conda ? 'bioconda::seqkit=2.0.0' : null)
+    conda (params.enable_conda ? 'bioconda::seqkit=2.3.1' : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/seqkit:2.0.0--h9ee0642_0' :
-        'quay.io/biocontainers/seqkit:2.0.0--h9ee0642_0' }"
+        'https://depot.galaxyproject.org/singularity/seqkit:2.3.1--h9ee0642_0' :
+        'quay.io/biocontainers/seqkit:2.3.1--h9ee0642_0' }"
 
     input:
     path fasta
