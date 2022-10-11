@@ -192,6 +192,12 @@
                     "type": "boolean",
                     "fa_icon": "fas fa-cloud-download-alt",
                     "description": "Save reads failing trimming"
+                },
+                "fastp_known_mirna_adapters": {
+                    "type": "string",
+                    "default": "${projectDir}/assets/known_adapters.fa",
+                    "description": "FastA with known miRNA adapter sequences for adapter trimming",
+                    "fa_icon": "far fa-question-circle"
                 }
             }
         },
