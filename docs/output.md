@@ -13,7 +13,8 @@ The directories listed below will be created in the results directory after the 
 The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes data using the following steps:
 
 - [FastQC](#fastqc) - read quality control
-- [TrimGalore](#trimgalore) - adapter trimming
+- [FastP](#fastp) - adapter trimming
+- [Bowtie2](#bowtie2) - contamination filtering
 - [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
 - [SAMtools](#samtools) - alignment result processing and feature counting
 - [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
@@ -39,28 +40,30 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 
 ![MultiQC - FastQC sequence counts plot](images/mqc_fastqc_counts.png)
 
-## TrimGalore
+## FastP
 
-[TrimGalore](http://www.bioinformatics.babraham.ac.uk/projects/trim_galore/) is used for removal of adapter contamination and trimming of low quality regions. TrimGalore uses [Cutadapt](https://github.com/marcelm/cutadapt) for adapter trimming and runs FastQC after it finishes.
+[FastP](https://github.com/OpenGene/fastp) is used for removal of adapter contamination and trimming of low quality regions.
 
-MultiQC reports the percentage of bases removed by TrimGalore in the _General Statistics_ table, along with a line plot showing where reads were trimmed.
+MultiQC reports the percentage of bases removed by FastP in the _General Statistics_ table, along some further information on the results.
 
-**Output directory: `results/trim_galore`**
+**Output directory: `results/fastp`**
 
 Contains FastQ files with quality and adapter trimmed reads for each sample, along with a log file describing the trimming.
 
-- `sample_trimmed.fq.gz` Trimmed FastQ data
-- `sample.fastq.gz_trimming_report.txt` Trimming report (describes which parameters that were used)
-- `sample_trimmed_fastqc.html`
-- `sample_trimmed_fastqc.zip` FastQC report for trimmed reads
+- `sample_fastp.json` - JSON report file with information on parameters and trimming metrics
+- `sample_fastp.html` - HTML report with some visualizations of trimming metrics
 
-This is an example of the output we can get:
+FastP can automatically detect adapter sequences when not specified directly by the user - the pipeline also comes with a feature and a supplied miRNA adapters file to ensure adapters auto-detected are more accurate. If there are needs to add more known miRNA adapters to this list, please open a pull request.
 
-![cutadapt](images/cutadapt_plot.png)
+## Bowtie2
+
+[Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) is used to align the reads to user-defined databases of contaminants.
+
+MultiQC reports the number of reads that were removed by each of the contaminant databases.
 
 ## Bowtie
 
-[Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) in [miRBase](http://www.mirbase.org/).
+[Bowtie](http://bowtie-bio.sourceforge.net/index.shtml) is used for mapping adapter trimmed reads against the mature miRNAs and miRNA precursors (hairpins) of the chosen database [miRBase](http://www.mirbase.org/) or [MirGeneDB](https://mirgenedb.org/).
 
 **Output directory: `results/samtools`**
 

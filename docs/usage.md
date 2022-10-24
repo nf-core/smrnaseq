@@ -12,30 +12,55 @@ This option indicates the experimental protocol used for the sample preparation.
 
 - 'illumina': adapter (`TGGAATTCTCGGGTGCCAAGG`)
 - 'nextflex': adapter (`TGGAATTCTCGGGTGCCAAGG), clip_r1 (`4`), three_prime_clip_r1 (`4`)
-- 'qiaseq': adapter (`AACTGTAGGCACCATCAAT)
+- 'qiaseq': adapter (`AACTGTAGGCACCATCAAT`)
 - 'cats': adapter (`GATCGGAAGAGCACACGTCTG), clip_r1(`3)
-- 'custom' (where the ser can indicate the `three_prime_adapter`, `clip_r1` and three_prime_clip_r1`)
+- 'custom' (where the user can indicate the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` manually)
 
-### `mirtrace_species`
+:warning: At least the `custom` protocol has to be specified, otherwise the pipeline won't run. In case you specify the `custom` protocol, ensure that the parameters above are set accordingly or the defaults will be applied. If you want to auto-detect the adapters using `fastp`, please set `--three_prime_adapter` to `""`.
 
-It should point to the 3-letter species name used by `miRBase`.
+### `mirtrace_species` or `mirgenedb_species`
+
+It should point to the 3-letter species name used by [miRBase](https://www.mirbase.org/help/genome_summary.shtml) or [MirGeneDB](https://www.mirgenedb.org/browse). Note the difference in case for the two databases.
 
 ### miRNA related files
+
+Different parameters can be set for the two supported databases. By default `miRBase` will be used with the parameters below.
 
 - `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRbase: `https://mirbase.org/ftp/CURRENT/genomes/${params.mirtrace_species}.gff3`
 - `mature`: points to the FASTA file of mature miRNA sequences. `https://mirbase.org/ftp/CURRENT/mature.fa.gz`
 - `hairpin`: points to the FASTA file of precursor miRNA sequences. `https://mirbase.org/ftp/CURRENT/hairpin.fa.gz`
+
+If MirGeneDB should be used instead it needs to be specified using `--mirgenedb` and use the parameters below .
+
+- `mirgenedb_gff`: The data can not be downloaded automatically (URLs are created with short term tokens in it), thus the user needs to supply the gff file for either his species, or all species downloaded from `https://mirgenedb.org/download`. The total set will automatically be subsetted to the species specified with `--mirgenedb_species`.
+- `mirgenedb_mature`: points to the FASTA file of mature miRNA sequences. Download from `https://mirgenedb.org/download`.
+- `mirgenedb_hairpin`: points to the FASTA file of precursor miRNA sequences. Download from `https://mirgenedb.org/download`. Note that MirGeneDB does not have a dedicated `hairpin` file, but the `Precursor sequences` are to be used.
 
 ### Genome
 
 - `fasta`: the reference genome FASTA file
 - `bt_indices`: points to the folder containing the `bowtie2` indices for the genome reference specified by `fasta`. **Note:** if the FASTA file in `fasta` is not the same file used to generate the `bowtie2` indices, then the pipeline will fail.
 
+### Contamination filtering
+
+This step has, until now, only been tested for human data. Unexpected behaviour can occur when using it with a different species.
+
+Contamination filtering of the sequencing reads is optional and can be invoked using the `filter_contamination` parameter. FASTA files with
+
+- `rrna`: Used to supply a FASTA file containing rRNA contamination sequence.
+- `trna`: Used to supply a FASTA file containing tRNA contamination sequence. e.g. `http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/hg38-tRNAs.fa`
+- `cdna`: Used to supply a FASTA file containing cDNA contamination sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `ncrna`: Used to supply a FASTA file containing ncRNA contamination sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `pirna`: Used to supply a FASTA file containing piRNA contamination sequence. e.g. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `other_contamination`: Used to supply an additional filtering set. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+
 ## Samplesheet input
 
-You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row as shown in the examples below.
+You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 2 columns ("sample" and "fastq_1"), and a header row as shown in the examples below.
 
-```console
+If a second fastq file is provided using another column, the extra data are ignored by this pipeline. The smRNA species should be sufficiently contained in the first read, and so the second read is superfluous data in this smRNA context.
+
+```bash
 --input '[path to samplesheet file]'
 ```
 
@@ -78,7 +103,7 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 
 The typical command for running the pipeline is as follows:
 
-```console
+```bash
 nextflow run nf-core/smrnaseq --input samplesheet.csv --outdir <OUTDIR> --genome GRCh37 -profile docker
 ```
 
@@ -86,9 +111,9 @@ This will launch the pipeline with the `docker` configuration profile. See below
 
 Note that the pipeline will create the following files in your working directory:
 
-```console
+```bash
 work                # Directory containing the nextflow working files
-<OUTIDR>            # Finished results in specified location (defined with --outdir)
+<OUTDIR>            # Finished results in specified location (defined with --outdir)
 .nextflow_log       # Log file from Nextflow
 # Other nextflow hidden files, eg. history of pipeline runs and old logs.
 ```
@@ -97,7 +122,7 @@ work                # Directory containing the nextflow working files
 
 When you run the above command, Nextflow automatically pulls the pipeline code from GitHub and stores it as a cached version. When running the pipeline after this, it will always use the cached version if available - even if the pipeline has been updated since. To make sure that you're running the latest version of the pipeline, make sure that you regularly update the cached version of the pipeline:
 
-```console
+```bash
 nextflow pull nf-core/smrnaseq
 ```
 
@@ -265,6 +290,14 @@ See the main [Nextflow documentation](https://www.nextflow.io/docs/latest/config
 
 If you have any questions or issues please send us a message on [Slack](https://nf-co.re/join/slack) on the [`#configs` channel](https://nfcore.slack.com/channels/configs).
 
+## Azure Resource Requests
+
+To be used with the `azurebatch` profile by specifying the `-profile azurebatch`.
+We recommend providing a compute `params.vm_type` of `Standard_D16_v3` VMs by default but these options can be changed if required.
+
+Note that the choice of VM size depends on your quota and the overall workload during the analysis.
+For a thorough list, please refer the [Azure Sizes for virtual machines in Azure](https://docs.microsoft.com/en-us/azure/virtual-machines/sizes).
+
 ## Running in the background
 
 Nextflow handles job submissions and supervises the running jobs. The Nextflow process must run until the pipeline is finished.
@@ -279,6 +312,6 @@ Some HPC setups also allow you to run nextflow within a cluster job submitted yo
 In some cases, the Nextflow Java virtual machines can start to request a large amount of memory.
 We recommend adding the following line to your environment to limit this (typically in `~/.bashrc` or `~./bash_profile`):
 
-```console
+```bash
 NXF_OPTS='-Xms1g -Xmx4g'
 ```

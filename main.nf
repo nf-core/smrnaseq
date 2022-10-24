@@ -17,6 +17,10 @@ nextflow.enable.dsl = 2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+params.fasta            = WorkflowMain.getGenomeAttribute(params, 'fasta')
+params.mirtrace_species = WorkflowMain.getGenomeAttribute(params, 'mirtrace_species')
+params.bowtie_index     = WorkflowMain.getGenomeAttribute(params, 'bowtie')
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     VALIDATE & PRINT PARAMETER SUMMARY

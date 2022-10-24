@@ -1,10 +1,10 @@
 process PARSE_FASTA_MIRNA {
     label 'process_medium'
 
-    conda (params.enable_conda ? 'bioconda::seqkit=2.0.0' : null)
+    conda (params.enable_conda ? 'bioconda::seqkit=2.3.1' : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/seqkit:2.0.0--h9ee0642_0' :
-        'quay.io/biocontainers/seqkit:2.0.0--h9ee0642_0' }"
+        'https://depot.galaxyproject.org/singularity/seqkit:2.3.1--h9ee0642_0' :
+        'quay.io/biocontainers/seqkit:2.3.1--h9ee0642_0' }"
 
     input:
     path fasta
@@ -13,7 +13,11 @@ process PARSE_FASTA_MIRNA {
     path '*_igenome.fa', emit: parsed_fasta
     path "versions.yml", emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
+    def filter_species = params.mirgenedb ? params.mirgenedb_species : params.mirtrace_species
     """
     # Uncompress FASTA reference files if necessary
     FASTA="$fasta"
@@ -27,7 +31,7 @@ process PARSE_FASTA_MIRNA {
     # TODO perl -ane 's/[ybkmrsw]/N/ig;print;' \${FASTA}_parsed_tmp.fa > \${FASTA}_parsed.fa
 
     sed -i 's/\s.*//' \${FASTA}_parsed.fa
-    seqkit grep -r --pattern \".*${params.mirtrace_species}-.*\" \${FASTA}_parsed.fa > \${FASTA}_sps.fa
+    seqkit grep -r --pattern \".*${filter_species}-.*\" \${FASTA}_parsed.fa > \${FASTA}_sps.fa
     seqkit seq --rna2dna \${FASTA}_sps.fa > \${FASTA}_igenome.fa
 
     cat <<-END_VERSIONS > versions.yml

@@ -16,11 +16,14 @@ process BOWTIE_MAP_SEQ {
     tuple val(meta), path('unmapped/*fq.gz'), emit: unmapped
     path "versions.yml"                     , emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
-    def index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     """
+    INDEX=`find -L ./ -name "*.3.ebwt" | sed 's/.3.ebwt//'`
     bowtie \\
-        -x $index_base \\
+        -x \$INDEX \\
         -q <(zcat $reads) \\
         -p ${task.cpus} \\
         -t \\

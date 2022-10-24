@@ -7,34 +7,19 @@ process MIRTRACE_RUN {
         'quay.io/biocontainers/mirtrace:1.0.1--hdfd78af_1' }"
 
     input:
-    path reads
+    tuple val(meta), path(reads)
 
     output:
     path "mirtrace/*"  , emit: mirtrace
     path "versions.yml", emit: versions
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
-    def three_prime_adapter = params.three_prime_adapter
-    // Presets
-    if (params.protocol == "illumina"){
-        three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"
-    } else if (params.protocol == "nextflex"){
-        three_prime_adapter = "TGGAATTCTCGGGTGCCAAGG"
-    } else if (params.protocol == "qiaseq"){
-        three_prime_adapter = "AACTGTAGGCACCATCAAT"
-    } else if (params.protocol == "cats"){
-        three_prime_adapter = "AAAAAAAA"
-    }
-    if (params.three_prime_adapter){
-        // to allow replace of 3' primer using one of the previous protocols
-        three_prime_adapter = params.three_prime_adapter
-    }
     // mirtrace protocol defaults to 'params.protocol' if not set
-    def mirtrace_protocol = params.mirtrace_protocol
-    if (!params.mirtrace_protocol){
-        mirtrace_protocol = params.protocol
-    }
-    def primer = (mirtrace_protocol=="cats") ? " " : " --adapter $three_prime_adapter "
+    def primer = meta.adapter ? "--adapter ${meta.adapter}" : ""
+    def protocol = params.protocol == 'custom' ? '' : "--protocol $params.protocol"
     def java_mem = ''
     if(task.memory){
         tmem = task.memory.toBytes()
@@ -52,7 +37,7 @@ process MIRTRACE_RUN {
     java $java_mem -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace qc  \\
         --species $params.mirtrace_species \\
         $primer \\
-        --protocol $mirtrace_protocol \\
+        $protocol \\
         --config mirtrace_config \\
         --write-fasta \\
         --output-dir mirtrace \\
