@@ -20,7 +20,7 @@ This option indicates the experimental protocol used for the sample preparation.
 
 ### `mirtrace_species` or `mirgenedb_species`
 
-It should point to the 3-letter species name used by [miRBase](https://www.mirbase.org/help/genome_summary.shtml) or MirGeneDB. Note the difference in case for the two databases.
+It should point to the 3-letter species name used by [miRBase](https://www.mirbase.org/help/genome_summary.shtml) or [MirGeneDB](https://www.mirgenedb.org/browse). Note the difference in case for the two databases.
 
 ### miRNA related files
 
