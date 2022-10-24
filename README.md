@@ -18,6 +18,12 @@ The pipeline is built using [Nextflow](https://www.nextflow.io), a workflow tool
 
 On release, automated continuous integration tests run the pipeline on a full-sized dataset on the AWS cloud infrastructure. This ensures that the pipeline runs on AWS, has sensible resource allocation defaults set to run on real-world datasets, and permits the persistent storage of results to benchmark between pipeline releases and other analysis sources. The results obtained from the full-sized test can be viewed on the [nf-core website](https://nf-co.re/smrnaseq/results).
 
+## Online videos
+
+A short talk about the history, current status and functionality on offer in this pipeline was given by Lorena Pantano (@lpantano) on [9th November 2021](https://youtu.be/4YLQ2VwpCJE) as part of the nf-core/bytesize series.
+
+You can find numerous talks on the nf-core events page from various topics including writing pipelines/modules in Nextflow DSL2, using nf-core tooling, running nf-core pipelines as well as more generic content like contributing to Github. Please check them out!
+
 ## Pipeline summary
 
 1. Raw read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
