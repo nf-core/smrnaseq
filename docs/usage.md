@@ -24,7 +24,7 @@ It should point to the 3-letter species name used by [miRBase](https://www.mirba
 
 ### miRNA related files
 
-Different parameters can be set for the two supported datbases. By default `miRBase` will be used with the parameters below.
+Different parameters can be set for the two supported databases. By default `miRBase` will be used with the parameters below.
 
 - `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRbase: `https://mirbase.org/ftp/CURRENT/genomes/${params.mirtrace_species}.gff3`
 - `mature`: points to the FASTA file of mature miRNA sequences. `https://mirbase.org/ftp/CURRENT/mature.fa.gz`
