@@ -76,7 +76,7 @@
                 "mirgenedb_species": {
                     "type": "string",
                     "description": "Species of MirGeneDB.",
-                    "help_text": "This replaces the value of `--mirtrace_species` if `--mirgenedb` is used. \n Note the difference in case for species names used in MirGeneDB and miRBase."
+                    "help_text": "This replaces the value of `--mirtrace_species` if `--mirgenedb` is used. \n Note the difference in case for species names used in MirGeneDB and miRBase. See https://www.mirgenedb.org/browse for more information."
                 },
                 "fasta": {
                     "type": "string",
