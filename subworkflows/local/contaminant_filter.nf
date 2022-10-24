@@ -74,7 +74,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BLAT_CDNA.out.versions)
         INDEX_CDNA ( BLAT_CDNA.out.filtered_set )
         ch_versions = ch_versions.mix(INDEX_CDNA.out.versions)
-        MAP_CDNA (  trna_reads, INDEX_CDNA.out.index, 'cDNA' )
+        MAP_CDNA ( trna_reads, INDEX_CDNA.out.index, 'cDNA' )
         ch_versions = ch_versions.mix(MAP_CDNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_CDNA.out.stats.ifEmpty(null))
         MAP_CDNA.out.unmapped.set { cdna_reads }
@@ -100,7 +100,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BLAT_PIRNA.out.versions)
         INDEX_PIRNA ( BLAT_PIRNA.out.filtered_set )
         ch_versions = ch_versions.mix(INDEX_PIRNA.out.versions)
-        MAP_PIRNA (ncrna_reads, INDEX_PIRNA.out.index, 'piRNA' )
+        MAP_PIRNA ( ncrna_reads, INDEX_PIRNA.out.index, 'piRNA' )
         ch_versions = ch_versions.mix(MAP_PIRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_PIRNA.out.stats.ifEmpty(null))
         MAP_PIRNA.out.unmapped.set { pirna_reads }
@@ -113,7 +113,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BLAT_OTHER.out.versions)
         INDEX_OTHER ( BLAT_OTHER.out.filtered_set )
         ch_versions = ch_versions.mix(INDEX_OTHER.out.versions)
-        MAP_OTHER (ncrna_reads, INDEX_OTHER.out.index, 'other' )
+        MAP_OTHER ( ncrna_reads, INDEX_OTHER.out.index, 'other' )
         ch_versions = ch_versions.mix(MAP_OTHER.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_OTHER.out.stats.ifEmpty(null))
         MAP_OTHER.out.unmapped.set { other_cont_reads }
