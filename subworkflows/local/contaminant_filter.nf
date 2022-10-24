@@ -44,7 +44,6 @@ workflow CONTAMINANT_FILTER {
 
     reads.set { rrna_reads }
 
-
     if (params.rrna) {
         // Index DB and filter $reads emit: $rrna_reads
         INDEX_RRNA ( rrna )

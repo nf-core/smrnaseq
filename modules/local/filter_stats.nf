@@ -11,8 +11,8 @@ process FILTER_STATS {
     path stats_files
 
     output:
-    path "*_mqc.yaml"                                            , emit: stats
-    tuple val(meta), path('*.filtered.fastq.gz')                 , emit: reads
+    path "*_mqc.yaml"                           , emit: stats
+    tuple val(meta), path('*.filtered.fastq.gz'), emit: reads
 
     when:
     task.ext.when == null || task.ext.when
