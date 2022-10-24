@@ -45,7 +45,7 @@ If MirGeneDB should be used instead it needs to be specified using `--mirgenedb`
 
 This step has, until now, only been tested for human data. Unexpected behaviour can occur when using it with a different species.
 
-Contamination filtering of the sequencing reads is optional and can be invoked using `filter_contamination`. FASTA files with contamination sequences to use need to be supplied using the following commands. Otherwise the contamination filtering of the specific type will be omitted.
+Contamination filtering of the sequencing reads is optional and can be invoked using the `filter_contamination` parameter. FASTA files with
 
 - `rrna`: Used to supply a FASTA file containing rRNA contamination sequence.
 - `trna`: Used to supply a FASTA file containing tRNA contamination sequence. e.g. `http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/hg38-tRNAs.fa`
