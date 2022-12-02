@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Dev
 
+- [[#205](https://github.com/nf-core/smrnaseq/issues/205)] - Fix mirTrace Report to be a single report again instead of per sample reports
+
 ## [v2.1.0](https://github.com/nf-core/smrnaseq/releases/tag/2.1.0) - 2022-10-20 Maroon Tin Dalmatian
 
 ### Enhancements & fixes
