@@ -124,15 +124,15 @@ workflow SMRNASEQ {
     // SUBWORKFLOW: Read QC and trim adapters
     //
 
+    if(!params.skip_qc){
     FASTQC_FASTP (
         ch_cat_fastq,
         false,
         false
     )
-
     ch_versions = ch_versions.mix(FASTQC_FASTP.out.versions)
-
     reads_for_mirna = FASTQC_FASTP.out.reads
+
 
     //
     // SUBWORKFLOW: mirtrace QC
@@ -143,6 +143,14 @@ workflow SMRNASEQ {
     | MIRTRACE
 
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
+
+    } else{
+        //TODO - rob? :-)
+        
+    }
+
+
+
 
     //
     // SUBWORKFLOW: remove contaminants from reads
