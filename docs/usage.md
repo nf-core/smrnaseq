@@ -139,7 +139,7 @@ This version number will be logged in reports when you run the pipeline, so that
 The `bin` directory contains some scripts used by the pipeline which may also be run manually:
 
 - `edgeR_miRBase.r`: R script using for processing reads counts of mature miRNAs and miRNA precursors (hairpins).
-This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future. For example, at the bottom of the MultiQC reports.
+  This version number will be logged in reports when you run the pipeline, so that you'll know what you used when you look back in the future. For example, at the bottom of the MultiQC reports.
 
 ## Core Nextflow arguments
 
