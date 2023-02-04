@@ -30,6 +30,9 @@ process FASTQC {
         [ -f "\${new_name}" ] || ln -s \$old_name \$new_name
     done
     fastqc $args --threads $task.cpus $renamed_files
+    """
+    printf "%s\\n" $reads | while read f; do ln -s \$f ${prefix}_\$(basename \$f) ; done
+    fastqc $args --threads $task.cpus ${prefix}_*
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
