@@ -1,7 +1,7 @@
 process MIRTRACE_RUN {
     label 'process_medium'
 
-    conda (params.enable_conda ? 'bioconda::mirtrace=1.0.1' : null)
+    conda 'bioconda::mirtrace=1.0.1'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/mirtrace:1.0.1--hdfd78af_1' :
         'quay.io/biocontainers/mirtrace:1.0.1--hdfd78af_1' }"
