@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Dev
 
-* Updated FASTP module to allow direct addition of adapter_fasta file to it
+- Updated FASTP module to allow direct addition of adapter_fasta file to it
 
 ## [v2.1.0](https://github.com/nf-core/smrnaseq/releases/tag/2.1.0) - 2022-10-20 Maroon Tin Dalmatian
 
