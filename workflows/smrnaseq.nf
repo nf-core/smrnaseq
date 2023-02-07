@@ -139,10 +139,12 @@ workflow SMRNASEQ {
     //
     // SUBWORKFLOW: mirtrace QC
     //
-    FASTQC_FASTP.out.adapterseq
-    | join( ch_cat_fastq )
-    | map { meta, adapterseq, fastq -> [meta + [adapter:adapterseq], fastq] }
-    | MIRTRACE
+    ch_outputs_for_mirtrace = FASTQC_FASTP.out.adapterseq
+    .join( ch_cat_fastq )
+    .map { meta, adapterseq, fastq -> [meta + [adapter:adapterseq], fastq] }
+    .collect()
+
+    MIRTRACE(ch_outputs_for_mirtrace)
 
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
 
