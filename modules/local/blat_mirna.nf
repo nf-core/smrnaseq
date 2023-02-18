@@ -2,7 +2,7 @@ process BLAT_MIRNA {
     tag "$fasta"
     label 'process_medium'
 
-    conda (params.enable_conda ? 'bioconda::blat=36' : null)
+    conda 'bioconda::blat=36'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/blat:36--0' :
         'quay.io/biocontainers/blat:36--0' }"

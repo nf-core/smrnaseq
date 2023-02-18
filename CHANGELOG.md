@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Dev
 
+- [[#208](https://github.com/nf-core/smrnaseq/issues/208)] - Fixed usability of `--skip_qc` parameter
+- Updated FASTP module to allow direct addition of adapter_fasta file to it
 - [[#205](https://github.com/nf-core/smrnaseq/issues/205)] - Fix mirTrace Report to be a single report again instead of per sample reports
 - [[#206](https://github.com/nf-core/smrnaseq/issues/206)] - Use % as separator in sed commands to enable conda working properly on OSX and Linux
 
