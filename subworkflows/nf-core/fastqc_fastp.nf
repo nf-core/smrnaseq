@@ -32,7 +32,6 @@ workflow FASTQC_FASTP {
     save_trimmed_fail //   value: boolean
     save_merged       //   value: boolean
 
-
     main:
 
     ch_versions = Channel.empty()
