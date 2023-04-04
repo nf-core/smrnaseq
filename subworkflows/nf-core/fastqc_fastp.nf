@@ -28,6 +28,7 @@ String getFastpAdapterSequence(json_file){
 workflow FASTQC_FASTP {
     take:
     reads             // channel: [ val(meta), [ reads ] ]
+    adapter_list      // channel: [ path/to/adapters.fa ]
     save_trimmed_fail //   value: boolean
     save_merged       //   value: boolean
 
@@ -58,6 +59,7 @@ workflow FASTQC_FASTP {
     if (!params.skip_fastp) {
         FASTP (
             reads,
+            adapter_list,
             save_trimmed_fail,
             save_merged
         )

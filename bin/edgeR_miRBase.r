@@ -43,7 +43,7 @@ for (i in 1:2) {
     # Only subset if at least one sample is remaining
     nr_keep <- sum(row_sub)
     if (nr_keep > 0){
-        data<-data[!row_sub,]
+        data<-data[!row_sub,, drop=FALSE]
     }
     #Also check for colSums > 0, otherwise DGEList will fail if samples have entirely colSum == 0 #Fixes #134
     drop_colsum_zero <- (colSums(data, na.rm=T) != 0) # T if colSum is not 0, F otherwise
