@@ -139,10 +139,9 @@ workflow SMRNASEQ {
     //
     FASTQC_FASTP.out.adapterseq
     .join( ch_cat_fastq )
-    .map { meta, adapterseq, fastq -> [meta + [adapter:adapterseq], fastq] }
-    .collect()
+    .map { meta, adapterseq, fastq -> [adapterseq, meta.id, fastq] }
+    .groupTuple()
     .set { ch_mitrace_inputs }
-
 
     MIRTRACE(ch_mitrace_inputs)
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
@@ -173,7 +172,7 @@ workflow SMRNASEQ {
         reference_mature,
         reference_hairpin,
         mirna_gtf,
-        CONTAMINANT_FILTER.out.filtered_reads
+        contamination_stats
     )
     ch_versions = ch_versions.mix(MIRNA_QUANT.out.versions.ifEmpty(null))
 
@@ -182,10 +181,8 @@ workflow SMRNASEQ {
     //
     genome_stats = Channel.empty()
     if (params.fasta){
-        ch_fasta = file(params.fasta)
-        GENOME_QUANT ( ch_fasta, params.bowtie_index, MIRNA_QUANT.out.unmapped )
-        GENOME_QUANT.out.stats
-            .set { genome_stats }
+        GENOME_QUANT ( file(params.fasta), params.bowtie_index, MIRNA_QUANT.out.unmapped )
+        genome_stats = GENOME_QUANT.out.stats
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
         if (!params.skip_mirdeep) {
@@ -222,9 +219,9 @@ workflow SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.trim_json.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect().ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([]))
 

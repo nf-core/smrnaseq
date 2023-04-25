@@ -7,7 +7,7 @@ process MIRTRACE_RUN {
         'quay.io/biocontainers/mirtrace:1.0.1--hdfd78af_1' }"
 
     input:
-    tuple val(meta), path(reads)
+    tuple val(adapter), val(ids), path(reads)
 
     output:
     path "mirtrace/*"  , emit: mirtrace
@@ -18,22 +18,20 @@ process MIRTRACE_RUN {
 
     script:
     // mirtrace protocol defaults to 'params.protocol' if not set
-    def primer = meta.adapter ? "--adapter ${meta.adapter}" : ""
+    def primer = adapter ? "--adapter ${adapter}" : ""
     def protocol = params.protocol == 'custom' ? '' : "--protocol $params.protocol"
     def java_mem = ''
-    def prefix = "${meta.id}"
     if(task.memory){
         tmem = task.memory.toBytes()
         java_mem = "-Xms${tmem} -Xmx${tmem}"
     }
+    def config_lines = [ids,reads]
+    .transpose()
+    .collect({ id, path -> "echo '${path},${id}' >> mirtrace_config" })
     """
     export mirtracejar=\$(dirname \$(which mirtrace))
-    for i in $reads
-    do
-        path=\$(realpath \${i})
-        prefix=$prefix
-        echo \$path","\$prefix
-    done > mirtrace_config
+    
+    ${config_lines.join("\n    ")}
 
     java $java_mem -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace qc  \\
         --species $params.mirtrace_species \\
