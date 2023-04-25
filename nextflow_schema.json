@@ -249,11 +249,6 @@
             "description": "Switches to skip specific pipeline steps, if desired.",
             "fa_icon": "fas fa-fast-forward",
             "properties": {
-                "skip_qc": {
-                    "type": "boolean",
-                    "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip all QC steps"
-                },
                 "skip_fastqc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
