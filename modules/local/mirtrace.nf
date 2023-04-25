@@ -30,7 +30,7 @@ process MIRTRACE_RUN {
     .collect({ id, path -> "echo '${path},${id}' >> mirtrace_config" })
     """
     export mirtracejar=\$(dirname \$(which mirtrace))
-    
+
     ${config_lines.join("\n    ")}
 
     java $java_mem -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace qc  \\
