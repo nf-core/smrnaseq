@@ -3,8 +3,6 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-- Group samples by adapter sequence before running mirtrace.
-
 ## [v2.2.0](https://github.com/nf-core/smrnaseq/releases/tag/2.2.0) - 2023-04-25
 
 - [[#220](https://github.com/nf-core/smrnaseq/issues/220)] - Fixed an issue where miRTrace reports fastq basename instead of sample ID
@@ -13,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#205](https://github.com/nf-core/smrnaseq/issues/205)] - Fix mirTrace Report to be a single report again instead of per sample reports
 - [[#206](https://github.com/nf-core/smrnaseq/issues/206)] - Use % as separator in sed commands to enable conda working properly on OSX and Linux
 - [[#207](https://github.com/nf-core/smrnaseq/issues/224)] - Fix Samplesheet print error
+- Group samples by adapter sequence before running mirtrace
 
 ## [v2.1.0](https://github.com/nf-core/smrnaseq/releases/tag/2.1.0) - 2022-10-20 Maroon Tin Dalmatian
 
