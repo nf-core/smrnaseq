@@ -59,7 +59,7 @@ if (!params.mirgenedb) {
 }
 
 include { INPUT_CHECK        } from '../subworkflows/local/input_check'
-include { FASTQC_FASTP       } from '../subworkflows/nf-core/fastqc_fastp'
+include { FASTQC_FASTP       } from '../subworkflows/local/fastqc_fastp'
 include { CONTAMINANT_FILTER } from '../subworkflows/local/contaminant_filter'
 include { MIRNA_QUANT        } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT       } from '../subworkflows/local/genome_quant'
@@ -125,7 +125,6 @@ workflow SMRNASEQ {
     // SUBWORKFLOW: Read QC and trim adapters
     //
 
-    if(!params.skip_qc){
     FASTQC_FASTP (
         ch_cat_fastq,
         ch_fastp_adapters,
@@ -133,27 +132,18 @@ workflow SMRNASEQ {
         false
     )
     ch_versions = ch_versions.mix(FASTQC_FASTP.out.versions)
-    reads_for_mirna = FASTQC_FASTP.out.reads
-
 
     //
     // SUBWORKFLOW: mirtrace QC
     //
-    ch_outputs_for_mirtrace = FASTQC_FASTP.out.adapterseq
+    FASTQC_FASTP.out.adapterseq
     .join( ch_cat_fastq )
-    .map { meta, adapterseq, fastq -> [meta + [adapter:adapterseq], fastq] }
-    .collect()
+    .map { meta, adapterseq, fastq -> [adapterseq, meta.id, fastq] }
+    .groupTuple()
+    .set { ch_mitrace_inputs }
 
-    MIRTRACE(ch_outputs_for_mirtrace)
-
+    MIRTRACE(ch_mitrace_inputs)
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
-
-    } else{
-        //TODO - rob? :-)
-
-    }
-
-
 
 
     //
@@ -172,10 +162,8 @@ workflow SMRNASEQ {
             FASTQC_FASTP.out.reads
         )
 
-        reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
+        contamination_stats = CONTAMINANT_FILTER.out.filter_stats
         ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
-        CONTAMINANT_FILTER.out.filter_stats
-            .set { contamination_stats }
 
     }
 
@@ -183,7 +171,7 @@ workflow SMRNASEQ {
         reference_mature,
         reference_hairpin,
         mirna_gtf,
-        reads_for_mirna
+        contamination_stats
     )
     ch_versions = ch_versions.mix(MIRNA_QUANT.out.versions.ifEmpty(null))
 
@@ -192,10 +180,8 @@ workflow SMRNASEQ {
     //
     genome_stats = Channel.empty()
     if (params.fasta){
-        ch_fasta = file(params.fasta)
-        GENOME_QUANT ( ch_fasta, params.bowtie_index, MIRNA_QUANT.out.unmapped )
-        GENOME_QUANT.out.stats
-            .set { genome_stats }
+        GENOME_QUANT ( file(params.fasta), params.bowtie_index, MIRNA_QUANT.out.unmapped )
+        genome_stats = GENOME_QUANT.out.stats
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
         if (!params.skip_mirdeep) {
@@ -229,23 +215,22 @@ workflow SMRNASEQ {
         ch_multiqc_files = Channel.empty()
         ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
         ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([])),
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.trim_json.collect{it[1]}.ifEmpty([])),
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.trim_json.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect().ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([]))
 
-    MULTIQC (
-        ch_multiqc_files.collect(),
-        ch_multiqc_config.toList(),
-        ch_multiqc_custom_config.toList(),
-        ch_multiqc_logo.toList()
-    )
-    multiqc_report = MULTIQC.out.report.toList()
+        MULTIQC (
+            ch_multiqc_files.collect(),
+            ch_multiqc_config.toList(),
+            ch_multiqc_custom_config.toList(),
+            ch_multiqc_logo.toList()
+        )
+        multiqc_report = MULTIQC.out.report.toList()
     }
 }
 
