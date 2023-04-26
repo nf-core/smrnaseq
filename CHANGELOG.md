@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v2.2.0](https://github.com/nf-core/smrnaseq/releases/tag/2.2.0) - 2023-04-25
+## [v2.2.0](https://github.com/nf-core/smrnaseq/releases/tag/2.2.0) - 2023-04-26
 
 - [[#220](https://github.com/nf-core/smrnaseq/issues/220)] - Fixed an issue where miRTrace reports fastq basename instead of sample ID
 - [[#208](https://github.com/nf-core/smrnaseq/issues/208)] - Fixed usability of `--skip_qc` parameter
