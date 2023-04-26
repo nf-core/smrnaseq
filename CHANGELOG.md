@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#206](https://github.com/nf-core/smrnaseq/issues/206)] - Use % as separator in sed commands to enable conda working properly on OSX and Linux
 - [[#207](https://github.com/nf-core/smrnaseq/issues/224)] - Fix Samplesheet print error
 - Group samples by adapter sequence before running mirtrace
+- Remove `--skip_qc` parameter
 
 ## [v2.1.0](https://github.com/nf-core/smrnaseq/releases/tag/2.1.0) - 2022-10-20 Maroon Tin Dalmatian
 
