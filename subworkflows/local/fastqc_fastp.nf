@@ -35,10 +35,10 @@ workflow FASTQC_FASTP {
 
     main:
 
-    ch_versions = Channel.empty()
-
+    ch_versions     = Channel.empty()
     fastqc_raw_html = Channel.empty()
     fastqc_raw_zip  = Channel.empty()
+    adapterseq      = reads.map { meta, _ -> [meta, null] }
     if (!params.skip_fastqc) {
         FASTQC_RAW (
             reads

@@ -59,7 +59,7 @@ if (!params.mirgenedb) {
 }
 
 include { INPUT_CHECK        } from '../subworkflows/local/input_check'
-include { FASTQC_FASTP       } from '../subworkflows/nf-core/fastqc_fastp'
+include { FASTQC_FASTP       } from '../subworkflows/local/fastqc_fastp'
 include { CONTAMINANT_FILTER } from '../subworkflows/local/contaminant_filter'
 include { MIRNA_QUANT        } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT       } from '../subworkflows/local/genome_quant'
@@ -132,7 +132,6 @@ workflow SMRNASEQ {
         false
     )
     ch_versions = ch_versions.mix(FASTQC_FASTP.out.versions)
-    ch_reads = FASTQC_FASTP.out.reads
 
     //
     // SUBWORKFLOW: mirtrace QC
