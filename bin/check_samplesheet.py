@@ -50,14 +50,13 @@ def check_samplesheet(file_in, file_out):
 
     sample_mapping_dict = {}
     with open(file_in, "r") as fin:
-
         ## Check header
         MIN_COLS = 2
         HEADER = ["sample", "fastq_1"]
         header = [x.strip('"') for x in fin.readline().strip().split(",")]
         if any([item not in header for item in HEADER]):
             missing = [item for item in HEADER if item not in header]
-            eprint("ERROR: Please check samplesheet header. Missing columns: '{}'".format(",".join(missing)))
+            print_error("ERROR: Please check samplesheet header. Missing columns: '{}'".format(",".join(missing)))
             sys.exit(1)
 
         ## Check sample entries

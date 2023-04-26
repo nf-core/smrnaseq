@@ -4,7 +4,7 @@ process FORMAT_FASTA_MIRNA {
     tag "$fasta"
     label 'process_medium'
 
-    conda (params.enable_conda ? 'bioconda::fastx_toolkit=0.0.14-9' : null)
+    conda 'bioconda::fastx_toolkit=0.0.14-9'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/fastx_toolkit:0.0.14--he1b5a44_8' :
         'quay.io/biocontainers/fastx_toolkit:0.0.14--he1b5a44_8' }"

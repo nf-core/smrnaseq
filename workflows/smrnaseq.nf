@@ -38,6 +38,7 @@ ch_multiqc_config          = Channel.fromPath("$projectDir/assets/multiqc_config
 ch_multiqc_custom_config   = params.multiqc_config ? Channel.fromPath( params.multiqc_config, checkIfExists: true ) : Channel.empty()
 ch_multiqc_logo            = params.multiqc_logo   ? Channel.fromPath( params.multiqc_logo, checkIfExists: true ) : Channel.empty()
 ch_multiqc_custom_methods_description = params.multiqc_methods_description ? file(params.multiqc_methods_description, checkIfExists: true) : file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
+ch_fastp_adapters          = Channel.fromPath(params.fastp_known_mirna_adapters, checkIfExists: true).collect() // collect to consume for all incoming samples to FASTP
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -58,7 +59,7 @@ if (!params.mirgenedb) {
 }
 
 include { INPUT_CHECK        } from '../subworkflows/local/input_check'
-include { FASTQC_FASTP       } from '../subworkflows/nf-core/fastqc_fastp'
+include { FASTQC_FASTP       } from '../subworkflows/local/fastqc_fastp'
 include { CONTAMINANT_FILTER } from '../subworkflows/local/contaminant_filter'
 include { MIRNA_QUANT        } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT       } from '../subworkflows/local/genome_quant'
@@ -126,23 +127,24 @@ workflow SMRNASEQ {
 
     FASTQC_FASTP (
         ch_cat_fastq,
+        ch_fastp_adapters,
         false,
         false
     )
-
     ch_versions = ch_versions.mix(FASTQC_FASTP.out.versions)
-
-    reads_for_mirna = FASTQC_FASTP.out.reads
 
     //
     // SUBWORKFLOW: mirtrace QC
     //
     FASTQC_FASTP.out.adapterseq
-    | join( ch_cat_fastq )
-    | map { meta, adapterseq, fastq -> [meta + [adapter:adapterseq], fastq] }
-    | MIRTRACE
+    .join( ch_cat_fastq )
+    .map { meta, adapterseq, fastq -> [adapterseq, meta.id, fastq] }
+    .groupTuple()
+    .set { ch_mitrace_inputs }
 
+    MIRTRACE(ch_mitrace_inputs)
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
+
 
     //
     // SUBWORKFLOW: remove contaminants from reads
@@ -160,10 +162,8 @@ workflow SMRNASEQ {
             FASTQC_FASTP.out.reads
         )
 
-        reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
+        contamination_stats = CONTAMINANT_FILTER.out.filter_stats
         ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
-        CONTAMINANT_FILTER.out.filter_stats
-            .set { contamination_stats }
 
     }
 
@@ -171,7 +171,7 @@ workflow SMRNASEQ {
         reference_mature,
         reference_hairpin,
         mirna_gtf,
-        reads_for_mirna
+        contamination_stats
     )
     ch_versions = ch_versions.mix(MIRNA_QUANT.out.versions.ifEmpty(null))
 
@@ -180,10 +180,8 @@ workflow SMRNASEQ {
     //
     genome_stats = Channel.empty()
     if (params.fasta){
-        ch_fasta = file(params.fasta)
-        GENOME_QUANT ( ch_fasta, params.bowtie_index, MIRNA_QUANT.out.unmapped )
-        GENOME_QUANT.out.stats
-            .set { genome_stats }
+        GENOME_QUANT ( file(params.fasta), params.bowtie_index, MIRNA_QUANT.out.unmapped )
+        genome_stats = GENOME_QUANT.out.stats
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
         if (!params.skip_mirdeep) {
@@ -217,13 +215,12 @@ workflow SMRNASEQ {
         ch_multiqc_files = Channel.empty()
         ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
         ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([])),
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.trim_json.collect{it[1]}.ifEmpty([])),
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.trim_json.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect().ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([]))
 
@@ -234,9 +231,9 @@ workflow SMRNASEQ {
             ch_multiqc_logo.toList()
         )
         multiqc_report = MULTIQC.out.report.toList()
-        ch_versions    = ch_versions.mix(MULTIQC.out.versions)
     }
 }
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -250,7 +247,7 @@ workflow.onComplete {
     }
     NfcoreTemplate.summary(workflow, params, log)
     if (params.hook_url) {
-        NfcoreTemplate.adaptivecard(workflow, params, summary_params, projectDir, log)
+        NfcoreTemplate.IM_notification(workflow, params, summary_params, projectDir, log)
     }
 }
 
