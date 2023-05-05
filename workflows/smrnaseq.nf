@@ -150,6 +150,7 @@ workflow SMRNASEQ {
     // SUBWORKFLOW: remove contaminants from reads
     //
     contamination_stats = Channel.empty()
+    mirna_reads = FASTQC_FASTP.out.reads
     if (params.filter_contamination){
         CONTAMINANT_FILTER (
             reference_hairpin,
@@ -164,6 +165,7 @@ workflow SMRNASEQ {
 
         contamination_stats = CONTAMINANT_FILTER.out.filter_stats
         ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
+        mirna_reads = CONTAMINANT_FILTER.out.filtered_reads
 
     }
 
@@ -171,7 +173,7 @@ workflow SMRNASEQ {
         reference_mature,
         reference_hairpin,
         mirna_gtf,
-        contamination_stats
+        mirna_reads
     )
     ch_versions = ch_versions.mix(MIRNA_QUANT.out.versions.ifEmpty(null))
 
