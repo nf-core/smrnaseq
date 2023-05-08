@@ -84,7 +84,7 @@ nextflow run nf-core/smrnaseq \
     --genome 'GRCh37' \
     --mirtrace_species 'hsa' \
     --protocol 'illumina' \
-   --outdir <OUTDIR>
+    --outdir <OUTDIR>
 ```
 
 > **Warning:**
