@@ -12,7 +12,7 @@
 
 ## Introduction
 
-**nf-core/smrnaseq** is a bioinformatics pipeline that ...
+**nf-core/smrnaseq** is a bioinformatics best-practice analysis pipeline for Small RNA-Seq.
 
 <!-- TODO nf-core:
    Complete this sentence with a 2-3 sentence summary of what types of data the pipeline ingests, a brief overview of the
@@ -46,7 +46,7 @@ sample,fastq_1
 CONTROL_REP1,AEG588A1_S1_L002_001.fastq.gz
 ```
 
-Each row represents a fastq file (single-end) or a pair of fastq files (paired end).
+Each row represents a fastq file (single-end).
 
 -->
 
@@ -58,6 +58,9 @@ Now, you can run the pipeline using:
 nextflow run nf-core/smrnaseq \
    -profile <docker/singularity/.../institute> \
    --input samplesheet.csv \
+    --genome 'GRCh37' \
+    --mirtrace_species 'hsa' \
+    --protocol 'illumina' \
    --outdir <OUTDIR>
 ```
 
