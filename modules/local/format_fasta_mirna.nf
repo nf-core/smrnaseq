@@ -7,7 +7,7 @@ process FORMAT_FASTA_MIRNA {
     conda 'bioconda::fastx_toolkit=0.0.14-9'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/fastx_toolkit:0.0.14--he1b5a44_8' :
-        'quay.io/biocontainers/fastx_toolkit:0.0.14--he1b5a44_8' }"
+        'biocontainers/fastx_toolkit:0.0.14--he1b5a44_8' }"
 
     input:
     path fasta
