@@ -5,7 +5,7 @@ process BLAT_MIRNA {
     conda 'bioconda::blat=36'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/blat:36--0' :
-        'quay.io/biocontainers/blat:36--0' }"
+        'biocontainers/blat:36--0' }"
 
     input:
     val db_type
