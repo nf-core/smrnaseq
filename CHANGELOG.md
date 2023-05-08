@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Enhancements & fixes
 
 - [[#238](https://github.com/nf-core/smrnaseq/issues/238)] - Restored the missing mirtop outputs
+- [[#242](https://github.com/nf-core/smrnaseq/issues/242)] - Fixed mirtrace using wrong input fastq files (untrimmed)
 
 ## [v2.2.0](https://github.com/nf-core/smrnaseq/releases/tag/2.2.0) - 2023-04-26
 
