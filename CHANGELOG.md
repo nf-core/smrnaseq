@@ -7,16 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Enhancements & fixes
 
-- [[#238](https://github.com/nf-core/smrnaseq/issues/238) - Restored the missing mirtop outputs
+- [[#238](https://github.com/nf-core/smrnaseq/issues/238)] - Restored the missing mirtop outputs
 
 ## [v2.2.0](https://github.com/nf-core/smrnaseq/releases/tag/2.2.0) - 2023-04-26
 
-- [[#220](https://github.com/nf-core/smrnaseq/issues/220) - Fixed an issue where miRTrace reports fastq basename instead of sample ID
-- [[#208](https://github.com/nf-core/smrnaseq/issues/208) - Fixed usability of `--skip_qc` parameter
+- [[#220](https://github.com/nf-core/smrnaseq/issues/220)] - Fixed an issue where miRTrace reports fastq basename instead of sample ID
+- [[#208](https://github.com/nf-core/smrnaseq/issues/208)] - Fixed usability of `--skip_qc` parameter
 - Updated FASTP module to allow direct addition of adapter_fasta file to it
-- [[#205](https://github.com/nf-core/smrnaseq/issues/205) - Fix mirTrace Report to be a single report again instead of per sample reports
-- [[#206](https://github.com/nf-core/smrnaseq/issues/206) - Use % as separator in sed commands to enable conda working properly on OSX and Linux
-- [[#207](https://github.com/nf-core/smrnaseq/issues/224) - Fix Samplesheet print error
+- [[#205](https://github.com/nf-core/smrnaseq/issues/205)] - Fix mirTrace Report to be a single report again instead of per sample reports
+- [[#206](https://github.com/nf-core/smrnaseq/issues/206)] - Use % as separator in sed commands to enable conda working properly on OSX and Linux
+- [[#207](https://github.com/nf-core/smrnaseq/issues/224)] - Fix Samplesheet print error
 - Group samples by adapter sequence before running mirtrace
 - Remove `--skip_qc` parameter
 
@@ -24,15 +24,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Enhancements & fixes
 
-- [[#12](https://github.com/nf-core/smrnaseq/issues/12) - Enabled the use of `MirGeneDB` as an alternative database insted of `miRBase`
-- [[#113](https://github.com/nf-core/smrnaseq/issues/113) - Added a optional contamination filtering step, including MultiQC plot
-- [[#137](https://github.com/nf-core/smrnaseq/issues/137) - Fixed issue with mirTop and MultiQC by upgrading to MultiQC V1.13dev
-- [[#159](https://github.com/nf-core/smrnaseq/issues/159) - Index files were not collected when `bowtie_index` was used and thus mapping was failing
-- [[#161](https://github.com/nf-core/smrnaseq/issues/161) - Trimmed output was not as documented and not correctly published
-- [[#168](https://github.com/nf-core/smrnaseq/issues/168) - Removed `mirtrace_protocol` as the parameter was redundant and `params.protocol` is entirely sufficient
+- [[#12](https://github.com/nf-core/smrnaseq/issues/12)] - Enabled the use of `MirGeneDB` as an alternative database insted of `miRBase`
+- [[#113](https://github.com/nf-core/smrnaseq/issues/113)] - Added a optional contamination filtering step, including MultiQC plot
+- [[#137](https://github.com/nf-core/smrnaseq/issues/137)] - Fixed issue with mirTop and MultiQC by upgrading to MultiQC V1.13dev
+- [[#159](https://github.com/nf-core/smrnaseq/issues/159)] - Index files were not collected when `bowtie_index` was used and thus mapping was failing
+- [[#161](https://github.com/nf-core/smrnaseq/issues/161)] - Trimmed output was not as documented and not correctly published
+- [[#168](https://github.com/nf-core/smrnaseq/issues/168)] - Removed `mirtrace_protocol` as the parameter was redundant and `params.protocol` is entirely sufficient
 - Updated pipeline template to [nf-core/tools 2.6.0](https://github.com/nf-core/tools/releases/tag/2.6.0)
-- [[#188](https://github.com/nf-core/smrnaseq/pull/188) - Dropped TrimGalore in favor of fastp QC and adapter trimming, improved handling of adapters and trimming parameters
-- [[#194](https://github.com/nf-core/smrnaseq/issues/194) - Added default adapters file for FastP improved miRNA adapter trimming
+- [[#188](https://github.com/nf-core/smrnaseq/pull/188)] - Dropped TrimGalore in favor of fastp QC and adapter trimming, improved handling of adapters and trimming parameters
+- [[#194](https://github.com/nf-core/smrnaseq/issues/194)] - Added default adapters file for FastP improved miRNA adapter trimming
 
 ### Parameters
 
@@ -56,7 +56,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Major enhancements
 
 - Updated pipeline template to [nf-core/tools 2.4.1](https://github.com/nf-core/tools/releases/tag/2.4.1)
-- [[#137](https://github.com/nf-core/smrnaseq/issues/137) - Update mirtop container to version `0.4.25` to fix multiqc error
+- [[#137](https://github.com/nf-core/smrnaseq/issues/137)] - Update mirtop container to version `0.4.25` to fix multiqc error
 - Port pipeline to the updated Nextflow DSL2 syntax adopted on nf-core/modules
 - Bump minimum Nextflow version from `20.04.0` -> `21.10.3`
 - Point to the proper test data branch
