@@ -11,9 +11,8 @@ class WorkflowMain {
     //
     public static String citation(workflow) {
         return "If you use ${workflow.manifest.name} for your analysis please cite:\n\n" +
-            // TODO nf-core: Add Zenodo DOI for pipeline after first release
-            //"* The pipeline\n" +
-            //"  https://doi.org/10.5281/zenodo.XXXXXXX\n\n" +
+            "* The pipeline\n" +
+            "  https://zenodo.org/badge/latestdoi/140590861\n\n" +
             "* The nf-core framework\n" +
             "  https://doi.org/10.1038/s41587-020-0439-x\n\n" +
             "* Software dependencies\n" +
@@ -49,6 +48,10 @@ class WorkflowMain {
     // Validate parameters and print summary to screen
     //
     public static void initialise(workflow, params, log) {
+
+        //Detect Protocol setting, set this early before help so help shows proper adapters etc pp
+        WorkflowSmrnaseq.formatProtocol(params,log)
+
         // Print help to screen if required
         if (params.help) {
             log.info help(workflow, params)
@@ -85,6 +88,7 @@ class WorkflowMain {
         if (!params.input) {
             Nextflow.error("Please provide an input samplesheet to the pipeline e.g. '--input samplesheet.csv'")
         }
+
     }
     //
     // Get attribute from genome config file e.g. fasta
