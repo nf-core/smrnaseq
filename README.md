@@ -94,7 +94,6 @@ nextflow run nf-core/smrnaseq \
 
 For more details, please refer to the [usage documentation](https://nf-co.re/smrnaseq/usage) and the [parameter documentation](https://nf-co.re/smrnaseq/parameters).
 
-
 ## Pipeline output
 
 To see the the results of a test run with a full size dataset refer to the [results](https://nf-co.re/smrnaseq/results) tab on the nf-core website pipeline page.
