@@ -22,7 +22,7 @@ jobs:
             {
               "outdir": "s3://${{ secrets.AWS_S3_BUCKET }}/smrnaseq/results-test-${{ github.sha }}"
             }
-          profiles: test,aws_tower,awsecr
+          profiles: test,awsecr
       - uses: actions/upload-artifact@v3
         with:
           name: Tower debug log file
