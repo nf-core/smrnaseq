@@ -137,12 +137,12 @@ workflow SMRNASEQ {
     // SUBWORKFLOW: mirtrace QC
     //
     FASTQC_FASTP.out.adapterseq
-    .join( ch_cat_fastq )
-    .map { meta, adapterseq, fastq -> [adapterseq, meta.id, fastq] }
+    .join( FASTQC_FASTP.out.reads )
+    .map { meta, adapterseq, reads -> [adapterseq, meta.id, reads] }
     .groupTuple()
-    .set { ch_mitrace_inputs }
+    .set { ch_mirtrace_inputs }
 
-    MIRTRACE(ch_mitrace_inputs)
+    MIRTRACE(ch_mirtrace_inputs)
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
 
 
@@ -150,6 +150,7 @@ workflow SMRNASEQ {
     // SUBWORKFLOW: remove contaminants from reads
     //
     contamination_stats = Channel.empty()
+    mirna_reads = FASTQC_FASTP.out.reads
     if (params.filter_contamination){
         CONTAMINANT_FILTER (
             reference_hairpin,
@@ -164,6 +165,7 @@ workflow SMRNASEQ {
 
         contamination_stats = CONTAMINANT_FILTER.out.filter_stats
         ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
+        mirna_reads = CONTAMINANT_FILTER.out.filtered_reads
 
     }
 
@@ -171,7 +173,7 @@ workflow SMRNASEQ {
         reference_mature,
         reference_hairpin,
         mirna_gtf,
-        contamination_stats
+        mirna_reads
     )
     ch_versions = ch_versions.mix(MIRNA_QUANT.out.versions.ifEmpty(null))
 

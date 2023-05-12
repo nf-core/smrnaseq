@@ -105,7 +105,7 @@ workflow FASTQC_FASTP {
     trim_log           // channel: [ val(meta), [ log ] ]
     trim_reads_fail    // channel: [ val(meta), [ fastq.gz ] ]
     trim_reads_merged  // channel: [ val(meta), [ fastq.gz ] ]
-    adapterseq         // channel: [ val(meat), [ adapterseq ] ]
+    adapterseq         // channel: [ val(meta), [ adapterseq ] ]
 
     fastqc_raw_html    // channel: [ val(meta), [ html ] ]
     fastqc_raw_zip     // channel: [ val(meta), [ zip ] ]

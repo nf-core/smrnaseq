@@ -9,9 +9,7 @@ workflow MIRTRACE {
     reads      // channel: [ val(adapterseq), [ val(ids) ], [ path(reads) ] ]
 
     main:
-    reads
-    | map { adapterseq, ids, read_collection -> [adapterseq, ids, read_collection*.first()]}
-    | MIRTRACE_RUN
+    reads | MIRTRACE_RUN
 
     emit:
     results    = MIRTRACE_RUN.out.mirtrace

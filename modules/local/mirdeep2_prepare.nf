@@ -6,7 +6,7 @@ process MIRDEEP2_PIGZ {
     conda 'bioconda::bioconvert=0.4.3'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/bioconvert:0.4.3--py_0' :
-        'quay.io/biocontainers/bioconvert:0.4.3--py_0' }"
+        'biocontainers/bioconvert:0.4.3--py_0' }"
 
     input:
     tuple val(meta), path(reads)

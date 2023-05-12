@@ -4,7 +4,7 @@ process INDEX_CONTAMINANTS {
     conda 'bowtie2=2.4.5'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/bowtie2:2.4.5--py39hd2f7db1_2' :
-        'quay.io/biocontainers/bowtie2:2.4.5--py36hfca12d5_2'}"
+        'biocontainers/bowtie2:2.4.5--py36hfca12d5_2'}"
 
     input:
     path fasta
