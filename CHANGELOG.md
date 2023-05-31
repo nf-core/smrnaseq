@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Current dev
 
-- Remove globs from process alias when using ECR containers
+- [[#253]](https://github.com/nf-core/smrnaseq/pull/253) - Remove globs from process alias when using ECR containers
 
 ## [v2.2.1](https://github.com/nf-core/smrnaseq/releases/tag/2.2.1) - 2023-05-12
 
