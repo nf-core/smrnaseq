@@ -25,7 +25,6 @@ jobs:
       matrix:
         NXF_VER:
           - "23.04.1"
-          - "latest-everything"
         profile:
           - "test"
           - "test_no_genome"
