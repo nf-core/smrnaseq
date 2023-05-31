@@ -5,7 +5,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Current dev
 
-Nothing yet
+## [v2.2.2](https://github.com/nf-core/smrnaseq/releases/tag/2.2.2) - 2023-06-01
+
+- [[#253](https://github.com/nf-core/smrnaseq/pull/253)] - Removes globs from public AWS ECR hosted container configuration.
+
 ## [v2.2.1](https://github.com/nf-core/smrnaseq/releases/tag/2.2.1) - 2023-05-12
 
 ### Enhancements & fixes
