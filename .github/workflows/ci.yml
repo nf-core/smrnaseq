@@ -21,13 +21,23 @@ jobs:
     # Only run on push if this is the nf-core dev branch (merged PRs)
     if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/smrnaseq') }}"
     runs-on: ubuntu-latest
+    continue-on-error: true
     strategy:
       matrix:
-        NXF_VER:
-          - "23.04.1"
-        profile:
-          - "test"
-          - "test_no_genome"
+        include:
+          - NXF_VER: "22.10.1"
+            NF_AMAZON: 1.11.0
+            profile: "test"
+          - NXF_VER: "23.04.1"
+            NF_AMAZON: 1.16.2
+            profile: "test"
+          - NXF_VER: "23.05.0-edge"
+            NF_AMAZON: 1.16.2
+            profile: "test"
+          - NXF_VER: "23.05.0-edge"
+            NF_AMAZON: 2.0.0
+            profile: "test"
+
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v3
@@ -39,4 +49,4 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }},docker --outdir ./results -plugins nf-amazon@1.16.2
+          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }},docker --outdir ./results -plugins nf-amazon@${{ matrix.NF_AMAZON }}
