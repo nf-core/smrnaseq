@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Current dev
 
 Nothing yet
+
 ## [v2.2.1](https://github.com/nf-core/smrnaseq/releases/tag/2.2.1) - 2023-05-12
 
 ### Enhancements & fixes
