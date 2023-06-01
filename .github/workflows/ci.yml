@@ -46,7 +46,7 @@ jobs:
 
       - name: Run pipeline with test data
         run: |
-          nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }},docker --outdir ./results -plugins nf-amazon@${{ matrix.NF_AMAZON }} -log ${{ matrix.NXF_VER }}_${{ matrix.NF_AMAZON }}.log
+          nextflow run -log ${{ matrix.NXF_VER }}_${{ matrix.NF_AMAZON }}.log ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }},docker --outdir ./results -plugins nf-amazon@${{ matrix.NF_AMAZON }}
 
       - name: Upload logs
         uses: actions/upload-artifact@v2
