@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## dev
+
+- Remove public_aws_ecr profile
+
 ## [v2.2.2](https://github.com/nf-core/smrnaseq/releases/tag/2.2.2) - 2023-06-01
 
 - [[#253]](https://github.com/nf-core/smrnaseq/pull/253) - Remove globs from process alias when using ECR containers
