@@ -25,7 +25,7 @@ if (!params.mirtrace_species) {
 }
 
 // Genome options
-def mirna_gtf_from_species = params.mirtrace_species ? "https://mirbase.org/ftp/CURRENT/genomes/${params.mirtrace_species}.gff3" : false
+def mirna_gtf_from_species = params.mirtrace_species ? "https://mirbase.org/download/CURRENT/genomes/${params.mirtrace_species}.gff3" : false
 def mirna_gtf = params.mirna_gtf ?: mirna_gtf_from_species
 
 /*

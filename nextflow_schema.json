@@ -87,7 +87,7 @@
                 "mirna_gtf": {
                     "type": "string",
                     "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
-                    "help_text": "miRBase `.gff3` file, typically downloaded from [`https://mirbase.org/ftp/CURRENT/genomes/`](https://mirbase.org/ftp/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
+                    "help_text": "miRBase `.gff3` file, typically downloaded from [`https://mirbase.org/download/CURRENT/genomes/`](https://mirbase.org/download/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
                     "fa_icon": "fas fa-address-book"
                 },
                 "mirgenedb_gff": {
@@ -100,7 +100,7 @@
                     "description": "Path to FASTA file with mature miRNAs.",
                     "fa_icon": "fas fa-wheelchair",
                     "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
-                    "default": "https://mirbase.org/ftp/CURRENT/mature.fa.gz"
+                    "default": "https://mirbase.org/download/CURRENT/mature.fa"
                 },
                 "mirgenedb_mature": {
                     "type": "string",
@@ -112,7 +112,7 @@
                     "description": "Path to FASTA file with miRNAs precursors.",
                     "fa_icon": "fab fa-cuttlefish",
                     "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
-                    "default": "https://mirbase.org/ftp/CURRENT/hairpin.fa.gz"
+                    "default": "https://mirbase.org/download/CURRENT/hairpin.fa"
                 },
                 "mirgenedb_hairpin": {
                     "type": "string",
