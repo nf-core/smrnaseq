@@ -3,7 +3,7 @@
 //
 
 include { INDEX_GENOME      } from '../../modules/local/bowtie_genome'
-include { BAM_SORT_SAMTOOLS } from '../nf-core/bam_sort_samtools'
+include { BAM_SORT_STATS_SAMTOOLS } from '../nf-core/bam_sort_stats_samtools'
 include { BOWTIE_MAP_SEQ as BOWTIE_MAP_GENOME } from '../../modules/local/bowtie_map_mirna'
 
 workflow GENOME_QUANT {
@@ -29,14 +29,14 @@ workflow GENOME_QUANT {
         BOWTIE_MAP_GENOME ( reads, bowtie_index.collect() )
         ch_versions = ch_versions.mix(BOWTIE_MAP_GENOME.out.versions)
 
-        BAM_SORT_SAMTOOLS ( BOWTIE_MAP_GENOME.out.bam, Channel.empty()  )
-        ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
+        BAM_SORT_STATS_SAMTOOLS ( BOWTIE_MAP_GENOME.out.bam, Channel.empty()  )
+        ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
     }
 
     emit:
     fasta    = fasta_formatted
     index    = bowtie_index
-    stats    = BAM_SORT_SAMTOOLS.out.stats
+    stats    = BAM_SORT_STATS_SAMTOOLS.out.stats
 
     versions = ch_versions
 }

@@ -15,8 +15,8 @@ include {   BOWTIE_MAP_SEQ  as BOWTIE_MAP_MATURE
             BOWTIE_MAP_SEQ  as BOWTIE_MAP_HAIRPIN
             BOWTIE_MAP_SEQ  as BOWTIE_MAP_SEQCLUSTER } from '../../modules/local/bowtie_map_mirna'
 
-include {   BAM_SORT_SAMTOOLS as BAM_STATS_MATURE
-            BAM_SORT_SAMTOOLS as BAM_STATS_HAIRPIN   } from '../nf-core/bam_sort_samtools'
+include {   BAM_SORT_STATS_SAMTOOLS as BAM_STATS_MATURE
+            BAM_SORT_STATS_SAMTOOLS as BAM_STATS_HAIRPIN   } from '../nf-core/bam_sort_stats_samtools'
 
 include { SEQCLUSTER_SEQUENCES } from '../../modules/local/seqcluster_collapse.nf'
 include { MIRTOP_QUANT         } from '../../modules/local/mirtop_quant.nf'
