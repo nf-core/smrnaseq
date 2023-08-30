@@ -60,6 +60,7 @@ You can find numerous talks on the nf-core events page from various topics inclu
 First, prepare a samplesheet with your input data that looks as follows:
 
 `samplesheet.csv`:
+
 ```csv
 sample,fastq_1
 Clone1_N1,s3://ngi-igenomes/test-data/smrnaseq/C1-N1-R1_S4_L001_R1_001.fastq.gz
@@ -71,6 +72,7 @@ Control_N1,s3://ngi-igenomes/test-data/smrnaseq/Ctl-N1-R1_S1_L001_R1_001.fastq.g
 Control_N2,s3://ngi-igenomes/test-data/smrnaseq/Ctl-N2-R1_S2_L001_R1_001.fastq.gz
 Control_N3,s3://ngi-igenomes/test-data/smrnaseq/Ctl-N3-R1_S3_L001_R1_001.fastq.gz
 ```
+
 Each row represents a fastq file (single-end).
 
 Now, you can run the pipeline using:
