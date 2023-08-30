@@ -1,5 +1,4 @@
 process SAMPLESHEET_CHECK {
-    label 'process_low'
     tag "$samplesheet"
     label 'process_single'
 
