@@ -57,16 +57,32 @@ You can find numerous talks on the nf-core events page from various topics inclu
 > to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline)
 > with `-profile test` before running the workflow on actual data.
 
+First, prepare a samplesheet with your input data that looks as follows:
+
+`samplesheet.csv`:
+```csv
+sample,fastq_1
+Clone1_N1,s3://ngi-igenomes/test-data/smrnaseq/C1-N1-R1_S4_L001_R1_001.fastq.gz
+Clone1_N3,s3://ngi-igenomes/test-data/smrnaseq/C1-N3-R1_S6_L001_R1_001.fastq.gz
+Clone9_N1,s3://ngi-igenomes/test-data/smrnaseq/C9-N1-R1_S7_L001_R1_001.fastq.gz
+Clone9_N2,s3://ngi-igenomes/test-data/smrnaseq/C9-N2-R1_S8_L001_R1_001.fastq.gz
+Clone9_N3,s3://ngi-igenomes/test-data/smrnaseq/C9-N3-R1_S9_L001_R1_001.fastq.gz
+Control_N1,s3://ngi-igenomes/test-data/smrnaseq/Ctl-N1-R1_S1_L001_R1_001.fastq.gz
+Control_N2,s3://ngi-igenomes/test-data/smrnaseq/Ctl-N2-R1_S2_L001_R1_001.fastq.gz
+Control_N3,s3://ngi-igenomes/test-data/smrnaseq/Ctl-N3-R1_S3_L001_R1_001.fastq.gz
+```
+Each row represents a fastq file (single-end).
+
 Now, you can run the pipeline using:
 
 ```bash
 nextflow run nf-core/smrnaseq \
    -profile <docker/singularity/.../institute> \
-   --input samplesheet.csv \
-    --genome 'GRCh37' \
-    --mirtrace_species 'hsa' \
-    --protocol 'illumina' \
-    --outdir <OUTDIR>
+  --input samplesheet.csv \
+  --genome 'GRCh37' \
+  --mirtrace_species 'hsa' \
+  --protocol 'illumina' \
+  --outdir <OUTDIR>
 ```
 
 > **Warning:**
