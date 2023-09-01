@@ -13,7 +13,7 @@ process FORMAT_FASTA_MIRNA {
     tuple val(meta2), path(fasta)
 
     output:
-    tuple meta2, path '*_idx.fa'    , emit: formatted_fasta
+    tuple val(meta2), path('*_idx.fa')    , emit: formatted_fasta
     path "versions.yml", emit: versions
 
     when:
