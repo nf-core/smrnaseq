@@ -25,8 +25,8 @@ include { EDGER_QC             } from '../../modules/local/edger_qc.nf'
 
 workflow MIRNA_QUANT {
     take:
-    mature     // channel: fasta file
-    hairpin    // channel: fasta file
+    mature     // channel: [ val(meta), fasta file]
+    hairpin    // channel: [ val(meta), fasta file]
     gtf        // channle: GTF file
     reads      // channel: [ val(meta), [ reads ] ]
 
@@ -94,7 +94,7 @@ workflow MIRNA_QUANT {
 
     ch_mirtop_logs = Channel.empty()
     if (params.mirtrace_species){
-        MIRTOP_QUANT ( BOWTIE_MAP_SEQCLUSTER.out.bam.collect{it[1]}, FORMAT_HAIRPIN.out.formatted_fasta, gtf )
+        MIRTOP_QUANT ( BOWTIE_MAP_SEQCLUSTER.out.bam.collect{it[1]}, FORMAT_HAIRPIN.out.formatted_fasta.collect{it[1]}, gtf )
         ch_mirtop_logs = MIRTOP_QUANT.out.logs
         ch_versions = ch_versions.mix(MIRTOP_QUANT.out.versions)
 

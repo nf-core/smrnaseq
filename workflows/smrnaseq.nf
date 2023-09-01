@@ -179,8 +179,8 @@ workflow SMRNASEQ {
     }
 
     MIRNA_QUANT (
-        reference_mature,
-        reference_hairpin,
+        [ [:], reference_mature],
+        [ [:], reference_hairpin],
         mirna_gtf,
         mirna_reads
     )

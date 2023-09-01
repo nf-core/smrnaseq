@@ -8,7 +8,7 @@ include { BOWTIE_MAP_SEQ as BOWTIE_MAP_GENOME } from '../../modules/local/bowtie
 
 workflow GENOME_QUANT {
     take:
-    fasta
+    fasta //channel: [ val(meta2), [ reads ] ]
     index
     reads // channel: [ val(meta), [ reads ] ]
 
@@ -16,7 +16,7 @@ workflow GENOME_QUANT {
     ch_versions = Channel.empty()
 
     if (!index){
-        INDEX_GENOME ( fasta )
+        INDEX_GENOME ( [ [:], fasta ] )
         bowtie_index    = INDEX_GENOME.out.index
         fasta_formatted = INDEX_GENOME.out.fasta
         ch_versions     = ch_versions.mix(INDEX_GENOME.out.versions)

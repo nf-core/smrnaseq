@@ -7,11 +7,11 @@ process PARSE_FASTA_MIRNA {
         'biocontainers/seqkit:2.3.1--h9ee0642_0' }"
 
     input:
-    path fasta
+    tuple val(meta2), path(fasta)
 
     output:
-    path '*_igenome.fa', emit: parsed_fasta
-    path "versions.yml", emit: versions
+    tuple val(meta2), path('*_igenome.fa'), emit: parsed_fasta
+    path "versions.yml"                   , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
