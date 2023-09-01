@@ -25,8 +25,8 @@ include { EDGER_QC             } from '../../modules/local/edger_qc.nf'
 
 workflow MIRNA_QUANT {
     take:
-    mature     // channel: fasta file
-    hairpin    // channel: fasta file
+    mature     // channel: [ val(meta), fasta file]
+    hairpin    // channel: [ val(meta), fasta file]
     gtf        // channle: GTF file
     reads      // channel: [ val(meta), [ reads ] ]
 
