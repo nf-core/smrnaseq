@@ -26,9 +26,9 @@ It should point to the 3-letter species name used by [miRBase](https://www.mirba
 
 Different parameters can be set for the two supported databases. By default `miRBase` will be used with the parameters below.
 
-- `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRbase: `https://mirbase.org/ftp/CURRENT/genomes/${params.mirtrace_species}.gff3`
-- `mature`: points to the FASTA file of mature miRNA sequences. `https://mirbase.org/ftp/CURRENT/mature.fa.gz`
-- `hairpin`: points to the FASTA file of precursor miRNA sequences. `https://mirbase.org/ftp/CURRENT/hairpin.fa.gz`
+- `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRbase: `https://mirbase.org/download/CURRENT/genomes/${params.mirtrace_species}.gff3`
+- `mature`: points to the FASTA file of mature miRNA sequences. `https://mirbase.org/download/CURRENT/mature.fa`
+- `hairpin`: points to the FASTA file of precursor miRNA sequences. `https://mirbase.org/download/CURRENT/hairpin.fa`
 
 If MirGeneDB should be used instead it needs to be specified using `--mirgenedb` and use the parameters below .
 
@@ -104,7 +104,7 @@ An [example samplesheet](../assets/samplesheet.csv) has been provided with the p
 The typical command for running the pipeline is as follows:
 
 ```bash
-nextflow run nf-core/smrnaseq --input samplesheet.csv --outdir <OUTDIR> --genome GRCh37 -profile docker
+nextflow run nf-core/smrnaseq --input ./samplesheet.csv --outdir ./results --genome GRCh37 -profile docker
 ```
 
 This will launch the pipeline with the `docker` configuration profile. See below for more information about profiles.
@@ -123,7 +123,8 @@ If you wish to repeatedly use the same parameters for multiple runs, rather than
 Pipeline settings can be provided in a `yaml` or `json` file via `-params-file <file>`.
 
 > ⚠️ Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories), or module arguments (args).
-> The above pipeline run specified with a params file in yaml format:
+
+The above pipeline run specified with a params file in yaml format:
 
 ```bash
 nextflow run nf-core/smrnaseq -profile docker -params-file params.yaml
@@ -135,7 +136,6 @@ with `params.yaml` containing:
 input: './samplesheet.csv'
 outdir: './results/'
 genome: 'GRCh37'
-input: 'data'
 <...>
 ```
 
