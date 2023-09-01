@@ -125,8 +125,8 @@ class WorkflowSmrnaseq {
 
         switch(params.protocol){
             case 'illumina':
-                params.putIfAbsent("clip_r1", 1);
-                params.putIfAbsent("three_prime_clip_r1",2);
+                params.putIfAbsent("clip_r1", 0);
+                params.putIfAbsent("three_prime_clip_r1",0);
                 params.putIfAbsent("three_prime_adapter", "TGGAATTCTCGGGTGCCAAGG");
                 break
             case 'nextflex':
