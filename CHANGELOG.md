@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#253]](https://github.com/nf-core/smrnaseq/pull/253) - Remove globs from process alias when using ECR containers
 - [[#237]](https://github.com/nf-core/smrnaseq/issues/237) - Fix illumina protocol clip parameters to default
 - Remove public_aws_ecr profile
+- [[#269]](https://github.com/nf-core/smrnaseq/pull/269) - Updated miRBase URLs with new location (old ones were broken)
 
 ### Software dependencies
 
