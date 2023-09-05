@@ -3,7 +3,21 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [v2.2.1](https://github.com/nf-core/smrnaseq/releases/tag/2.2.1) - 2023-05-08
+## [v2.2.2](https://github.com/nf-core/smrnaseq/releases/tag/2.2.2) - 2023-09-04
+
+- [[#253]](https://github.com/nf-core/smrnaseq/pull/253) - Remove globs from process alias when using ECR containers
+- [[#237]](https://github.com/nf-core/smrnaseq/issues/237) - Fix illumina protocol clip parameters to default
+- Remove public_aws_ecr profile
+- [[#269]](https://github.com/nf-core/smrnaseq/pull/269) - Updated miRBase URLs with new location (old ones were broken)
+
+### Software dependencies
+
+| Dependency | Old version | New version |
+| ---------- | ----------- | ----------- |
+| `multiqc`  | 1.13        | 1.15        |
+| `fastp`    | 0.23.2      | 0.23.4      |
+
+## [v2.2.1](https://github.com/nf-core/smrnaseq/releases/tag/2.2.1) - 2023-05-12
 
 ### Enhancements & fixes
 

@@ -10,11 +10,11 @@ process FORMAT_FASTA_MIRNA {
         'biocontainers/fastx_toolkit:0.0.14--he1b5a44_8' }"
 
     input:
-    path fasta
+    tuple val(meta2), path(fasta)
 
     output:
-    path '*_idx.fa'    , emit: formatted_fasta
-    path "versions.yml", emit: versions
+    tuple val(meta2), path('*_idx.fa') , emit: formatted_fasta
+    path "versions.yml"                , emit: versions
 
     when:
     task.ext.when == null || task.ext.when

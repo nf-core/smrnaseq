@@ -8,7 +8,7 @@ process INDEX_GENOME {
         'biocontainers/bowtie:1.3.1--py310h4070885_4' }"
 
     input:
-    path fasta
+    tuple val(meta2), path(fasta)
 
     output:
     path 'genome*ebwt'     , emit: index

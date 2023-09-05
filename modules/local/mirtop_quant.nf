@@ -12,9 +12,9 @@ process MIRTOP_QUANT {
     path gtf
 
     output:
-    path "mirtop/mirtop.gff"
+    path "mirtop/mirtop.gff"        , emit: mirtop_gff
     path "mirtop/mirtop.tsv"        , emit: mirtop_table
-    path "mirtop/mirtop_rawData.tsv"
+    path "mirtop/mirtop_rawData.tsv", emit: mirtop_rawdata
     path "mirtop/stats/*"           , emit: logs
     path "versions.yml"             , emit: versions
 
