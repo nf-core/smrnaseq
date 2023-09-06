@@ -25,10 +25,9 @@ process PARSE_FASTA_MIRNA {
         gunzip -f \$FASTA
         FASTA=\${FASTA%%.gz}
     fi
+    sed 's/&gt;/>/g' \$FASTA | sed 's#<br>#\\n#g' | sed 's#</p>##g' | sed 's#<p>##g' > \${FASTA}_html_cleaned.fa
     # Remove spaces from miRBase FASTA files
-    # sed -i 's, ,_,g' \$FASTA
-    sed '#^[^>]#s#[^AUGCaugc]#N#g' \$FASTA > \${FASTA}_parsed.fa
-    # TODO perl -ane 's/[ybkmrsw]/N/ig;print;' \${FASTA}_parsed_tmp.fa > \${FASTA}_parsed.fa
+    sed '#^[^>]#s#[^AUGCaugc]#N#g' \${FASTA}_html_cleaned.fa > \${FASTA}_parsed.fa
 
     sed -i 's#\s.*##' \${FASTA}_parsed.fa
     seqkit grep -r --pattern \".*${filter_species}-.*\" \${FASTA}_parsed.fa > \${FASTA}_sps.fa
