@@ -24,9 +24,11 @@ process MIRTOP_QUANT {
     script:
     def filter_species = params.mirgenedb ? params.mirgenedb_species : params.mirtrace_species
     """
-    mirtop gff --hairpin $hairpin --gtf $gtf -o mirtop --sps $filter_species ./bams/*
-    mirtop counts --hairpin $hairpin --gtf $gtf -o mirtop --sps $filter_species --add-extra --gff mirtop/mirtop.gff
-    mirtop export --format isomir --hairpin $hairpin --gtf $gtf --sps $filter_species -o mirtop mirtop/mirtop.gff
+    #Cleanup the GTF if mirbase html form is broken
+    sed 's/&gt;/>/g' \$gtf | sed 's#<br>#\\n#g' | sed 's#</p>##g' | sed 's#<p>##g' > \${gtf}_html_cleaned.fa
+    mirtop gff --hairpin $hairpin --gtf \${gtf}_html_cleaned.fa -o mirtop --sps $filter_species ./bams/*
+    mirtop counts --hairpin $hairpin --gtf \${gtf}_html_cleaned.fa -o mirtop --sps $filter_species --add-extra --gff mirtop/mirtop.gff
+    mirtop export --format isomir --hairpin $hairpin --gtf \${gtf}_html_cleaned.fa --sps $filter_species -o mirtop mirtop/mirtop.gff
     mirtop stats mirtop/mirtop.gff --out mirtop/stats
     mv mirtop/stats/mirtop_stats.log mirtop/stats/full_mirtop_stats.log
 
