@@ -25,10 +25,11 @@ process MIRTOP_QUANT {
     def filter_species = params.mirgenedb ? params.mirgenedb_species : params.mirtrace_species
     """
     #Cleanup the GTF if mirbase html form is broken
-    sed 's/&gt;/>/g' \$gtf | sed 's#<br>#\\n#g' | sed 's#</p>##g' | sed 's#<p>##g' > \${gtf}_html_cleaned.fa
-    mirtop gff --hairpin $hairpin --gtf \${gtf}_html_cleaned.fa -o mirtop --sps $filter_species ./bams/*
-    mirtop counts --hairpin $hairpin --gtf \${gtf}_html_cleaned.fa -o mirtop --sps $filter_species --add-extra --gff mirtop/mirtop.gff
-    mirtop export --format isomir --hairpin $hairpin --gtf \${gtf}_html_cleaned.fa --sps $filter_species -o mirtop mirtop/mirtop.gff
+    GTF="$gtf"
+    sed 's/&gt;/>/g' \$GTF | sed 's#<br>#\\n#g' | sed 's#</p>##g' | sed 's#<p>##g' > \${GTF}_html_cleaned.fa
+    mirtop gff --hairpin $hairpin --gtf \${GTF}_html_cleaned.fa -o mirtop --sps $filter_species ./bams/*
+    mirtop counts --hairpin $hairpin --gtf \${GTF}_html_cleaned.fa -o mirtop --sps $filter_species --add-extra --gff mirtop/mirtop.gff
+    mirtop export --format isomir --hairpin $hairpin --gtf \${GTF}_html_cleaned.fa --sps $filter_species -o mirtop mirtop/mirtop.gff
     mirtop stats mirtop/mirtop.gff --out mirtop/stats
     mv mirtop/stats/mirtop_stats.log mirtop/stats/full_mirtop_stats.log
 
