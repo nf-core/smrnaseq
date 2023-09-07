@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [v2.2.4](https://github.com/nf-core/smrnaseq/releases/tag/2.2.4) - 2023-09-07
 
 - Bugfix for issue with handling malformed GFF3 from mirbase (was forgotten in 2.2.3)
+
 ## [v2.2.3](https://github.com/nf-core/smrnaseq/releases/tag/2.2.3) - 2023-09-06
 
 - [[#271]](https://github.com/nf-core/smrnaseq/issues/271) - Bugfix for parsing hairpin and mature fasta files
