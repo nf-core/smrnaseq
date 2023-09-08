@@ -26,7 +26,7 @@ process MIRTOP_QUANT {
     """
     #Cleanup the GTF if mirbase html form is broken
     GTF="$gtf"
-    sed 's/&gt;/>/g' \$GTF | sed 's#<br>#\\n#g' | sed 's#</p>##g' | sed 's#<p>##g' | sed -e :a -e '/^\n*\$/{\$d;N;};/\n\$/ba' > \${GTF}_html_cleaned.fa
+    sed 's/&gt;/>/g' \$GTF | sed 's#<br>#\\n#g' | sed 's#</p>##g' | sed 's#<p>##g' | sed -e :a -e '/^\\n*\$/{\$d;N;};/\\n\$/ba' > \${GTF}_html_cleaned.fa
     mirtop gff --hairpin $hairpin --gtf \${GTF}_html_cleaned.fa -o mirtop --sps $filter_species ./bams/*
     mirtop counts --hairpin $hairpin --gtf \${GTF}_html_cleaned.fa -o mirtop --sps $filter_species --add-extra --gff mirtop/mirtop.gff
     mirtop export --format isomir --hairpin $hairpin --gtf \${GTF}_html_cleaned.fa --sps $filter_species -o mirtop mirtop/mirtop.gff
