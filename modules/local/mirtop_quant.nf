@@ -29,7 +29,7 @@ process MIRTOP_QUANT {
     sed 's/&gt;/>/g' \$GTF | sed 's#<br>#\\n#g' | sed 's#</p>##g' | sed 's#<p>##g' | sed -e :a -e '/^\\n*\$/{\$d;N;};/\\n\$/ba' > \${GTF}_html_cleaned.gtf
     mirtop gff --hairpin $hairpin --gtf \${GTF}_html_cleaned.gtf -o mirtop --sps $filter_species ./bams/*
     mirtop counts --hairpin $hairpin --gtf \${GTF}_html_cleaned.gtf -o mirtop --sps $filter_species --add-extra --gff mirtop/mirtop.gff
-    mirtop export --format isomir --hairpin $hairpin --gtf \${GTF}_html_cleaned.fa --sps $filter_species -o mirtop mirtop/mirtop.gff
+    mirtop export --format isomir --hairpin $hairpin --gtf \${GTF}_html_cleaned.gtf --sps $filter_species -o mirtop mirtop/mirtop.gff
     mirtop stats mirtop/mirtop.gff --out mirtop/stats
     mv mirtop/stats/mirtop_stats.log mirtop/stats/full_mirtop_stats.log
 
