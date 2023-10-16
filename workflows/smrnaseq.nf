@@ -195,6 +195,12 @@ workflow SMRNASEQ {
         genome_stats = GENOME_QUANT.out.stats
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
+        FASTQC_FASTP.out.reads.view { it -> println "DEBUG ==> FASTQC_FASTP.out.reads = $it" }
+        GENOME_QUANT.out.fasta.view { it -> println "DEBUG ==> GENOME_QUANT.out.fasta = $it" }
+        GENOME_QUANT.out.index.view { it -> println "DEBUG ==> GENOME_QUANT.out.index = $it" }
+        MIRNA_QUANT.out.fasta_hairpin.view { it -> println "DEBUG ==> MIRNA_QUANT.out.fasta_hairpin = $it" }
+        MIRNA_QUANT.out.fasta_mature.view { it -> println "DEBUG ==> MIRNA_QUANT.out.fasta_mature = $it" }
+
         if (!params.skip_mirdeep) {
             MIRDEEP2 (
                 FASTQC_FASTP.out.reads,

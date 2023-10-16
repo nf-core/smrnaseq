@@ -26,9 +26,9 @@ workflow MIRDEEP2 {
 
     MIRDEEP2_MAPPER.out.mirdeep2_inputs.view{ it -> "DEBUG: MIRDEEP2_MAPPER.out.mirdeep2_inputs: " }
 
-    print "DEBUG fasta:" + fasta
-    print "DEBUG hairpin:" + hairpin
-    print "DEBUG mature:" + mature
+    println "DEBUG fasta:" + fasta
+    println "DEBUG hairpin:" + hairpin
+    println "DEBUG mature:" + mature
 
     MIRDEEP2_RUN ( fasta, MIRDEEP2_MAPPER.out.mirdeep2_inputs, hairpin, mature )
     ch_versions = ch_versions.mix(MIRDEEP2_RUN.out.versions.first())
