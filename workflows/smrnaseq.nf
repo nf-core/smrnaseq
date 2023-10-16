@@ -195,13 +195,16 @@ workflow SMRNASEQ {
         genome_stats = GENOME_QUANT.out.stats
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
+        hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
+        mature_clean  = MIRNA_QUANT.out.fasta_mature.map { it -> it[1] }
+
         if (!params.skip_mirdeep) {
             MIRDEEP2 (
                 FASTQC_FASTP.out.reads,
                 GENOME_QUANT.out.fasta,
                 GENOME_QUANT.out.index.collect(),
-                MIRNA_QUANT.out.fasta_hairpin,
-                MIRNA_QUANT.out.fasta_mature
+                hairpin_clean,
+                mature_clean
             )
             ch_versions = ch_versions.mix(MIRDEEP2.out.versions)
         }

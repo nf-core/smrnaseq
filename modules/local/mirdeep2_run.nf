@@ -10,7 +10,7 @@ process MIRDEEP2_RUN {
         'biocontainers/mirdeep2:2.0.1.3--hdfd78af_1' }"
 
     input:
-    tuple val(meta2), path(fasta)
+    path(fasta)
     tuple path(reads), path(arf)
     path hairpin
     path mature
