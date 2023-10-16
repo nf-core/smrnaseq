@@ -210,8 +210,10 @@ workflow SMRNASEQ {
                 FASTQC_FASTP.out.reads,
                 GENOME_QUANT.out.fasta,
                 GENOME_QUANT.out.index.collect(),
-                MIRNA_QUANT.out.fasta_hairpin,
-                MIRNA_QUANT.out.fasta_mature
+                // MIRNA_QUANT.out.fasta_hairpin,
+                // MIRNA_QUANT.out.fasta_mature
+                hairpin_clean,
+                mature_clean
             )
             ch_versions = ch_versions.mix(MIRDEEP2.out.versions)
         }
