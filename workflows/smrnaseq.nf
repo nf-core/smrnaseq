@@ -178,11 +178,6 @@ workflow SMRNASEQ {
 
     }
 
-    print reference_mature
-    print reference_hairpin
-    print mirna_gtf
-    print mirna_reads
-
     MIRNA_QUANT (
         [ [:], reference_mature],
         [ [:], reference_hairpin],
