@@ -197,21 +197,12 @@ workflow SMRNASEQ {
 
         hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
         mature_clean  = MIRNA_QUANT.out.fasta_mature.map { it -> it[1] }
-        FASTQC_FASTP.out.reads.view { it -> println "DEBUG ==> FASTQC_FASTP.out.reads = $it" }
-        GENOME_QUANT.out.fasta.view { it -> println "DEBUG ==> GENOME_QUANT.out.fasta = $it" }
-        GENOME_QUANT.out.index.view { it -> println "DEBUG ==> GENOME_QUANT.out.index = $it" }
-        // MIRNA_QUANT.out.fasta_hairpin.view { it -> println "DEBUG ==> MIRNA_QUANT.out.fasta_hairpin = $it" }
-        // MIRNA_QUANT.out.fasta_mature.view { it -> println "DEBUG ==> MIRNA_QUANT.out.fasta_mature = $it" }
-        hairpin_clean.view { it -> println "DEBUG ==> hairpin_clean = $it" }
-        mature_clean.view { it -> println "DEBUG ==> mature_clean = $it" }
 
         if (!params.skip_mirdeep) {
             MIRDEEP2 (
                 FASTQC_FASTP.out.reads,
                 GENOME_QUANT.out.fasta,
                 GENOME_QUANT.out.index.collect(),
-                // MIRNA_QUANT.out.fasta_hairpin,
-                // MIRNA_QUANT.out.fasta_mature
                 hairpin_clean,
                 mature_clean
             )
