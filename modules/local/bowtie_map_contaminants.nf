@@ -22,7 +22,7 @@ process BOWTIE_MAP_CONTAMINANTS {
 
     script:
     """
-    INDEX=`find -L ./ -name "*.3.ebwt" | sed 's/.3.ebwt//'`
+    INDEX=`find -L ./ -name "*.3.bt2" | sed 's/.3.bt2//'`
     bowtie2 \\
         --threads ${task.cpus} \\
         --very-sensitive-local \\
