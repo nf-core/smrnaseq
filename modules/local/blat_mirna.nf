@@ -53,7 +53,7 @@ process BLAT_MIRNA {
         blat -out=blast8 $mirna $contaminants /dev/stdout | awk 'BEGIN{FS="\t"}{if(\$11 < 1e-5)print \$1;}' | uniq > mirnahit.txt
         awk 'BEGIN { while((getline<"mirnahit.txt")>0) l[">"\$1]=1 } /^>/ {x = l[\$1]} {if(!x) print }' $contaminants  > filtered.fa
 
-cat <<-END_VERSIONS > versions.yml
+        cat <<-END_VERSIONS > versions.yml
         "${task.process}":
             blat: \$(echo \$(blat) | grep Standalone | awk '{ if (match(\$0,/[0-9]*[0-9]/,m)) print m[0] }')
         END_VERSIONS

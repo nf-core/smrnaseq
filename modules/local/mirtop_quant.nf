@@ -34,7 +34,7 @@ process MIRTOP_QUANT {
     mv mirtop/stats/mirtop_stats.log mirtop/stats/full_mirtop_stats.log
 
     cat <<-END_VERSIONS > versions.yml
-    ${task.process}":
+    "${task.process}":
         mirtop: \$(echo \$(mirtop --version 2>&1) | sed 's/^.*mirtop //')
     END_VERSIONS
     """
