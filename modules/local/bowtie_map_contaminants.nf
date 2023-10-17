@@ -22,16 +22,17 @@ process BOWTIE_MAP_CONTAMINANTS {
 
     script:
     """
-    INDEX=`find -L ./ -name "*.3.bt2" | sed 's/.3.bt2//'`
+    INDEX=`find -L ./ -name "*.rev.1.bt2" | sed "s/\\.rev.1.bt2\$//"`
     bowtie2 \\
+        -x \$INDEX \\
+        -U ${reads} \\
         --threads ${task.cpus} \\
+        --un ${meta.id}.${contaminant_type}.filter.unmapped.contaminant.fastq \\
         --very-sensitive-local \\
         -k 1 \\
-        -x \$INDEX \\
-        --un ${meta.id}.${contaminant_type}.filter.unmapped.contaminant.fastq \\
-        ${reads} \\
+        -S ${meta.id}.filter.contaminant.sam \\
         ${args} \\
-        -S ${meta.id}.filter.contaminant.sam > ${meta.id}.contaminant_bowtie.log 2>&1
+        > ${meta.id}.contaminant_bowtie.log 2>&1
 
     # extracting number of reads from bowtie logs
     awk -v type=${contaminant_type} 'BEGIN{tot=0} {if(NR==4 || NR == 5){tot += \$1}} END {print "\\""type"\\": "tot }' ${meta.id}.contaminant_bowtie.log | tr -d , > filtered.${meta.id}_${contaminant_type}.stats
