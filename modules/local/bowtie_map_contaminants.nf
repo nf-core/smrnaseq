@@ -21,6 +21,8 @@ process BOWTIE_MAP_CONTAMINANTS {
     task.ext.when == null || task.ext.when
 
     script:
+    def args = task.ext.args ?: ""
+
     """
     INDEX=`find -L ./ -name "*.rev.1.bt2" | sed "s/\\.rev.1.bt2\$//"`
     bowtie2 \\
