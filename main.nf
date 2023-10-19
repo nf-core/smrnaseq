@@ -17,10 +17,11 @@ nextflow.enable.dsl = 2
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-// TODO nf-core: Remove this line if you don't need a FASTA file
-//   This is an example of how to use getGenomeAttribute() to fetch parameters
-//   from igenomes.config using `--genome`
-params.fasta = WorkflowMain.getGenomeAttribute(params, 'fasta')
+
+params.fasta            = WorkflowMain.getGenomeAttribute(params, 'fasta')
+params.mirtrace_species = WorkflowMain.getGenomeAttribute(params, 'mirtrace_species')
+params.bowtie_index     = WorkflowMain.getGenomeAttribute(params, 'bowtie')
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -54,9 +55,6 @@ WorkflowMain.initialise(workflow, params, log)
 
 include { SMRNASEQ } from './workflows/smrnaseq'
 
-//
-// WORKFLOW: Run main nf-core/smrnaseq analysis pipeline
-//
 workflow NFCORE_SMRNASEQ {
     SMRNASEQ ()
 }
@@ -66,7 +64,6 @@ workflow NFCORE_SMRNASEQ {
     RUN ALL WORKFLOWS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
 //
 // WORKFLOW: Execute a single named workflow for the pipeline
 // See: https://github.com/nf-core/rnaseq/issues/619
