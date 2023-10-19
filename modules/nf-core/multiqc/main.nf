@@ -6,7 +6,6 @@ process MULTIQC {
         'https://depot.galaxyproject.org/singularity/multiqc:1.15--pyhdfd78af_0' :
         'biocontainers/multiqc:1.15--pyhdfd78af_0' }"
 
-
     input:
     path  multiqc_files, stageAs: "?/*"
     path(multiqc_config)
