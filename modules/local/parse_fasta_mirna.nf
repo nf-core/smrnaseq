@@ -25,7 +25,7 @@ process PARSE_FASTA_MIRNA {
         gunzip -f \$FASTA
         FASTA=\${FASTA%%.gz}
     fi
-    sed 's/&gt;/>/g' \$FASTA | sed 's#<br>#\\n#g' | sed 's#</p>##g' | sed 's#<p>##g' > \${FASTA}_html_cleaned.fa
+    sed 's/&gt;/>/g' \$FASTA | sed 's#<br>#\\n#g' | sed 's#</p>##g' | sed 's#<p>##g' | sed -e :a -e '/^\\n*\$/{\$d;N;};/\\n\$/ba' > \${FASTA}_html_cleaned.fa
     # Remove spaces from miRBase FASTA files
     sed '#^[^>]#s#[^AUGCaugc]#N#g' \${FASTA}_html_cleaned.fa > \${FASTA}_parsed.fa
 
