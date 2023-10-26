@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update template to 2.10
 - Bugfix for issue with mirdeep2 channels [#289](https://github.com/nf-core/smrnaseq/issues/289)
 - Bugfix for issue with handling malformed GFF3 from mirbase (was forgotten in 2.2.3)
+- Updated dependencies, including FASTQC, MultiQC 1.17, fastP and samtools to latest versions
 
 ## [v2.2.3](https://github.com/nf-core/smrnaseq/releases/tag/2.2.3) - 2023-09-06
 
