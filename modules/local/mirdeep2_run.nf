@@ -35,7 +35,7 @@ process MIRDEEP2_RUN {
         -z _${reads.simpleName}
 
     cat <<-END_VERSIONS > versions.yml
-    ${task.process}":
+    "${task.process}":
         mirdeep2: \$(echo "$VERSION")
     END_VERSIONS
     """

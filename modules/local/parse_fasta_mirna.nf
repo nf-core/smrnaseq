@@ -34,7 +34,7 @@ process PARSE_FASTA_MIRNA {
     seqkit seq --rna2dna \${FASTA}_sps.fa > \${FASTA}_igenome.fa
 
     cat <<-END_VERSIONS > versions.yml
-    ${task.process}":
+    "${task.process}":
         seqkit: \$(echo \$(seqkit 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
     END_VERSIONS
     """

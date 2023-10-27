@@ -25,7 +25,7 @@ process SEQCLUSTER_SEQUENCES {
     mv collapsed/*.fastq.gz final/.
 
     cat <<-END_VERSIONS > versions.yml
-    ${task.process}":
+    "${task.process}":
         seqcluster: \$(echo \$(seqcluster --version 2>&1) | sed 's/^.*seqcluster //')
     END_VERSIONS
     """

@@ -195,13 +195,16 @@ workflow SMRNASEQ {
         genome_stats = GENOME_QUANT.out.stats
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
+        hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
+        mature_clean  = MIRNA_QUANT.out.fasta_mature.map { it -> it[1] }
+
         if (!params.skip_mirdeep) {
             MIRDEEP2 (
                 FASTQC_FASTP.out.reads,
                 GENOME_QUANT.out.fasta,
                 GENOME_QUANT.out.index.collect(),
-                MIRNA_QUANT.out.fasta_hairpin,
-                MIRNA_QUANT.out.fasta_mature
+                hairpin_clean,
+                mature_clean
             )
             ch_versions = ch_versions.mix(MIRDEEP2.out.versions)
         }
@@ -227,7 +230,8 @@ workflow SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
         ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.trim_json.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.fastqc_trim_zip.collect{it[1]}.ifEmpty([]))
+        // ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.trim_json.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
