@@ -67,8 +67,8 @@ def check_samplesheet(file_in, file_out):
             # Check valid number of columns per row
             if len(lspl) != len(header):
                 print_error(
-                    "Invalid number of columns: found {} columns (header has {})".format(
-                        line_number, len(lspl), len(header)
+                    "Invalid number of columns found - header has {} columns, content has {}. Number of rows {})".format(
+                        len(header), len(lspl), line_number
                     ),
                     f"Line #{line_number+2}",
                     line,
