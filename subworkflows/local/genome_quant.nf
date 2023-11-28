@@ -8,7 +8,7 @@ include { BOWTIE_MAP_SEQ as BOWTIE_MAP_GENOME } from '../../modules/local/bowtie
 
 workflow GENOME_QUANT {
     take:
-    fasta 
+    fasta
     index
     reads // channel: [ val(meta), [ reads ] ]
 
@@ -28,8 +28,10 @@ workflow GENOME_QUANT {
     if (bowtie_index){
         BOWTIE_MAP_GENOME ( reads, bowtie_index.collect() )
         ch_versions = ch_versions.mix(BOWTIE_MAP_GENOME.out.versions)
-
-        BAM_SORT_STATS_SAMTOOLS ( BOWTIE_MAP_GENOME.out.bam, Channel.empty()  )
+        fasta_formatted
+            .map { file -> tuple(file.baseName, file) }
+            .set { sort_input }
+        BAM_SORT_STATS_SAMTOOLS ( BOWTIE_MAP_GENOME.out.bam,  sort_input )
         ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
     }
 
