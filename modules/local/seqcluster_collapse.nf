@@ -2,10 +2,10 @@ process SEQCLUSTER_SEQUENCES {
     label 'process_medium'
     tag "$meta.id"
 
-    conda (params.enable_conda ? 'bioconda::seqcluster=1.2.9-0' : null)
+    conda 'bioconda::seqcluster=1.2.9-0'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/seqcluster:1.2.9--pyh5e36f6f_0' :
-        'quay.io/biocontainers/seqcluster:1.2.8--pyh5e36f6f_0' }"
+        'biocontainers/seqcluster:1.2.8--pyh5e36f6f_0' }"
 
     input:
     tuple val(meta), path(reads)
@@ -13,6 +13,9 @@ process SEQCLUSTER_SEQUENCES {
     output:
     tuple val(meta), path("final/*.fastq.gz"), emit: collapsed
     path "versions.yml"                      , emit: versions
+
+    when:
+    task.ext.when == null || task.ext.when
 
     script:
     """

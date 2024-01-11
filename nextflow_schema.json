@@ -15,9 +15,9 @@
                 "input": {
                     "type": "string",
                     "format": "file-path",
+                    "exists": true,
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
-                    "schema": "assets/schema_input.json",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
                     "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/smrnaseq/usage#samplesheet-input).",
                     "fa_icon": "fas fa-file-csv"
@@ -109,50 +109,53 @@
                     "fa_icon": "fas fa-book",
                     "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
                 },
-                "mirGeneDB": {
+                "mirgenedb": {
                     "type": "boolean",
-                    "description": "Boolean wether mirGeneDB should be used instead of miRBase",
-                    "help_text": "This allows you to use mirGeneDB instead of miRBase as the database. \n Note that you will need to set the additional flags `--mirGeneDB_species`, `--mirGeneDB_gff`, `--mirGeneDB_mature` and `--mirGeneDB_hairpin`",
-                    "default": "false"
+                    "description": "Boolean whether MirGeneDB should be used instead of miRBase",
+                    "help_text": "This allows you to use MirGeneDB instead of miRBase as the database. \n Note that you will need to set the additional flags `--mirgenedb_species`, `--mirgenedb_gff`, `--mirgenedb_mature` and `--mirgenedb_hairpin`"
                 },
                 "mirtrace_species": {
                     "type": "string",
                     "description": "Species for miRTrace.",
-                    "help_text": "This is automatically set when using `--genome`. Example values: `hsa`, `mmu`...\n Note that mirTrace relies on miRBase for its species reference. See available references [here](https://mirbase.org/ftp/CURRENT/genomes/).",
+                    "help_text": "This is automatically set when using `--genome`. Example values: `hsa`, `mmu`...\n Note that mirTrace relies on miRBase for its species reference. See available references [here](https://www.mirbase.org/help/genome_summary.shtml).",
                     "fa_icon": "fas fa-journal-whills"
                 },
-                "mirGeneDB_species": {
+                "mirgenedb_species": {
                     "type": "string",
-                    "description": "Species of mirGeneDB.",
-                    "help_text": "This replaces the value of `--mirtrace_species` if `--mirGeneDB` is used. \n Note the difference in case for species names used in MirGeneDB and miRBase."
+                    "description": "Species of MirGeneDB.",
+                    "help_text": "This replaces the value of `--mirtrace_species` if `--mirgenedb` is used. \n Note the difference in case for species names used in MirGeneDB and miRBase. See https://www.mirgenedb.org/browse for more information."
                 },
                 "fasta": {
                     "type": "string",
-                    "fa_icon": "fas fa-font",
-                    "description": "Path to reference genome FASTA genome file.",
-                    "help_text": "If you have no genome reference available, the pipeline can build one using a FASTA file. This requires additional time and resources, so it's better to use a pre-build index if possible."
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
+                    "description": "Path to FASTA genome file.",
+                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
+                    "fa_icon": "far fa-file-code"
                 },
                 "mirna_gtf": {
                     "type": "string",
                     "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
-                    "help_text": "miRBase `.gff3` file, typically downloaded from [`https://mirbase.org/ftp/CURRENT/genomes/`](https://mirbase.org/ftp/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
+                    "help_text": "miRBase `.gff3` file, typically downloaded from [`https://mirbase.org/download/CURRENT/genomes/`](https://mirbase.org/download/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
                     "fa_icon": "fas fa-address-book"
                 },
-                "mirGeneDB_gff": {
+                "mirgenedb_gff": {
                     "type": "string",
                     "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
-                    "help_text": "mirGeneDB `.gff3` file, typically downloaded from [`https://mirgenedb.org/download`]. This replaces the value of --mirna_gff if --mirGeneDB is used."
+                    "help_text": "MirGeneDB `.gff3` file, typically downloaded from [`https://mirgenedb.org/download`]. This replaces the value of --mirna_gff if --mirgenedb is used."
                 },
                 "mature": {
                     "type": "string",
                     "description": "Path to FASTA file with mature miRNAs.",
                     "fa_icon": "fas fa-wheelchair",
                     "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
-                    "default": "https://mirbase.org/ftp/CURRENT/mature.fa.gz"
+                    "default": "https://mirbase.org/download/CURRENT/mature.fa"
                 },
-                "mirGeneDB_mature": {
+                "mirgenedb_mature": {
                     "type": "string",
-                    "description": "Path to FASTA file with mirGeneDB mature miRNAs.",
+                    "description": "Path to FASTA file with MirGeneDB mature miRNAs.",
                     "help_text": "This file needs to be downloaded from [`https://mirgenedb.org/download`]. Can be given either as a plain text `.fa` file or a compressed `.gz` file."
                 },
                 "hairpin": {
@@ -160,14 +163,14 @@
                     "description": "Path to FASTA file with miRNAs precursors.",
                     "fa_icon": "fab fa-cuttlefish",
                     "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
-                    "default": "https://mirbase.org/ftp/CURRENT/hairpin.fa.gz"
+                    "default": "https://mirbase.org/download/CURRENT/hairpin.fa"
                 },
-                "mirGeneDB_hairpin": {
+                "mirgenedb_hairpin": {
                     "type": "string",
                     "description": "Path to FASTA file with miRNAs precursors.",
-                    "help_text": "This file needs to be downloaded from [`https://mirgenedb.org/download`]. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\nNote that mirGeneDB does not have a dedicated hairpin file. The equivalent is the `Precursor sequences`."
+                    "help_text": "This file needs to be downloaded from [`https://mirgenedb.org/download`]. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\nNote that MirGeneDB does not have a dedicated hairpin file. The equivalent is the `Precursor sequences`."
                 },
-                "bowtie_indices": {
+                "bowtie_index": {
                     "type": "string",
                     "description": "Path to a Bowtie 1 index directory",
                     "fa_icon": "fas fa-book",
@@ -179,18 +182,9 @@
                     "help_text": "Saving generated references means that you can use them for future pipeline runs, reducing processing times.",
                     "fa_icon": "fas fa-save"
                 },
-                "igenomes_base": {
-                    "type": "string",
-                    "format": "directory-path",
-                    "description": "Directory / URL base for iGenomes references.",
-                    "default": "s3://ngi-igenomes/igenomes",
-                    "fa_icon": "fas fa-cloud-download-alt",
-                    "hidden": true
-                },
                 "igenomes_ignore": {
                     "type": "boolean",
                     "description": "Do not load the iGenomes reference config.",
-                    "default": false,
                     "fa_icon": "fas fa-ban",
                     "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`.",
                     "hidden": true
@@ -203,12 +197,6 @@
             "description": "Options for trimming reads and primers.",
             "fa_icon": "fas fa-cut",
             "properties": {
-                "min_length": {
-                    "type": "integer",
-                    "default": 17,
-                    "description": "Discard reads that are shorter than this after quality / adapter trimming.",
-                    "fa_icon": "fas fa-ruler"
-                },
                 "clip_r1": {
                     "type": "integer",
                     "fa_icon": "fas fa-cut",
@@ -225,19 +213,34 @@
                     "fa_icon": "fas fa-text-width",
                     "description": "Sequencing adapter sequence to use for trimming."
                 },
-                "mirtrace_protocol": {
-                    "type": "string",
-                    "default": "illumina",
-                    "fa_icon": "fas fa-vial",
-                    "description": "The miRTrace protocol for QC reporting.",
-                    "help_text": "miRTrace can handle four protocols, each with their own primer-read structure. See the protocol descriptions [here](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/doc/manual/mirtrace_manual.pdf).",
-                    "enum": ["illumina", "cats", "qiaseq", "nextflex"]
+                "trim_fastq": {
+                    "type": "boolean",
+                    "default": true,
+                    "fa_icon": "fas fa-hand-scissors",
+                    "description": "Trim FastQ files"
                 },
-                "trim_galore_max_length": {
+                "fastp_min_length": {
+                    "type": "integer",
+                    "default": 17,
+                    "description": "Minimum filter length for raw reads.",
+                    "fa_icon": "fas fa-ruler-horizontal"
+                },
+                "fastp_max_length": {
                     "type": "integer",
                     "default": 40,
-                    "description": "The max-length parameter used for trimming with TrimGalore!.",
-                    "fa_icon": "fas fa-ruler"
+                    "description": "Maximum filter length for raw reads.",
+                    "fa_icon": "fas fa-ruler-horizontal"
+                },
+                "save_trimmed_fail": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-cloud-download-alt",
+                    "description": "Save reads failing trimming"
+                },
+                "fastp_known_mirna_adapters": {
+                    "type": "string",
+                    "default": "${projectDir}/assets/known_adapters.fa",
+                    "description": "FastA with known miRNA adapter sequences for adapter trimming",
+                    "fa_icon": "far fa-question-circle"
                 }
             }
         },
@@ -249,7 +252,6 @@
             "properties": {
                 "filter_contamination": {
                     "type": "boolean",
-                    "default": false,
                     "description": "Enables the contamination filtering."
                 },
                 "rrna": {
@@ -290,35 +292,25 @@
             "description": "Switches to skip specific pipeline steps, if desired.",
             "fa_icon": "fas fa-fast-forward",
             "properties": {
-                "skip_qc": {
-                    "type": "boolean",
-                    "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip all QC steps",
-                    "default": false
-                },
                 "skip_fastqc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip FastQC",
-                    "default": false
+                    "description": "Skip FastQC"
                 },
                 "skip_mirdeep": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip miRDeep",
-                    "default": false
+                    "description": "Skip miRDeep"
                 },
                 "skip_multiqc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip MultiQC",
-                    "default": false
+                    "description": "Skip MultiQC"
                 },
-                "skip_trimming": {
+                "skip_fastp": {
                     "type": "boolean",
-                    "fa_icon": "fas fa-fast-forward",
-                    "description": "Skip all trimming steps.",
-                    "default": false
+                    "description": "Skip FastP",
+                    "fa_icon": "fas fa-forward"
                 }
             }
         },
@@ -399,7 +391,7 @@
                     "description": "Maximum amount of time that can be requested for any single job.",
                     "default": "240.h",
                     "fa_icon": "far fa-clock",
-                    "pattern": "^(\\d+\\.?\\s*(s|m|h|day)\\s*)+$",
+                    "pattern": "^(\\d+\\.?\\s*(s|m|h|d|day)\\s*)+$",
                     "hidden": true,
                     "help_text": "Use to set an upper-limit for the time requirement for each process. Should be a string in the format integer-unit e.g. `--max_time '2.h'`"
                 }
@@ -416,6 +408,14 @@
                     "type": "boolean",
                     "description": "Display help text.",
                     "fa_icon": "fas fa-question-circle",
+                    "default": false,
+                    "hidden": true
+                },
+                "version": {
+                    "type": "boolean",
+                    "description": "Display version and exit.",
+                    "fa_icon": "fas fa-question-circle",
+                    "default": false,
                     "hidden": true
                 },
                 "publish_dir_mode": {
@@ -439,6 +439,7 @@
                     "type": "boolean",
                     "description": "Send plain-text email instead of HTML.",
                     "fa_icon": "fas fa-remove-format",
+                    "default": false,
                     "hidden": true
                 },
                 "max_multiqc_email_size": {
@@ -453,20 +454,33 @@
                     "type": "boolean",
                     "description": "Do not use coloured log outputs.",
                     "fa_icon": "fas fa-palette",
+                    "default": false,
+                    "hidden": true
+                },
+                "hook_url": {
+                    "type": "string",
+                    "description": "Incoming hook URL for messaging service",
+                    "fa_icon": "fas fa-people-group",
+                    "help_text": "Incoming hook URL for messaging service. Currently, MS Teams and Slack are supported.",
                     "hidden": true
                 },
                 "multiqc_config": {
                     "type": "string",
+                    "format": "file-path",
                     "description": "Custom config file to supply to MultiQC.",
                     "fa_icon": "fas fa-cog",
                     "hidden": true
                 },
-                "tracedir": {
+                "multiqc_logo": {
                     "type": "string",
-                    "description": "Directory to keep pipeline Nextflow logs and reports.",
-                    "default": "${params.outdir}/pipeline_info",
-                    "fa_icon": "fas fa-cogs",
+                    "description": "Custom logo file to supply to MultiQC. File name must also be set in the MultiQC config file",
+                    "fa_icon": "fas fa-image",
                     "hidden": true
+                },
+                "multiqc_methods_description": {
+                    "type": "string",
+                    "description": "Custom MultiQC yaml file containing HTML including a methods description.",
+                    "fa_icon": "fas fa-cog"
                 },
                 "validate_params": {
                     "type": "boolean",
@@ -475,18 +489,29 @@
                     "fa_icon": "fas fa-check-square",
                     "hidden": true
                 },
-                "show_hidden_params": {
+                "validationShowHiddenParams": {
                     "type": "boolean",
                     "fa_icon": "far fa-eye-slash",
                     "description": "Show all params when using `--help`",
+                    "default": false,
                     "hidden": true,
                     "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
                 },
-                "enable_conda": {
+                "validationFailUnrecognisedParams": {
                     "type": "boolean",
-                    "description": "Run this workflow with Conda. You can also use '-profile conda' instead of providing this parameter.",
+                    "fa_icon": "far fa-check-circle",
+                    "description": "Validation of parameters fails when an unrecognised parameter is found.",
+                    "default": false,
                     "hidden": true,
-                    "fa_icon": "fas fa-bacon"
+                    "help_text": "By default, when an unrecognised parameter is found, it returns a warinig."
+                },
+                "validationLenientMode": {
+                    "type": "boolean",
+                    "fa_icon": "far fa-check-circle",
+                    "description": "Validation of parameters in lenient more.",
+                    "default": false,
+                    "hidden": true,
+                    "help_text": "Allows string values that are parseable as numbers or booleans. For further information see [JSONSchema docs](https://github.com/everit-org/json-schema#lenient-mode)."
                 }
             }
         }

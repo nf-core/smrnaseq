@@ -6,16 +6,10 @@ include { MIRTRACE_RUN } from '../../modules/local/mirtrace'
 
 workflow MIRTRACE {
     take:
-    reads      // channel: [ val(meta), [ reads ] ]
+    reads      // channel: [ val(adapterseq), [ val(ids) ], [ path(reads) ] ]
 
     main:
-    reads
-        .map { it[1] }
-        .flatten()
-        .dump(tag:'mirtrace')
-        .set { all_reads }
-
-    MIRTRACE_RUN ( all_reads.collect() )
+    reads | MIRTRACE_RUN
 
     emit:
     results    = MIRTRACE_RUN.out.mirtrace

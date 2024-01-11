@@ -1,10 +1,10 @@
 process BOWTIE_MAP_CONTAMINANTS {
     label 'process_medium'
 
-    conda (params.enable_conda ? 'bowtie2=2.4.5' : null)
+    conda 'bowtie2=2.4.5'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/bowtie2:2.4.5--py39hd2f7db1_2' :
-        'quay.io/biocontainers/bowtie2:2.4.5--py36hfca12d5_2' }"
+        'biocontainers/bowtie2:2.4.5--py36hfca12d5_2' }"
 
     input:
     tuple val(meta), path(reads)
@@ -17,16 +17,20 @@ process BOWTIE_MAP_CONTAMINANTS {
     path "versions.yml"                                         , emit: versions
     path "filtered.*.stats"                                     , emit: stats
 
+    when:
+    task.ext.when == null || task.ext.when
+
     script:
-    def index_base = index.toString().tokenize(' ')[0].tokenize('.')[0]
     """
+    INDEX=`find -L ./ -name "*.3.ebwt" | sed 's/.3.ebwt//'`
     bowtie2 \\
         --threads ${task.cpus} \\
         --very-sensitive-local \\
         -k 1 \\
-        -x $index_base \\
+        -x \$INDEX \\
         --un ${meta.id}.${contaminant_type}.filter.unmapped.contaminant.fastq \\
         ${reads} \\
+        ${args} \\
         -S ${meta.id}.filter.contaminant.sam > ${meta.id}.contaminant_bowtie.log 2>&1
 
     # extracting number of reads from bowtie logs

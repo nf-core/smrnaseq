@@ -3,39 +3,77 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unpublished Version / DEV]
-
-### Enhancements & fixes
-
-- Trimmed output was not as documented and not correctly published [#161](https://github.com/nf-core/smrnaseq/issues/161)
-
-### Other enhancements
-
-- [#55](https://github.com/nf-core/smrnaseq/issues/12) - Enabled the use of `MirGeneDB` as an alternative database insted of `miRBase`
-- [#113](https://github.com/nf-core/smrnaseq/issues/113) - Added a optional contamination filtering step, including MultiQC plot.
+## [dev](https://github.com/nf-core/smrnaseq/branch/dev)
 
 ### Parameters
 
 | Old parameter | New parameter               |
 | ------------- | --------------------------- |
-|               | `--mirGeneDB`               |
-|               | `--mirGeneDB_species`       |
-|               | `--mirGeneDB_gff`           |
-|               | `--mirGeneDB_mature`        |
-|               | `--mirGeneDB_hairpin`       |
-|               | `--contamination_filter`    |
-|               | `--rrna`                    |
-|               | `--trna`                    |
-|               | `--cdna`                    |
-|               | `--ncrna`                   |
-|               | `--pirna`                   |
-|               | `--other_contamination`     |
 |               | `--with_umi`                |
 |               | `--umitools_extract_method` |
 |               | `--umitools_bc_pattern`     |
 |               | `--umi_discard_read`        |
 |               | `--save_umi_intermeds`      |
 |               | `--umi_merge_unmapped`      |
+
+
+## [v2.2.4](https://github.com/nf-core/smrnaseq/releases/tag/2.2.4) - 2023-11-03
+
+- Update template to 2.10
+- [[#289]](https://github.com/nf-core/smrnaseq/issues/289) - Bugfix for issue with mirdeep2 channels ()
+- [[#288]](https://github.com/nf-core/smrnaseq/issues/288) - Bugfix for issue with handling malformed GFF3 from mirbase
+- Updated dependencies, including FASTQC, MultiQC 1.17, fastP and samtools to latest versions
+
+## [v2.2.3](https://github.com/nf-core/smrnaseq/releases/tag/2.2.3) - 2023-09-06
+
+- [[#271]](https://github.com/nf-core/smrnaseq/issues/271) - Bugfix for parsing hairpin and mature fasta files
+
+## [v2.2.2](https://github.com/nf-core/smrnaseq/releases/tag/2.2.2) - 2023-09-04
+
+- [[#253]](https://github.com/nf-core/smrnaseq/pull/253) - Remove globs from process alias when using ECR containers
+- [[#237]](https://github.com/nf-core/smrnaseq/issues/237) - Fix illumina protocol clip parameters to default
+- Remove public_aws_ecr profile
+- [[#269]](https://github.com/nf-core/smrnaseq/pull/269) - Updated miRBase URLs with new location (old ones were broken)
+
+### Software dependencies
+
+| Dependency | Old version | New version |
+| ---------- | ----------- | ----------- |
+| `multiqc`  | 1.13        | 1.15        |
+| `fastp`    | 0.23.2      | 0.23.4      |
+
+## [v2.2.1](https://github.com/nf-core/smrnaseq/releases/tag/2.2.1) - 2023-05-12
+
+### Enhancements & fixes
+
+- [[#238](https://github.com/nf-core/smrnaseq/issues/238)] - Restored the missing mirtop outputs
+- [[#242](https://github.com/nf-core/smrnaseq/issues/242)] - Fixed mirtrace using wrong input fastq files (untrimmed)
+
+## [v2.2.0](https://github.com/nf-core/smrnaseq/releases/tag/2.2.0) - 2023-04-26
+
+- [[#220](https://github.com/nf-core/smrnaseq/issues/220)] - Fixed an issue where miRTrace reports fastq basename instead of sample ID
+- [[#208](https://github.com/nf-core/smrnaseq/issues/208)] - Fixed usability of `--skip_qc` parameter
+- Updated FASTP module to allow direct addition of adapter_fasta file to it
+- [[#205](https://github.com/nf-core/smrnaseq/issues/205)] - Fix mirTrace Report to be a single report again instead of per sample reports
+- [[#206](https://github.com/nf-core/smrnaseq/issues/206)] - Use % as separator in sed commands to enable conda working properly on OSX and Linux
+- [[#207](https://github.com/nf-core/smrnaseq/issues/224)] - Fix Samplesheet print error
+- Group samples by adapter sequence before running mirtrace
+- Remove `--skip_qc` parameter
+
+## [v2.1.0](https://github.com/nf-core/smrnaseq/releases/tag/2.1.0) - 2022-10-20 Maroon Tin Dalmatian
+
+### Enhancements & fixes
+
+- [[#12](https://github.com/nf-core/smrnaseq/issues/12)] - Enabled the use of `MirGeneDB` as an alternative database insted of `miRBase`
+- [[#113](https://github.com/nf-core/smrnaseq/issues/113)] - Added a optional contamination filtering step, including MultiQC plot
+- [[#137](https://github.com/nf-core/smrnaseq/issues/137)] - Fixed issue with mirTop and MultiQC by upgrading to MultiQC V1.13dev
+- [[#159](https://github.com/nf-core/smrnaseq/issues/159)] - Index files were not collected when `bowtie_index` was used and thus mapping was failing
+- [[#161](https://github.com/nf-core/smrnaseq/issues/161)] - Trimmed output was not as documented and not correctly published
+- [[#168](https://github.com/nf-core/smrnaseq/issues/168)] - Removed `mirtrace_protocol` as the parameter was redundant and `params.protocol` is entirely sufficient
+- Updated pipeline template to [nf-core/tools 2.6.0](https://github.com/nf-core/tools/releases/tag/2.6.0)
+- [[#188](https://github.com/nf-core/smrnaseq/pull/188)] - Dropped TrimGalore in favor of fastp QC and adapter trimming, improved handling of adapters and trimming parameters
+- [[#194](https://github.com/nf-core/smrnaseq/issues/194)] - Added default adapters file for FastP improved miRNA adapter trimming
+
 
 ## [v2.0.0](https://github.com/nf-core/smrnaseq/releases/tag/2.0.0) - 2022-05-31 Aqua Zinc Chihuahua
 

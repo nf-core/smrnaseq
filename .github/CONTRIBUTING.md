@@ -9,7 +9,9 @@ Please use the pre-filled template to save time.
 However, don't be put off by this template - other more general issues and suggestions are welcome!
 Contributions to the code are even more welcome ;)
 
-> If you need help using or modifying nf-core/smrnaseq then the best place to ask is on the nf-core Slack [#smrnaseq](https://nfcore.slack.com/channels/smrnaseq) channel ([join our Slack here](https://nf-co.re/join/slack)).
+:::info
+If you need help using or modifying nf-core/smrnaseq then the best place to ask is on the nf-core Slack [#smrnaseq](https://nfcore.slack.com/channels/smrnaseq) channel ([join our Slack here](https://nf-co.re/join/slack)).
+:::
 
 ## Contribution workflow
 
@@ -101,3 +103,18 @@ If you are using a new feature from core Nextflow, you may bump the minimum requ
 ### Images and figures
 
 For overview images and other documents we follow the nf-core [style guidelines and examples](https://nf-co.re/developers/design_guidelines).
+
+## GitHub Codespaces
+
+This repo includes a devcontainer configuration which will create a GitHub Codespaces for Nextflow development! This is an online developer environment that runs in your browser, complete with VSCode and a terminal.
+
+To get started:
+
+- Open the repo in [Codespaces](https://github.com/nf-core/smrnaseq/codespaces)
+- Tools installed
+  - nf-core
+  - Nextflow
+
+Devcontainer specs:
+
+- [DevContainer config](.devcontainer/devcontainer.json)
