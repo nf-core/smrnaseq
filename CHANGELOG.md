@@ -5,7 +5,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [dev](https://github.com/nf-core/smrnaseq/branch/dev)
 
-- _nothing yet done_
+### Parameters
+
+| Old parameter | New parameter               |
+| ------------- | --------------------------- |
+|               | `--with_umi`                |
+|               | `--umitools_extract_method` |
+|               | `--umitools_bc_pattern`     |
+|               | `--umi_discard_read`        |
+|               | `--save_umi_intermeds`      |
+|               | `--umi_merge_unmapped`      |
+
 
 ## [v2.2.4](https://github.com/nf-core/smrnaseq/releases/tag/2.2.4) - 2023-11-03
 
@@ -64,22 +74,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#188](https://github.com/nf-core/smrnaseq/pull/188)] - Dropped TrimGalore in favor of fastp QC and adapter trimming, improved handling of adapters and trimming parameters
 - [[#194](https://github.com/nf-core/smrnaseq/issues/194)] - Added default adapters file for FastP improved miRNA adapter trimming
 
-### Parameters
-
-| Old parameter | New parameter            |
-| ------------- | ------------------------ |
-|               | `--mirgenedb`            |
-|               | `--mirgenedb_species`    |
-|               | `--mirgenedb_gff`        |
-|               | `--mirgenedb_mature`     |
-|               | `--mirgenedb_hairpin`    |
-|               | `--contamination_filter` |
-|               | `--rrna`                 |
-|               | `--trna`                 |
-|               | `--cdna`                 |
-|               | `--ncrna`                |
-|               | `--pirna`                |
-|               | `--other_contamination`  |
 
 ## [v2.0.0](https://github.com/nf-core/smrnaseq/releases/tag/2.0.0) - 2022-05-31 Aqua Zinc Chihuahua
 
@@ -98,19 +92,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Other enhancements & fixes
 
 - [#134](https://github.com/nf-core/smrnaseq/issues/134) - Fixed colSum of zero issues for edgeR_miRBase.R script
+- [#49](https://github.com/nf-core/smrnaseq/issues/49) - Integrated the existing umitools modules into the pipeline and extend the deduplication step.
 - [#55](https://github.com/lpantano/seqcluster/pull/55) - update seqcluster to fix UMI-detecting bug
-
-### Parameters
-
-| Old parameter        | New parameter    |
-| -------------------- | ---------------- |
-| `--conda`            | `--enable_conda` |
-| `--clusterOptions`   |                  |
-| `--publish_dir_mode` |                  |
-
-> **NB:** Parameter has been **updated** if both old and new parameter information is present.
-> **NB:** Parameter has been **added** if just the new parameter information is present.
-> **NB:** Parameter has been **removed** if parameter information isn't present.
 
 ### Software dependencies
 
@@ -133,6 +116,7 @@ Note, since the pipeline is now using Nextflow DSL2, each process will be run wi
 | `seqkit`             | 0.16.0      | 2.0.0       |
 | `trim-galore`        | 0.6.6       | 0.6.7       |
 | `bioconvert`         | -           | 0.4.3       |
+| `umi_tools`          | -           | 1.1.2       |
 | `htseq`              | -           | -           |
 | `markdown`           | -           | -           |
 | `pymdown-extensions` | -           | -           |
