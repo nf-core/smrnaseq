@@ -5,6 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.3dev - [date]
 
+- [[#299]](https://github.com/nf-core/smrnaseq/issues/299) - Bugfix for missing inputs in BAM stats (`genome_quant.r`)
 - [[#164]](https://github.com/nf-core/smrnaseq/pull/164) - UMI Handling Feature implemented in the pipeline
 - [[#302]](https://github.com/nf-core/smrnaseq/pull/302) - Merged in nf-core template v2.11.1
 
