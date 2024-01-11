@@ -3,7 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [dev](https://github.com/nf-core/smrnaseq/branch/dev)
+## v2.3dev - [date]
+
+- [[#164]](https://github.com/nf-core/smrnaseq/pull/164) - UMI Handling Feature implemented in the pipeline
+- [[#302]](https://github.com/nf-core/smrnaseq/pull/302) - Merged in nf-core template v2.11.1
 
 ### Parameters
 
@@ -15,7 +18,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 |               | `--umi_discard_read`        |
 |               | `--save_umi_intermeds`      |
 |               | `--umi_merge_unmapped`      |
-
 
 ## [v2.2.4](https://github.com/nf-core/smrnaseq/releases/tag/2.2.4) - 2023-11-03
 
@@ -73,7 +75,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Updated pipeline template to [nf-core/tools 2.6.0](https://github.com/nf-core/tools/releases/tag/2.6.0)
 - [[#188](https://github.com/nf-core/smrnaseq/pull/188)] - Dropped TrimGalore in favor of fastp QC and adapter trimming, improved handling of adapters and trimming parameters
 - [[#194](https://github.com/nf-core/smrnaseq/issues/194)] - Added default adapters file for FastP improved miRNA adapter trimming
-
 
 ## [v2.0.0](https://github.com/nf-core/smrnaseq/releases/tag/2.0.0) - 2022-05-31 Aqua Zinc Chihuahua
 
