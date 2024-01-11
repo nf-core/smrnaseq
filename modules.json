@@ -5,6 +5,11 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+                    "cat/cat": {
+                        "branch": "master",
+                        "git_sha": "d593e8f6b7d1bbbb2acf43a4b9efeeac8d6720f2",
+                        "installed_by": ["modules"]
+                    },
                     "cat/fastq": {
                         "branch": "master",
                         "git_sha": "516189e968feb4ebdd9921806988b4c12b4ac2dc",
@@ -17,17 +22,22 @@
                     },
                     "fastp": {
                         "branch": "master",
-                        "git_sha": "516189e968feb4ebdd9921806988b4c12b4ac2dc",
-                        "installed_by": ["modules"]
+                        "git_sha": "d086322563bdbb08c94bf15a7db58a39ccdb1520",
+                        "installed_by": ["fastq_fastqc_umitools_fastp", "modules"]
                     },
                     "fastqc": {
                         "branch": "master",
                         "git_sha": "516189e968feb4ebdd9921806988b4c12b4ac2dc",
-                        "installed_by": ["modules"]
+                        "installed_by": ["fastq_fastqc_umitools_fastp", "modules"]
                     },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "516189e968feb4ebdd9921806988b4c12b4ac2dc",
+                        "git_sha": "8ec825f465b9c17f9d83000022995b4f7de6fe93",
+                        "installed_by": ["modules"]
+                    },
+                    "samtools/bam2fq": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905",
                         "installed_by": ["modules"]
                     },
                     "samtools/flagstat": {
@@ -54,6 +64,16 @@
                         "branch": "master",
                         "git_sha": "516189e968feb4ebdd9921806988b4c12b4ac2dc",
                         "installed_by": ["modules", "bam_stats_samtools"]
+                    },
+                    "umitools/dedup": {
+                        "branch": "master",
+                        "git_sha": "9d489648a7425fa18d8bed18935442c104d8733c",
+                        "installed_by": ["modules"]
+                    },
+                    "umitools/extract": {
+                        "branch": "master",
+                        "git_sha": "5e34754d42cd2d5d248ca8673c0a53cdf5624905",
+                        "installed_by": ["fastq_fastqc_umitools_fastp", "modules"]
                     }
                 }
             },
@@ -68,6 +88,11 @@
                         "branch": "master",
                         "git_sha": "cfd937a668919d948f6fcbf4218e79de50c2f36f",
                         "installed_by": ["subworkflows", "bam_sort_stats_samtools"]
+                    },
+                    "fastq_fastqc_umitools_fastp": {
+                        "branch": "master",
+                        "git_sha": "3e8b0c1144ccf60b7848efbdc2be285ff20b49ee",
+                        "installed_by": ["subworkflows"]
                     }
                 }
             }
