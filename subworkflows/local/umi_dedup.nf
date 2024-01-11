@@ -5,9 +5,10 @@
 include { INDEX_GENOME                        } from '../../modules/local/bowtie_genome'
 include { BOWTIE_MAP_SEQ as UMI_MAP_GENOME    } from '../../modules/local/bowtie_map_mirna'
 include { BAM_SORT_STATS_SAMTOOLS             } from '../../subworkflows/nf-core/bam_sort_stats_samtools'
-include { UMITOOLS_DEDUP                      } from '../../modules/nf-core/modules/umitools/dedup/main'
-include { SAMTOOLS_BAM2FQ                     } from '../../modules/nf-core/modules/samtools/bam2fq/main'
-include { CAT_CAT                             } from '../../modules/nf-core/modules/cat/cat/main'
+include { UMITOOLS_DEDUP                      } from '../../modules/nf-core/umitools/dedup/main'
+include { SAMTOOLS_BAM2FQ                     } from '../../modules/nf-core/samtools/bam2fq/main'
+include { CAT_CAT                             } from '../../modules/nf-core/cat/cat/main'
+
 
 workflow DEDUPLICATE_UMIS {
     take:
