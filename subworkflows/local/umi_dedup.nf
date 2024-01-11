@@ -1,10 +1,10 @@
-// 
+//
 // Deduplicate the UMI reads by mapping them to the complete genome.
 //
 
 include { INDEX_GENOME                        } from '../../modules/local/bowtie_genome'
 include { BOWTIE_MAP_SEQ as UMI_MAP_GENOME    } from '../../modules/local/bowtie_map_mirna'
-include { BAM_SORT_SAMTOOLS                   } from '../../subworkflows/nf-core/bam_sort_samtools'
+include { BAM_SORT_STATS_SAMTOOLS             } from '../../subworkflows/nf-core/bam_sort_stats_samtools'
 include { UMITOOLS_DEDUP                      } from '../../modules/nf-core/modules/umitools/dedup/main'
 include { SAMTOOLS_BAM2FQ                     } from '../../modules/nf-core/modules/samtools/bam2fq/main'
 include { CAT_CAT                             } from '../../modules/nf-core/modules/cat/cat/main'
@@ -31,7 +31,7 @@ workflow DEDUPLICATE_UMIS {
     }
 
     if (bt_index){
-        
+
         UMI_MAP_GENOME ( reads, bt_index.collect() )
         ch_versions = ch_versions.mix(UMI_MAP_GENOME.out.versions)
 
@@ -54,7 +54,7 @@ workflow DEDUPLICATE_UMIS {
                 .join(UMI_MAP_GENOME.out.unmapped)
                 .map { meta, file1, file2 -> [meta, [file1, file2]]}
                 .set { ch_cat }
-    
+
             CAT_CAT ( ch_cat )
             ch_dedup_reads = CAT_CAT.out.file_out
         }
