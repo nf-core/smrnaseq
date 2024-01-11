@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [dev](https://github.com/nf-core/smrnaseq/branch/dev)
 
-- _nothing yet done_
+- [[#299]](https://github.com/nf-core/smrnaseq/issues/299) - Bugfix for missing inputs in BAM stats (`genome_quant.r`)
 
 ## [v2.2.4](https://github.com/nf-core/smrnaseq/releases/tag/2.2.4) - 2023-11-03
 
