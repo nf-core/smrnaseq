@@ -23,7 +23,7 @@ process MIRDEEP2_PIGZ {
     pigz -f -d -p $task.cpus $reads
 
     cat <<-END_VERSIONS > versions.yml
-    ${task.process}":
+    "${task.process}":
         pigz: \$( pigz --version 2>&1 | sed 's/pigz //g' )
     END_VERSIONS
     """

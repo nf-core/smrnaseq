@@ -27,10 +27,10 @@ It should point to the 3-letter species name used by [miRBase](https://www.mirba
 Different parameters can be set for the two supported databases. By default `miRBase` will be used with the parameters below.
 
 - `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRbase: `https://mirbase.org/download/CURRENT/genomes/${params.mirtrace_species}.gff3`
-- `mature`: points to the FASTA file of mature miRNA sequences. `https://mirbase.org/download/CURRENT/mature.fa`
-- `hairpin`: points to the FASTA file of precursor miRNA sequences. `https://mirbase.org/download/CURRENT/hairpin.fa`
+- `mature`: points to the FASTA file of mature miRNA sequences. `https://mirbase.org/download/mature.fa`
+- `hairpin`: points to the FASTA file of precursor miRNA sequences. `https://mirbase.org/download/hairpin.fa`
 
-If MirGeneDB should be used instead it needs to be specified using `--mirgenedb` and use the parameters below .
+If MirGeneDB should be used instead it needs to be specified using `--mirgenedb` and use the parameters below.
 
 - `mirgenedb_gff`: The data can not be downloaded automatically (URLs are created with short term tokens in it), thus the user needs to supply the gff file for either his species, or all species downloaded from `https://mirgenedb.org/download`. The total set will automatically be subsetted to the species specified with `--mirgenedb_species`.
 - `mirgenedb_mature`: points to the FASTA file of mature miRNA sequences. Download from `https://mirgenedb.org/download`.
