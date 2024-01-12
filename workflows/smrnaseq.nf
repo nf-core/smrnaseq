@@ -72,7 +72,7 @@ include { MIRNA_QUANT           } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT          } from '../subworkflows/local/genome_quant'
 include { MIRTRACE              } from '../subworkflows/local/mirtrace'
 include { MIRDEEP2              } from '../subworkflows/local/mirdeep2'
-include { INDEX_GENOME          } from '../../modules/local/bowtie_genome'
+include { INDEX_GENOME          } from '../modules/local/bowtie_genome'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
