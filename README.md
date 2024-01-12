@@ -30,7 +30,8 @@ You can find numerous talks on the nf-core events page from various topics inclu
 1. Quality check and triming
    1. Raw read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
    2. Adapter trimming ([`fastp`](https://github.com/OpenGene/fastp))
-   3. Trim read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
+   3. UMI barcode extraction ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools))
+   4. Trim read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. miRNA QC ([`miRTrace`](https://github.com/friedlanderlab/mirtrace))
 3. Contamination filtering ([`Bowtie2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) (Optional)
    1. rRNA filtration
@@ -39,7 +40,8 @@ You can find numerous talks on the nf-core events page from various topics inclu
    4. ncRNA filtration
    5. piRNA filtration
    6. Others filtration
-4. miRNA quantification
+4. UMI barcode deduplication ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools))
+5. miRNA quantification
    - EdgeR
      1. Reads alignment against miRBase mature miRNA ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
      2. Post-alignment processing of alignment against Mature miRNA ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
@@ -52,21 +54,19 @@ You can find numerous talks on the nf-core events page from various topics inclu
    - Mirtop quantification
      1. Read collapsing ([`seqcluster`](https://github.com/lpantano/seqcluster))
      2. miRNA and isomiR annotation ([`mirtop`](https://github.com/miRTop/mirtop))
-5. Genome Quantification (Optional)
+6. Genome Quantification (Optional)
    1. Reads alignment against host reference genome ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
    2. Post-alignment processing of alignment against host reference genome ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-6. Novel miRNAs and known miRNAs discovery ([`MiRDeep2`](https://www.mdc-berlin.de/content/mirdeep2-documentation)) (Optional)
+7. Novel miRNAs and known miRNAs discovery ([`MiRDeep2`](https://www.mdc-berlin.de/content/mirdeep2-documentation)) (Optional)
    1. Mapping against reference genome with the mapper module
    2. Known and novel miRNA discovery with the mirdeep2 module
-7. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
+8. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
+
 
 ## Usage
 
-:::note
-If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how
-to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline)
-with `-profile test` before running the workflow on actual data.
-:::
+> [!NOTE]
+> If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
 
 First, prepare a samplesheet with your input data that looks as follows:
 
@@ -98,11 +98,9 @@ nextflow run nf-core/smrnaseq \
   --outdir <OUTDIR>
 ```
 
-:::warning
-Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those
-provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
-see [docs](https://nf-co.re/usage/configuration#custom-configuration-files).
-:::
+> [!WARNING]
+> Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
+> see [docs](https://nf-co.re/usage/configuration#custom-configuration-files).
 
 For more details and further functionality, please refer to the [usage documentation](https://nf-co.re/smrnaseq/usage) and the [parameter documentation](https://nf-co.re/smrnaseq/parameters).
 

@@ -50,6 +50,54 @@
                 }
             }
         },
+        "umi_options": {
+            "title": "UMI options",
+            "type": "object",
+            "description": "Options for processing reads with unique molecular identifiers",
+            "default": "",
+            "properties": {
+                "with_umi": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-barcode",
+                    "description": "Enable UMI-based read deduplication."
+                },
+                "umitools_extract_method": {
+                    "type": "string",
+                    "default": "string",
+                    "fa_icon": "fas fa-barcode",
+                    "description": "UMI pattern to use. Can be either 'string' (default) or 'regex'.",
+                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).\n"
+                },
+                "skip_umi_extract": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-compress-alt",
+                    "description": "Skip the UMI extraction from the read in case the UMIs have been moved to the headers in advance of the pipeline run."
+                },
+                "umitools_bc_pattern": {
+                    "type": "string",
+                    "fa_icon": "fas fa-barcode",
+                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).",
+                    "description": "The UMI barcode pattern to use e.g. 'NNNNNN' indicates that the first 6 nucleotides of the read are from the UMI."
+                },
+                "umi_discard_read": {
+                    "type": "integer",
+                    "fa_icon": "fas fa-barcode",
+                    "description": "After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively."
+                },
+                "save_umi_intermeds": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-save",
+                    "description": "If this option is specified, intermediate FastQ and BAM files produced by UMI-tools are also saved in the results directory."
+                },
+                "umi_merge_unmapped": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-save",
+                    "description": "Unless deactivated the deduplicated reads are merged with the reads that could not be placed to reduce the potential reference bias",
+                    "default": true
+                }
+            },
+            "fa_icon": "fas fa-barcode"
+        },
         "reference_genome_options": {
             "title": "Reference genome options",
             "type": "object",
@@ -162,7 +210,6 @@
                 },
                 "three_prime_adapter": {
                     "type": "string",
-                    "default": "TGGAATTCTCGGGTGCCAAGG",
                     "fa_icon": "fas fa-text-width",
                     "description": "Sequencing adapter sequence to use for trimming."
                 },
@@ -194,6 +241,12 @@
                     "default": "${projectDir}/assets/known_adapters.fa",
                     "description": "FastA with known miRNA adapter sequences for adapter trimming",
                     "fa_icon": "far fa-question-circle"
+                },
+                "min_trimmed_reads": {
+                    "type": "integer",
+                    "default": 10,
+                    "fa_icon": "far fa-window-minimize",
+                    "description": "Minimum number of reads required in input file to use it"
                 }
             }
         },
@@ -361,14 +414,12 @@
                     "type": "boolean",
                     "description": "Display help text.",
                     "fa_icon": "fas fa-question-circle",
-                    "default": false,
                     "hidden": true
                 },
                 "version": {
                     "type": "boolean",
                     "description": "Display version and exit.",
                     "fa_icon": "fas fa-question-circle",
-                    "default": false,
                     "hidden": true
                 },
                 "publish_dir_mode": {
@@ -392,7 +443,6 @@
                     "type": "boolean",
                     "description": "Send plain-text email instead of HTML.",
                     "fa_icon": "fas fa-remove-format",
-                    "default": false,
                     "hidden": true
                 },
                 "max_multiqc_email_size": {
@@ -407,7 +457,6 @@
                     "type": "boolean",
                     "description": "Do not use coloured log outputs.",
                     "fa_icon": "fas fa-palette",
-                    "default": false,
                     "hidden": true
                 },
                 "hook_url": {
@@ -446,7 +495,6 @@
                     "type": "boolean",
                     "fa_icon": "far fa-eye-slash",
                     "description": "Show all params when using `--help`",
-                    "default": false,
                     "hidden": true,
                     "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
                 },
@@ -454,7 +502,6 @@
                     "type": "boolean",
                     "fa_icon": "far fa-check-circle",
                     "description": "Validation of parameters fails when an unrecognised parameter is found.",
-                    "default": false,
                     "hidden": true,
                     "help_text": "By default, when an unrecognised parameter is found, it returns a warinig."
                 },
@@ -462,9 +509,11 @@
                     "type": "boolean",
                     "fa_icon": "far fa-check-circle",
                     "description": "Validation of parameters in lenient more.",
-                    "default": false,
                     "hidden": true,
                     "help_text": "Allows string values that are parseable as numbers or booleans. For further information see [JSONSchema docs](https://github.com/everit-org/json-schema#lenient-mode)."
+                },
+                "save_merged": {
+                    "type": "boolean"
                 }
             }
         }
@@ -472,6 +521,9 @@
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/umi_options"
         },
         {
             "$ref": "#/definitions/reference_genome_options"

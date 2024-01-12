@@ -64,13 +64,14 @@ if (!params.mirgenedb) {
     if (params.mirgenedb_gff) { mirna_gtf = file(params.mirgenedb_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found: ${params.mirgenedb_gff}"}
 }
 
-include { INPUT_CHECK        } from '../subworkflows/local/input_check'
-include { FASTQC_FASTP       } from '../subworkflows/local/fastqc_fastp'
-include { CONTAMINANT_FILTER } from '../subworkflows/local/contaminant_filter'
-include { MIRNA_QUANT        } from '../subworkflows/local/mirna_quant'
-include { GENOME_QUANT       } from '../subworkflows/local/genome_quant'
-include { MIRTRACE           } from '../subworkflows/local/mirtrace'
-include { MIRDEEP2           } from '../subworkflows/local/mirdeep2'
+include { INPUT_CHECK           } from '../subworkflows/local/input_check'
+include { FASTQ_FASTQC_UMITOOLS_FASTP } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
+include { DEDUPLICATE_UMIS      } from '../subworkflows/local/umi_dedup'
+include { CONTAMINANT_FILTER    } from '../subworkflows/local/contaminant_filter'
+include { MIRNA_QUANT           } from '../subworkflows/local/mirna_quant'
+include { GENOME_QUANT          } from '../subworkflows/local/genome_quant'
+include { MIRTRACE              } from '../subworkflows/local/mirtrace'
+include { MIRDEEP2              } from '../subworkflows/local/mirdeep2'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -131,23 +132,48 @@ workflow SMRNASEQ {
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
     //
-    // SUBWORKFLOW: Read QC and trim adapters
+    // SUBWORKFLOW: Read QC, extract UMI and trim adapters & dedup UMIs if necessary / desired by the user
     //
 
-    FASTQC_FASTP (
+    FASTQ_FASTQC_UMITOOLS_FASTP (
         ch_cat_fastq,
-        ch_fastp_adapters,
-        false,
-        false
+        params.skip_fastqc,
+        params.with_umi,
+        params.skip_umi_extract,
+        params.umi_discard_read,
+        params.skip_fastp,
+        params.fastp_known_mirna_adapters,
+        params.save_trimmed_fail,
+        params.save_merged,
+        params.min_trimmed_reads
     )
-    ch_versions = ch_versions.mix(FASTQC_FASTP.out.versions)
+    ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.versions)
+
+    reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
+
+    //
+    // SUBWORKFLOW: Deduplicate UMIs by mapping them to the genome
+    //
+    if (params.with_umi){
+        if (fasta){
+            fasta_ch = file(fasta)
+            DEDUPLICATE_UMIS (
+                fasta_ch,
+                bt_index,
+                FASTQC_UMITOOLS_FASTP.out.trim_reads
+            )
+            reads_for_mirna = DEDUPLICATE_UMIS.out.reads
+            ch_versions = ch_versions.mix(DEDUPLICATE_UMIS.out.versions)
+        }
+    }
+
 
     //
     // SUBWORKFLOW: mirtrace QC
     //
-    FASTQC_FASTP.out.adapterseq
-    .join( FASTQC_FASTP.out.reads )
-    .map { meta, adapterseq, reads -> [adapterseq, meta.id, reads] }
+    FASTQ_FASTQC_UMITOOLS_FASTP.out.adapter_seq
+    .join( FASTQ_FASTQC_UMITOOLS_FASTP.out.reads )
+    .map { meta, adapter_seq, reads -> [adapter_seq, meta.id, reads] }
     .groupTuple()
     .set { ch_mirtrace_inputs }
 
@@ -159,7 +185,7 @@ workflow SMRNASEQ {
     // SUBWORKFLOW: remove contaminants from reads
     //
     contamination_stats = Channel.empty()
-    mirna_reads = FASTQC_FASTP.out.reads
+    mirna_reads = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
     if (params.filter_contamination){
         CONTAMINANT_FILTER (
             reference_hairpin,
@@ -169,7 +195,7 @@ workflow SMRNASEQ {
             params.ncrna,
             params.pirna,
             params.other_contamination,
-            FASTQC_FASTP.out.reads
+            FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
         )
 
         contamination_stats = CONTAMINANT_FILTER.out.filter_stats
@@ -200,7 +226,7 @@ workflow SMRNASEQ {
 
         if (!params.skip_mirdeep) {
             MIRDEEP2 (
-                FASTQC_FASTP.out.reads,
+                FASTQ_FASTQC_UMITOOLS_FASTP.out.reads,
                 GENOME_QUANT.out.fasta,
                 GENOME_QUANT.out.index.collect(),
                 hairpin_clean,
@@ -229,9 +255,9 @@ workflow SMRNASEQ {
         ch_multiqc_files = Channel.empty()
         ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
         ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.fastqc_trim_zip.collect{it[1]}.ifEmpty([]))
-        // ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.trim_json.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_json.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
