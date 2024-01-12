@@ -241,6 +241,12 @@
                     "default": "${projectDir}/assets/known_adapters.fa",
                     "description": "FastA with known miRNA adapter sequences for adapter trimming",
                     "fa_icon": "far fa-question-circle"
+                },
+                "min_trimmed_reads": {
+                    "type": "integer",
+                    "default": 10,
+                    "fa_icon": "far fa-window-minimize",
+                    "description": "Minimum number of reads required in input file to use it"
                 }
             }
         },
