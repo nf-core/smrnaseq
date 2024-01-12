@@ -155,7 +155,7 @@ workflow SMRNASEQ {
     // SUBWORKFLOW: Deduplicate UMIs by mapping them to the genome
     //
     if (params.with_umi){
-        if (fasta){
+        if (params.fasta){
             fasta_ch = file(fasta)
             DEDUPLICATE_UMIS (
                 fasta_ch,
