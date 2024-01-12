@@ -141,7 +141,7 @@ workflow SMRNASEQ {
         params.with_umi,
         params.skip_umi_extract,
         params.umi_discard_read,
-        params.skip_trimming,
+        params.skip_fastp,
         params.fastp_known_mirna_adapters,
         params.save_trimmed_fail,
         params.save_merged,
@@ -185,7 +185,7 @@ workflow SMRNASEQ {
     // SUBWORKFLOW: remove contaminants from reads
     //
     contamination_stats = Channel.empty()
-    mirna_reads = FASTQC_FASTP.out.reads
+    mirna_reads = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
     if (params.filter_contamination){
         CONTAMINANT_FILTER (
             reference_hairpin,
@@ -195,7 +195,7 @@ workflow SMRNASEQ {
             params.ncrna,
             params.pirna,
             params.other_contamination,
-            FASTQC_FASTP.out.reads
+            FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
         )
 
         contamination_stats = CONTAMINANT_FILTER.out.filter_stats
@@ -223,7 +223,7 @@ workflow SMRNASEQ {
 
         if (!params.skip_mirdeep) {
             MIRDEEP2 (
-                FASTQC_UMITOOLS_FASTP.out.reads,
+                FASTQ_FASTQC_UMITOOLS_FASTP.out.reads,
                 GENOME_QUANT.out.fasta,
                 GENOME_QUANT.out.index.collect(),
                 MIRNA_QUANT.out.fasta_hairpin,
@@ -252,8 +252,8 @@ workflow SMRNASEQ {
         ch_multiqc_files = Channel.empty()
         ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
         ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQC_FASTP.out.trim_json.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_json.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
