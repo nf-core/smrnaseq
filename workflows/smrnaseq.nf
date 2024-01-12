@@ -156,7 +156,7 @@ workflow SMRNASEQ {
     //
     if (params.with_umi){
         if (params.fasta){
-            fasta_ch = file(fasta)
+            fasta_ch = file(params.fasta)
             DEDUPLICATE_UMIS (
                 fasta_ch,
                 bt_index,
