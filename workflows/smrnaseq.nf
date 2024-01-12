@@ -72,6 +72,7 @@ include { MIRNA_QUANT           } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT          } from '../subworkflows/local/genome_quant'
 include { MIRTRACE              } from '../subworkflows/local/mirtrace'
 include { MIRDEEP2              } from '../subworkflows/local/mirdeep2'
+include { INDEX_GENOME          } from '../../modules/local/bowtie_genome'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -157,9 +158,15 @@ workflow SMRNASEQ {
     if (params.with_umi){
         if (params.fasta){
             fasta_ch = file(params.fasta)
+
+            //This needs to be done here as GENOME_QUANT should not run prior to the deduplication of UMIs.
+            INDEX_GENOME ( fasta )
+
+            ch_versions = ch_versions.mix(INDEX_GENOME.out.versions)
+
             DEDUPLICATE_UMIS (
                 fasta_ch,
-                bt_index,
+                INDEX_GENOME.out.bowtie_indices,
                 FASTQC_UMITOOLS_FASTP.out.trim_reads
             )
             reads_for_mirna = DEDUPLICATE_UMIS.out.reads

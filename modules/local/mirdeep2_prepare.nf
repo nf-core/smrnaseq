@@ -3,10 +3,10 @@ process MIRDEEP2_PIGZ {
     tag "$meta.id"
 
     // TODO maybe create a mulled container and uncompress within mirdeep2_mapper?
-    conda 'bioconda::bioconvert=0.4.3'
+    conda 'bioconda::bioconvert=1.1.1'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/bioconvert:0.4.3--py_0' :
-        'biocontainers/bioconvert:0.4.3--py_0' }"
+        'https://depot.galaxyproject.org/singularity/bioconvert:1.1.1--pyhdfd78af_0' :
+        'biocontainers/bioconvert:1.1.1--pyhdfd78af_0' }"
 
     input:
     tuple val(meta), path(reads)
