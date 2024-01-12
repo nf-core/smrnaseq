@@ -142,16 +142,14 @@ workflow SMRNASEQ {
         params.skip_umi_extract,
         params.umi_discard_read,
         params.skip_trimming,
-        params.umi_discard_read,
-        params.skip_trimming,
-        params.adapter_fasta,
+        params.fastp_known_mirna_adapters,
         params.save_trimmed_fail,
         params.save_merged,
         params.min_trimmed_reads
     )
     ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.versions)
 
-    reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_reads
+    reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
 
     //
     // SUBWORKFLOW: Deduplicate UMIs by mapping them to the genome
