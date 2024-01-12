@@ -173,9 +173,9 @@ workflow SMRNASEQ {
     //
     // SUBWORKFLOW: mirtrace QC
     //
-    FASTQ_FASTQC_UMITOOLS_FASTP.out.adapterseq
+    FASTQ_FASTQC_UMITOOLS_FASTP.out.adapter_seq
     .join( FASTQ_FASTQC_UMITOOLS_FASTP.out.reads )
-    .map { meta, adapterseq, reads -> [adapterseq, meta.id, reads] }
+    .map { meta, adapter_seq, reads -> [adapter_seq, meta.id, reads] }
     .groupTuple()
     .set { ch_mirtrace_inputs }
 
