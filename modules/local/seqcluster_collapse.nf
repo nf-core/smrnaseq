@@ -2,7 +2,7 @@ process SEQCLUSTER_SEQUENCES {
     label 'process_medium'
     tag "$meta.id"
 
-    conda 'bioconda::seqcluster=1.2.9-0'
+    conda 'bioconda::seqcluster=1.2.9'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/seqcluster:1.2.9--pyh5e36f6f_0' :
         'biocontainers/seqcluster:1.2.9--pyh5e36f6f_0' }"
