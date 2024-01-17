@@ -166,7 +166,7 @@ workflow SMRNASEQ {
 
             DEDUPLICATE_UMIS (
                 fasta_ch,
-                INDEX_GENOME.out.bowtie_indices,
+                INDEX_GENOME.out.index,
                 FASTQ_FASTQC_UMITOOLS_FASTP.out.reads,
                 params.umi_stats
             )

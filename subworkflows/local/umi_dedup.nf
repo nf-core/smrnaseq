@@ -24,11 +24,10 @@ workflow DEDUPLICATE_UMIS {
 
     if (!bt_index){
         INDEX_GENOME ( [ [:], fasta ] )
-        bt_index      = INDEX_GENOME.out.bowtie_indices
+        bt_index      = INDEX_GENOME.out.index
         fasta_formatted = INDEX_GENOME.out.fasta
         ch_versions     = ch_versions.mix(INDEX_GENOME.out.versions)
     } else {
-        bt_index     = Channel.fromPath("${bt_index}**ebwt", checkIfExists: true).ifEmpty { exit 1, "Bowtie1 index directory not found: ${bt_index}" }
         fasta_formatted = fasta
     }
 
