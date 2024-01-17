@@ -167,7 +167,8 @@ workflow SMRNASEQ {
             DEDUPLICATE_UMIS (
                 fasta_ch,
                 INDEX_GENOME.out.bowtie_indices,
-                FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_reads
+                FASTQ_FASTQC_UMITOOLS_FASTP.out.reads,
+                params.umi_stats
             )
             reads_for_mirna = DEDUPLICATE_UMIS.out.reads
             ch_versions = ch_versions.mix(DEDUPLICATE_UMIS.out.versions)
