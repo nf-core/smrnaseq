@@ -29,6 +29,7 @@ jobs:
         profile:
           - "test"
           - "test_no_genome"
+          - "test_umi"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@v4
