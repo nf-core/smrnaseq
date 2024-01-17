@@ -31,35 +31,34 @@ workflow DEDUPLICATE_UMIS {
         fasta_formatted = fasta
     }
 
-    if (bt_index){
 
-        UMI_MAP_GENOME ( reads, bt_index.collect() )
-        ch_versions = ch_versions.mix(UMI_MAP_GENOME.out.versions)
+    UMI_MAP_GENOME ( reads, bt_index.collect() )
+    ch_versions = ch_versions.mix(UMI_MAP_GENOME.out.versions)
 
-        BAM_SORT_SAMTOOLS ( UMI_MAP_GENOME.out.bam, Channel.empty() )
-        ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
+    BAM_SORT_SAMTOOLS ( UMI_MAP_GENOME.out.bam, Channel.empty() )
+    ch_versions = ch_versions.mix(BAM_SORT_SAMTOOLS.out.versions)
 
-        ch_umi_dedup = BAM_SORT_SAMTOOLS.out.bam.join(BAM_SORT_SAMTOOLS.out.bai)
-        UMITOOLS_DEDUP ( ch_umi_dedup )
-        ch_versions = ch_versions.mix(UMITOOLS_DEDUP.out.versions)
-        ch_dedup_stats = ch_dedup_stats.mix(UMITOOLS_DEDUP.out.tsv_edit_distance).join(UMITOOLS_DEDUP.out.tsv_per_umi).join(UMITOOLS_DEDUP.out.tsv_umi_per_position)
+    ch_umi_dedup = BAM_SORT_SAMTOOLS.out.bam.join(BAM_SORT_SAMTOOLS.out.bai)
+    UMITOOLS_DEDUP ( ch_umi_dedup )
+    ch_versions = ch_versions.mix(UMITOOLS_DEDUP.out.versions)
+    ch_dedup_stats = ch_dedup_stats.mix(UMITOOLS_DEDUP.out.tsv_edit_distance).join(UMITOOLS_DEDUP.out.tsv_per_umi).join(UMITOOLS_DEDUP.out.tsv_umi_per_position)
 
-        SAMTOOLS_BAM2FQ ( UMITOOLS_DEDUP.out.bam, false )
-        ch_versions = ch_versions.mix(SAMTOOLS_BAM2FQ.out.versions)
+    SAMTOOLS_BAM2FQ ( UMITOOLS_DEDUP.out.bam, false )
+    ch_versions = ch_versions.mix(SAMTOOLS_BAM2FQ.out.versions)
 
-        ch_dedup_reads = SAMTOOLS_BAM2FQ.out.reads
+    ch_dedup_reads = SAMTOOLS_BAM2FQ.out.reads
 
-        if ( params.umi_merge_unmapped ) {
+    if ( params.umi_merge_unmapped ) {
 
-            SAMTOOLS_BAM2FQ.out.reads
-                .join(UMI_MAP_GENOME.out.unmapped)
-                .map { meta, file1, file2 -> [meta, [file1, file2]]}
-                .set { ch_cat }
+        SAMTOOLS_BAM2FQ.out.reads
+            .join(UMI_MAP_GENOME.out.unmapped)
+            .map { meta, file1, file2 -> [meta, [file1, file2]]}
+            .set { ch_cat }
 
-            CAT_CAT ( ch_cat )
-            ch_dedup_reads = CAT_CAT.out.file_out
-        }
+        CAT_CAT ( ch_cat )
+        ch_dedup_reads = CAT_CAT.out.file_out
     }
+
 
     emit:
     reads    = ch_dedup_reads
