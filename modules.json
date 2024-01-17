@@ -7,12 +7,12 @@
                 "nf-core": {
                     "cat/cat": {
                         "branch": "master",
-                        "git_sha": "d593e8f6b7d1bbbb2acf43a4b9efeeac8d6720f2",
+                        "git_sha": "81f27e75847087865299cc46605deb3b09b4e0a2",
                         "installed_by": ["modules"]
                     },
                     "cat/fastq": {
                         "branch": "master",
-                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "git_sha": "02fd5bd7275abad27aad32d5c852e0a9b1b98882",
                         "installed_by": ["modules"]
                     },
                     "custom/dumpsoftwareversions": {
@@ -22,13 +22,13 @@
                     },
                     "fastp": {
                         "branch": "master",
-                        "git_sha": "d086322563bdbb08c94bf15a7db58a39ccdb1520",
+                        "git_sha": "1799e452de650f6fb8890d25829bca23014b0728",
                         "installed_by": ["fastq_fastqc_umitools_fastp", "modules"]
                     },
                     "fastqc": {
                         "branch": "master",
                         "git_sha": "617777a807a1770f73deb38c80004bac06807eef",
-                        "installed_by": ["fastq_fastqc_umitools_fastp", "modules"]
+                        "installed_by": ["fastq_fastqc_umitools_fastp"]
                     },
                     "multiqc": {
                         "branch": "master",
