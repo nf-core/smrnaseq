@@ -160,7 +160,7 @@ workflow SMRNASEQ {
             fasta_ch = file(params.fasta)
 
             //This needs to be done here as GENOME_QUANT should not run prior to the deduplication of UMIs.
-            INDEX_GENOME ( fasta_ch )
+            INDEX_GENOME ( [ [:], fasta ] )
 
             ch_versions = ch_versions.mix(INDEX_GENOME.out.versions)
 
