@@ -23,7 +23,7 @@ workflow DEDUPLICATE_UMIS {
     ch_dedup_stats = Channel.empty()
 
     if (!bt_index){
-        INDEX_GENOME ( fasta )
+        INDEX_GENOME ( [ [:], fasta ] )
         bt_index      = INDEX_GENOME.out.bowtie_indices
         fasta_formatted = INDEX_GENOME.out.fasta
         ch_versions     = ch_versions.mix(INDEX_GENOME.out.versions)
