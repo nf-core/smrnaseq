@@ -21,6 +21,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 |               | `--save_umi_intermeds`      |
 |               | `--umi_merge_unmapped`      |
 
+### Software dependencies
+
+| Dependency   | Old version | New version |
+| ------------ | ----------- | ----------- |
+| `multiqc`    | 1.15        | 1.19        |
+| `edgeR`      | 3.36.0      | 4.0.2       |
+| `limma`      | 3.50.0      | 3.58.1      |
+| `bioconvert` | 0.4.3       | 1.1.1       |
+| `mirdeep`    | 2.0.1       | 2.0.1.3     |
+| `seqkit`     | 2.3.1       | 2.6.1       |
+| `fastqc`     | 0.11.4      | 0.12.1      |
+| `samtools`   | 1.17        | 1.18        |
+| `umitools`   | <none>      | 1.1.4       |
+
 ## [v2.2.4](https://github.com/nf-core/smrnaseq/releases/tag/2.2.4) - 2023-11-03
 
 - Update template to 2.10
@@ -119,7 +133,6 @@ Note, since the pipeline is now using Nextflow DSL2, each process will be run wi
 | `seqkit`             | 0.16.0      | 2.0.0       |
 | `trim-galore`        | 0.6.6       | 0.6.7       |
 | `bioconvert`         | -           | 0.4.3       |
-| `umi_tools`          | -           | 1.1.2       |
 | `htseq`              | -           | -           |
 | `markdown`           | -           | -           |
 | `pymdown-extensions` | -           | -           |
