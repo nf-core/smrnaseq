@@ -12,7 +12,6 @@ include { CAT_CAT                             } from '../../modules/nf-core/cat/
 
 workflow DEDUPLICATE_UMIS {
     take:
-    fasta
     bt_index
     reads      // channel: [ val(meta), [ reads ] ]
     val_get_dedup_stats //boolean true/false
@@ -21,16 +20,6 @@ workflow DEDUPLICATE_UMIS {
 
     ch_versions = Channel.empty()
     ch_dedup_stats = Channel.empty()
-
-    if (!bt_index){
-        INDEX_GENOME ( [ [:], fasta ] )
-        bt_index      = INDEX_GENOME.out.index
-        fasta_formatted = INDEX_GENOME.out.fasta
-        ch_versions     = ch_versions.mix(INDEX_GENOME.out.versions)
-    } else {
-        fasta_formatted = fasta
-    }
-
 
     UMI_MAP_GENOME ( reads, bt_index.collect() )
     ch_versions = ch_versions.mix(UMI_MAP_GENOME.out.versions)

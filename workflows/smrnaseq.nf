@@ -150,29 +150,32 @@ workflow SMRNASEQ {
     )
     ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.versions)
 
+    ch_fasta = file(params.fasta)
     reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
+
+    //Prepare bowtie index, unless specified
+    //This needs to be done here as the index is used by both UMI deduplication and GENOME_QUANT
+    if(params.bowtie_index) {
+        ch_bowtie_index  = Channel.fromPath("${index}**ebwt", checkIfExists: true).ifEmpty { error "Bowtie1 index directory not found: ${index}" }
+        ch_fasta_formatted = ch_fasta
+    } else {
+        INDEX_GENOME ( [ [:], ch_fasta ] )
+        ch_versions = ch_versions.mix(INDEX_GENOME.out.versions)
+        ch_bowtie_index = INDEX_GENOME.out.index
+        ch_fasta_formatted = INDEX_GENOME.out.fasta
+    }
 
     //
     // SUBWORKFLOW: Deduplicate UMIs by mapping them to the genome
     //
     if (params.with_umi){
-        if (params.fasta){
-            fasta_ch = file(params.fasta)
-
-            //This needs to be done here as GENOME_QUANT should not run prior to the deduplication of UMIs.
-            INDEX_GENOME ( [ [:], fasta_ch ] )
-
-            ch_versions = ch_versions.mix(INDEX_GENOME.out.versions)
-
-            DEDUPLICATE_UMIS (
-                fasta_ch,
-                INDEX_GENOME.out.index,
-                FASTQ_FASTQC_UMITOOLS_FASTP.out.reads,
-                params.umi_stats
-            )
-            reads_for_mirna = DEDUPLICATE_UMIS.out.reads
-            ch_versions = ch_versions.mix(DEDUPLICATE_UMIS.out.versions)
-        }
+        DEDUPLICATE_UMIS (
+            ch_bowtie_index,
+            FASTQ_FASTQC_UMITOOLS_FASTP.out.reads,
+            params.umi_stats
+        )
+        reads_for_mirna = DEDUPLICATE_UMIS.out.reads
+        ch_versions = ch_versions.mix(DEDUPLICATE_UMIS.out.versions)
     }
 
 
@@ -225,7 +228,7 @@ workflow SMRNASEQ {
     //
     genome_stats = Channel.empty()
     if (params.fasta){
-        GENOME_QUANT ( file(params.fasta), params.bowtie_index, MIRNA_QUANT.out.unmapped )
+        GENOME_QUANT ( ch_bowtie_index, ch_fasta_formatted, MIRNA_QUANT.out.unmapped )
         genome_stats = GENOME_QUANT.out.stats
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
