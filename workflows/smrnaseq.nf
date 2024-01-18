@@ -64,15 +64,15 @@ if (!params.mirgenedb) {
     if (params.mirgenedb_gff) { mirna_gtf = file(params.mirgenedb_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found: ${params.mirgenedb_gff}"}
 }
 
-include { INPUT_CHECK           } from '../subworkflows/local/input_check'
+include { INPUT_CHECK                 } from '../subworkflows/local/input_check'
 include { FASTQ_FASTQC_UMITOOLS_FASTP } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
-include { DEDUPLICATE_UMIS      } from '../subworkflows/local/umi_dedup'
-include { CONTAMINANT_FILTER    } from '../subworkflows/local/contaminant_filter'
-include { MIRNA_QUANT           } from '../subworkflows/local/mirna_quant'
-include { GENOME_QUANT          } from '../subworkflows/local/genome_quant'
-include { MIRTRACE              } from '../subworkflows/local/mirtrace'
-include { MIRDEEP2              } from '../subworkflows/local/mirdeep2'
-include { INDEX_GENOME          } from '../modules/local/bowtie_genome'
+include { DEDUPLICATE_UMIS            } from '../subworkflows/local/umi_dedup'
+include { CONTAMINANT_FILTER          } from '../subworkflows/local/contaminant_filter'
+include { MIRNA_QUANT                 } from '../subworkflows/local/mirna_quant'
+include { GENOME_QUANT                } from '../subworkflows/local/genome_quant'
+include { MIRTRACE                    } from '../subworkflows/local/mirtrace'
+include { MIRDEEP2                    } from '../subworkflows/local/mirdeep2'
+include { INDEX_GENOME                } from '../modules/local/bowtie_genome'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
