@@ -213,7 +213,7 @@ workflow SMRNASEQ {
 
         contamination_stats = CONTAMINANT_FILTER.out.filter_stats
         ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
-        mirna_reads = CONTAMINANT_FILTER.out.filtered_reads
+        ch_reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
 
     }
 
@@ -221,7 +221,7 @@ workflow SMRNASEQ {
         [ [:], reference_mature],
         [ [:], reference_hairpin],
         mirna_gtf,
-        mirna_reads
+        ch_reads_for_mirna
     )
     ch_versions = ch_versions.mix(MIRNA_QUANT.out.versions.ifEmpty(null))
 
