@@ -33,8 +33,6 @@ workflow MIRNA_QUANT {
     main:
     ch_versions = Channel.empty()
 
-
-
     PARSE_MATURE ( mature ).parsed_fasta.set { mirna_parsed }
     ch_versions = ch_versions.mix(PARSE_MATURE.out.versions)
 
@@ -78,7 +76,6 @@ workflow MIRNA_QUANT {
     ch_versions = ch_versions.mix(BAM_STATS_HAIRPIN.out.versions)
 
 
-
     BAM_STATS_MATURE.out.idxstats.collect{it[1]}
         .mix(BAM_STATS_HAIRPIN.out.idxstats.collect{it[1]})
         .dump(tag:'edger')
@@ -86,8 +83,6 @@ workflow MIRNA_QUANT {
         .collect()
         .set { edger_input }
     EDGER_QC ( edger_input )
-
-
 
     reads
         .map { add_suffix(it, "seqcluster") }
@@ -99,9 +94,6 @@ workflow MIRNA_QUANT {
 
     BOWTIE_MAP_SEQCLUSTER ( reads_collapsed, hairpin_bowtie.collect() )
     ch_versions = ch_versions.mix(BOWTIE_MAP_SEQCLUSTER.out.versions)
-
-
-
 
     ch_mirtop_logs = Channel.empty()
     if (params.mirtrace_species){
@@ -116,8 +108,6 @@ workflow MIRNA_QUANT {
         .map { add_suffix(it, "genome") }
         .dump (tag:'gsux')
         .set { reads_genome }
-
-
 
     emit:
     fasta_mature        = FORMAT_MATURE.out.formatted_fasta
