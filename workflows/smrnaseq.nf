@@ -154,7 +154,7 @@ workflow SMRNASEQ {
         error "Specifying a genome fasta is required for UMI deduplication"
     }
     ch_fasta = params.fasta ? file(params.fasta): []
-    reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
+    ch_reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
 
     //Prepare bowtie index, unless specified
     //This needs to be done here as the index is used by both UMI deduplication and GENOME_QUANT
@@ -174,10 +174,10 @@ workflow SMRNASEQ {
     if (params.with_umi){
         DEDUPLICATE_UMIS (
             ch_bowtie_index,
-            FASTQ_FASTQC_UMITOOLS_FASTP.out.reads,
+            ch_reads_for_mirna,
             params.umi_stats
         )
-        reads_for_mirna = DEDUPLICATE_UMIS.out.reads
+        ch_reads_for_mirna = DEDUPLICATE_UMIS.out.reads
         ch_versions = ch_versions.mix(DEDUPLICATE_UMIS.out.versions)
     }
 
@@ -186,7 +186,7 @@ workflow SMRNASEQ {
     // SUBWORKFLOW: mirtrace QC
     //
     FASTQ_FASTQC_UMITOOLS_FASTP.out.adapter_seq
-    .join( FASTQ_FASTQC_UMITOOLS_FASTP.out.reads )
+    .join( ch_reads_for_mirna )
     .map { meta, adapter_seq, reads -> [adapter_seq, meta.id, reads] }
     .groupTuple()
     .set { ch_mirtrace_inputs }
@@ -199,7 +199,6 @@ workflow SMRNASEQ {
     // SUBWORKFLOW: remove contaminants from reads
     //
     contamination_stats = Channel.empty()
-    mirna_reads = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
     if (params.filter_contamination){
         CONTAMINANT_FILTER (
             reference_hairpin,
@@ -209,7 +208,7 @@ workflow SMRNASEQ {
             params.ncrna,
             params.pirna,
             params.other_contamination,
-            FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
+            ch_reads_for_mirna
         )
 
         contamination_stats = CONTAMINANT_FILTER.out.filter_stats
@@ -240,7 +239,7 @@ workflow SMRNASEQ {
 
         if (!params.skip_mirdeep) {
             MIRDEEP2 (
-                FASTQ_FASTQC_UMITOOLS_FASTP.out.reads,
+                ch_reads_for_mirna,
                 GENOME_QUANT.out.fasta,
                 GENOME_QUANT.out.index.collect(),
                 hairpin_clean,
