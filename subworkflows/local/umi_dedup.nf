@@ -5,7 +5,7 @@
 include { INDEX_GENOME                        } from '../../modules/local/bowtie_genome'
 include { BOWTIE_MAP_SEQ as UMI_MAP_GENOME    } from '../../modules/local/bowtie_map_mirna'
 include { BAM_SORT_STATS_SAMTOOLS             } from '../../subworkflows/nf-core/bam_sort_stats_samtools'
-include { UMITOOLS_DEDUP                      } from '../../modules/nf-core/umitools/dedup/main'
+include { UMICOLLAPSE                         } from '../../modules/nf-core/umicollapse/main'
 include { SAMTOOLS_BAM2FQ                     } from '../../modules/nf-core/samtools/bam2fq/main'
 include { CAT_CAT                             } from '../../modules/nf-core/cat/cat/main'
 
@@ -19,7 +19,6 @@ workflow DEDUPLICATE_UMIS {
     main:
 
     ch_versions = Channel.empty()
-    ch_dedup_stats = Channel.empty()
 
     UMI_MAP_GENOME ( reads, bt_index.collect() )
     ch_versions = ch_versions.mix(UMI_MAP_GENOME.out.versions)
@@ -28,11 +27,10 @@ workflow DEDUPLICATE_UMIS {
     ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
     ch_umi_dedup = BAM_SORT_STATS_SAMTOOLS.out.bam.join(BAM_SORT_STATS_SAMTOOLS.out.bai)
-    UMITOOLS_DEDUP ( ch_umi_dedup, val_get_dedup_stats)
-    ch_versions = ch_versions.mix(UMITOOLS_DEDUP.out.versions)
-    ch_dedup_stats = ch_dedup_stats.mix(UMITOOLS_DEDUP.out.tsv_edit_distance).join(UMITOOLS_DEDUP.out.tsv_per_umi).join(UMITOOLS_DEDUP.out.tsv_umi_per_position)
+    UMICOLLAPSE ( ch_umi_dedup, val_get_dedup_stats)
+    ch_versions = ch_versions.mix(UMICOLLAPSE.out.versions)
 
-    SAMTOOLS_BAM2FQ ( UMITOOLS_DEDUP.out.bam, false )
+    SAMTOOLS_BAM2FQ ( UMICOLLAPSE.out.bam, false )
     ch_versions = ch_versions.mix(SAMTOOLS_BAM2FQ.out.versions)
 
     ch_dedup_reads = SAMTOOLS_BAM2FQ.out.reads
@@ -52,6 +50,5 @@ workflow DEDUPLICATE_UMIS {
     emit:
     reads    = ch_dedup_reads
     indices  = bt_index
-    stats    = ch_dedup_stats
     versions = ch_versions
 }
