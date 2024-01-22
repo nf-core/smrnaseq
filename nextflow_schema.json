@@ -95,12 +95,6 @@
                     "type": "boolean",
                     "fa_icon": "fas fa-save",
                     "description": "If this option is specified, intermediate FastQ and BAM files produced by UMI-tools are also saved in the results directory."
-                },
-                "umi_merge_unmapped": {
-                    "type": "boolean",
-                    "fa_icon": "fas fa-save",
-                    "description": "Unless deactivated the deduplicated reads are merged with the reads that could not be placed to reduce the potential reference bias",
-                    "default": true
                 }
             },
             "fa_icon": "fas fa-barcode"

@@ -16,10 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | ------------- | --------------------------- |
 |               | `--with_umi`                |
 |               | `--umitools_extract_method` |
+|               | `--umitools_method`         |
+|               | `--skip_umi_extract`        |
 |               | `--umitools_bc_pattern`     |
 |               | `--umi_discard_read`        |
 |               | `--save_umi_intermeds`      |
-|               | `--umi_merge_unmapped`      |
 
 ### Software dependencies
 

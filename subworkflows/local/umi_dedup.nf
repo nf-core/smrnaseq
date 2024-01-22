@@ -34,18 +34,6 @@ workflow DEDUPLICATE_UMIS {
 
     ch_dedup_reads = SAMTOOLS_BAM2FQ.out.reads
 
-    if ( params.umi_merge_unmapped ) {
-
-        SAMTOOLS_BAM2FQ.out.reads
-            .join(UMI_MAP_GENOME.out.unmapped)
-            .map { meta, file1, file2 -> [meta, [file1, file2]]}
-            .set { ch_cat }
-
-        CAT_CAT ( ch_cat )
-        ch_dedup_reads = CAT_CAT.out.file_out
-    }
-
-
     emit:
     reads    = ch_dedup_reads
     indices  = bt_index
