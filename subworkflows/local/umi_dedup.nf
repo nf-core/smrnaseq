@@ -14,7 +14,6 @@ workflow DEDUPLICATE_UMIS {
     take:
     bt_index
     reads      // channel: [ val(meta), [ reads ] ]
-    val_get_dedup_stats //boolean true/false
 
     main:
 
@@ -27,7 +26,7 @@ workflow DEDUPLICATE_UMIS {
     ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
     ch_umi_dedup = BAM_SORT_STATS_SAMTOOLS.out.bam.join(BAM_SORT_STATS_SAMTOOLS.out.bai)
-    UMICOLLAPSE ( ch_umi_dedup, val_get_dedup_stats)
+    UMICOLLAPSE(ch_umi_dedup)
     ch_versions = ch_versions.mix(UMICOLLAPSE.out.versions)
 
     SAMTOOLS_BAM2FQ ( UMICOLLAPSE.out.bam, false )

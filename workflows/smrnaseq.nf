@@ -179,7 +179,6 @@ workflow SMRNASEQ {
         DEDUPLICATE_UMIS (
             ch_bowtie_index,
             ch_reads_for_mirna,
-            params.umi_stats
         )
         ch_reads_for_mirna = DEDUPLICATE_UMIS.out.reads
         ch_versions = ch_versions.mix(DEDUPLICATE_UMIS.out.versions)
