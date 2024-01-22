@@ -68,6 +68,13 @@
                     "description": "UMI pattern to use. Can be either 'string' (default) or 'regex'.",
                     "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).\n"
                 },
+                "umitools_method": {
+                    "type": "string",
+                    "default": "directional",
+                    "description": "UMI grouping method",
+                    "fa_icon": "fas fa-layer-group",
+                    "help_text": "Available options are unique, percentile, cluster, adjacency or directional."
+                },
                 "skip_umi_extract": {
                     "type": "boolean",
                     "fa_icon": "fas fa-compress-alt",
