@@ -25,7 +25,7 @@ process UMICOLLAPSE {
 
     """
     umicollapse \\
-        -Xmx${task.memory.toMega() * 0.8}M \\
+        -Xmx${(task.memory.toMega() * 0.8).intValue()}M \\
         bam \\
         -i $bam \\
         -o ${prefix}.bam \\
