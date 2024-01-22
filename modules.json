@@ -8,107 +8,72 @@
                     "cat/cat": {
                         "branch": "master",
                         "git_sha": "81f27e75847087865299cc46605deb3b09b4e0a2",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "cat/fastq": {
                         "branch": "master",
                         "git_sha": "02fd5bd7275abad27aad32d5c852e0a9b1b98882",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "custom/dumpsoftwareversions": {
                         "branch": "master",
                         "git_sha": "8ec825f465b9c17f9d83000022995b4f7de6fe93",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "fastp": {
                         "branch": "master",
                         "git_sha": "1799e452de650f6fb8890d25829bca23014b0728",
-                        "installed_by": [
-                            "fastq_fastqc_umitools_fastp",
-                            "modules"
-                        ]
+                        "installed_by": ["fastq_fastqc_umitools_fastp", "modules"]
                     },
                     "fastqc": {
                         "branch": "master",
                         "git_sha": "617777a807a1770f73deb38c80004bac06807eef",
-                        "installed_by": [
-                            "fastq_fastqc_umitools_fastp"
-                        ]
+                        "installed_by": ["fastq_fastqc_umitools_fastp"]
                     },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "8ec825f465b9c17f9d83000022995b4f7de6fe93",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "samtools/bam2fq": {
                         "branch": "master",
                         "git_sha": "a64788f5ad388f1d2ac5bd5f1f3f8fc81476148c",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "samtools/flagstat": {
                         "branch": "master",
                         "git_sha": "a64788f5ad388f1d2ac5bd5f1f3f8fc81476148c",
-                        "installed_by": [
-                            "bam_stats_samtools",
-                            "modules"
-                        ]
+                        "installed_by": ["bam_stats_samtools", "modules"]
                     },
                     "samtools/idxstats": {
                         "branch": "master",
                         "git_sha": "a64788f5ad388f1d2ac5bd5f1f3f8fc81476148c",
-                        "installed_by": [
-                            "bam_stats_samtools",
-                            "modules"
-                        ]
+                        "installed_by": ["bam_stats_samtools", "modules"]
                     },
                     "samtools/index": {
                         "branch": "master",
                         "git_sha": "a64788f5ad388f1d2ac5bd5f1f3f8fc81476148c",
-                        "installed_by": [
-                            "bam_sort_stats_samtools",
-                            "modules"
-                        ]
+                        "installed_by": ["bam_sort_stats_samtools", "modules"]
                     },
                     "samtools/sort": {
                         "branch": "master",
                         "git_sha": "a64788f5ad388f1d2ac5bd5f1f3f8fc81476148c",
-                        "installed_by": [
-                            "bam_sort_stats_samtools",
-                            "modules"
-                        ]
+                        "installed_by": ["bam_sort_stats_samtools", "modules"]
                     },
                     "samtools/stats": {
                         "branch": "master",
                         "git_sha": "a64788f5ad388f1d2ac5bd5f1f3f8fc81476148c",
-                        "installed_by": [
-                            "bam_stats_samtools",
-                            "modules"
-                        ]
+                        "installed_by": ["bam_stats_samtools", "modules"]
                     },
                     "umicollapse": {
                         "branch": "master",
                         "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
-                        "installed_by": [
-                            "modules"
-                        ]
+                        "installed_by": ["modules"]
                     },
                     "umitools/extract": {
                         "branch": "master",
                         "git_sha": "65ad3e0b9a4099592e1102e92e10455dc661cf53",
-                        "installed_by": [
-                            "fastq_fastqc_umitools_fastp",
-                            "modules"
-                        ]
+                        "installed_by": ["fastq_fastqc_umitools_fastp", "modules"]
                     }
                 }
             },
@@ -117,24 +82,17 @@
                     "bam_sort_stats_samtools": {
                         "branch": "master",
                         "git_sha": "a64788f5ad388f1d2ac5bd5f1f3f8fc81476148c",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     },
                     "bam_stats_samtools": {
                         "branch": "master",
                         "git_sha": "a64788f5ad388f1d2ac5bd5f1f3f8fc81476148c",
-                        "installed_by": [
-                            "bam_sort_stats_samtools",
-                            "subworkflows"
-                        ]
+                        "installed_by": ["bam_sort_stats_samtools", "subworkflows"]
                     },
                     "fastq_fastqc_umitools_fastp": {
                         "branch": "master",
                         "git_sha": "d20574ce7420a54fe47b46a91c5f2215d1a2777c",
-                        "installed_by": [
-                            "subworkflows"
-                        ]
+                        "installed_by": ["subworkflows"]
                     }
                 }
             }
