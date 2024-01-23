@@ -23,10 +23,11 @@ process UMICOLLAPSE {
     def prefix = task.ext.prefix ?: "${meta.id}"
     def VERSION = '1.0.0-1' // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
 
+    // Things I tried...
     """
     java \\
-      -Xmx${(task.memory.toMega() * 0.8).intValue()}M \\
-      -Xss99M \\
+      -Xmx${(task.memory.toGiga() - 1).intValue()}G \\
+      -Xss1G \\
       -jar /usr/local/share/umicollapse-${VERSION}/umicollapse.jar \\
       bam \\
       -i $bam \\
