@@ -24,9 +24,8 @@ process UMICOLLAPSE {
     def VERSION = '1' // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
 
     """
-    umicollapse \\
-        -Xmx${(task.memory.toMega() * 0.8).intValue()}M \\
-        -Xss99M \\
+    JAVA_TOOL_OPTIONS="-Xmx${(task.memory.toMega() * 0.8).intValue()}M -Xss99M" \\
+      umicollapse \\
         bam \\
         -i $bam \\
         -o ${prefix}.bam \\
