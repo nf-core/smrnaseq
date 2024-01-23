@@ -21,15 +21,17 @@ process UMICOLLAPSE {
     script:
     def args   = task.ext.args ?: ''
     def prefix = task.ext.prefix ?: "${meta.id}"
-    def VERSION = '1' // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
+    def VERSION = '1.0.0-1' // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
 
     """
-    JAVA_TOOL_OPTIONS="-Xmx${(task.memory.toMega() * 0.8).intValue()}M -Xss99M" \\
-      umicollapse \\
-        bam \\
-        -i $bam \\
-        -o ${prefix}.bam \\
-        $args
+    java \\
+      -Xmx${(task.memory.toMega() * 0.8).intValue()}M \\
+      -Xss99M \\
+      -jar /usr/local/share/umicollapse-${VERSION}/umicollapse.jar \\
+      bam \\
+      -i $bam \\
+      -o ${prefix}.bam \\
+      $args
 
     mv .command.log ${prefix}_UMICollapse.log
 
