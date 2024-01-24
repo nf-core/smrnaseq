@@ -43,8 +43,8 @@ process MIRTRACE_RUN {
         --force
 
     cat <<-END_VERSIONS > versions.yml
-    ${task.process}":
-        mirtrace: \$(echo \$(mirtrace -v 2>&1))
+    "${task.process}":
+        mirtrace: \$(echo \$(mirtrace -v))
     END_VERSIONS
     """
 

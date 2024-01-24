@@ -39,17 +39,8 @@ workflow MIRNA_QUANT {
     FORMAT_MATURE ( mirna_parsed )
     ch_versions = ch_versions.mix(FORMAT_MATURE.out.versions)
 
-    PARSE_HAIRPIN ( hairpin ).parsed_fasta.set { hairpin_parsed }
-    ch_versions = ch_versions.mix(PARSE_HAIRPIN.out.versions)
-
-    FORMAT_HAIRPIN ( hairpin_parsed )
-    ch_versions = ch_versions.mix(FORMAT_HAIRPIN.out.versions)
-
     INDEX_MATURE ( FORMAT_MATURE.out.formatted_fasta ).index.set { mature_bowtie }
     ch_versions = ch_versions.mix(INDEX_MATURE.out.versions)
-
-    INDEX_HAIRPIN ( FORMAT_HAIRPIN.out.formatted_fasta ).index.set { hairpin_bowtie }
-    ch_versions = ch_versions.mix(INDEX_HAIRPIN.out.versions)
 
     reads
         .map { add_suffix(it, "mature") }
@@ -64,14 +55,26 @@ workflow MIRNA_QUANT {
         .dump (tag:'hsux')
         .set { reads_hairpin }
 
-    BOWTIE_MAP_HAIRPIN ( reads_hairpin, hairpin_bowtie.collect() )
-    ch_versions = ch_versions.mix(BOWTIE_MAP_HAIRPIN.out.versions)
-
     BAM_STATS_MATURE ( BOWTIE_MAP_MATURE.out.bam, FORMAT_MATURE.out.formatted_fasta )
     ch_versions = ch_versions.mix(BAM_STATS_MATURE.out.versions)
 
+
+
+    PARSE_HAIRPIN ( hairpin ).parsed_fasta.set { hairpin_parsed }
+    ch_versions = ch_versions.mix(PARSE_HAIRPIN.out.versions)
+
+    FORMAT_HAIRPIN ( hairpin_parsed )
+    ch_versions = ch_versions.mix(FORMAT_HAIRPIN.out.versions)
+
+    INDEX_HAIRPIN ( FORMAT_HAIRPIN.out.formatted_fasta ).index.set { hairpin_bowtie }
+    ch_versions = ch_versions.mix(INDEX_HAIRPIN.out.versions)
+
+    BOWTIE_MAP_HAIRPIN ( reads_hairpin, hairpin_bowtie.collect() )
+    ch_versions = ch_versions.mix(BOWTIE_MAP_HAIRPIN.out.versions)
+
     BAM_STATS_HAIRPIN ( BOWTIE_MAP_HAIRPIN.out.bam, FORMAT_HAIRPIN.out.formatted_fasta )
     ch_versions = ch_versions.mix(BAM_STATS_HAIRPIN.out.versions)
+
 
     BAM_STATS_MATURE.out.idxstats.collect{it[1]}
         .mix(BAM_STATS_HAIRPIN.out.idxstats.collect{it[1]})

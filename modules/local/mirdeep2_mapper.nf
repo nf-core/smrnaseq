@@ -4,7 +4,7 @@ process MIRDEEP2_MAPPER {
     label 'process_medium'
     tag "$meta.id"
 
-    conda 'bioconda::mirdeep2=2.0.1'
+    conda 'bioconda::mirdeep2=2.0.1.3'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/mirdeep2:2.0.1.3--hdfd78af_1' :
         'biocontainers/mirdeep2:2.0.1.3--hdfd78af_1' }"

@@ -4,7 +4,7 @@ process MIRDEEP2_RUN {
     label 'process_medium'
     errorStrategy 'ignore'
 
-    conda 'bioconda::mirdeep2=2.0.1'
+    conda 'bioconda::mirdeep2=2.0.1.3'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/mirdeep2:2.0.1.3--hdfd78af_1' :
         'biocontainers/mirdeep2:2.0.1.3--hdfd78af_1' }"
@@ -35,9 +35,8 @@ process MIRDEEP2_RUN {
         -z _${reads.simpleName}
 
     cat <<-END_VERSIONS > versions.yml
-    ${task.process}":
+    "${task.process}":
         mirdeep2: \$(echo "$VERSION")
     END_VERSIONS
     """
 }
-

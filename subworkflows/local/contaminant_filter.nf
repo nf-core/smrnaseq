@@ -123,6 +123,6 @@ workflow CONTAMINANT_FILTER {
 
     emit:
     filtered_reads = FILTER_STATS.out.reads
-    versions = ch_versions
+    versions = ch_versions.mix(FILTER_STATS.out.versions)
     filter_stats = FILTER_STATS.out.stats
 }
