@@ -22,12 +22,12 @@
                     },
                     "fastp": {
                         "branch": "master",
-                        "git_sha": "1799e452de650f6fb8890d25829bca23014b0728",
+                        "git_sha": "c9488585ce7bd35ccd2a30faa2371454c8112fb9",
                         "installed_by": ["fastq_fastqc_umitools_fastp", "modules"]
                     },
                     "fastqc": {
                         "branch": "master",
-                        "git_sha": "617777a807a1770f73deb38c80004bac06807eef",
+                        "git_sha": "c9488585ce7bd35ccd2a30faa2371454c8112fb9",
                         "installed_by": ["fastq_fastqc_umitools_fastp"]
                     },
                     "multiqc": {
@@ -67,7 +67,7 @@
                     },
                     "umicollapse": {
                         "branch": "master",
-                        "git_sha": "b71a681e9ec41cefd330e12b8566b5f5aff4941c",
+                        "git_sha": "b573d74ce7eced7963d00d4a7f99db9caed61d79",
                         "installed_by": ["modules"]
                     },
                     "umitools/extract": {
@@ -91,7 +91,7 @@
                     },
                     "fastq_fastqc_umitools_fastp": {
                         "branch": "master",
-                        "git_sha": "d20574ce7420a54fe47b46a91c5f2215d1a2777c",
+                        "git_sha": "a4bceac1aecee5aa0a5dbc601baf0e2e61013fb2",
                         "installed_by": ["subworkflows"]
                     }
                 }
