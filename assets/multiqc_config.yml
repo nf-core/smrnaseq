@@ -14,19 +14,18 @@ report_section_order:
 export_plots: true
 
 module_order:
-   - fastqc:
+  - fastqc:
       name: "FastQC (raw)"
       info: "This section of the report shows FastQC results on the input files."
       path_filters:
         - "**/*.raw_fastqc.zip"
-   - fastqc:
+  - fastqc:
       name: "FastQC (trimmed)"
       info: "This section of the report shows FastQC results after adapter trimming."
       path_filters:
         - "**/*.trim_fastqc.zip"
-   - fastqc:
+  - fastqc:
       name: "FastQC (deduplicated)"
       info: "This section of the report shows FastQC results after UMI-based deduplication."
       path_filters:
         - "**/*.deduplicated_fastqc.zip"
-
