@@ -8,6 +8,7 @@ include { BAM_SORT_STATS_SAMTOOLS             } from '../../subworkflows/nf-core
 include { UMICOLLAPSE                         } from '../../modules/nf-core/umicollapse/main'
 include { SAMTOOLS_BAM2FQ                     } from '../../modules/nf-core/samtools/bam2fq/main'
 include { CAT_CAT                             } from '../../modules/nf-core/cat/cat/main'
+include { FASTQC as FASTQC_DEDUPLICATED        } from '../../modules/nf-core/fastqc/main'
 
 
 workflow DEDUPLICATE_UMIS {
@@ -34,8 +35,12 @@ workflow DEDUPLICATE_UMIS {
 
     ch_dedup_reads = SAMTOOLS_BAM2FQ.out.reads
 
+    FASTQC_DEDUPLICATED(ch_dedup_reads)
+
     emit:
-    reads    = ch_dedup_reads
+    reads = ch_dedup_reads
+    fastqc_html = FASTQC_DEDUPLICATED.out.html
+    fastqc_zip = FASTQC_DEDUPLICATED.out.zip
     indices  = bt_index
     versions = ch_versions
 }
