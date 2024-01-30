@@ -66,7 +66,6 @@ if (!params.mirgenedb) {
 
 include { INPUT_CHECK                 } from '../subworkflows/local/input_check'
 include { FASTQ_FASTQC_UMITOOLS_FASTP } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
-include { DEDUPLICATE_UMIS            } from '../subworkflows/local/umi_dedup'
 include { CONTAMINANT_FILTER          } from '../subworkflows/local/contaminant_filter'
 include { MIRNA_QUANT                 } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT                } from '../subworkflows/local/genome_quant'
@@ -83,10 +82,10 @@ include { INDEX_GENOME                } from '../modules/local/bowtie_genome'
 //
 // MODULE: Installed directly from nf-core/modules
 //
-include { CAT_FASTQ                   } from '../modules/nf-core/cat/fastq/main'
-include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
-include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/custom/dumpsoftwareversions/main'
-
+include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/main'
+include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
+include { CUSTOM_DUMPSOFTWAREVERSIONS      } from '../modules/nf-core/custom/dumpsoftwareversions/main'
+include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -150,9 +149,6 @@ workflow SMRNASEQ {
     )
     ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.versions)
 
-    if(params.with_umi && !params.fasta) {
-        error "Specifying a genome fasta is required for UMI deduplication"
-    }
     ch_fasta = params.fasta ? file(params.fasta): []
     ch_reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
 
@@ -160,7 +156,7 @@ workflow SMRNASEQ {
     // without fasta, no genome analysis.
     if(params.fasta) {
         //Prepare bowtie index, unless specified
-        //This needs to be done here as the index is used by both UMI deduplication and GENOME_QUANT
+        //This needs to be done here as the index is used by GENOME_QUANT
         if(params.bowtie_index) {
             ch_bowtie_index  = Channel.fromPath("${index}**ebwt", checkIfExists: true).ifEmpty { error "Bowtie1 index directory not found: ${index}" }
         } else {
@@ -175,13 +171,19 @@ workflow SMRNASEQ {
     //
     // SUBWORKFLOW: Deduplicate UMIs by mapping them to the genome
     //
-    if (params.with_umi){
-        DEDUPLICATE_UMIS (
-            ch_bowtie_index,
-            ch_reads_for_mirna,
-        )
-        ch_reads_for_mirna = DEDUPLICATE_UMIS.out.reads
-        ch_versions = ch_versions.mix(DEDUPLICATE_UMIS.out.versions)
+    // if (params.with_umi){
+    //     DEDUPLICATE_UMIS (
+    //         ch_bowtie_index,
+    //         ch_reads_for_mirna,
+    //     )
+    //     ch_reads_for_mirna = DEDUPLICATE_UMIS.out.reads
+    //     ch_versions = ch_versions.mix(DEDUPLICATE_UMIS.out.versions)
+    // }
+
+    //UMI Dedup for fastq input
+    if (params.with_umi) {
+        UMICOLLAPSE_FASTQ(ch_reads_for_mirna, 'fastq')
+        ch_reads_for_mirna = UMICOLLAPSE_FASTQ.out.fastq
     }
 
 
@@ -275,7 +277,7 @@ workflow SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_zip.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_json.collect{it[1]}.ifEmpty([]))
         if(params.with_umi) {
-            ch_multiqc_files = ch_multiqc_files.mix(DEDUPLICATE_UMIS.out.fastqc_zip.collect{it[1]}.ifEmpty([]))
+            ch_multiqc_files = ch_multiqc_files.mix(UMICOLLAPSE_FASTQ.out.log.collect().ifEmpty([]))
         }
         ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
