@@ -14,7 +14,7 @@ process UMICOLLAPSE {
 
     output:
     tuple val(meta), path("*.bam"), emit: bam,                         optional: true
-    tuple val(meta), path("${prefix}.${extension}"), emit: fastq,      optional: true
+    tuple val(meta), path("*dedup*fastq.gz"), emit: fastq,      optional: true
     tuple val(meta), path("*_UMICollapse.log"), emit: log
     path  "versions.yml"          , emit: versions
 

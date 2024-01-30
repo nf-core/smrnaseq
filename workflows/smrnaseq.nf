@@ -182,9 +182,9 @@ workflow SMRNASEQ {
     //
     FASTQ_FASTQC_UMITOOLS_FASTP.out.adapter_seq
     .join( ch_reads_for_mirna )
+    .dump()
     .map { meta, adapter_seq, reads -> [adapter_seq, meta.id, reads] }
     .groupTuple()
-    .dump()
     .set { ch_mirtrace_inputs }
 
     MIRTRACE(ch_mirtrace_inputs)
