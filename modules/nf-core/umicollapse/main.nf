@@ -42,7 +42,7 @@ process UMICOLLAPSE {
     UMICOLLAPSE_JAR=\$(dirname \$(which umicollapse))/../share/umicollapse-${VERSION}/umicollapse.jar
     java \\
         -Xmx${max_heap_size_mega}M \\
-        -Xss${max_stack_size_mega}M \\
+        -Xss999M \\
         -jar \$UMICOLLAPSE_JAR \\
         $mode \\
         -i ${input} \\
