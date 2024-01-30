@@ -182,7 +182,9 @@ workflow SMRNASEQ {
 
     //UMI Dedup for fastq input
     if (params.with_umi) {
-        UMICOLLAPSE_FASTQ(ch_reads_for_mirna, 'fastq')
+        ch_fastq = Channel.value('fastq')
+        ch_input_for_collapse = ch_reads_for_mirna.map{ meta, reads -> [meta, reads, []]} //Needs to be done to add a []
+        UMICOLLAPSE_FASTQ(ch_input_for_collapse, ch_fastq)
         ch_reads_for_mirna = UMICOLLAPSE_FASTQ.out.fastq
     }
 
