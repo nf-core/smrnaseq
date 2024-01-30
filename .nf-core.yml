@@ -1,1 +1,5 @@
 repository_type: pipeline
+lint:
+  nextflow_config:
+    - config_defaults:
+        - params.fastp_known_mirna_adapters

@@ -81,12 +81,12 @@
                 "nf-core": {
                     "bam_sort_stats_samtools": {
                         "branch": "master",
-                        "git_sha": "a64788f5ad388f1d2ac5bd5f1f3f8fc81476148c",
+                        "git_sha": "0c38be7e652a0b2f3a37681ee4c0dbdf85677647",
                         "installed_by": ["subworkflows"]
                     },
                     "bam_stats_samtools": {
                         "branch": "master",
-                        "git_sha": "a64788f5ad388f1d2ac5bd5f1f3f8fc81476148c",
+                        "git_sha": "0c38be7e652a0b2f3a37681ee4c0dbdf85677647",
                         "installed_by": ["bam_sort_stats_samtools", "subworkflows"]
                     },
                     "fastq_fastqc_umitools_fastp": {
