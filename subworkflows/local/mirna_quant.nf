@@ -84,6 +84,8 @@ workflow MIRNA_QUANT {
         .set { edger_input }
     EDGER_QC ( edger_input )
 
+    ch_versions.mix(EDGER_QC.out.versions)
+
     reads
         .map { add_suffix(it, "seqcluster") }
         .dump (tag:'ssux')

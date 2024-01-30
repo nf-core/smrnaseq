@@ -9,15 +9,17 @@ workflow INPUT_CHECK {
     samplesheet // file: /path/to/samplesheet.csv
 
     main:
+    ch_versions = Channel.empty()
     SAMPLESHEET_CHECK ( samplesheet )
         .csv
         .splitCsv ( header:true, sep:',' )
         .map { create_fastq_channel(it) }
         .set { reads }
+    ch_versions.mix(SAMPLESHEET_CHECK.out.versions)
 
     emit:
     reads                                     // channel: [ val(meta), [ reads ] ]
-    versions = SAMPLESHEET_CHECK.out.versions // channel: [ versions.yml ]
+    versions =  ch_versions                   // channel: [ versions.yml ]
 }
 
 // Function to get list of [ meta, [ fastq_1 ] ]
