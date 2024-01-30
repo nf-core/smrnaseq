@@ -2,7 +2,6 @@
 // Quantify mirna with bowtie and mirtop
 //
 
-include { INDEX_GENOME      } from '../../modules/local/bowtie_genome'
 include { BAM_SORT_STATS_SAMTOOLS } from '../nf-core/bam_sort_stats_samtools'
 include { BOWTIE_MAP_SEQ as BOWTIE_MAP_GENOME } from '../../modules/local/bowtie_map_mirna'
 
