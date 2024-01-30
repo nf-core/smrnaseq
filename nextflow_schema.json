@@ -239,6 +239,9 @@
                 },
                 "fastp_known_mirna_adapters": {
                     "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
                     "default": "${projectDir}/assets/known_adapters.fa",
                     "description": "FastA with known miRNA adapter sequences for adapter trimming",
                     "fa_icon": "far fa-question-circle"
