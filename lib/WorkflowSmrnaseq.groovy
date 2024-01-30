@@ -48,8 +48,6 @@ class WorkflowSmrnaseq {
 
     public static String toolCitationText(params) {
 
-        // TODO nf-core: Optionally add in-text citation tools to this list.
-
         // Can use ternary operators to dynamically construct based conditions, e.g. params["run_xyz"] ? "Tool (Foo et al. 2023)" : "",
         // Uncomment function in methodsDescriptionText to render in MultiQC report
         def citation_text = [

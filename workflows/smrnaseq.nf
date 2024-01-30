@@ -69,9 +69,9 @@ include { FASTQ_FASTQC_UMITOOLS_FASTP } from '../subworkflows/nf-core/fastq_fast
 include { CONTAMINANT_FILTER          } from '../subworkflows/local/contaminant_filter'
 include { MIRNA_QUANT                 } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT                } from '../subworkflows/local/genome_quant'
-include { MIRTRACE                    } from '../subworkflows/local/mirtrace'
 include { MIRDEEP2                    } from '../subworkflows/local/mirdeep2'
 include { INDEX_GENOME                } from '../modules/local/bowtie_genome'
+include { MIRTRACE_RUN as MIRTRACE         } from '../modules/local/mirtrace'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -179,7 +179,7 @@ workflow SMRNASEQ {
 
 
     //
-    // SUBWORKFLOW: mirtrace QC
+    // MODULE: mirtrace QC
     //
     FASTQ_FASTQC_UMITOOLS_FASTP.out.adapter_seq
     .join( ch_reads_for_mirna )
@@ -276,7 +276,7 @@ workflow SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect().ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.mirtrace.collect().ifEmpty([]))
 
         MULTIQC (
             ch_multiqc_files.collect(),
