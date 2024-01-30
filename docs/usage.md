@@ -54,6 +54,18 @@ Contamination filtering of the sequencing reads is optional and can be invoked u
 - `pirna`: Used to supply a FASTA file containing piRNA contamination sequence. e.g. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 - `other_contamination`: Used to supply an additional filtering set. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 
+### UMI handling
+
+The pipeline handles UMIs with two tools `Umitools-extract` and subsequently `Umicollapse` to deduplicate using UMI information. This can be achieved by using the parameters for UMI handling:
+
+```bash
+--with_umi --umitools_bc_pattern = '.+AACTGTAGGCACCATCAAT{s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
+```
+
+:::note
+You will have to specify custom `umitools_bc_pattern` patterns if your UMI is different. Please check the required capability in your UMI handling manual.
+:::
+
 ## Samplesheet input
 
 You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 2 columns ("sample" and "fastq_1"), and a header row as shown in the examples below.
