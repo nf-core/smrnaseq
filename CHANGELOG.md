@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#164]](https://github.com/nf-core/smrnaseq/pull/164) - UMI Handling Feature implemented in the pipeline
 - [[#302]](https://github.com/nf-core/smrnaseq/pull/302) - Merged in nf-core template v2.11.1
 - [[#294]](https://github.com/nf-core/smrnaseq/pull/294) - Fixed contamination screening issues
+- [[#309]](https://github.com/nf-core/smrnaseq/pull/309) - Merged in nf-core template v2.12.0
 
 ### Parameters
 

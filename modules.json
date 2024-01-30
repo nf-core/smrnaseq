@@ -67,7 +67,7 @@
                     },
                     "umicollapse": {
                         "branch": "master",
-                        "git_sha": "b573d74ce7eced7963d00d4a7f99db9caed61d79",
+                        "git_sha": "0f0531e44e5d106fc7ef4aadfb23352b09da80a9",
                         "installed_by": ["modules"]
                     },
                     "umitools/extract": {
