@@ -168,18 +168,6 @@ workflow SMRNASEQ {
         }
     }
 
-    //
-    // SUBWORKFLOW: Deduplicate UMIs by mapping them to the genome
-    //
-    // if (params.with_umi){
-    //     DEDUPLICATE_UMIS (
-    //         ch_bowtie_index,
-    //         ch_reads_for_mirna,
-    //     )
-    //     ch_reads_for_mirna = DEDUPLICATE_UMIS.out.reads
-    //     ch_versions = ch_versions.mix(DEDUPLICATE_UMIS.out.versions)
-    // }
-
     //UMI Dedup for fastq input
     if (params.with_umi) {
         ch_fastq = Channel.value('fastq')
@@ -196,6 +184,7 @@ workflow SMRNASEQ {
     .join( ch_reads_for_mirna )
     .map { meta, adapter_seq, reads -> [adapter_seq, meta.id, reads] }
     .groupTuple()
+    .dump()
     .set { ch_mirtrace_inputs }
 
     MIRTRACE(ch_mirtrace_inputs)
