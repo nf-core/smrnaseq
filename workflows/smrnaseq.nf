@@ -174,7 +174,8 @@ workflow SMRNASEQ {
         ch_input_for_collapse = ch_reads_for_mirna.map{ meta, reads -> [meta, reads, []]} //Needs to be done to add a []
         UMICOLLAPSE_FASTQ(ch_input_for_collapse, ch_fastq)
         ch_reads_for_mirna = UMICOLLAPSE_FASTQ.out.fastq
-    }
+        ch_versions = ch_versions.mix(UMICOLLAPSE_FASTQ.out.versions)
+        }
 
 
     //
