@@ -3,23 +3,23 @@
 //
 
 include { BLAT_MIRNA as BLAT_CDNA
-          BLAT_MIRNA as BLAT_NCRNA
-          BLAT_MIRNA as BLAT_PIRNA
-          BLAT_MIRNA as BLAT_OTHER } from '../../modules/local/blat_mirna'
+        BLAT_MIRNA as BLAT_NCRNA
+        BLAT_MIRNA as BLAT_PIRNA
+        BLAT_MIRNA as BLAT_OTHER } from '../../modules/local/blat_mirna'
 
 include { INDEX_CONTAMINANTS as INDEX_RRNA
-          INDEX_CONTAMINANTS as INDEX_TRNA
-          INDEX_CONTAMINANTS as INDEX_CDNA
-          INDEX_CONTAMINANTS as INDEX_NCRNA
-          INDEX_CONTAMINANTS as INDEX_PIRNA
-          INDEX_CONTAMINANTS as INDEX_OTHER } from '../../modules/local/bowtie_contaminants'
+        INDEX_CONTAMINANTS as INDEX_TRNA
+        INDEX_CONTAMINANTS as INDEX_CDNA
+        INDEX_CONTAMINANTS as INDEX_NCRNA
+        INDEX_CONTAMINANTS as INDEX_PIRNA
+        INDEX_CONTAMINANTS as INDEX_OTHER } from '../../modules/local/bowtie_contaminants'
 
 include { BOWTIE_MAP_CONTAMINANTS as MAP_RRNA
-          BOWTIE_MAP_CONTAMINANTS as MAP_TRNA
-          BOWTIE_MAP_CONTAMINANTS as MAP_CDNA
-          BOWTIE_MAP_CONTAMINANTS as MAP_NCRNA
-          BOWTIE_MAP_CONTAMINANTS as MAP_PIRNA
-          BOWTIE_MAP_CONTAMINANTS as MAP_OTHER } from '../../modules/local/bowtie_map_contaminants'
+        BOWTIE_MAP_CONTAMINANTS as MAP_TRNA
+        BOWTIE_MAP_CONTAMINANTS as MAP_CDNA
+        BOWTIE_MAP_CONTAMINANTS as MAP_NCRNA
+        BOWTIE_MAP_CONTAMINANTS as MAP_PIRNA
+        BOWTIE_MAP_CONTAMINANTS as MAP_OTHER } from '../../modules/local/bowtie_map_contaminants'
 
 include { FILTER_STATS } from '../../modules/local/filter_stats'
 
