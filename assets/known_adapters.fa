@@ -1,6 +1,2 @@
-> QIAseq miRNA adapter
-AACTGTAGGCACCATCAAT
-> Illumina miRNA adapter
-TGGAATTCTCGGGTGCCAAGG
-> Nextflex miRNA adapter
+> Illumina Sequencing Adapter
 TGGAATTCTCGGGTGCCAAGG
