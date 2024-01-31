@@ -71,7 +71,6 @@ include { MIRNA_QUANT                 } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT                } from '../subworkflows/local/genome_quant'
 include { MIRDEEP2                    } from '../subworkflows/local/mirdeep2'
 include { INDEX_GENOME                } from '../modules/local/bowtie_genome'
-include { MIRTRACE_RUN as MIRTRACE    } from '../modules/local/mirtrace'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -86,6 +85,7 @@ include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/
 include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS      } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
+include { MIRTRACE                         } from '../subworkflows/local/mirtrace'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -188,7 +188,7 @@ workflow SMRNASEQ {
     .groupTuple()
     .set { ch_mirtrace_inputs }
 
-    ch_mirtrace_inputs | MIRTRACE
+    MIRTRACE(ch_mirtrace_inputs)
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
 
 
