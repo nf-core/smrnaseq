@@ -71,6 +71,7 @@ include { MIRNA_QUANT                 } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT                } from '../subworkflows/local/genome_quant'
 include { MIRDEEP2                    } from '../subworkflows/local/mirdeep2'
 include { INDEX_GENOME                } from '../modules/local/bowtie_genome'
+include { MIRTRACE                    } from '../subworkflows/local/mirtrace'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -85,7 +86,8 @@ include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/
 include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS      } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
-include { MIRTRACE                         } from '../subworkflows/local/mirtrace'
+include { UMITOOLS_EXTRACT                 } from '../../../modules/nf-core/umitools/extract/main'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -169,13 +171,17 @@ workflow SMRNASEQ {
     }
 
     //UMI Dedup for fastq input
+    // This involves running on the sequencing adapter trimmed remnants of the entire reads
+    // consisting of sequence + common sequence "miRNA adapter" + UMI
+    // once collapsing happened, we will use umitools extract to get rid of the common miRNA sequence + the UMI to have only plain collapsed reads without any other clutter
     if (params.with_umi) {
         ch_fastq = Channel.value('fastq')
         ch_input_for_collapse = ch_reads_for_mirna.map{ meta, reads -> [meta, reads, []]} //Needs to be done to add a []
         UMICOLLAPSE_FASTQ(ch_input_for_collapse, ch_fastq)
-        ch_reads_for_mirna = UMICOLLAPSE_FASTQ.out.fastq
         ch_versions = ch_versions.mix(UMICOLLAPSE_FASTQ.out.versions)
-        }
+        UMITOOLS_EXTRACT(UMICOLLAPSE_FASTQ.out.fastq)
+        ch_reads_for_mirna = UMITOOLS_EXTRACT.out.reads
+    }
 
 
     //
