@@ -71,7 +71,7 @@ include { MIRNA_QUANT                 } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT                } from '../subworkflows/local/genome_quant'
 include { MIRDEEP2                    } from '../subworkflows/local/mirdeep2'
 include { INDEX_GENOME                } from '../modules/local/bowtie_genome'
-include { MIRTRACE_RUN as MIRTRACE         } from '../modules/local/mirtrace'
+include { MIRTRACE_RUN as MIRTRACE    } from '../modules/local/mirtrace'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -188,7 +188,7 @@ workflow SMRNASEQ {
     .groupTuple()
     .set { ch_mirtrace_inputs }
 
-    MIRTRACE(ch_mirtrace_inputs)
+    ch_mirtrace_inputs | MIRTRACE
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
 
 
