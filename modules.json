@@ -27,7 +27,7 @@
                     },
                     "fastqc": {
                         "branch": "master",
-                        "git_sha": "c9488585ce7bd35ccd2a30faa2371454c8112fb9",
+                        "git_sha": "f4ae1d942bd50c5c0b9bd2de1393ce38315ba57c",
                         "installed_by": ["fastq_fastqc_umitools_fastp"]
                     },
                     "multiqc": {
@@ -62,7 +62,7 @@
                     },
                     "umicollapse": {
                         "branch": "master",
-                        "git_sha": "6971511e34fb6563a48f1bf583238a7c49654910",
+                        "git_sha": "2e561f4551ce3df2bc60016f7ea359f2ed4bce49",
                         "installed_by": ["modules"]
                     },
                     "umitools/extract": {
