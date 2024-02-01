@@ -58,8 +58,6 @@ workflow MIRNA_QUANT {
     BAM_STATS_MATURE ( BOWTIE_MAP_MATURE.out.bam, FORMAT_MATURE.out.formatted_fasta )
     ch_versions = ch_versions.mix(BAM_STATS_MATURE.out.versions)
 
-
-
     PARSE_HAIRPIN ( hairpin ).parsed_fasta.set { hairpin_parsed }
     ch_versions = ch_versions.mix(PARSE_HAIRPIN.out.versions)
 
@@ -75,15 +73,14 @@ workflow MIRNA_QUANT {
     BAM_STATS_HAIRPIN ( BOWTIE_MAP_HAIRPIN.out.bam, FORMAT_HAIRPIN.out.formatted_fasta )
     ch_versions = ch_versions.mix(BAM_STATS_HAIRPIN.out.versions)
 
-
     BAM_STATS_MATURE.out.idxstats.collect{it[1]}
         .mix(BAM_STATS_HAIRPIN.out.idxstats.collect{it[1]})
         .dump(tag:'edger')
         .flatten()
         .collect()
         .set { edger_input }
-    EDGER_QC ( edger_input )
 
+    EDGER_QC ( edger_input )
     ch_versions.mix(EDGER_QC.out.versions)
 
     reads

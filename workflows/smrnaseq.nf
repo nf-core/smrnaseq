@@ -64,14 +64,15 @@ if (!params.mirgenedb) {
     if (params.mirgenedb_gff) { mirna_gtf = file(params.mirgenedb_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found: ${params.mirgenedb_gff}"}
 }
 
-include { INPUT_CHECK                 } from '../subworkflows/local/input_check'
-include { FASTQ_FASTQC_UMITOOLS_FASTP } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
-include { CONTAMINANT_FILTER          } from '../subworkflows/local/contaminant_filter'
-include { MIRNA_QUANT                 } from '../subworkflows/local/mirna_quant'
-include { GENOME_QUANT                } from '../subworkflows/local/genome_quant'
-include { MIRDEEP2                    } from '../subworkflows/local/mirdeep2'
-include { INDEX_GENOME                } from '../modules/local/bowtie_genome'
-include { MIRTRACE                    } from '../subworkflows/local/mirtrace'
+include { INPUT_CHECK                               } from '../subworkflows/local/input_check'
+include { FASTQ_FASTQC_UMITOOLS_FASTP               } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
+include { FASTP as FASTP_LENGTH_FILTER              } from '../modules/nf-core/fastp'
+include { CONTAMINANT_FILTER                        } from '../subworkflows/local/contaminant_filter'
+include { MIRNA_QUANT                               } from '../subworkflows/local/mirna_quant'
+include { GENOME_QUANT                              } from '../subworkflows/local/genome_quant'
+include { MIRDEEP2                                  } from '../subworkflows/local/mirdeep2'
+include { INDEX_GENOME                              } from '../modules/local/bowtie_genome'
+include { MIRTRACE                                  } from '../subworkflows/local/mirtrace'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -136,7 +137,6 @@ workflow SMRNASEQ {
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters & dedup UMIs if necessary / desired by the user
     //
-
     FASTQ_FASTQC_UMITOOLS_FASTP (
         ch_cat_fastq,
         params.skip_fastqc,
@@ -170,7 +170,7 @@ workflow SMRNASEQ {
         }
     }
 
-    //UMI Dedup for fastq input
+    // UMI Dedup for fastq input
     // This involves running on the sequencing adapter trimmed remnants of the entire reads
     // consisting of sequence + common sequence "miRNA adapter" + UMI
     // once collapsing happened, we will use umitools extract to get rid of the common miRNA sequence + the UMI to have only plain collapsed reads without any other clutter
@@ -180,9 +180,18 @@ workflow SMRNASEQ {
         UMICOLLAPSE_FASTQ(ch_input_for_collapse, ch_fastq)
         ch_versions = ch_versions.mix(UMICOLLAPSE_FASTQ.out.versions)
         UMITOOLS_EXTRACT(UMICOLLAPSE_FASTQ.out.fastq)
-        ch_reads_for_mirna = UMITOOLS_EXTRACT.out.reads
-    }
 
+        // Filter out sequences smaller than params.fastp_min_length
+        FASTP_LENGTH_FILTER (
+            UMITOOLS_EXTRACT.out.reads,
+            params.fastp_known_mirna_adapters,
+            params.save_trimmed_fail,
+            params.save_merged
+        )
+        ch_versions = ch_versions.mix(FASTP_LENGTH_FILTER.out.versions)
+
+        ch_reads_for_mirna = FASTP_LENGTH_FILTER.out.reads
+    }
 
     //
     // MODULE: mirtrace QC
@@ -194,9 +203,11 @@ workflow SMRNASEQ {
     .groupTuple()
     .set { ch_mirtrace_inputs }
 
+    //
+    // SUBWORKFLOW: MIRTRACE
+    //
     MIRTRACE(ch_mirtrace_inputs)
     ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
-
 
     //
     // SUBWORKFLOW: remove contaminants from reads
