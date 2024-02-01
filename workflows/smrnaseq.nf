@@ -86,7 +86,7 @@ include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/
 include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS      } from '../modules/nf-core/custom/dumpsoftwareversions/main'
 include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
-include { UMITOOLS_EXTRACT                 } from '../../../modules/nf-core/umitools/extract/main'
+include { UMITOOLS_EXTRACT                 } from '../modules/nf-core/umitools/extract/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
