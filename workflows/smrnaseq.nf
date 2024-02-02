@@ -134,6 +134,8 @@ workflow SMRNASEQ {
     .set { ch_cat_fastq }
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
+    mirna_adapters = params.with_umi ? [] : params.fastp_known_mirna_adapters
+
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters & dedup UMIs if necessary / desired by the user
     //
@@ -144,7 +146,7 @@ workflow SMRNASEQ {
         params.skip_umi_extract,
         params.umi_discard_read,
         params.skip_fastp,
-        params.fastp_known_mirna_adapters,
+        mirna_adapters,
         params.save_trimmed_fail,
         params.save_merged,
         params.min_trimmed_reads
@@ -184,7 +186,7 @@ workflow SMRNASEQ {
         // Filter out sequences smaller than params.fastp_min_length
         FASTP_LENGTH_FILTER (
             UMITOOLS_EXTRACT.out.reads,
-            params.fastp_known_mirna_adapters,
+            mirna_adapters,
             params.save_trimmed_fail,
             params.save_merged
         )
