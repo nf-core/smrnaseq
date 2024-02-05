@@ -228,7 +228,7 @@
                 },
                 "fastp_max_length": {
                     "type": "integer",
-                    "default": 40,
+                    "default": 100,
                     "description": "Maximum filter length for raw reads.",
                     "fa_icon": "fas fa-ruler-horizontal"
                 },
