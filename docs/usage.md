@@ -11,10 +11,12 @@
 This option indicates the experimental protocol used for the sample preparation. Currently supporting:
 
 - 'illumina': adapter (`TGGAATTCTCGGGTGCCAAGG`)
-- 'nextflex': adapter (`TGGAATTCTCGGGTGCCAAGG), clip_r1 (`4`), three_prime_clip_r1 (`4`)
+- 'nextflex': adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`4`), three_prime_clip_r1 (`4`)
 - 'qiaseq': adapter (`AACTGTAGGCACCATCAAT`)
-- 'cats': adapter (`GATCGGAAGAGCACACGTCTG), clip_r1(`3)
+- 'cats': adapter (`GATCGGAAGAGCACACGTCTG`), clip_r1(`3)
 - 'custom' (where the user can indicate the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` manually)
+
+The parameter `--three_prime_adapter` is set to the Illumina adapter sequence `AGATCGGAAGAGCACACGTCTGAACTCCAGTCA`. This is also to ensure, that the auto-detect functionality of `FASTP` is not used. Please make sure to adapt this adapter sequence accordingly for your run.
 
 :warning: At least the `custom` protocol has to be specified, otherwise the pipeline won't run. In case you specify the `custom` protocol, ensure that the parameters above are set accordingly or the defaults will be applied. If you want to auto-detect the adapters using `fastp`, please set `--three_prime_adapter` to `""`.
 
