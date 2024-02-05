@@ -58,14 +58,14 @@ Contamination filtering of the sequencing reads is optional and can be invoked u
 
 ### UMI handling
 
-The pipeline handles UMIs with two tools `Umitools-extract` and subsequently `Umicollapse` to deduplicate using UMI information. This can be achieved by using the parameters for UMI handling:
+The pipeline handles UMIs with two tools `Umitools-extract` and subsequently `Umicollapse` to deduplicate using UMI information. This can be achieved by using the parameters for UMI handling as follows (in this case for the Qiagen kit):
 
 ```bash
---with_umi --umitools_bc_pattern = '.+AACTGTAGGCACCATCAAT{s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
+--with_umi --umitools_extract_method regex --umitools_bc_pattern = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
 ```
 
 :::note
-You will have to specify custom `umitools_bc_pattern` patterns if your UMI is different. Please check the required capability in your UMI handling manual.
+You will have to specify custom `umitools_bc_pattern` patterns if your UMI is different. Please check the required capability in your UMI handling manual. It should be set in a way, that only the sequence of the RNA molecule is left after extraction.
 :::
 
 ## Samplesheet input
