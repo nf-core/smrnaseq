@@ -16,7 +16,7 @@ This option indicates the experimental protocol used for the sample preparation.
 - 'cats': adapter (`GATCGGAAGAGCACACGTCTG`), clip_r1(`3)
 - 'custom' (where the user can indicate the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` manually)
 
-The parameter `--three_prime_adapter` is set to the Illumina adapter sequence `AGATCGGAAGAGCACACGTCTGAACTCCAGTCA`. This is also to ensure, that the auto-detect functionality of `FASTP` is not used. Please make sure to adapt this adapter sequence accordingly for your run.
+The parameter `--three_prime_adapter` is set to the Illumina TruSeq single index adapter sequence `AGATCGGAAGAGCACACGTCTGAACTCCAGTCA`. This is also to ensure, that the auto-detect functionality of `FASTP` is disabled. Please make sure to adapt this adapter sequence accordingly for your run.
 
 :warning: At least the `custom` protocol has to be specified, otherwise the pipeline won't run. In case you specify the `custom` protocol, ensure that the parameters above are set accordingly or the defaults will be applied. If you want to auto-detect the adapters using `fastp`, please set `--three_prime_adapter` to `""`.
 
@@ -58,14 +58,14 @@ Contamination filtering of the sequencing reads is optional and can be invoked u
 
 ### UMI handling
 
-The pipeline handles UMIs with two tools `Umitools-extract` and subsequently `Umicollapse` to deduplicate using UMI information. This can be achieved by using the parameters for UMI handling as follows (in this case for the Qiagen kit):
+The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire read sequence after 3'adapter removal. Followed by Umitools-extract to extract the miRNA adapter and UMI. This can be achieved by using the parameters for UMI handling as follows (in this case for QIAseq miRNA Library Kit):
 
 ```bash
 --with_umi --umitools_extract_method regex --umitools_bc_pattern = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
 ```
 
 :::note
-You will have to specify custom `umitools_bc_pattern` patterns if your UMI is different. Please check the required capability in your UMI handling manual. It should be set in a way, that only the sequence of the RNA molecule is left after extraction.
+You will have to specify custom umitools_bc_pattern patterns if your UMI read structure is different. Please check the required capability in your UMI handling manual. It should be set in a way, that only the insert sequence of the RNA molecule is left after extraction. Please refer to the manual of the used kit for the expected read structure.
 :::
 
 ## Samplesheet input
