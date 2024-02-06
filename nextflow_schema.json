@@ -75,10 +75,11 @@
                     "fa_icon": "fas fa-layer-group",
                     "help_text": "Available options are dir, cc, adj"
                 },
-                "skip_umi_extract": {
+                "skip_umi_extract_before_dedup": {
                     "type": "boolean",
                     "fa_icon": "fas fa-compress-alt",
-                    "description": "Skip the UMI extraction from the read in case the UMIs have been moved to the headers in advance of the pipeline run."
+                    "description": "Skip the UMI extraction from the reads before deduplication. Please note, if this parameter is set to false, the reads will be deduplicated solely on insert sequence. UMIs might be extracted after deduplication depending on the set umitools_bc_pattern nevertheless if with_umi is set to True.",
+                    "default": true
                 },
                 "umitools_bc_pattern": {
                     "type": "string",
@@ -212,7 +213,8 @@
                 "three_prime_adapter": {
                     "type": "string",
                     "fa_icon": "fas fa-text-width",
-                    "description": "Sequencing adapter sequence to use for trimming."
+                    "description": "Sequencing adapter sequence to use for trimming.",
+                    "default": "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA"
                 },
                 "trim_fastq": {
                     "type": "boolean",
