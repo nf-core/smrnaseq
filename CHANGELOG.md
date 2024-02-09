@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v2.3.0 - 2024-01-31 - Gray Zinc Dalmatian
+## v2.3.0 - 2024-02-09 - Gray Zinc Dalmatian
 
 - [[#307]](https://github.com/nf-core/smrnaseq/pull/307) - Clean up config file and improve output folder structure
 - [[#299]](https://github.com/nf-core/smrnaseq/issues/299) - Bugfix for missing inputs in BAM stats (`genome_quant.r`)
@@ -12,18 +12,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#294]](https://github.com/nf-core/smrnaseq/pull/294) - Fixed contamination screening issues
 - [[#309]](https://github.com/nf-core/smrnaseq/pull/309) - Merged in nf-core template v2.12.0
 - [[#310]](https://github.com/nf-core/smrnaseq/pull/310) - Removed unnecessarily separate mirtrace subworkflow, now using module instead
+- [[#311]](https://github.com/nf-core/smrnaseq/pull/311) - Fix use of FASTP, set `three_prime_adapter` per default
+- [[#314]](https://github.com/nf-core/smrnaseq/pull/314) - Add parameters to control publishing of intermediate results
 
 ### Parameters
 
-| Old parameter | New parameter               |
-| ------------- | --------------------------- |
-|               | `--with_umi`                |
-|               | `--umitools_extract_method` |
-|               | `--umitools_method`         |
-|               | `--skip_umi_extract`        |
-|               | `--umitools_bc_pattern`     |
-|               | `--umi_discard_read`        |
-|               | `--save_umi_intermeds`      |
+| Old parameter | New parameter                |
+| ------------- | ---------------------------- |
+|               | `--with_umi`                 |
+|               | `--umitools_extract_method`  |
+|               | `--umitools_method`          |
+|               | `--skip_umi_extract`         |
+|               | `--umitools_bc_pattern`      |
+|               | `--umi_discard_read`         |
+|               | `--save_umi_intermeds`       |
+|               | `--save_aligned`             |
+|               | `--save_aligned_mirna_quant` |
+|               | `--save_merged`              |
 
 ### Software dependencies
 
