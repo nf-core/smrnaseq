@@ -190,6 +190,11 @@
                     "fa_icon": "fas fa-download",
                     "description": "Save aligned reads in bam format."
                 },
+                "save_aligned_mirna_quant": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Save aligned reads in bam format of miRNA quant subworkflow."
+                },
                 "igenomes_ignore": {
                     "type": "boolean",
                     "description": "Do not load the iGenomes reference config.",
