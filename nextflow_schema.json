@@ -185,6 +185,16 @@
                     "help_text": "Saving generated references means that you can use them for future pipeline runs, reducing processing times.",
                     "fa_icon": "fas fa-save"
                 },
+                "save_aligned": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-download",
+                    "description": "Save aligned reads in bam format."
+                },
+                "save_aligned_mirna_quant": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Save aligned reads in bam format of miRNA quant subworkflow."
+                },
                 "igenomes_ignore": {
                     "type": "boolean",
                     "description": "Do not load the iGenomes reference config.",
@@ -256,7 +266,8 @@
                 },
                 "save_merged": {
                     "type": "boolean",
-                    "description": "Save merged reads."
+                    "description": "Save merged reads.",
+                    "default": true
                 }
             }
         },
