@@ -187,13 +187,16 @@
                 },
                 "save_aligned": {
                     "type": "boolean",
-                    "fa_icon": "fas fa-download",
-                    "description": "Save aligned reads in bam format."
+                    "fa_icon": "fas fa-save",
+                    "help_text": "Save aligned reads of initial bowtie mapping.",
+                    "description": "Save aligned reads of initial mapping in bam format."
                 },
                 "save_aligned_mirna_quant": {
                     "type": "boolean",
+                    "fa_icon": "fas fa-save",
                     "default": true,
-                    "description": "Save aligned reads in bam format of miRNA quant subworkflow."
+                    "help_text": "Save aligned reads of the bowtie runs in BOWTIE_MAP_MATURE, BOWTIE_MAP_HAIRPIN, and BOWTIE_MAP_SEQCLUSTER.",
+                    "description": "Save aligned reads of miRNA quant subworkflow in bam format."
                 },
                 "igenomes_ignore": {
                     "type": "boolean",
