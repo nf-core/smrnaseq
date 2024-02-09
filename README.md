@@ -4,9 +4,11 @@
     <img alt="nf-core/smrnaseq" src="docs/images/nf-core-smrnaseq_logo_light.png">
   </picture>
 </h1>
+
 [![GitHub Actions CI Status](https://github.com/nf-core/smrnaseq/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/smrnaseq/actions?query=workflow%3A%22nf-core+CI%22)
 [![GitHub Actions Linting Status](https://github.com/nf-core/smrnaseq/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/smrnaseq/actions?query=workflow%3A%22nf-core+linting%22)
 [![AWS CI](https://img.shields.io/badge/CI%20tests-full%20size-FF9900?labelColor=000000&logo=Amazon%20AWS)](https://nf-co.re/smrnaseq/results)[![Cite with Zenodo](http://img.shields.io/badge/DOI-10.5281/zenodo.3456879-1073c8?labelColor=000000)](https://doi.org/10.5281/zenodo.3456879)
+
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A523.04.0-23aa62.svg)](https://www.nextflow.io/)
 [![run with conda](http://img.shields.io/badge/run%20with-conda-3EB049?labelColor=000000&logo=anaconda)](https://docs.conda.io/en/latest/)
 [![run with docker](https://img.shields.io/badge/run%20with-docker-0db7ed?labelColor=000000&logo=docker)](https://www.docker.com/)
@@ -33,19 +35,24 @@ You can find numerous talks on the nf-core events page from various topics inclu
 
 1. Quality check and triming
    1. Raw read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-   2. Adapter trimming ([`fastp`](https://github.com/OpenGene/fastp))
-   3. UMI barcode extraction ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools))
-   4. Trim read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-2. miRNA QC ([`miRTrace`](https://github.com/friedlanderlab/mirtrace))
-3. Contamination filtering ([`Bowtie2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) (Optional)
+   2. UMI extraction and miRNA adapter trimming ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools)) (Optional)
+   3. 3' adapter trimming ([`fastp`](https://github.com/OpenGene/fastp))
+   4. Read quality and length filter ([`fastp`](https://github.com/OpenGene/fastp))
+   5. Trim read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
+2. UMI deduplication (Optional)
+   1. Deduplication on fastq-level ([`UMICollapse`](https://github.com/Daniel-Liu-c0deb0t/UMICollapse))
+   2. Barcode and miRNA adapter extraction ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools))
+   3. Read length filter ([`fastp`](https://github.com/OpenGene/fastp))
+3. miRNA QC ([`miRTrace`](https://github.com/friedlanderlab/mirtrace))
+4. Contamination filtering ([`Bowtie2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) (Optional)
    1. rRNA filtration
    2. tRNA filtration
    3. cDNA filtration
    4. ncRNA filtration
    5. piRNA filtration
    6. Others filtration
-4. UMI barcode deduplication ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools))
-5. miRNA quantification
+5. UMI barcode deduplication ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools))
+6. miRNA quantification
    - EdgeR
      1. Reads alignment against miRBase mature miRNA ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
      2. Post-alignment processing of alignment against Mature miRNA ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
@@ -58,13 +65,13 @@ You can find numerous talks on the nf-core events page from various topics inclu
    - Mirtop quantification
      1. Read collapsing ([`seqcluster`](https://github.com/lpantano/seqcluster))
      2. miRNA and isomiR annotation ([`mirtop`](https://github.com/miRTop/mirtop))
-6. Genome Quantification (Optional)
+7. Genome Quantification (Optional)
    1. Reads alignment against host reference genome ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
    2. Post-alignment processing of alignment against host reference genome ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-7. Novel miRNAs and known miRNAs discovery ([`MiRDeep2`](https://www.mdc-berlin.de/content/mirdeep2-documentation)) (Optional)
+8. Novel miRNAs and known miRNAs discovery ([`MiRDeep2`](https://www.mdc-berlin.de/content/mirdeep2-documentation)) (Optional)
    1. Mapping against reference genome with the mapper module
    2. Known and novel miRNA discovery with the mirdeep2 module
-8. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
+9. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
 
 ## Usage
 

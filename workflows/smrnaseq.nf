@@ -143,7 +143,7 @@ workflow SMRNASEQ {
         ch_cat_fastq,
         params.skip_fastqc,
         params.with_umi,
-        params.skip_umi_extract,
+        params.skip_umi_extract_before_dedup,
         params.umi_discard_read,
         params.skip_fastp,
         mirna_adapters,
