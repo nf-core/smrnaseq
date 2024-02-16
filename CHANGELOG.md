@@ -34,14 +34,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 | Dependency    | Old version | New version |
 | ------------- | ----------- | ----------- |
-| `multiqc`     | 1.15        | 1.19        |
+| `multiqc`     | 1.15        | 1.20        |
 | `edgeR`       | 3.36.0      | 4.0.2       |
 | `limma`       | 3.50.0      | 3.58.1      |
 | `bioconvert`  | 0.4.3       | 1.1.1       |
 | `mirdeep`     | 2.0.1       | 2.0.1.3     |
 | `seqkit`      | 2.3.1       | 2.6.1       |
 | `fastqc`      | 0.11.4      | 0.12.1      |
-| `samtools`    | 1.17        | 1.18        |
+| `samtools`    | 1.17        | 1.19.2      |
 | `umitools`    | <none>      | 1.1.4       |
 | `umicollapse` | <none>      | 1.0.0       |
 
