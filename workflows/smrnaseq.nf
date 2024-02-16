@@ -162,7 +162,7 @@ workflow SMRNASEQ {
         //Prepare bowtie index, unless specified
         //This needs to be done here as the index is used by GENOME_QUANT
         if(params.bowtie_index) {
-            Channel.fromPath("${params.bowtie_index}**ebwt", checkIfExists: true).ifEmpty{ error "Bowtie1 index directory not found: ${index}" }.set { ch_bowtie_index }
+            Channel.fromPath("${params.bowtie_index}**ebwt", checkIfExists: true).ifEmpty{ error "Bowtie1 index directory not found: ${params.bowtie_index}" }.set { ch_bowtie_index }
         } else {
             INDEX_GENOME ( [ [:], ch_fasta ] )
             ch_versions = ch_versions.mix(INDEX_GENOME.out.versions)
