@@ -153,7 +153,7 @@ workflow SMRNASEQ {
     )
     ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.versions)
 
-    ch_fasta = params.fasta ? Channel.value(file(params.fasta)) : []
+    ch_fasta = params.fasta ? file(params.fasta) : []
     ch_reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
 
     // even if bowtie index is specified, there still needs to be a fasta.
