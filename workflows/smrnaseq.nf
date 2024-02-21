@@ -242,7 +242,6 @@ workflow SMRNASEQ {
     // MODULE: MultiQC
     //
     if (!params.skip_multiqc) {
-        workflow_summary    = WorkflowSmrnaseq.paramsSummaryMultiqc(workflow, summary_params)
         ch_workflow_summary = Channel.value(paramsSummaryMultiqc(workflow_summary))
 
         methods_description    = WorkflowSmrnaseq.methodsDescriptionText(workflow, ch_multiqc_custom_methods_description, params)
