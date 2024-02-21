@@ -32,8 +32,6 @@ workflow NFCORE_SMRNASEQ {
     ch_input            // channel: samplesheet file as specified to --input
     ch_samplesheet      // channel: sample fastqs parsed from --input
     ch_versions         // channel: [ path(versions.yml) ]
-    ch_fasta            // channel: path(genome.fasta)
-
 
     main:
 

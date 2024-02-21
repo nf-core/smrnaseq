@@ -29,8 +29,8 @@ include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_smrn
 */
 
 params.fasta            = getGenomeAttribute('fasta')
-params.mirtrace_species = getGenomeAttribute(params, 'mirtrace_species')
-params.bowtie_index     = getGenomeAttribute(params, 'bowtie')
+params.mirtrace_species = getGenomeAttribute('mirtrace_species')
+params.bowtie_index     = getGenomeAttribute('bowtie')
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -40,6 +40,7 @@ params.bowtie_index     = getGenomeAttribute(params, 'bowtie')
 workflow {
 
     main:
+    ch_versions = Channel.empty()
 
     //
     // SUBWORKFLOW: Run initialisation tasks
@@ -58,11 +59,10 @@ workflow {
     // WORKFLOW: Run main workflow
     //
     NFCORE_SMRNASEQ (
-        PIPELINE_INITIALISATION.out.samplesheet
+        Channel.of(file(params.input, checkIfExists: true)),
+        PIPELINE_INITIALISATION.out.samplesheet,
+        ch_versions
     )
-
-    multiqc_report = NFCORE_SMRNASEQ.out.multiqc_report // channel: /path/to/multiqc_report.html
-
 
     //
     // SUBWORKFLOW: Run completion tasks
