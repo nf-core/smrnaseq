@@ -29,41 +29,22 @@ ch_fastp_adapters          = Channel.fromPath(params.fastp_known_mirna_adapters,
 workflow NFCORE_SMRNASEQ {
 
     take:
-    ch_samplesheet // channel: samplesheet read in from --input
+    ch_input            // channel: samplesheet file as specified to --input
+    ch_samplesheet      // channel: sample fastqs parsed from --input
+    ch_versions         // channel: [ path(versions.yml) ]
+    ch_fasta            // channel: path(genome.fasta)
+
 
     main:
-
-    ch_versions = Channel.empty()
-
-    //
-    // SUBWORKFLOW: Read in samplesheet, validate and stage input files
-    //
-    INPUT_CHECK (
-        file(params.input)
-    )
-    .reads
-    .dump(tag: 'group')
-    .branch {
-        meta, fastq ->
-            single  : fastq.size() == 1
-                return [ meta, fastq.flatten() ]
-            multiple: fastq.size() > 1
-                return [ meta, fastq.flatten() ]
-    }
-    .set { ch_fastq }
-    ch_versions = ch_versions.mix(INPUT_CHECK.out.versions)
-    // TODO: OPTIONAL, you can use nf-validation plugin to create an input channel from the samplesheet with Channel.fromSamplesheet("input")
-    // See the documentation https://nextflow-io.github.io/nf-validation/samplesheets/fromSamplesheet/
-    // ! There is currently no tooling to help you write a sample sheet schema
 
     //
     // MODULE: Concatenate FastQ files from same sample if required
     //
     CAT_FASTQ (
-        ch_fastq.multiple
+        ch_samplesheet.multiple
     )
     .reads
-    .mix(ch_fastq.single)
+    .mix(ch_samplesheet.single)
     .set { ch_cat_fastq }
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
@@ -208,6 +189,7 @@ workflow NFCORE_SMRNASEQ {
     //
     // MODULE: MultiQC
     //
+    ch_multiqc_report = Channel.empty()
     if (!params.skip_multiqc) {
         ch_workflow_summary = Channel.value(paramsSummaryMultiqc(workflow_summary))
 
@@ -235,20 +217,13 @@ workflow NFCORE_SMRNASEQ {
             ch_multiqc_custom_config.toList(),
             ch_multiqc_logo.toList()
         )
-        multiqc_report = MULTIQC.out.report.toList()
+        ch_multiqc_report = MULTIQC.out.report
+
     }
 
-    //
-    // SUBWORKFLOW: Run completion tasks
-    //
-    PIPELINE_COMPLETION (
-        params.email,
-        params.email_on_fail,
-        params.plaintext_email,
-        params.outdir,
-        params.monochrome_logs,
-        params.hook_url
-    )
+    emit:
+    multiqc_report = ch_multiqc_report // channel: /path/to/multiqc_report.html
+    versions       = ch_versions       // channel: [ path(versions.yml) ]
 }
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
