@@ -237,7 +237,6 @@ workflow NFCORE_SMRNASEQ {
         )
         multiqc_report = MULTIQC.out.report.toList()
     }
-}
 
     //
     // SUBWORKFLOW: Run completion tasks
@@ -250,7 +249,7 @@ workflow NFCORE_SMRNASEQ {
         params.monochrome_logs,
         params.hook_url
     )
-
+}
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     THE END
