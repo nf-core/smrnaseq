@@ -3,20 +3,20 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/main'
+include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter'
+include { FASTQC                           } from '../modules/nf-core/fastqc/main'
 include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
 include { FASTP as FASTP_LENGTH_FILTER     } from '../modules/nf-core/fastp'
-include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter'
-include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant'
-include { MIRDEEP2                         } from '../subworkflows/local/mirdeep2'
 include { INDEX_GENOME                     } from '../modules/local/bowtie_genome'
+include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant'
+include { MIRDEEP2                         } from '../subworkflows/local/mirdeep2'
 include { MIRTRACE                         } from '../subworkflows/local/mirtrace'
-include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/main'
 include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
 include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
 include { UMITOOLS_EXTRACT                 } from '../modules/nf-core/umitools/extract/main'
-include { FASTQC                           } from '../modules/nf-core/fastqc/main'
-include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
+
 include { paramsSummaryMap                 } from 'plugin/nf-validation'
 include { paramsSummaryMultiqc             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 
