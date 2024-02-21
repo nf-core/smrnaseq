@@ -29,10 +29,11 @@ include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_smrn
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-// TODO nf-core: Remove this line if you don't need a FASTA file
-//   This is an example of how to use getGenomeAttribute() to fetch parameters
-//   from igenomes.config using `--genome`
-params.fasta = getGenomeAttribute('fasta')
+
+params.fasta            = getGenomeAttribute('fasta')
+params.mirtrace_species = getGenomeAttribute(params, 'mirtrace_species')
+params.bowtie_index     = getGenomeAttribute(params, 'bowtie')
+
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -66,7 +67,6 @@ workflow NFCORE_SMRNASEQ {
     RUN MAIN WORKFLOW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
 workflow {
 
     main:
