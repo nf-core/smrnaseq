@@ -46,7 +46,16 @@ workflow NFCORE_SMRNASEQ {
     ch_versions         // channel: [ path(versions.yml) ]
 
     main:
-
+    //Config checks
+    if (!params.mirgenedb) {
+    if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
+    if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
+    } else {
+    if (params.mirgenedb_mature) { reference_mature = file(params.mirgenedb_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mirgenedb_mature}" }
+    if (params.mirgenedb_hairpin) { reference_hairpin = file(params.mirgenedb_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.mirgenedb_hairpin}" }
+    if (params.mirgenedb_gff) { mirna_gtf = file(params.mirgenedb_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found: ${params.mirgenedb_gff}"}
+    if (!params.mirgenedb_species) { exit 1, "MirGeneDB species not set, please specify via the --mirgenedb_species parameter"}
+    }
     //
     // Create separate channels for samples that have single/multiple FastQ files to merge
     //
