@@ -3,10 +3,22 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { FASTQC                      } from '../modules/nf-core/fastqc/main'
-include { MULTIQC                     } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap            } from 'plugin/nf-validation'
-include { paramsSummaryMultiqc        } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
+include { FASTP as FASTP_LENGTH_FILTER     } from '../modules/nf-core/fastp'
+include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter'
+include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant'
+include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant'
+include { MIRDEEP2                         } from '../subworkflows/local/mirdeep2'
+include { INDEX_GENOME                     } from '../modules/local/bowtie_genome'
+include { MIRTRACE                         } from '../subworkflows/local/mirtrace'
+include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/main'
+include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
+include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
+include { UMITOOLS_EXTRACT                 } from '../modules/nf-core/umitools/extract/main'
+include { FASTQC                           } from '../modules/nf-core/fastqc/main'
+include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
+include { paramsSummaryMap                 } from 'plugin/nf-validation'
+include { paramsSummaryMultiqc             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -36,14 +48,27 @@ workflow NFCORE_SMRNASEQ {
     main:
 
     //
+    // Create separate channels for samples that have single/multiple FastQ files to merge
+    //
+    ch_samplesheet
+        .branch {
+            meta, fastqs ->
+                single  : fastqs.size() == 1
+                    return [ meta, fastqs.flatten() ]
+                multiple: fastqs.size() > 1
+                    return [ meta, fastqs.flatten() ]
+        }
+        .set { ch_fastq }
+
     // MODULE: Concatenate FastQ files from same sample if required
     //
     CAT_FASTQ (
-        ch_samplesheet.multiple
+        ch_fastq.multiple
     )
     .reads
-    .mix(ch_samplesheet.single)
+    .mix(ch_fastq.single)
     .set { ch_cat_fastq }
+
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
 
     mirna_adapters = params.with_umi ? [] : params.fastp_known_mirna_adapters
