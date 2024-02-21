@@ -45,6 +45,3 @@ jobs:
       - name: Run pipeline with test data
         run: |
           nextflow run ${GITHUB_WORKSPACE} -profile ${{ matrix.profile }},docker --outdir ./results
-
-      - name: Free Disk Space for Phil - Because Science!
-        uses: jlumbroso/free-disk-space@v1.3.1
