@@ -67,6 +67,7 @@ if (!params.mirgenedb) {
 include { INPUT_CHECK                               } from '../subworkflows/local/input_check'
 include { FASTQ_FASTQC_UMITOOLS_FASTP               } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
 include { FASTP as FASTP_LENGTH_FILTER              } from '../modules/nf-core/fastp'
+include { UNTARFILES as UNTAR_BOWTIE_INDEX          } from '../modules/nf-core/untarfiles'
 include { CONTAMINANT_FILTER                        } from '../subworkflows/local/contaminant_filter'
 include { MIRNA_QUANT                               } from '../subworkflows/local/mirna_quant'
 include { GENOME_QUANT                              } from '../subworkflows/local/genome_quant'
@@ -162,8 +163,14 @@ workflow SMRNASEQ {
         //Prepare bowtie index, unless specified
         //This needs to be done here as the index is used by GENOME_QUANT
         if(params.bowtie_index) {
-            Channel.fromPath("${params.bowtie_index}**ebwt", checkIfExists: true).ifEmpty{ error "Bowtie1 index directory not found: ${params.bowtie_index}" }.filter { it != null }.set { ch_bowtie_index }
             ch_fasta = Channel.fromPath(params.fasta)
+            if (params.bowtie_index.endsWith(".tar.gz")) {
+                UNTAR_BOWTIE_INDEX ( [ [], params.bowtie_index ]).files.map { it[1] }.set {ch_bowtie_index}
+                ch_versions  = ch_versions.mix(UNTAR_BOWTIE_INDEX.out.versions)
+            } else {
+                Channel.fromPath("${params.bowtie_index}**ebwt", checkIfExists: true).ifEmpty{ error "Bowtie1 index directory not found: ${params.bowtie_index}" }.filter { it != null }.set { ch_bowtie_index }
+            }Channel
+        .fromPath(
         } else {
             INDEX_GENOME ( [ [:], ch_fasta ] )
             ch_versions = ch_versions.mix(INDEX_GENOME.out.versions)

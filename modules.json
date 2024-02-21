@@ -69,6 +69,11 @@
                         "branch": "master",
                         "git_sha": "9e56d7a647fbf6f7e45ef123bc916ad66b6f7c9d",
                         "installed_by": ["fastq_fastqc_umitools_fastp", "modules"]
+                    },
+                    "untarfiles": {
+                        "branch": "master",
+                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "installed_by": ["modules"]
                     }
                 }
             },
