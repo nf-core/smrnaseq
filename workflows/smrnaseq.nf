@@ -169,8 +169,7 @@ workflow SMRNASEQ {
                 ch_versions  = ch_versions.mix(UNTAR_BOWTIE_INDEX.out.versions)
             } else {
                 Channel.fromPath("${params.bowtie_index}**ebwt", checkIfExists: true).ifEmpty{ error "Bowtie1 index directory not found: ${params.bowtie_index}" }.filter { it != null }.set { ch_bowtie_index }
-            }Channel
-        .fromPath(
+            }
         } else {
             INDEX_GENOME ( [ [:], ch_fasta ] )
             ch_versions = ch_versions.mix(INDEX_GENOME.out.versions)
