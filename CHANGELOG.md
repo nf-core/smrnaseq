@@ -44,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 | `seqkit`      | 2.3.1       | 2.6.1       |
 | `fastqc`      | 0.11.4      | 0.12.1      |
 | `samtools`    | 1.17        | 1.19.2      |
-| `umitools`    | <none>      | 1.1.4       |
+| `umitools`    | <none>      | 1.1.5       |
 | `umicollapse` | <none>      | 1.0.0       |
 
 ## [v2.2.4](https://github.com/nf-core/smrnaseq/releases/tag/2.2.4) - 2023-11-03
