@@ -16,7 +16,7 @@ include { MIRTRACE                         } from '../subworkflows/local/mirtrac
 include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
 include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
 include { UMITOOLS_EXTRACT                 } from '../modules/nf-core/umitools/extract/main'
-
+include { UNTARFILES as UNTAR_BOWTIE_INDEX } from '../modules/nf-core/untarfiles'
 include { paramsSummaryMap                 } from 'plugin/nf-validation'
 include { paramsSummaryMultiqc             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -117,8 +117,14 @@ workflow NFCORE_SMRNASEQ {
         //Prepare bowtie index, unless specified
         //This needs to be done here as the index is used by GENOME_QUANT
         if(params.bowtie_index) {
-            ch_bowtie_index  = Channel.fromPath("${index}**ebwt", checkIfExists: true).ifEmpty { error "Bowtie1 index directory not found: ${index}" }
-        } else {
+            ch_fasta = Channel.fromPath(params.fasta)
+            if (params.bowtie_index.endsWith(".tar.gz")) {
+                UNTAR_BOWTIE_INDEX ( [ [], params.bowtie_index ]).files.map { it[1] }.set {ch_bowtie_index}
+                ch_versions  = ch_versions.mix(UNTAR_BOWTIE_INDEX.out.versions)
+            } else {
+                Channel.fromPath("${params.bowtie_index}**ebwt", checkIfExists: true).ifEmpty{ error "Bowtie1 index directory not found: ${params.bowtie_index}" }.filter { it != null }.set { ch_bowtie_index }
+            }
+            } else {
             INDEX_GENOME ( [ [:], ch_fasta ] )
             ch_versions = ch_versions.mix(INDEX_GENOME.out.versions)
             ch_bowtie_index = INDEX_GENOME.out.index
