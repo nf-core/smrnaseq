@@ -87,7 +87,7 @@ workflow NFCORE_SMRNASEQ {
     .mix(ch_fastq.single)
     .set { ch_cat_fastq }
 
-    ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first().ifEmpty(null))
+    ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first())
 
     mirna_adapters = params.with_umi ? [] : params.fastp_known_mirna_adapters
 
@@ -170,7 +170,7 @@ workflow NFCORE_SMRNASEQ {
     // SUBWORKFLOW: MIRTRACE
     //
     MIRTRACE(ch_mirtrace_inputs)
-    ch_versions = ch_versions.mix(MIRTRACE.out.versions.ifEmpty(null))
+    ch_versions = ch_versions.mix(MIRTRACE.out.versions)
 
     //
     // SUBWORKFLOW: remove contaminants from reads
@@ -200,7 +200,7 @@ workflow NFCORE_SMRNASEQ {
         mirna_gtf,
         ch_reads_for_mirna
     )
-    ch_versions = ch_versions.mix(MIRNA_QUANT.out.versions.ifEmpty(null))
+    ch_versions = ch_versions.mix(MIRNA_QUANT.out.versions)
 
     //
     // GENOME
@@ -242,7 +242,7 @@ workflow NFCORE_SMRNASEQ {
         ch_workflow_summary = Channel.value(paramsSummaryMultiqc(summary_params))
 
         ch_multiqc_files = Channel.empty()
-        ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions )
+        ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
         ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_zip.collect{it[1]}.ifEmpty([]))
