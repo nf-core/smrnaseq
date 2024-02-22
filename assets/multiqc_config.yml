@@ -13,6 +13,8 @@ report_section_order:
 
 export_plots: true
 
+disable_version_detection: true
+
 module_order:
   - fastqc:
       name: "FastQC (raw)"
