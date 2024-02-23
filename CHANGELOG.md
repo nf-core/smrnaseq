@@ -54,6 +54,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#288]](https://github.com/nf-core/smrnaseq/issues/288) - Bugfix for issue with handling malformed GFF3 from mirbase
 - Updated dependencies, including FASTQC, MultiQC 1.17, fastP and samtools to latest versions
 
+### Parameters
+
+| Old parameter | New parameter            |
+| ------------- | ------------------------ |
+|               | `--mirgenedb`            |
+|               | `--mirgenedb_species`    |
+|               | `--mirgenedb_gff`        |
+|               | `--mirgenedb_mature`     |
+|               | `--mirgenedb_hairpin`    |
+|               | `--contamination_filter` |
+|               | `--rrna`                 |
+|               | `--trna`                 |
+|               | `--cdna`                 |
+|               | `--ncrna`                |
+|               | `--pirna`                |
+|               | `--other_contamination`  |
+
 ## [v2.2.3](https://github.com/nf-core/smrnaseq/releases/tag/2.2.3) - 2023-09-06
 
 - [[#271]](https://github.com/nf-core/smrnaseq/issues/271) - Bugfix for parsing hairpin and mature fasta files
@@ -153,9 +170,17 @@ Note, since the pipeline is now using Nextflow DSL2, each process will be run wi
 | `bowtie2`            | -           | 2.4.5       |
 | `blat`               | -           | 36          |
 
-> **NB:** Dependency has been **updated** if both old and new version information is present.
-> **NB:** Dependency has been **added** if just the new version information is present.
-> **NB:** Dependency has been **removed** if version information isn't present.
+### Parameters
+
+| Old parameter        | New parameter    |
+| -------------------- | ---------------- |
+| `--conda`            | `--enable_conda` |
+| `--clusterOptions`   |                  |
+| `--publish_dir_mode` |                  |
+
+> **NB:** Parameter has been **updated** if both old and new parameter information is present.
+> **NB:** Parameter has been **added** if just the new parameter information is present.
+> **NB:** Parameter has been **removed** if parameter information isn't present.
 
 ## [v1.1.0](https://github.com/nf-core/smrnaseq/releases/tag/1.1.0) - 2021-06-15
 
