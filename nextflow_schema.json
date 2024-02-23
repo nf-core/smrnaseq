@@ -16,6 +16,7 @@
                     "type": "string",
                     "format": "file-path",
                     "exists": true,
+                    "schema": "assets/schema_input.json",
                     "mimetype": "text/csv",
                     "pattern": "^\\S+\\.csv$",
                     "description": "Path to comma-separated file containing information about the samples in the experiment.",
@@ -49,6 +50,56 @@
                     "fa_icon": "fas fa-file-signature"
                 }
             }
+        },
+        "umi_options": {
+            "title": "UMI options",
+            "type": "object",
+            "description": "Options for processing reads with unique molecular identifiers",
+            "default": "",
+            "properties": {
+                "with_umi": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-barcode",
+                    "description": "Enable UMI-based read deduplication."
+                },
+                "umitools_extract_method": {
+                    "type": "string",
+                    "default": "string",
+                    "fa_icon": "fas fa-barcode",
+                    "description": "UMI pattern to use. Can be either 'string' (default) or 'regex'.",
+                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).\n"
+                },
+                "umitools_method": {
+                    "type": "string",
+                    "default": "dir",
+                    "description": "UMI grouping method",
+                    "fa_icon": "fas fa-layer-group",
+                    "help_text": "Available options are dir, cc, adj"
+                },
+                "skip_umi_extract_before_dedup": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-compress-alt",
+                    "description": "Skip the UMI extraction from the reads before deduplication. Please note, if this parameter is set to false, the reads will be deduplicated solely on insert sequence. UMIs might be extracted after deduplication depending on the set umitools_bc_pattern nevertheless if with_umi is set to True.",
+                    "default": true
+                },
+                "umitools_bc_pattern": {
+                    "type": "string",
+                    "fa_icon": "fas fa-barcode",
+                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).",
+                    "description": "The UMI barcode pattern to use e.g. 'NNNNNN' indicates that the first 6 nucleotides of the read are from the UMI."
+                },
+                "umi_discard_read": {
+                    "type": "integer",
+                    "fa_icon": "fas fa-barcode",
+                    "description": "After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively."
+                },
+                "save_umi_intermeds": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-save",
+                    "description": "If this option is specified, intermediate FastQ and BAM files produced by UMI-tools are also saved in the results directory."
+                }
+            },
+            "fa_icon": "fas fa-barcode"
         },
         "reference_genome_options": {
             "title": "Reference genome options",
@@ -104,7 +155,7 @@
                     "description": "Path to FASTA file with mature miRNAs.",
                     "fa_icon": "fas fa-wheelchair",
                     "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
-                    "default": "https://mirbase.org/download/CURRENT/mature.fa"
+                    "default": "https://mirbase.org/download/mature.fa"
                 },
                 "mirgenedb_mature": {
                     "type": "string",
@@ -116,7 +167,7 @@
                     "description": "Path to FASTA file with miRNAs precursors.",
                     "fa_icon": "fab fa-cuttlefish",
                     "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
-                    "default": "https://mirbase.org/download/CURRENT/hairpin.fa"
+                    "default": "https://mirbase.org/download/hairpin.fa"
                 },
                 "mirgenedb_hairpin": {
                     "type": "string",
@@ -134,6 +185,19 @@
                     "description": "Save generated reference genome files to results.",
                     "help_text": "Saving generated references means that you can use them for future pipeline runs, reducing processing times.",
                     "fa_icon": "fas fa-save"
+                },
+                "save_aligned": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-save",
+                    "help_text": "Save aligned reads of initial bowtie mapping.",
+                    "description": "Save aligned reads of initial mapping in bam format."
+                },
+                "save_aligned_mirna_quant": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-save",
+                    "default": true,
+                    "help_text": "Save aligned reads of the bowtie runs in BOWTIE_MAP_MATURE, BOWTIE_MAP_HAIRPIN, and BOWTIE_MAP_SEQCLUSTER.",
+                    "description": "Save aligned reads of miRNA quant subworkflow in bam format."
                 },
                 "igenomes_ignore": {
                     "type": "boolean",
@@ -162,9 +226,9 @@
                 },
                 "three_prime_adapter": {
                     "type": "string",
-                    "default": "TGGAATTCTCGGGTGCCAAGG",
                     "fa_icon": "fas fa-text-width",
-                    "description": "Sequencing adapter sequence to use for trimming."
+                    "description": "Sequencing adapter sequence to use for trimming.",
+                    "default": "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA"
                 },
                 "trim_fastq": {
                     "type": "boolean",
@@ -180,7 +244,7 @@
                 },
                 "fastp_max_length": {
                     "type": "integer",
-                    "default": 40,
+                    "default": 100,
                     "description": "Maximum filter length for raw reads.",
                     "fa_icon": "fas fa-ruler-horizontal"
                 },
@@ -191,9 +255,23 @@
                 },
                 "fastp_known_mirna_adapters": {
                     "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
                     "default": "${projectDir}/assets/known_adapters.fa",
                     "description": "FastA with known miRNA adapter sequences for adapter trimming",
                     "fa_icon": "far fa-question-circle"
+                },
+                "min_trimmed_reads": {
+                    "type": "integer",
+                    "default": 10,
+                    "fa_icon": "far fa-window-minimize",
+                    "description": "Minimum number of reads required in input file to use it"
+                },
+                "save_merged": {
+                    "type": "boolean",
+                    "description": "Save merged reads.",
+                    "default": true
                 }
             }
         },
@@ -361,14 +439,12 @@
                     "type": "boolean",
                     "description": "Display help text.",
                     "fa_icon": "fas fa-question-circle",
-                    "default": false,
                     "hidden": true
                 },
                 "version": {
                     "type": "boolean",
                     "description": "Display version and exit.",
                     "fa_icon": "fas fa-question-circle",
-                    "default": false,
                     "hidden": true
                 },
                 "publish_dir_mode": {
@@ -392,7 +468,6 @@
                     "type": "boolean",
                     "description": "Send plain-text email instead of HTML.",
                     "fa_icon": "fas fa-remove-format",
-                    "default": false,
                     "hidden": true
                 },
                 "max_multiqc_email_size": {
@@ -407,7 +482,6 @@
                     "type": "boolean",
                     "description": "Do not use coloured log outputs.",
                     "fa_icon": "fas fa-palette",
-                    "default": false,
                     "hidden": true
                 },
                 "hook_url": {
@@ -446,7 +520,6 @@
                     "type": "boolean",
                     "fa_icon": "far fa-eye-slash",
                     "description": "Show all params when using `--help`",
-                    "default": false,
                     "hidden": true,
                     "help_text": "By default, parameters set as _hidden_ in the schema are not shown on the command line when a user runs with `--help`. Specifying this option will tell the pipeline to show all parameters."
                 },
@@ -454,7 +527,6 @@
                     "type": "boolean",
                     "fa_icon": "far fa-check-circle",
                     "description": "Validation of parameters fails when an unrecognised parameter is found.",
-                    "default": false,
                     "hidden": true,
                     "help_text": "By default, when an unrecognised parameter is found, it returns a warinig."
                 },
@@ -462,7 +534,6 @@
                     "type": "boolean",
                     "fa_icon": "far fa-check-circle",
                     "description": "Validation of parameters in lenient more.",
-                    "default": false,
                     "hidden": true,
                     "help_text": "Allows string values that are parseable as numbers or booleans. For further information see [JSONSchema docs](https://github.com/everit-org/json-schema#lenient-mode)."
                 }
@@ -472,6 +543,9 @@
     "allOf": [
         {
             "$ref": "#/definitions/input_output_options"
+        },
+        {
+            "$ref": "#/definitions/umi_options"
         },
         {
             "$ref": "#/definitions/reference_genome_options"

@@ -11,10 +11,12 @@
 This option indicates the experimental protocol used for the sample preparation. Currently supporting:
 
 - 'illumina': adapter (`TGGAATTCTCGGGTGCCAAGG`)
-- 'nextflex': adapter (`TGGAATTCTCGGGTGCCAAGG), clip_r1 (`4`), three_prime_clip_r1 (`4`)
+- 'nextflex': adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`4`), three_prime_clip_r1 (`4`)
 - 'qiaseq': adapter (`AACTGTAGGCACCATCAAT`)
-- 'cats': adapter (`GATCGGAAGAGCACACGTCTG), clip_r1(`3)
+- 'cats': adapter (`GATCGGAAGAGCACACGTCTG`), clip_r1(`3)
 - 'custom' (where the user can indicate the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` manually)
+
+The parameter `--three_prime_adapter` is set to the Illumina TruSeq single index adapter sequence `AGATCGGAAGAGCACACGTCTGAACTCCAGTCA`. This is also to ensure, that the auto-detect functionality of `FASTP` is disabled. Please make sure to adapt this adapter sequence accordingly for your run.
 
 :warning: At least the `custom` protocol has to be specified, otherwise the pipeline won't run. In case you specify the `custom` protocol, ensure that the parameters above are set accordingly or the defaults will be applied. If you want to auto-detect the adapters using `fastp`, please set `--three_prime_adapter` to `""`.
 
@@ -27,10 +29,10 @@ It should point to the 3-letter species name used by [miRBase](https://www.mirba
 Different parameters can be set for the two supported databases. By default `miRBase` will be used with the parameters below.
 
 - `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRbase: `https://mirbase.org/download/CURRENT/genomes/${params.mirtrace_species}.gff3`
-- `mature`: points to the FASTA file of mature miRNA sequences. `https://mirbase.org/download/CURRENT/mature.fa`
-- `hairpin`: points to the FASTA file of precursor miRNA sequences. `https://mirbase.org/download/CURRENT/hairpin.fa`
+- `mature`: points to the FASTA file of mature miRNA sequences. `https://mirbase.org/download/mature.fa`
+- `hairpin`: points to the FASTA file of precursor miRNA sequences. `https://mirbase.org/download/hairpin.fa`
 
-If MirGeneDB should be used instead it needs to be specified using `--mirgenedb` and use the parameters below .
+If MirGeneDB should be used instead it needs to be specified using `--mirgenedb` and use the parameters below.
 
 - `mirgenedb_gff`: The data can not be downloaded automatically (URLs are created with short term tokens in it), thus the user needs to supply the gff file for either his species, or all species downloaded from `https://mirgenedb.org/download`. The total set will automatically be subsetted to the species specified with `--mirgenedb_species`.
 - `mirgenedb_mature`: points to the FASTA file of mature miRNA sequences. Download from `https://mirgenedb.org/download`.
@@ -53,6 +55,18 @@ Contamination filtering of the sequencing reads is optional and can be invoked u
 - `ncrna`: Used to supply a FASTA file containing ncRNA contamination sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 - `pirna`: Used to supply a FASTA file containing piRNA contamination sequence. e.g. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 - `other_contamination`: Used to supply an additional filtering set. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+
+### UMI handling
+
+The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire read sequence after 3'adapter removal. Followed by Umitools-extract to extract the miRNA adapter and UMI. This can be achieved by using the parameters for UMI handling as follows (in this case for QIAseq miRNA Library Kit):
+
+```bash
+--with_umi --umitools_extract_method regex --umitools_bc_pattern = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
+```
+
+:::note
+You will have to specify custom umitools_bc_pattern patterns if your UMI read structure is different. Please check the required capability in your UMI handling manual. It should be set in a way, that only the insert sequence of the RNA molecule is left after extraction. Please refer to the manual of the used kit for the expected read structure.
+:::
 
 ## Samplesheet input
 

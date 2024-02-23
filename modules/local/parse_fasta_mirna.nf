@@ -1,10 +1,10 @@
 process PARSE_FASTA_MIRNA {
     label 'process_medium'
 
-    conda 'bioconda::seqkit=2.3.1'
+    conda 'bioconda::seqkit=2.6.1'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/seqkit:2.3.1--h9ee0642_0' :
-        'biocontainers/seqkit:2.3.1--h9ee0642_0' }"
+        'https://depot.galaxyproject.org/singularity/seqkit:2.6.1--h9ee0642_0' :
+        'biocontainers/seqkit:2.6.1--h9ee0642_0' }"
 
     input:
     tuple val(meta2), path(fasta)
@@ -34,7 +34,7 @@ process PARSE_FASTA_MIRNA {
     seqkit seq --rna2dna \${FASTA}_sps.fa > \${FASTA}_igenome.fa
 
     cat <<-END_VERSIONS > versions.yml
-    ${task.process}":
+    "${task.process}":
         seqkit: \$(echo \$(seqkit 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
     END_VERSIONS
     """

@@ -4,7 +4,7 @@ process BOWTIE_MAP_CONTAMINANTS {
     conda 'bowtie2=2.4.5'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/bowtie2:2.4.5--py39hd2f7db1_2' :
-        'biocontainers/bowtie2:2.4.5--py36hfca12d5_2' }"
+        'biocontainers/bowtie2:2.4.5--py39hd2f7db1_2' }"
 
     input:
     tuple val(meta), path(reads)
@@ -21,17 +21,20 @@ process BOWTIE_MAP_CONTAMINANTS {
     task.ext.when == null || task.ext.when
 
     script:
+    def args = task.ext.args ?: ""
+
     """
-    INDEX=`find -L ./ -name "*.3.ebwt" | sed 's/.3.ebwt//'`
+    INDEX=`find -L ./ -name "*.rev.1.bt2" | sed "s/\\.rev.1.bt2\$//"`
     bowtie2 \\
+        -x \$INDEX \\
+        -U ${reads} \\
         --threads ${task.cpus} \\
+        --un ${meta.id}.${contaminant_type}.filter.unmapped.contaminant.fastq \\
         --very-sensitive-local \\
         -k 1 \\
-        -x \$INDEX \\
-        --un ${meta.id}.${contaminant_type}.filter.unmapped.contaminant.fastq \\
-        ${reads} \\
+        -S ${meta.id}.filter.contaminant.sam \\
         ${args} \\
-        -S ${meta.id}.filter.contaminant.sam > ${meta.id}.contaminant_bowtie.log 2>&1
+        > ${meta.id}.contaminant_bowtie.log 2>&1
 
     # extracting number of reads from bowtie logs
     awk -v type=${contaminant_type} 'BEGIN{tot=0} {if(NR==4 || NR == 5){tot += \$1}} END {print "\\""type"\\": "tot }' ${meta.id}.contaminant_bowtie.log | tr -d , > filtered.${meta.id}_${contaminant_type}.stats
