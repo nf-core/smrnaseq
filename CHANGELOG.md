@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v2.3.0 - 2024-02-22 - Gray Zinc Dalmatian
+## v2.3.0 - 2024-02-23 - Gray Zinc Dalmatian
 
 - [[#307]](https://github.com/nf-core/smrnaseq/pull/307) - Clean up config file and improve output folder structure
 - [[#299]](https://github.com/nf-core/smrnaseq/issues/299) - Bugfix for missing inputs in BAM stats (`genome_quant.r`)
