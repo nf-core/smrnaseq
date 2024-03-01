@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - _tbd_
 
+### Software dependencies
+
+| Dependency | Old version | New version |
+| ---------- | ----------- | ----------- |
+| `multiqc`  | 1.20        | 1.21        |
+
 ## v2.3.0 - 2024-02-23 - Gray Zinc Dalmatian
 
 - [[#307]](https://github.com/nf-core/smrnaseq/pull/307) - Clean up config file and improve output folder structure
