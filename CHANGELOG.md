@@ -5,7 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.3.1 - XXXX-XX-XX- Gray Zinc Dalmation Patch
 
-- _tbd_
+- [[#328]](https://github.com/nf-core/smrnaseq/pull/328) - Fix [casting issue](https://github.com/nf-core/smrnaseq/issues/327) in mirtrace module
 
 ### Software dependencies
 
