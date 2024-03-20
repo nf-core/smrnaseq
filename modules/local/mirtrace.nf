@@ -7,7 +7,7 @@ process MIRTRACE_RUN {
         'biocontainers/mirtrace:1.0.1--hdfd78af_1' }"
 
     input:
-    tuple val(adapter), val(ids), path(reads)
+    tuple val(adapter), val(ids), val(reads)
 
     output:
     path "mirtrace/*"  , emit: mirtrace
