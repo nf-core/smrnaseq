@@ -8,6 +8,7 @@ process MIRTRACE_RUN {
 
     input:
     tuple val(adapter), val(ids), path(reads)
+    path(mirtrace_config)
 
     output:
     path "mirtrace/*"  , emit: mirtrace
@@ -26,13 +27,6 @@ process MIRTRACE_RUN {
         java_mem = "-Xms${tmem} -Xmx${tmem}"
     }
 
-    //Staging the files as path() but then getting the filenames for the config file that mirtrace needs
-    //Directly using val(reads) as in previous versions is not reliable as staging between work directories is not 100% reliable if not explicitly defined via nextflow itself
-    def config_lines = [ids,reads]
-    .transpose()
-    .collect({ id, path -> path.getFileName().toString()})
-    .map({path -> "echo ./${path}\n >> mirtrace_config"})
-
     """
     export mirtracejar=\$(dirname \$(which mirtrace))
 
@@ -40,7 +34,7 @@ process MIRTRACE_RUN {
         --species $params.mirtrace_species \\
         $primer \\
         $protocol \\
-        --config mirtrace_config \\
+        --config $mirtrace_config \\
         --write-fasta \\
         --output-dir mirtrace \\
         --force
