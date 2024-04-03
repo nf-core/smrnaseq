@@ -7,7 +7,7 @@ process MIRTRACE_RUN {
         'biocontainers/mirtrace:1.0.1--hdfd78af_1' }"
 
     input:
-    tuple val(adapter), val(ids), val(reads)
+    tuple val(adapter), val(ids), path(reads)
 
     output:
     path "mirtrace/*"  , emit: mirtrace
@@ -25,9 +25,13 @@ process MIRTRACE_RUN {
         tmem = task.memory.toBytes()
         java_mem = "-Xms${tmem} -Xmx${tmem}"
     }
+
+    //Staging the files as path() but then getting the filenames for the config file that mirtrace needs
+    //Directly using val(reads) as in previous versions is not reliable as staging between work directories is not 100% reliable if not explicitly defined via nextflow itself
     def config_lines = [ids,reads]
     .transpose()
-    .collect({ id, path -> "echo '${path},${id}' >> mirtrace_config" })
+    .collect({ id, path -> path.getFileName().toString()})
+
     """
     export mirtracejar=\$(dirname \$(which mirtrace))
 
