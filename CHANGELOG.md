@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v2.3.1 - XXXX-XX-XX- Gray Zinc Dalmation Patch
 
 - [[#328]](https://github.com/nf-core/smrnaseq/pull/328) - Fix [casting issue](https://github.com/nf-core/smrnaseq/issues/327) in mirtrace module
+- [[#334]](https://github.com/nf-core/smrnaseq/pull/334) - Fix [input channel cardinality](https://github.com/nf-core/smrnaseq/issues/331) in `MIRDEEP2_RUN` module
+- [[#334]](https://github.com/nf-core/smrnaseq/pull/334) - Fix [bowtie conda version](https://github.com/nf-core/smrnaseq/issues/333) in `BOWTIE_MAP_SEQ` module
 
 ### Software dependencies
 
