@@ -31,11 +31,10 @@ process MIRTRACE_RUN {
     def config_lines = [ids,reads]
     .transpose()
     .collect({ id, path -> path.getFileName().toString()})
+    .map({path -> "echo ./${path}\n >> mirtrace_config"})
 
     """
     export mirtracejar=\$(dirname \$(which mirtrace))
-
-    ${config_lines.join("\n    ")}
 
     java $java_mem -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace qc  \\
         --species $params.mirtrace_species \\
