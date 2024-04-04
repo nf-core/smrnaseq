@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#334]](https://github.com/nf-core/smrnaseq/pull/334) - Fix [input channel cardinality](https://github.com/nf-core/smrnaseq/issues/331) in `MIRDEEP2_RUN` module
 - [[#334]](https://github.com/nf-core/smrnaseq/pull/334) - Fix [bowtie conda version](https://github.com/nf-core/smrnaseq/issues/333) in `BOWTIE_MAP_SEQ` module
 - [[#335]](https://github.com/nf-core/smrnaseq/pull/335) - Final fix for [casting issue](https://github.com/nf-core/smrnaseq/issues/327) in mirtrace module
+- [[#337]](https://github.com/nf-core/smrnaseq/pull/337) - Fix [three_prime_adapter issue](https://github.com/nf-core/smrnaseq/issues/327), allow `auto-detect` as value
 
 ### Software dependencies
 
