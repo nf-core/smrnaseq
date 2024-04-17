@@ -272,6 +272,11 @@
                     "type": "boolean",
                     "description": "Save merged reads.",
                     "default": true
+                },
+                "phred_offset": {
+                    "type": "integer",
+                    "default": 33,
+                    "description": "The PHRED quality offset to be used for any input fastq files. Default is 33, standard Illumina 1.8+ format."
                 }
             }
         },
