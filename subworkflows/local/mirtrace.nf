@@ -16,7 +16,7 @@ workflow MIRTRACE {
     ch_mirtrace_config =
     reads.map { adapter, ids, reads -> [ids,reads]}
     .transpose()
-    .collectFile { id, path -> "./${path.getFileName().toString()},${id},${params.phred_offset}\n" } // operations need a channel, so, should be outside the module
+    .collectFile { adapter, id, path -> "./${path.getFileName().toString()},${id},${adapter},${params.phred_offset}\n" } // operations need a channel, so, should be outside the module
 
     MIRTRACE_RUN (
         reads,
