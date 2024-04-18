@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v2.3.1 - XXXX-XX-XX- Gray Zinc Dalmation Patch
+## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
 - [[#328]](https://github.com/nf-core/smrnaseq/pull/328) - Fix [casting issue](https://github.com/nf-core/smrnaseq/issues/327) in mirtrace module
 - [[#334]](https://github.com/nf-core/smrnaseq/pull/334) - Fix [input channel cardinality](https://github.com/nf-core/smrnaseq/issues/331) in `MIRDEEP2_RUN` module
@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#335]](https://github.com/nf-core/smrnaseq/pull/335) - Final fix for [casting issue](https://github.com/nf-core/smrnaseq/issues/327) in mirtrace module
 - [[#337]](https://github.com/nf-core/smrnaseq/pull/337) - Fix [three_prime_adapter issue](https://github.com/nf-core/smrnaseq/issues/326), allow `auto-detect` as value
 - [[#342]](https://github.com/nf-core/smrnaseq/pull/342) - Fix [phred offset issue](https://github.com/nf-core/smrnaseq/issues/341), allow specifying phred offset for FASTQ files
+- [[#342]](https://github.com/nf-core/smrnaseq/pull/343) - Fix [mirdeep2 output missing](https://github.com/nf-core/smrnaseq/issues/330), fix mirdeep2 outputs missing in outdir
 
 ### Software dependencies
 
