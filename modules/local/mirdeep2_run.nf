@@ -12,8 +12,8 @@ process MIRDEEP2_RUN {
     input:
     path(fasta)
     tuple path(reads), path(arf)
-    tuple val(meta2), path(hairpin)
-    tuple val(meta2), path(mature)
+    path(hairpin)
+    path(mature)
 
     output:
     path 'result*.{bed,csv,html}', emit: result

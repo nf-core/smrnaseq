@@ -8,6 +8,7 @@ process MIRTRACE_RUN {
 
     input:
     tuple val(adapter), val(ids), path(reads)
+    path(mirtrace_config)
 
     output:
     path "mirtrace/*"  , emit: mirtrace
@@ -18,26 +19,20 @@ process MIRTRACE_RUN {
 
     script:
     // mirtrace protocol defaults to 'params.protocol' if not set
-    def primer = adapter ? "--adapter ${adapter}" : ""
     def protocol = params.protocol == 'custom' ? '' : "--protocol $params.protocol"
     def java_mem = ''
     if(task.memory){
         tmem = task.memory.toBytes()
         java_mem = "-Xms${tmem} -Xmx${tmem}"
     }
-    def config_lines = [ids,reads]
-    .transpose()
-    .collect({ id, path -> "echo '${path},${id}' >> mirtrace_config" })
+
     """
     export mirtracejar=\$(dirname \$(which mirtrace))
 
-    ${config_lines.join("\n    ")}
-
     java $java_mem -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace qc  \\
         --species $params.mirtrace_species \\
-        $primer \\
         $protocol \\
-        --config mirtrace_config \\
+        --config $mirtrace_config \\
         --write-fasta \\
         --output-dir mirtrace \\
         --force

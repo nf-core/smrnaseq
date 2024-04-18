@@ -153,7 +153,7 @@ MultiQC reports the number of reads that were removed by each of the contaminant
 
 ## miRTrace
 
-[miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts).
+[miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts). By default, the pipeline sets the PHRED-offset to the most common +33, so if you need to adjust this, use the `params.phred_offset` option to include this accordingly for your FASTQ files.
 
 **Output directory: `results/mirtrace`**
 
