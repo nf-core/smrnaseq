@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#335]](https://github.com/nf-core/smrnaseq/pull/335) - Final fix for [casting issue](https://github.com/nf-core/smrnaseq/issues/327) in mirtrace module
 - [[#337]](https://github.com/nf-core/smrnaseq/pull/337) - Fix [three_prime_adapter issue](https://github.com/nf-core/smrnaseq/issues/326), allow `auto-detect` as value
 - [[#342]](https://github.com/nf-core/smrnaseq/pull/342) - Fix [phred offset issue](https://github.com/nf-core/smrnaseq/issues/341), allow specifying phred offset for FASTQ files
-- [[#342]](https://github.com/nf-core/smrnaseq/pull/343) - Fix [mirdeep2 output missing](https://github.com/nf-core/smrnaseq/issues/330), fix mirdeep2 outputs missing in outdir
+- [[#343]](https://github.com/nf-core/smrnaseq/pull/343) - Fix [mirdeep2 output missing](https://github.com/nf-core/smrnaseq/issues/330), fix mirdeep2 outputs missing in outdir
 
 ### Software dependencies
 
