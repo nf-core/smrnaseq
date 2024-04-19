@@ -3,6 +3,8 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.3.2dev - 2024-XX-XX - X
+
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
 - [[#328]](https://github.com/nf-core/smrnaseq/pull/328) - Fix [casting issue](https://github.com/nf-core/smrnaseq/issues/327) in mirtrace module
