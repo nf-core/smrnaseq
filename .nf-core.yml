@@ -1,2 +1,6 @@
 repository_type: pipeline
 nf_core_version: "2.14.1"
+lint:
+  nextflow_config:
+    - config_defaults:
+        - params.fastp_known_mirna_adapters
