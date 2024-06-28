@@ -2,10 +2,10 @@ process BLAT_MIRNA {
     tag "$fasta"
     label 'process_medium'
 
-    conda 'bioconda::blat=36'
+    conda 'bioconda::ucsc-blat=466'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/blat:36--0' :
-        'biocontainers/blat:36--0' }"
+        'oras://community.wave.seqera.io/library/ucsc-blat:445--896a938d26f1cc8c' :
+        'community.wave.seqera.io/library/ucsc-blat:445--32730933d3c2c916' }"
 
     input:
     val db_type
