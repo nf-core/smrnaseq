@@ -5,6 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.3.2dev - 2024-XX-XX - X
 
+- [[#332]](https://github.com/nf-core/smrnaseq/issues/332) by [[#361]](https://github.com/nf-core/smrnaseq/pull/361) - Fix documentation to use only single-end
 - [[#349]](https://github.com/nf-core/smrnaseq/pull/349) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347), change conda-base to conda-forge channel
 - [[#350]](https://github.com/nf-core/smrnaseq/pull/350) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347), set python version to 3.7 to fix pysam issue
 
