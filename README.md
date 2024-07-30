@@ -100,11 +100,10 @@ Now, you can run the pipeline using:
 
 ```bash
 nextflow run nf-core/smrnaseq \
-   -profile <docker/singularity/.../institute> \
+   -profile <docker/singularity/.../institute>,illumina \
   --input samplesheet.csv \
   --genome 'GRCh37' \
   --mirtrace_species 'hsa' \
-  --protocol 'illumina' \
   --outdir <OUTDIR>
 ```
 
