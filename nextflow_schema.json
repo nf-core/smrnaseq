@@ -23,14 +23,6 @@
                     "help_text": "You will need to create a design file with information about the samples in your experiment before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 3 columns, and a header row. See [usage docs](https://nf-co.re/smrnaseq/usage#samplesheet-input).",
                     "fa_icon": "fas fa-file-csv"
                 },
-                "protocol": {
-                    "type": "string",
-                    "default": "illumina",
-                    "fa_icon": "fas fa-vial",
-                    "description": "Protocol for constructing smRNA-seq libraries.",
-                    "help_text": "Presets for trimming parameters and 3' adapter sequence with a specified protocol.\n\n| Protocol      | Library Prep Kit                        | Trimming Parameter                      | 3' Adapter Sequence     |\n| :------------ | :-------------------------------------- | :-------------------------------------- | :---------------------  |\n| illumina      | Illumina TruSeq Small RNA               | `clip_r1 = 0` `three_prime_clip_r1 = 0` | `TGGAATTCTCGGGTGCCAAGG` |\n| nextflex      | BIOO SCIENTIFIC  NEXTFLEX Small RNA-Seq | `clip_r1 = 4` `three_prime_clip_r1 = 4` | `TGGAATTCTCGGGTGCCAAGG` |\n| qiaseq        | QIAGEN QIAseq miRNA                     | `clip_r1 = 0` `three_prime_clip_r1 = 0` | `AACTGTAGGCACCATCAAT`   |\n| cats          | Diagenode CATS Small RNA-seq            | `clip_r1 = 3` `three_prime_clip_r1 = 0` | `AAAAAAAAAAA` + `GATCGGAAGAGCACACGTCTG` (only polyA is used for trimming) |\n| custom        | user defined                            | user defined                            | user defined            |\n\n> NB: When running `--protocol custom` the user ***must define the 3' Adapter Sequence***.\n> If trimming parameters aren't provided the pipeline will deafult to `clip_R1 = 0` and `three_prime_clip_R1 = 0` (i.e. no extra clipping).",
-                    "enum": ["illumina", "nextflex", "qiaseq", "cats", "custom"]
-                },
                 "outdir": {
                     "type": "string",
                     "format": "directory-path",
@@ -48,6 +40,11 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                },
+                "protocol": {
+                    "type": "string",
+                    "default": "Custom",
+                    "fa_icon": "fas fa-atom"
                 }
             }
         },

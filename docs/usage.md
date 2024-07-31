@@ -14,11 +14,18 @@ This option indicates the experimental protocol used for the sample preparation.
 - 'nextflex': adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`4`), three_prime_clip_r1 (`4`)
 - 'qiaseq': adapter (`AACTGTAGGCACCATCAAT`)
 - 'cats': adapter (`GATCGGAAGAGCACACGTCTG`), clip_r1(`3)
-- 'custom' (where the user can indicate the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` manually)
+
+This option is not chosen as a parameter but as an additional profile that sets the corresponding `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` parameters accordingly. You can choose to either use any of the provided profiles by running the pipeline with e.g. `illumina` to set the defaults as described above in a more convenient way.
+
+```bash
+-profile your_other_profiles,illumina
+```
+
+In case you have a custom protocol, please supply the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` manually.
 
 The parameter `--three_prime_adapter` is set to the Illumina TruSeq single index adapter sequence `AGATCGGAAGAGCACACGTCTGAACTCCAGTCA`. This is also to ensure, that the auto-detect functionality of `FASTP` is disabled. Please make sure to adapt this adapter sequence accordingly for your run.
 
-:warning: At least the `custom` protocol has to be specified, otherwise the pipeline won't run. In case you specify the `custom` protocol, ensure that the parameters above are set accordingly or the defaults will be applied. If you want to auto-detect the adapters using `fastp`, please set `--three_prime_adapter` to `auto-detect`.
+:warning: If you do not choose a profile that sets the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` options, the pipeline won't run. If you want to auto-detect the adapters using `fastp`, please set `--three_prime_adapter` to `auto-detect`.
 
 ### `mirtrace_species` or `mirgenedb_species`
 
