@@ -43,7 +43,7 @@
                 },
                 "protocol": {
                     "type": "string",
-                    "default": "Custom",
+                    "default": "custom",
                     "fa_icon": "fas fa-atom"
                 }
             }
