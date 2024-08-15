@@ -31,6 +31,7 @@ jobs:
           - "test_no_genome,illumina"
           - "test_umi,illumina"
           - "test_index,illumina"
+          - "test_technical_repeats,illumina"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
