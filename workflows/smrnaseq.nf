@@ -48,7 +48,7 @@ workflow NFCORE_SMRNASEQ {
     main:
     //Config checks
     // Check optional parameters
-    if (!params.mirtrace_species) {
+    if (!params.mirgenedb && !params.mirtrace_species) {
             exit 1, "Reference species for miRTrace is not defined via the --mirtrace_species parameter."
         }
 
