@@ -1,7 +1,7 @@
 process EDGER_QC {
     label 'process_medium'
 
-    conda 'bioconda::bioconductor-limma=3.58.1 bioconda::bioconductor-edger=4.0.2 conda-forge::r-data.table=1.14.10 conda-forge::r-gplots=3.1.3 conda-forge::r-statmod=1.5.0'
+    conda 'bioconda::bioconductor-limma=3.58.1 bioconda::bioconductor-edger=4.0.16 conda-forge::r-data.table=1.14.10 conda-forge::r-gplots=3.1.3 conda-forge::r-statmod=1.5.0'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1:f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0' :
         'biocontainers/mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1:f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0' }"
