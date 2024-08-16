@@ -79,7 +79,7 @@ for (i in 1:2) {
     }
 
     # Make MDS plot (only perform with 3 or more samples)
-    if (length(filelist[[1]]) > 2){
+    if (length(ncol(dataNorm$counts)) > 2){
         pdf(paste(header,"_edgeR_MDS_plot.pdf",sep=""))
         MDSdata <- plotMDS(dataNorm)
         dev.off()

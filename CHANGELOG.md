@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#350]](https://github.com/nf-core/smrnaseq/pull/350) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347), set python version to 3.7 to fix pysam issue
 - [[#351]](https://github.com/nf-core/smrnaseq/issues/351) - Fix [Protocol inheritance issue](https://github.com/nf-core/smrnaseq/pull/364) - fixing protocol inheritance from subworkflow with move to config profile(s) for different protocols
 - [[#371]](https://github.com/nf-core/smrnaseq/issues/371) - Fix [Plain test profile](https://github.com/nf-core/smrnaseq/pull/372) - Updated default protocol value to "custom".
+- [[#187]](https://github.com/nf-core/smrnaseq/issues/187) - Fix checking number of samples which causes error in plotMDS.
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
