@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#349]](https://github.com/nf-core/smrnaseq/pull/349) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347), change conda-base to conda-forge channel
 - [[#350]](https://github.com/nf-core/smrnaseq/pull/350) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347), set python version to 3.7 to fix pysam issue
 - [[#351]](https://github.com/nf-core/smrnaseq/issues/351) - Fix [Protocol inheritance issue](https://github.com/nf-core/smrnaseq/pull/364) - fixing protocol inheritance from subworkflow with move to config profile(s) for different protocols
+- [[#374]](https://github.com/nf-core/smrnaseq/pull/374) - Fix [default tests](https://github.com/nf-core/smrnaseq/issues/375) so that they do not require additional profiles in CI. Change GitHub CI fail-fast strategy to false.
 - [[#371]](https://github.com/nf-core/smrnaseq/issues/371) - Fix [Plain test profile](https://github.com/nf-core/smrnaseq/pull/372) - Updated default protocol value to "custom".
 - [[#375](https://github.com/nf-core/smrnaseq/pull/375) - Test merging of [technical repeats](https://github.com/nf-core/smrnaseq/issues/212)
 

@@ -22,16 +22,17 @@ jobs:
     if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/smrnaseq') }}"
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         NXF_VER:
           - "23.04.0"
           - "latest-everything"
         profile:
-          - "test,illumina"
-          - "test_no_genome,illumina"
-          - "test_umi,illumina"
-          - "test_index,illumina"
-          - "test_technical_repeats,illumina"
+          - "test"
+          - "test_no_genome"
+          - "test_umi"
+          - "test_index"
+          - "test_technical_repeats"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
