@@ -78,7 +78,15 @@ You can find numerous talks on the nf-core events page from various topics inclu
 > [!NOTE]
 > If you are new to Nextflow and nf-core, please refer to [this page](https://nf-co.re/docs/usage/installation) on how to set-up Nextflow. Make sure to [test your setup](https://nf-co.re/docs/usage/introduction#how-to-run-a-pipeline) with `-profile test` before running the workflow on actual data.
 
-First, prepare a samplesheet with your input data that looks as follows:
+You can test the pipeline as follows:
+
+```bash
+nextflow run nf-core/smrnaseq \
+   -profile test \
+  --outdir <OUTDIR>
+```
+
+In order to use the pipeline with your own data, first prepare a samplesheet with your input data that looks as follows:
 
 `samplesheet.csv`:
 
@@ -106,6 +114,9 @@ nextflow run nf-core/smrnaseq \
   --mirtrace_species 'hsa' \
   --outdir <OUTDIR>
 ```
+
+> [!IMPORTANT]
+> Remember to add a protocol as an additional profile (such as `illumina`, `nexttflex`, `qiaseq` or `custom`) when running with your own data. Default is `custom`. See [usage documentation](https://nf-co.re/smrnaseq/usage) for more details about these profiles.
 
 > [!WARNING]
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
