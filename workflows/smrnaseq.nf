@@ -148,6 +148,7 @@ workflow NFCORE_SMRNASEQ {
         FASTP_LENGTH_FILTER (
             UMITOOLS_EXTRACT.out.reads,
             mirna_adapters,
+            false,
             params.save_trimmed_fail,
             params.save_merged
         )
@@ -302,7 +303,9 @@ workflow NFCORE_SMRNASEQ {
             ch_multiqc_files.collect(),
             ch_multiqc_config.toList(),
             ch_multiqc_custom_config.toList(),
-            ch_multiqc_logo.toList()
+            ch_multiqc_logo.toList(),
+            [],
+            []
         )
         ch_multiqc_report = MULTIQC.out.report
 
