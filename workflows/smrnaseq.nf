@@ -148,6 +148,7 @@ workflow NFCORE_SMRNASEQ {
         FASTP_LENGTH_FILTER (
             UMITOOLS_EXTRACT.out.reads,
             mirna_adapters,
+            false,
             params.save_trimmed_fail,
             params.save_merged
         )
