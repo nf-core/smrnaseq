@@ -1,12 +1,12 @@
 nextflow_pipeline {
 
-    name "Test Workflow main.nf - test_no_genome"
+    name "Test Workflow main.nf - test_mirgenedb"
     script "main.nf"
-    profile "test_no_genome"
-    tag "test_no_genome"
+    profile "test_mirgenedb"
+    tag "test_mirgenedb"
     tag "pipeline"
 
-    test("test_no_genome") {
+    test("test_mirgenedb") {
 
         when {
             params {
@@ -18,7 +18,7 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 147 }
+                { assert workflow.trace.succeeded().size() == 193 }
             )
         }
 
