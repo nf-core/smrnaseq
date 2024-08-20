@@ -79,7 +79,7 @@ for (i in 1:2) {
     }
 
     # Make MDS plot (only perform with 3 or more samples)
-    if (length(ncol(dataNorm$counts)) > 2){
+    if (ncol(dataNorm$counts) > 2){
         pdf(paste(header,"_edgeR_MDS_plot.pdf",sep=""))
         MDSdata <- plotMDS(dataNorm)
         dev.off()
@@ -111,6 +111,8 @@ for (i in 1:2) {
 
         # Write clustered distance values to file
         write.table(hmap$carpet, paste(header,"_log2CPM_sample_distances.txt",sep=""), quote=FALSE, sep="\t")
+    } else {
+    warning("Not enough samples to create an MDS plot. At least 3 samples are required.")
     }
 }
 
