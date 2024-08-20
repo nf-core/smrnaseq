@@ -48,7 +48,7 @@ workflow NFCORE_SMRNASEQ {
     main:
     //Config checks
     // Check optional parameters
-    if (!params.mirtrace_species) {
+    if (!params.mirgenedb && !params.mirtrace_species) {
             exit 1, "Reference species for miRTrace is not defined via the --mirtrace_species parameter."
         }
 
@@ -60,9 +60,9 @@ workflow NFCORE_SMRNASEQ {
         if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
         if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
     } else {
-        if (params.mirgenedb_mature) { reference_mature = file(params.mirgenedb_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mirgenedb_mature}" }
-        if (params.mirgenedb_hairpin) { reference_hairpin = file(params.mirgenedb_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.mirgenedb_hairpin}" }
-        if (params.mirgenedb_gff) { mirna_gtf = file(params.mirgenedb_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found: ${params.mirgenedb_gff}"}
+        if (params.mirgenedb_mature) { reference_mature = file(params.mirgenedb_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found via --mirgenedb_mature: ${params.mirgenedb_mature}" }
+        if (params.mirgenedb_hairpin) { reference_hairpin = file(params.mirgenedb_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found via --mirgenedb_hairpin: ${params.mirgenedb_hairpin}" }
+        if (params.mirgenedb_gff) { mirna_gtf = file(params.mirgenedb_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found via --mirgenedb_gff: ${params.mirgenedb_gff}"}
         if (!params.mirgenedb_species) { exit 1, "MirGeneDB species not set, please specify via the --mirgenedb_species parameter"}
     }
     //
@@ -170,8 +170,12 @@ workflow NFCORE_SMRNASEQ {
     //
     // SUBWORKFLOW: MIRTRACE
     //
-    MIRTRACE(ch_mirtrace_inputs)
-    ch_versions = ch_versions.mix(MIRTRACE.out.versions)
+    if (params.mirtrace_species) {
+            MIRTRACE(ch_mirtrace_inputs)
+            ch_versions = ch_versions.mix(MIRTRACE.out.versions)
+        } else {
+            log.warn "The parameter --mirtrace_species is absent. MIRTRACE quantification skipped."
+        }
 
     //
     // SUBWORKFLOW: remove contaminants from reads
@@ -291,7 +295,9 @@ workflow NFCORE_SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect().ifEmpty([]))
+        if (params.mirtrace_species) {
         ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([]))
+            }
 
         MULTIQC (
             ch_multiqc_files.collect(),
