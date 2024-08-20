@@ -12,8 +12,8 @@ nextflow_process {
             }
             process {
                 """
-                input[0] = [file("https://github.com/atrigila/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N1_mature.sorted.idxstats"),
-                file("https://github.com/atrigila/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N1_mature_hairpin.sorted.idxstats")
+                input[0] = [file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N1_mature.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N1_mature_hairpin.sorted.idxstats")
                 ]
                 """
             }
@@ -35,14 +35,14 @@ nextflow_process {
             process {
                 """
                 input[0] = [
-                file("https://github.com/atrigila/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N1_mature.sorted.idxstats"),
-                file("https://github.com/atrigila/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N1_mature_hairpin.sorted.idxstats"),
-                file("https://github.com/atrigila/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N3_mature.sorted.idxstats"),
-                file("https://github.com/atrigila/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N3_mature_hairpin.sorted.idxstats"),
-                file("https://github.com/atrigila/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Control_N1_mature.sorted.idxstats"),
-                file("https://github.com/atrigila/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Control_N1_mature_hairpin.sorted.idxstats"),
-                file("https://github.com/atrigila/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Control_N2_mature.sorted.idxstats"),
-                file("https://github.com/atrigila/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Control_N2_mature_hairpin.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N1_mature.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N1_mature_hairpin.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N3_mature.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N3_mature_hairpin.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Control_N1_mature.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Control_N1_mature_hairpin.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Control_N2_mature.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Control_N2_mature_hairpin.sorted.idxstats"),
                 ]
                 """
             }
