@@ -21,7 +21,7 @@ include {   BAM_SORT_STATS_SAMTOOLS as BAM_STATS_MATURE
 include { SEQCLUSTER_SEQUENCES } from '../../modules/local/seqcluster_collapse.nf'
 include { MIRTOP_QUANT         } from '../../modules/local/mirtop_quant.nf'
 include { TABLE_MERGE          } from '../../modules/local/datatable_merge.nf'
-include { EDGER_QC             } from '../../modules/local/edger_qc.nf'
+include { EDGER_QC             } from '../../modules/local/edger_qc/edger_qc.nf'
 
 workflow MIRNA_QUANT {
     take:

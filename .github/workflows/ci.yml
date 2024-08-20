@@ -49,8 +49,12 @@ jobs:
           - "23.04"
         nf_test_files: ["${{ fromJson(needs.nf-test-changes.outputs.nf_test_files) }}"]
         profile:
-          - "docker"
-
+          - "test"
+          - "test_no_genome"
+          - "test_umi"
+          - "test_index"
+          - "test_technical_repeats"
+          - "test_mirgenedb"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
