@@ -1,0 +1,71 @@
+nextflow_process {
+
+    name "Test Process TABLE_MERGE"
+    script "../datatable_merge.nf"
+    process "TABLE_MERGE"
+    tag "modules"
+    tag "modules_local"
+    tag "table_merge"
+
+    test("Contains hsa-miR-365b-3p, hsa-miR-7-5p, hsa-miR-103a-3p") {
+
+        when {
+            params {
+                outdir = "${outputDir}"
+            }
+            process {
+                """
+                input[0] = [file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/datatable_merge/small_mirtop_dataset.txt", checkIfExists: true)]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out).match()
+
+            with(process.out.mirna_tsv) {
+                with(get(0)) {
+                    assert get(0).endsWith(".tsv")
+
+                    // Check for specific miRNAs
+                    def lines = path(get(0)).readLines()
+                    assert lines.any { it.contains("hsa-miR-365b-3p") }
+                    assert lines.any { it.contains("hsa-miR-7-5p") }
+                    assert lines.any { it.contains("hsa-miR-103a-3p") }
+                }
+            }
+        }
+    }
+
+    test("Does not contain hsa-miR-107, hsa-miR-365a-3p") {
+
+        when {
+            params {
+                outdir = "${outputDir}"
+            }
+            process {
+                """
+                input[0] = [file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/datatable_merge/small_mirtop_dataset.txt", checkIfExists: true)]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+            assert snapshot(process.out).match()
+
+            with(process.out.mirna_tsv) {
+                with(get(0)) {
+                    assert get(0).endsWith(".tsv")
+
+                    // Check for the absence of specific miRNAs
+                    def lines = path(get(0)).readLines()
+                    assert !lines.any { it.contains("hsa-miR-107") }
+                    assert !lines.any { it.contains("hsa-miR-365a-3p") }
+                }
+            }
+        }
+    }
+
+}
