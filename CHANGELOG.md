@@ -5,16 +5,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.4.0dev - 2024-XX-XX - X
 
-- [[#332]](https://github.com/nf-core/smrnaseq/issues/332) by [[#361]](https://github.com/nf-core/smrnaseq/pull/361) - Fix documentation to use only single-end
 - [[#349]](https://github.com/nf-core/smrnaseq/pull/349) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347), change conda-base to conda-forge channel
-- [[#350]](https://github.com/nf-core/smrnaseq/pull/350) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347), set python version to 3.7 to fix pysam issue
-- [[#351]](https://github.com/nf-core/smrnaseq/issues/351) - Fix [Protocol inheritance issue](https://github.com/nf-core/smrnaseq/pull/364) - fixing protocol inheritance from subworkflow with move to config profile(s) for different protocols.
-- [[#369]](https://github.com/nf-core/smrnaseq/issues/369) - Fix [Linting](https://github.com/nf-core/smrnaseq/pull/377) - Fixed linting warnings and updated modules & subworkflows.
+- [[#350]](https://github.com/nf-core/smrnaseq/pull/350) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347), set python version to 3.7 to fix pysam issue.
+- [[#361]](https://github.com/nf-core/smrnaseq/pull/361) by [[#332]](https://github.com/nf-core/smrnaseq/issues/332) - Fix documentation to use only single-end.
+- [[#364]](https://github.com/nf-core/smrnaseq/pull/364) - Fix [Protocol inheritance issue](https://github.com/nf-core/smrnaseq/issues/351) - fixing protocol inheritance from subworkflow with move to config profile(s) for different protocols.
+- [[#372]](https://github.com/nf-core/smrnaseq/pull/372) - Fix [Plain test profile](https://github.com/nf-core/smrnaseq/issues/371) - Updated default protocol value to "custom".
 - [[#374]](https://github.com/nf-core/smrnaseq/pull/374) - Fix [default tests](https://github.com/nf-core/smrnaseq/issues/375) so that they do not require additional profiles in CI. Change GitHub CI fail-fast strategy to false.
-- [[#371]](https://github.com/nf-core/smrnaseq/issues/371) - Fix [Plain test profile](https://github.com/nf-core/smrnaseq/pull/372) - Updated default protocol value to "custom".
-- [[#380]](https://github.com/nf-core/smrnaseq/pull/380) - Fix checking number of samples which causes error in plotMDS. Add nf-tests for local modules using custom R scripts: [edgeR_mirBase.R](https://github.com/nf-core/smrnaseq/issues/187).
-- [[#378]](https://github.com/nf-core/smrnaseq/pull/378) - Fix [`--mirtrace_species` bug](<(https://github.com/nf-core/smrnaseq/issues/348)>). Make `MIRTRACE` process conditional. Add mirgenedb test.
 - [[#375]](https://github.com/nf-core/smrnaseq/pull/375) - Test merging of [technical repeats](https://github.com/nf-core/smrnaseq/issues/212).
+- [[#377]](https://github.com/nf-core/smrnaseq/pull/377) - Fix [Linting](https://github.com/nf-core/smrnaseq/issues/369) - Fixed linting warnings and updated modules & subworkflows.
+- [[#378]](https://github.com/nf-core/smrnaseq/pull/378) - Fix [`--mirtrace_species` bug](<(https://github.com/nf-core/smrnaseq/issues/348)>). Make `MIRTRACE` process conditional. Add mirgenedb test.
+- [[#380]](https://github.com/nf-core/smrnaseq/pull/380) - Fix checking number of samples which causes error in plotMDS. Add nf-tests for local modules using custom R scripts: [edgeR_mirBase.R](https://github.com/nf-core/smrnaseq/issues/187).
+- [[#381]](https://github.com/nf-core/smrnaseq/pull/381) - Update CI tests to nf-tests [Convert tests to nf-tests](https://github.com/nf-core/smrnaseq/issues/379).
 - [[#382]](https://github.com/nf-core/smrnaseq/pull/382) - Add nf-tests for local modules using custom R scripts: [collapse_mirtop.R](https://github.com/nf-core/smrnaseq/issues/174).
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
