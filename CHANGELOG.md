@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#187]](https://github.com/nf-core/smrnaseq/issues/187) - Fix checking number of samples which causes error in plotMDS.
 - [[#378]](https://github.com/nf-core/smrnaseq/pull/378) - Fix [`--mirtrace_species` bug](<(https://github.com/nf-core/smrnaseq/issues/348)>). Make `MIRTRACE` process conditional. Add mirgenedb test.
 - [[#375]](https://github.com/nf-core/smrnaseq/pull/375) - Test merging of [technical repeats](https://github.com/nf-core/smrnaseq/issues/212).
+- [[#383]](https://github.com/nf-core/smrnaseq/pull/383) - Fixes [parameter `--skip_fastp` throws an error](https://github.com/nf-core/smrnaseq/issues/263).
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
