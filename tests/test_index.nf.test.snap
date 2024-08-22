@@ -14,7 +14,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:07:36.900487683"
+        "timestamp": "2024-08-22T22:10:36.718345249"
     },
     "mirtrace": {
         "content": [
@@ -30,7 +30,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:07:50.05985187"
+        "timestamp": "2024-08-22T22:10:40.727064117"
     },
     "mirna_quant_reference": {
         "content": [
@@ -43,7 +43,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:06:50.940201041"
+        "timestamp": "2024-08-22T22:10:00.32667588"
     },
     "software_versions": {
         "content": [
@@ -53,7 +53,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:06:50.443184087"
+        "timestamp": "2024-08-22T22:09:59.767390635"
     },
     "mirna_quant_bam": {
         "content": [
@@ -142,7 +142,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:06:56.681862113"
+        "timestamp": "2024-08-22T22:10:09.479500085"
     },
     "mirna_quant_edger_qc": {
         "content": [
@@ -167,7 +167,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:07:13.417967341"
+        "timestamp": "2024-08-22T22:10:23.564610058"
     },
     "fastqc_raw": {
         "content": [
@@ -184,7 +184,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:07:23.201927758"
+        "timestamp": "2024-08-22T22:10:28.885128861"
     },
     "multiqc_multiqc_data": {
         "content": [
@@ -235,7 +235,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:10:00.492463242"
+        "timestamp": "2024-08-22T22:11:37.214190607"
     },
     "untar_bowtie_index": {
         "content": [
@@ -250,7 +250,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:06:50.464299168"
+        "timestamp": "2024-08-22T22:09:59.790457982"
     },
     "mirna_quant_seqcluster": {
         "content": [
@@ -267,7 +267,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:06:51.076830741"
+        "timestamp": "2024-08-22T22:10:00.453230388"
     },
     "mirtrace_qc_passed_reads.rnatype_unknown.collapsed": {
         "content": [
@@ -284,13 +284,12 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:08:39.709442943"
+        "timestamp": "2024-08-22T22:10:57.082105969"
     },
     "genome_quant_bam": {
         "content": [
             true,
             true,
-            "Control_N2_mature_hairpin_genome.sorted.flagstat:md5,b0d42e94b2e0e026cd32a88dce40722c",
             "Control_N2_mature_hairpin_genome.sorted.idxstats:md5,b6da32ce230fdeab39f3c4d5dcf41a3a",
             "Control_N2_mature_hairpin_genome.sorted.stats:md5,1222b755feaf406ecea3f2abb35a737c"
         ],
@@ -298,7 +297,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:09:49.007300611"
+        "timestamp": "2024-08-22T22:11:26.415029668"
     },
     "bowtie_index_mirna_mature": {
         "content": [
@@ -313,7 +312,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:09:14.547618596"
+        "timestamp": "2024-08-22T22:11:09.207867519"
     },
     "bowtie_index_mirna_hairpin": {
         "content": [
@@ -328,7 +327,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:09:27.72464599"
+        "timestamp": "2024-08-22T22:11:17.523064067"
     },
     "mirtrace_qc_passed_reads.all.collapsed": {
         "content": [
@@ -345,7 +344,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:07:59.93600436"
+        "timestamp": "2024-08-22T22:10:45.973826356"
     },
     "mirna_quant_mirtop": {
         "content": [
@@ -359,6 +358,6 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T19:07:04.940104262"
+        "timestamp": "2024-08-22T22:10:16.715546319"
     }
 }

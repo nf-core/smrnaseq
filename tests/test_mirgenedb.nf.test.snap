@@ -1,33 +1,38 @@
 {
-    "bowtie_index": {
+    "fastqc_trimmed": {
         "content": [
-            "genome.3.ebwt:md5,caf97e67055e1b465e933214d0168e68",
-            "genome.2.ebwt:md5,8f007efb2d23e46035cc47340c4d981e",
-            "genome.1.ebwt:md5,1bfbf95848b5a2e8a786d0a2c1054bbb",
-            "genome.4.ebwt:md5,87ff9d3ef8b55f845a9205a19c729f1c",
-            "genome.rev.1.ebwt:md5,3275dafaca50d8cafde473b54e9ebbff",
-            "genome.rev.2.ebwt:md5,65f054c598e3e9fdd33cb22c9f8f8ca5",
-            "genome.edited.fa:md5,5aaada29b1c575230fa1b7c3bd4d76db",
-            "fasta_bidx.3.ebwt:md5,ff4179d03d07954bc2c4e9e3db53cc84",
-            "fasta_bidx.4.ebwt:md5,5f58f8d33f5f4ad024fe5d5bed359e70",
-            "fasta_bidx.1.ebwt:md5,058b4869546dd035b4a0c04f5f88e2a0",
-            "fasta_bidx.rev.1.ebwt:md5,4ad69edd9799cc0a962fb4227336fbfb",
-            "fasta_bidx.2.ebwt:md5,f2a632771f4d91546b7d72eb02a074be",
-            "fasta_bidx.rev.2.ebwt:md5,f46776adf134dbf7b15a18ecb6810b05",
-            "fasta_bidx.1.ebwt:md5,7f642e502a03af140cc9defea6c5fbad",
-            "fasta_bidx.2.ebwt:md5,990abde7202805872f56781abfce9da1",
-            "fasta_bidx.3.ebwt:md5,f132742aec53cedb06ca87d289f9f4a2",
-            "fasta_bidx.rev.1.ebwt:md5,34feb7692da8d4752343cf327e1f4446",
-            "fasta_bidx.rev.2.ebwt:md5,ea6d4ad4a6fbc394e189ba95c38eaad0",
-            "fasta_bidx.4.ebwt:md5,70977c4174dd54d5715e24cbe148686c"
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
         ],
         "meta": {
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-21T15:55:30.30966024"
+        "timestamp": "2024-08-22T22:43:10.283525327"
     },
-    "genome_quant": {
+    "bowtie_index_genome": {
+        "content": [
+            "genome.rev.1.ebwt:md5,3275dafaca50d8cafde473b54e9ebbff",
+            "genome.3.ebwt:md5,caf97e67055e1b465e933214d0168e68",
+            "genome.1.ebwt:md5,1bfbf95848b5a2e8a786d0a2c1054bbb",
+            "genome.2.ebwt:md5,8f007efb2d23e46035cc47340c4d981e",
+            "genome.4.ebwt:md5,87ff9d3ef8b55f845a9205a19c729f1c",
+            "genome.edited.fa:md5,5aaada29b1c575230fa1b7c3bd4d76db",
+            "genome.rev.2.ebwt:md5,65f054c598e3e9fdd33cb22c9f8f8ca5"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-22T22:42:50.692564564"
+    },
+    "genome_quant_bam": {
         "content": [
             true,
             true,
@@ -45,36 +50,49 @@
             true,
             true,
             true,
-            "Clone9_N1_mature_hairpin_genome.sorted.flagstat:md5,6a8ad3be2ca0fa924fd32a04293d4ce4",
-            "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,5bb521c495f1c450835299b1eb88dc84",
+            "Control_N3_mature_hairpin_genome.sorted.flagstat:md5,047445077b03d7db3e7f5a3d5d162a1a",
             "Control_N2_mature_hairpin_genome.sorted.idxstats:md5,8fe506f0e0fb6fdec63ec3ac46088971",
-            "Clone9_N1_mature_hairpin_genome.sorted.idxstats:md5,aa37c5da7c2b4505ce58c3a21f97121c",
-            "Clone1_N3_mature_hairpin_genome.sorted.idxstats:md5,55fca6b9d8263d72d1ecd48d9dcb6cd4",
-            "Control_N1_mature_hairpin_genome.sorted.flagstat:md5,df2a57ac3b36f5d40793d3105a4bb2d1",
-            "Control_N3_mature_hairpin_genome.sorted.idxstats:md5,33ff4580ba9a6c28eb5ae94519ebba3d",
-            "Clone9_N3_mature_hairpin_genome.sorted.flagstat:md5,c8756a6359a58edfca350a288129e87c",
+            "Clone9_N3_mature_hairpin_genome.sorted.stats:md5,d73bffca2d2e685198bb1758c8e3e37c",
+            "Clone9_N1_mature_hairpin_genome.sorted.stats:md5,26c8e55e56641f2d4387a37b099ff0c2",
+            "Clone9_N2_mature_hairpin_genome.sorted.stats:md5,77ddc325e6f6b6cf872bc490b31d037d",
+            "Clone9_N2_mature_hairpin_genome.sorted.idxstats:md5,6f07962963e26663dc09e72eb60c887f",
             "Clone1_N1_mature_hairpin_genome.sorted.idxstats:md5,d92f9eae7657418858e6d2b69436f74f",
             "Control_N1_mature_hairpin_genome.sorted.idxstats:md5,a11f543771cea6b383fb596f60e998c3",
-            "Clone9_N2_mature_hairpin_genome.sorted.flagstat:md5,c9ea13138a4ade6bb64ac5de54bc2738",
-            "Clone9_N2_mature_hairpin_genome.sorted.idxstats:md5,6f07962963e26663dc09e72eb60c887f",
+            "Clone9_N3_mature_hairpin_genome.sorted.flagstat:md5,c8756a6359a58edfca350a288129e87c",
+            "Control_N3_mature_hairpin_genome.sorted.stats:md5,359d0ab9cc2b45b38efb7609cb80e463",
+            "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,5bb521c495f1c450835299b1eb88dc84",
             "Clone9_N3_mature_hairpin_genome.sorted.idxstats:md5,730cc6e2f92875f53ba5abaee4fc7a92",
-            "Control_N3_mature_hairpin_genome.sorted.flagstat:md5,047445077b03d7db3e7f5a3d5d162a1a",
+            "Clone9_N1_mature_hairpin_genome.sorted.idxstats:md5,aa37c5da7c2b4505ce58c3a21f97121c",
+            "Clone1_N3_mature_hairpin_genome.sorted.idxstats:md5,55fca6b9d8263d72d1ecd48d9dcb6cd4",
+            "Clone9_N2_mature_hairpin_genome.sorted.flagstat:md5,c9ea13138a4ade6bb64ac5de54bc2738",
+            "Control_N3_mature_hairpin_genome.sorted.idxstats:md5,33ff4580ba9a6c28eb5ae94519ebba3d",
+            "Control_N1_mature_hairpin_genome.sorted.flagstat:md5,df2a57ac3b36f5d40793d3105a4bb2d1",
+            "Clone9_N1_mature_hairpin_genome.sorted.flagstat:md5,6a8ad3be2ca0fa924fd32a04293d4ce4",
             "Control_N2_mature_hairpin_genome.sorted.flagstat:md5,b561e1e2e059cf4a8d156d2878d14638",
-            "Clone9_N3_mature_hairpin_genome.sorted.stats:md5,d73bffca2d2e685198bb1758c8e3e37c",
-            "Clone1_N3_mature_hairpin_genome.sorted.flagstat:md5,e21a3e140c55792fb394ddc7fc374d29",
-            "Clone9_N2_mature_hairpin_genome.sorted.stats:md5,77ddc325e6f6b6cf872bc490b31d037d",
             "Control_N2_mature_hairpin_genome.sorted.stats:md5,c1a6335191f99e05d41738c78f5d2498",
-            "Clone9_N1_mature_hairpin_genome.sorted.stats:md5,26c8e55e56641f2d4387a37b099ff0c2",
-            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,03d3f6227829c80c0e29cb49df9b6a27",
-            "Control_N1_mature_hairpin_genome.sorted.stats:md5,6a53b78cc7e4ca2338c76095af080151",
             "Clone1_N3_mature_hairpin_genome.sorted.stats:md5,072c74c558a972d462042fb4e3804209",
-            "Control_N3_mature_hairpin_genome.sorted.stats:md5,359d0ab9cc2b45b38efb7609cb80e463"
+            "Clone1_N3_mature_hairpin_genome.sorted.flagstat:md5,e21a3e140c55792fb394ddc7fc374d29",
+            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,03d3f6227829c80c0e29cb49df9b6a27",
+            "Control_N1_mature_hairpin_genome.sorted.stats:md5,6a53b78cc7e4ca2338c76095af080151"
         ],
         "meta": {
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-21T17:57:17.873520964"
+        "timestamp": "2024-08-22T22:43:14.705257782"
+    },
+    "mirna_quant_reference": {
+        "content": [
+            "hsa-hg38-pri-30-30.fas_igenome.fa:md5,0330f80966b98ef9b300db0b312c422d",
+            "hsa_igenome.fa:md5,f8a652b0a51db6ce518f7cdba06c3c01",
+            "hsa-hg38-pri-30-30.fas_igenome.fa_idx.fa:md5,f550596c4dc78658f1aa438c3f2432f1",
+            "hsa_igenome.fa_idx.fa:md5,f8a652b0a51db6ce518f7cdba06c3c01"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-22T22:42:51.639808318"
     },
     "software_versions": {
         "content": [
@@ -84,9 +102,113 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-21T15:55:13.060125336"
+        "timestamp": "2024-08-22T22:42:50.677062286"
     },
-    "fastqc": {
+    "mirna_quant_bam": {
+        "content": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            "Clone1_N1_mature.sorted.idxstats:md5,f391c89a5631b2f2c2d31ebe07fb47d0",
+            "Clone9_N2_mature.sorted.flagstat:md5,e705ff2fb2aff90722587e4ef2574d47",
+            "Clone9_N3_mature.sorted.stats:md5,20ed6d356eaa16e0820afb682505ef8e",
+            "Control_N2_mature.sorted.stats:md5,daab0b0c64f6f43ad16f1bcf269d397f",
+            "Control_N2_mature.sorted.idxstats:md5,6a40778e06c327a4bd7b4b8288839391",
+            "Clone9_N2_mature.sorted.idxstats:md5,fa0c2e4129cdf8d4b1db81040f488b06",
+            "Control_N3_mature.sorted.idxstats:md5,313845385850985d36906780a932f5e2",
+            "Clone1_N3_mature.sorted.stats:md5,8c5829865ae9fbfddae57947cb6c9519",
+            "Control_N1_mature.sorted.idxstats:md5,b7a382b1d0f5cba6cb94b3b5a6b18f84",
+            "Clone1_N3_mature.sorted.idxstats:md5,f1c77fac455e51e5a3d41520c4fd7b94",
+            "Clone9_N3_mature.sorted.idxstats:md5,1f11006d861191605278b6e5fdfa3d9a",
+            "Clone9_N1_mature.sorted.idxstats:md5,8302f401476f5c8fee3333e1c742c05e",
+            "Clone1_N1_mature.sorted.flagstat:md5,e5dfab2690df9cb96aec5889ad008604",
+            "Control_N2_mature.sorted.flagstat:md5,26eac956af9432cb43344d75001e134b",
+            "Clone9_N1_mature.sorted.stats:md5,96b82a0250469c1754abddd4c9b121f2",
+            "Control_N1_mature.sorted.flagstat:md5,f8df7690d20014518f47dc2fe39debec",
+            "Clone9_N2_mature.sorted.stats:md5,d1a72eb2ee8d515979e3d9c6aca36841",
+            "Clone1_N1_mature.sorted.stats:md5,c0756996051adc8d1bd0d0b60fd0855b",
+            "Control_N3_mature.sorted.stats:md5,926dbbacb28c0c79a9129dfe13b8ea46",
+            "Control_N1_mature.sorted.stats:md5,2a5fce73b26297bfce12d75b1e59b205",
+            "Control_N3_mature.sorted.flagstat:md5,ebc0ab77211c4c0537f2dae119c61ca2",
+            "Clone1_N3_mature.sorted.flagstat:md5,b66820feb3fb642aa1d3812f96c17a8f",
+            "Clone9_N3_mature.sorted.flagstat:md5,a027a77c3750bfb1172ce1dc3b3c2759",
+            "Clone9_N1_mature.sorted.flagstat:md5,adf40ba27907b6ef726d6c5923a731b9",
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            "Control_N1_mature_hairpin.sorted.idxstats:md5,79dc5e82ff88e7379c893549224cd87f",
+            "Control_N2_mature_hairpin.sorted.flagstat:md5,c830a70e5badf24c4c2067d5d856853e",
+            "Clone1_N1_mature_hairpin.sorted.idxstats:md5,cc9d2c4ad6d7e05e4a05c8006d64ac6d",
+            "Control_N3_mature_hairpin.sorted.idxstats:md5,b35b14f7dfc8fc4a7a757bf0596e0e0f",
+            "Clone9_N3_mature_hairpin.sorted.idxstats:md5,c0364e7a3b43606b8530adaea02a90b3",
+            "Clone9_N1_mature_hairpin.sorted.idxstats:md5,f3ed5bf23f73d41c42d3da0bf30f89ea",
+            "Control_N1_mature_hairpin.sorted.flagstat:md5,1dc7b98f0014a99a20de7c09a6b95340",
+            "Clone1_N3_mature_hairpin.sorted.idxstats:md5,32e53141026ee40748d8472be8bb561a",
+            "Clone9_N2_mature_hairpin.sorted.flagstat:md5,ab147350da763f38aaddb0b058d2eb1e",
+            "Clone9_N3_mature_hairpin.sorted.flagstat:md5,e2a4383981c36024c09c99bcc45d8cc2",
+            "Clone9_N2_mature_hairpin.sorted.idxstats:md5,07ed767bcfd4fa6fad9c78765e790064",
+            "Clone9_N1_mature_hairpin.sorted.flagstat:md5,678f4f9e98c3e1fcc5af54e8dd06fbbc",
+            "Control_N2_mature_hairpin.sorted.idxstats:md5,76a470476116128573764db2399d8565",
+            "Clone1_N3_mature_hairpin.sorted.stats:md5,29aa9e13aa7d7c95ac2aabd67e49482a",
+            "Clone1_N3_mature_hairpin.sorted.flagstat:md5,614588858f8e91665e913785c422ce42",
+            "Control_N2_mature_hairpin.sorted.stats:md5,14064d698b3f709b31b8d7022c9f07cf",
+            "Control_N1_mature_hairpin.sorted.stats:md5,546c01ab7193d65418db5e11ab57f8c6",
+            "Clone1_N1_mature_hairpin.sorted.flagstat:md5,ba7fd1aa5c0ed1bb161d1f4278926040",
+            "Clone1_N1_mature_hairpin.sorted.stats:md5,105a9a3726ab313c5845c70042fdffff",
+            "Control_N3_mature_hairpin.sorted.stats:md5,7f263ca41f6fe3a48afae87ca4d4bb5f",
+            "Clone9_N3_mature_hairpin.sorted.stats:md5,98a332aa9c51669ad5aa39429e4e386a",
+            "Control_N3_mature_hairpin.sorted.flagstat:md5,f5e2a68427234f7f4fb6f28227f61e02",
+            "Clone9_N1_mature_hairpin.sorted.stats:md5,91bb004f5271b4c507bef7d274df3d61",
+            "Clone9_N2_mature_hairpin.sorted.stats:md5,9665ed98a7d4ef1ae49b572008a9ab5d"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-22T22:42:56.766831973"
+    },
+    "bowtie_index_mirna_mature": {
+        "content": [
+            "fasta_bidx.1.ebwt:md5,7f642e502a03af140cc9defea6c5fbad",
+            "fasta_bidx.2.ebwt:md5,990abde7202805872f56781abfce9da1",
+            "fasta_bidx.3.ebwt:md5,f132742aec53cedb06ca87d289f9f4a2",
+            "fasta_bidx.4.ebwt:md5,70977c4174dd54d5715e24cbe148686c",
+            "fasta_bidx.rev.1.ebwt:md5,34feb7692da8d4752343cf327e1f4446",
+            "fasta_bidx.rev.2.ebwt:md5,ea6d4ad4a6fbc394e189ba95c38eaad0"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-22T22:42:51.326703216"
+    },
+    "mirna_quant_edger_qc": {
         "content": [
             true,
             true,
@@ -109,9 +231,41 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-21T17:57:13.983711958"
+        "timestamp": "2024-08-22T22:43:01.435116943"
     },
-    "multiqc": {
+    "fastqc_raw": {
+        "content": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-22T22:43:05.858666351"
+    },
+    "bowtie_index_mirna_hairpin": {
+        "content": [
+            "fasta_bidx.2.ebwt:md5,f2a632771f4d91546b7d72eb02a074be",
+            "fasta_bidx.1.ebwt:md5,058b4869546dd035b4a0c04f5f88e2a0",
+            "fasta_bidx.3.ebwt:md5,ff4179d03d07954bc2c4e9e3db53cc84",
+            "fasta_bidx.4.ebwt:md5,5f58f8d33f5f4ad024fe5d5bed359e70",
+            "fasta_bidx.rev.2.ebwt:md5,f46776adf134dbf7b15a18ecb6810b05",
+            "fasta_bidx.rev.1.ebwt:md5,4ad69edd9799cc0a962fb4227336fbfb"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-22T22:42:51.008913018"
+    },
+    "multiqc_multiqc_data": {
         "content": [
             "fastqc-status-check-heatmap.txt:md5,30f55902420433a11971d36956e8576e",
             "fastp_filtered_reads_plot.txt:md5,0af4d3cfbf463f33b2b88cdfd69909ac",
@@ -133,11 +287,11 @@
             "fastqc_per_sequence_quality_scores_plot-1.txt:md5,69f4459318311103fe71a5d1d3b2c076",
             true,
             "fastqc_overrepresented_sequences_plot-1.txt:md5,1de000de50cc7516bb9d996def14c6eb",
+            true,
             "fastqc-status-check-heatmap-1.txt:md5,e64c353797e6dc057d10b3194ca6b20d",
             "fastqc_sequence_counts_plot.txt:md5,384516be5885fdeac59e70c17f1413c2",
-            true,
-            true,
             "fastp-seq-quality-plot_Read_1_Before_filtering.txt:md5,65685440fcb927115ac30b01133e2f92",
+            true,
             "fastqc_per_base_sequence_quality_plot.txt:md5,80ea53d94917cadcb41f3fdb56cba014",
             "fastp-seq-content-n-plot_Read_1_After_filtering.txt:md5,048e9b2293217ab8b47ba0113b83c76c",
             "fastqc_adapter_content_plot.txt:md5,86a0f478fd3e690ef5132d08bf4e7625",
@@ -153,14 +307,10 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T14:16:09.201918482"
+        "timestamp": "2024-08-22T22:43:19.148826267"
     },
-    "mirna_quant": {
+    "mirna_quant_seqcluster": {
         "content": [
-            "hsa-hg38-pri-30-30.fas_igenome.fa:md5,0330f80966b98ef9b300db0b312c422d",
-            "hsa_igenome.fa:md5,f8a652b0a51db6ce518f7cdba06c3c01",
-            "hsa-hg38-pri-30-30.fas_igenome.fa_idx.fa:md5,f550596c4dc78658f1aa438c3f2432f1",
-            "hsa_igenome.fa_idx.fa:md5,f8a652b0a51db6ce518f7cdba06c3c01",
             "Control_N2.fastp_trimmed.fastq.gz:md5,d6e607edcb3d71c546ce8fdfb18e3999",
             "Clone1_N3.fastp_trimmed.fastq.gz:md5,2e395240c74b3870efe03dc329d8bad8",
             "Clone9_N3.fastp_trimmed.fastq.gz:md5,67cf9a7d2fa431f0e772391ed1651f93",
@@ -168,108 +318,12 @@
             "Control_N1.fastp_trimmed.fastq.gz:md5,2f09082eb68a8f1dc308050e330887ec",
             "Clone1_N1.fastp_trimmed.fastq.gz:md5,14a2590e663dbde105780726c2173c25",
             "Clone9_N1.fastp_trimmed.fastq.gz:md5,115cf0c346a93a47ba782c5724b4f090",
-            "Control_N3.fastp_trimmed.fastq.gz:md5,342368a6e6acdaf0ae9379676b6d07f0",
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            "Clone9_N1_mature.sorted.stats:md5,96b82a0250469c1754abddd4c9b121f2",
-            "Clone9_N2_mature.sorted.flagstat:md5,e705ff2fb2aff90722587e4ef2574d47",
-            "Control_N2_mature.sorted.flagstat:md5,26eac956af9432cb43344d75001e134b",
-            "Clone1_N3_mature.sorted.flagstat:md5,b66820feb3fb642aa1d3812f96c17a8f",
-            "Control_N1_mature.sorted.idxstats:md5,b7a382b1d0f5cba6cb94b3b5a6b18f84",
-            "Control_N3_mature.sorted.stats:md5,926dbbacb28c0c79a9129dfe13b8ea46",
-            "Control_N3_mature.sorted.flagstat:md5,ebc0ab77211c4c0537f2dae119c61ca2",
-            "Clone9_N3_mature.sorted.stats:md5,20ed6d356eaa16e0820afb682505ef8e",
-            "Control_N3_mature.sorted.idxstats:md5,313845385850985d36906780a932f5e2",
-            "Clone9_N1_mature.sorted.idxstats:md5,8302f401476f5c8fee3333e1c742c05e",
-            "Control_N1_mature.sorted.stats:md5,2a5fce73b26297bfce12d75b1e59b205",
-            "Clone1_N1_mature.sorted.idxstats:md5,f391c89a5631b2f2c2d31ebe07fb47d0",
-            "Clone9_N2_mature.sorted.idxstats:md5,fa0c2e4129cdf8d4b1db81040f488b06",
-            "Control_N2_mature.sorted.idxstats:md5,6a40778e06c327a4bd7b4b8288839391",
-            "Control_N1_mature.sorted.flagstat:md5,f8df7690d20014518f47dc2fe39debec",
-            "Clone1_N1_mature.sorted.flagstat:md5,e5dfab2690df9cb96aec5889ad008604",
-            "Clone1_N3_mature.sorted.stats:md5,8c5829865ae9fbfddae57947cb6c9519",
-            "Clone1_N3_mature.sorted.idxstats:md5,f1c77fac455e51e5a3d41520c4fd7b94",
-            "Clone9_N2_mature.sorted.stats:md5,d1a72eb2ee8d515979e3d9c6aca36841",
-            "Clone9_N1_mature.sorted.flagstat:md5,adf40ba27907b6ef726d6c5923a731b9",
-            "Clone9_N3_mature.sorted.idxstats:md5,1f11006d861191605278b6e5fdfa3d9a",
-            "Control_N2_mature.sorted.stats:md5,daab0b0c64f6f43ad16f1bcf269d397f",
-            "Clone9_N3_mature.sorted.flagstat:md5,a027a77c3750bfb1172ce1dc3b3c2759",
-            "Clone1_N1_mature.sorted.stats:md5,c0756996051adc8d1bd0d0b60fd0855b",
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            "Clone9_N1_mature_hairpin.sorted.idxstats:md5,f3ed5bf23f73d41c42d3da0bf30f89ea",
-            "Clone1_N1_mature_hairpin.sorted.idxstats:md5,cc9d2c4ad6d7e05e4a05c8006d64ac6d",
-            "Control_N3_mature_hairpin.sorted.stats:md5,7f263ca41f6fe3a48afae87ca4d4bb5f",
-            "Clone9_N2_mature_hairpin.sorted.flagstat:md5,ab147350da763f38aaddb0b058d2eb1e",
-            "Clone9_N2_mature_hairpin.sorted.stats:md5,9665ed98a7d4ef1ae49b572008a9ab5d",
-            "Clone9_N2_mature_hairpin.sorted.idxstats:md5,07ed767bcfd4fa6fad9c78765e790064",
-            "Clone1_N3_mature_hairpin.sorted.flagstat:md5,614588858f8e91665e913785c422ce42",
-            "Clone9_N3_mature_hairpin.sorted.stats:md5,98a332aa9c51669ad5aa39429e4e386a",
-            "Clone9_N1_mature_hairpin.sorted.stats:md5,91bb004f5271b4c507bef7d274df3d61",
-            "Control_N1_mature_hairpin.sorted.idxstats:md5,79dc5e82ff88e7379c893549224cd87f",
-            "Clone1_N1_mature_hairpin.sorted.flagstat:md5,ba7fd1aa5c0ed1bb161d1f4278926040",
-            "Control_N2_mature_hairpin.sorted.idxstats:md5,76a470476116128573764db2399d8565",
-            "Control_N1_mature_hairpin.sorted.stats:md5,546c01ab7193d65418db5e11ab57f8c6",
-            "Control_N3_mature_hairpin.sorted.flagstat:md5,f5e2a68427234f7f4fb6f28227f61e02",
-            "Clone1_N3_mature_hairpin.sorted.stats:md5,29aa9e13aa7d7c95ac2aabd67e49482a",
-            "Control_N2_mature_hairpin.sorted.stats:md5,14064d698b3f709b31b8d7022c9f07cf",
-            "Control_N3_mature_hairpin.sorted.idxstats:md5,b35b14f7dfc8fc4a7a757bf0596e0e0f",
-            "Clone9_N1_mature_hairpin.sorted.flagstat:md5,678f4f9e98c3e1fcc5af54e8dd06fbbc",
-            "Clone1_N1_mature_hairpin.sorted.stats:md5,105a9a3726ab313c5845c70042fdffff",
-            "Clone1_N3_mature_hairpin.sorted.idxstats:md5,32e53141026ee40748d8472be8bb561a",
-            "Clone9_N3_mature_hairpin.sorted.idxstats:md5,c0364e7a3b43606b8530adaea02a90b3",
-            "Clone9_N3_mature_hairpin.sorted.flagstat:md5,e2a4383981c36024c09c99bcc45d8cc2",
-            "Control_N1_mature_hairpin.sorted.flagstat:md5,1dc7b98f0014a99a20de7c09a6b95340",
-            "Control_N2_mature_hairpin.sorted.flagstat:md5,c830a70e5badf24c4c2067d5d856853e",
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true,
-            true
+            "Control_N3.fastp_trimmed.fastq.gz:md5,342368a6e6acdaf0ae9379676b6d07f0"
         ],
         "meta": {
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-22T14:16:03.791070797"
+        "timestamp": "2024-08-22T22:42:51.948240261"
     }
 }
