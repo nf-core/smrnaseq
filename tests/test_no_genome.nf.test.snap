@@ -97,7 +97,7 @@
             "mirtrace_complexity_plot.txt:md5,5f78d6f559a9642e68e1fd74ac2c11ca",
             "fastqc_per_sequence_gc_content_plot-1_Percentages.txt:md5,edf5130b48b0814788867dd42e9cf407",
             "multiqc_citations.txt:md5,3adbccd17a42d0d5d97ee7ebb476f433",
-            "samtools-stats-dp.txt:md5,951e248c4dce68d25e14f0c79ef36e2e",
+            true,
             "fastqc_sequence_length_distribution_plot.txt:md5,13f72b3be854c74cd7b5176ca0583770",
             "fastp-seq-content-n-plot_Read_1_Before_filtering.txt:md5,048e9b2293217ab8b47ba0113b83c76c",
             "fastqc_sequence_duplication_levels_plot-1.txt:md5,06a4162d4787883b1f39a1b9acb7bb91",
@@ -116,7 +116,7 @@
             "fastqc_sequence_counts_plot.txt:md5,384516be5885fdeac59e70c17f1413c2",
             "mirtrace_rna_categories_plot.txt:md5,8665376e2a123e1661f82cbbee54789f",
             "fastp-seq-quality-plot_Read_1_Before_filtering.txt:md5,65685440fcb927115ac30b01133e2f92",
-            "samtools_alignment_plot.txt:md5,e4335c4194bffb41df16619f3abfe705",
+            true,
             "fastqc_per_base_sequence_quality_plot.txt:md5,80ea53d94917cadcb41f3fdb56cba014",
             true,
             "fastp-seq-content-n-plot_Read_1_After_filtering.txt:md5,048e9b2293217ab8b47ba0113b83c76c",
@@ -136,7 +136,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-21T16:07:41.27780496"
+        "timestamp": "2024-08-22T14:27:56.186904169"
     },
     "mirna_quant": {
         "content": [
@@ -293,7 +293,7 @@
             true,
             true,
             true,
-            "hairpin_log2CPM_sample_distances.txt:md5,7cca5268281ff6e24f849526589b9e48",
+            true,
             true,
             true,
             true,
@@ -306,6 +306,6 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-21T21:16:50.121115379"
+        "timestamp": "2024-08-22T14:28:01.247994982"
     }
 }

@@ -120,7 +120,7 @@
             "fastqc_sequence_counts_plot-1.txt:md5,37d8ae6c5734eb2679e65e46c9af9101",
             "fastqc_per_sequence_gc_content_plot-1_Percentages.txt:md5,edf5130b48b0814788867dd42e9cf407",
             "multiqc_citations.txt:md5,57db2426be011862828d18f767d25b57",
-            "samtools-stats-dp.txt:md5,90d663100472e8b52c2c04c9ee28babf",
+            true,
             "fastqc_sequence_length_distribution_plot.txt:md5,13f72b3be854c74cd7b5176ca0583770",
             "fastp-seq-content-n-plot_Read_1_Before_filtering.txt:md5,048e9b2293217ab8b47ba0113b83c76c",
             "fastqc_sequence_duplication_levels_plot-1.txt:md5,06a4162d4787883b1f39a1b9acb7bb91",
@@ -135,7 +135,7 @@
             "fastqc_overrepresented_sequences_plot-1.txt:md5,1de000de50cc7516bb9d996def14c6eb",
             "fastqc-status-check-heatmap-1.txt:md5,e64c353797e6dc057d10b3194ca6b20d",
             "fastqc_sequence_counts_plot.txt:md5,384516be5885fdeac59e70c17f1413c2",
-            "samtools_alignment_plot.txt:md5,07766860ac4d8739fcec6b5b51289b57",
+            true,
             true,
             "fastp-seq-quality-plot_Read_1_Before_filtering.txt:md5,65685440fcb927115ac30b01133e2f92",
             "fastqc_per_base_sequence_quality_plot.txt:md5,80ea53d94917cadcb41f3fdb56cba014",
@@ -153,7 +153,7 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-21T17:57:21.712642814"
+        "timestamp": "2024-08-22T14:16:09.201918482"
     },
     "mirna_quant": {
         "content": [
@@ -251,7 +251,7 @@
             "Control_N2_mature_hairpin.sorted.flagstat:md5,c830a70e5badf24c4c2067d5d856853e",
             true,
             true,
-            "hairpin_log2CPM_sample_distances.txt:md5,ee28abcd0c9c3c05d22453e1039fe6a1",
+            true,
             true,
             true,
             true,
@@ -270,6 +270,6 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-21T17:57:09.190802792"
+        "timestamp": "2024-08-22T14:16:03.791070797"
     }
 }

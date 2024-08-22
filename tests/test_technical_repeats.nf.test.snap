@@ -135,7 +135,7 @@
             true,
             true,
             true,
-            "hairpin_log2CPM_sample_distances.txt:md5,2d89f929eff72230c1a6e8bffc8fa17a",
+            true,
             true,
             true,
             true,
@@ -148,6 +148,6 @@
             "nf-test": "0.9.0",
             "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-21T18:26:58.905465612"
+        "timestamp": "2024-08-22T14:44:11.679737041"
     }
 }
