@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#378]](https://github.com/nf-core/smrnaseq/pull/378) - Fix [`--mirtrace_species` bug](<(https://github.com/nf-core/smrnaseq/issues/348)>). Make `MIRTRACE` process conditional. Add mirgenedb test.
 - [[#375]](https://github.com/nf-core/smrnaseq/pull/375) - Test merging of [technical repeats](https://github.com/nf-core/smrnaseq/issues/212).
 - [[#382]](https://github.com/nf-core/smrnaseq/pull/382) - Add nf-tests for local modules using custom R scripts: [collapse_mirtop.R](https://github.com/nf-core/smrnaseq/issues/174).
+- [[#384]](https://github.com/nf-core/smrnaseq/pull/384) - Fix filter stats module and add filter contaminants test profile: [filter status bug fix](https://github.com/nf-core/smrnaseq/issues/360).
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
