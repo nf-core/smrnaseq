@@ -232,7 +232,7 @@ nextflow_pipeline {
                 // { assert snapshot( //these files are outputed by the profile but are sometimes not outputed while running CI tests
                 //     path("$outputDir/genome_quant/bam/Control_N2_mature_hairpin_genome.sorted.bam").exists(),
                 //     path("$outputDir/genome_quant/bam/Control_N2_mature_hairpin_genome.sorted.bam.bai").exists(),
-                //     path("$outputDir/genome_quant/bam/Control_N2_mature_hairpin_genome.sorted.flagstat"), 
+                //     path("$outputDir/genome_quant/bam/Control_N2_mature_hairpin_genome.sorted.flagstat"),
                 //     path("$outputDir/genome_quant/bam/Control_N2_mature_hairpin_genome.sorted.idxstats"),
                 //     path("$outputDir/genome_quant/bam/Control_N2_mature_hairpin_genome.sorted.stats")
                 // ).match("genome_quant_bam") },
