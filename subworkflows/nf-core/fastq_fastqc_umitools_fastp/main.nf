@@ -116,7 +116,7 @@ workflow FASTQ_FASTQC_UMITOOLS_FASTP {
                 trim_reads
             )
             trim_reads        = FASTP3.out.reads
-            trim_json         = FASTP3.out.json
+            //trim_json         = FASTP3.out.json
 
         }
         trim_reads
