@@ -286,19 +286,6 @@
         },
         "timestamp": "2024-08-22T22:10:57.082105969"
     },
-    "genome_quant_bam": {
-        "content": [
-            true,
-            true,
-            "Control_N2_mature_hairpin_genome.sorted.idxstats:md5,b6da32ce230fdeab39f3c4d5dcf41a3a",
-            "Control_N2_mature_hairpin_genome.sorted.stats:md5,1222b755feaf406ecea3f2abb35a737c"
-        ],
-        "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
-        },
-        "timestamp": "2024-08-22T22:11:26.415029668"
-    },
     "bowtie_index_mirna_mature": {
         "content": [
             "fasta_bidx.rev.2.ebwt:md5,ab52bc362b4c382cf213a71219e9efee",
