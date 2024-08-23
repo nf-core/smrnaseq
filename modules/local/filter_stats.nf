@@ -22,15 +22,13 @@ process FILTER_STATS {
     """
     readnumber=\$(wc -l ${reads} | awk '{ print \$1/4 }')
     cat ./filtered.${meta.id}_*.stats | \\
-    tr '\n' ', ' | \\
+    tr '\\n' ', ' | \\
     awk -v sample=${meta.id} -v readnumber=\$readnumber '{ print "id: \\"my_pca_section\\"\\nsection_name: \\"Contamination Filtering\\"\\ndescription: \\"This plot shows the amount of reads filtered by contaminant type.\\"\\nplot_type: \\"bargraph\\"\\npconfig:\\n  id: \\"contamination_filter_plot\\"\\n  title: \\"Contamination Plot\\"\\n  ylab: \\"Number of reads\\"\\ndata:\\n    "sample": {"\$0"\\"remaining reads\\": "readnumber"}" }' > ${meta.id}.contamination_mqc.yaml
     gzip -c ${reads} > ${meta.id}.filtered.fastq.gz
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        cat:  \$(cat --version | grep 'cat ' |sed 's/cat (GNU coreutils) //')
-        gzip: \$(gzip --version | grep "gzip" | sed 's/gzip //')
-        tr:  \$(tr --version | grep 'tr ' |sed 's/tr (GNU coreutils) //')
+        BusyBox: \$(busybox | sed -n -E 's/.*v([[:digit:].]+)\\s\\(.*/\\1/p')
     END_VERSIONS
     """
 }
