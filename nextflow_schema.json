@@ -43,8 +43,10 @@
                 },
                 "protocol": {
                     "type": "string",
-                    "default": "Custom",
-                    "fa_icon": "fas fa-atom"
+                    "description": "Indicates the experimental protocol used for sample preparation, used by miRTrace",
+                    "default": "custom",
+                    "fa_icon": "fas fa-atom",
+                    "enum": ["custom", "illumina", "nextflex", "qiaseq", "cats"]
                 }
             }
         },

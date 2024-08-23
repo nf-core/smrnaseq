@@ -13,12 +13,18 @@ include { FASTP3                } from '../../../modules/local/trim3p.nf'
 //
 import groovy.json.JsonSlurper
 
-def getFastpReadsAfterFiltering(json_file) {
+def getFastpReadsAfterFiltering(json_file, min_num_reads) {
+
+    if ( workflow.stubRun ) { return min_num_reads }
+
     def Map json = (Map) new JsonSlurper().parseText(json_file.text).get('summary')
     return json['after_filtering']['total_reads'].toLong()
 }
 
 def getFastpAdapterSequence(json_file){
+
+    if ( workflow.stubRun ) { return "" }
+
     def Map json = (Map) new JsonSlurper().parseText(json_file.text)
     try{
         adapter = json['adapter_cutting']['read1_adapter_sequence']
@@ -92,6 +98,7 @@ workflow FASTQ_FASTQC_UMITOOLS_FASTP {
         FASTP (
             umi_reads,
             adapter_fasta,
+            false, // don't want to set discard_trimmed_pass, else there will be no reads output
             save_trimmed_fail,
             save_merged
         )
@@ -121,7 +128,7 @@ workflow FASTQ_FASTQC_UMITOOLS_FASTP {
         //
         trim_reads
             .join(trim_json)
-            .map { meta, reads, json -> [ meta, reads, getFastpReadsAfterFiltering(json) ] }
+            .map { meta, reads, json -> [ meta, reads, getFastpReadsAfterFiltering(json, min_trimmed_reads.toLong()) ] }
             .set { ch_num_trimmed_reads }
 
         ch_num_trimmed_reads
