@@ -6,7 +6,6 @@ include { FASTQC as FASTQC_RAW  } from '../../../modules/nf-core/fastqc/main'
 include { FASTQC as FASTQC_TRIM } from '../../../modules/nf-core/fastqc/main'
 include { UMITOOLS_EXTRACT      } from '../../../modules/nf-core/umitools/extract/main'
 include { FASTP                 } from '../../../modules/nf-core/fastp/main'
-include { FASTP3                } from '../../../modules/local/trim3p.nf'
 
 //
 // Function that parses fastp json output file to get total number of reads after trimming
@@ -102,31 +101,19 @@ workflow FASTQ_FASTQC_UMITOOLS_FASTP {
             save_trimmed_fail,
             save_merged
         )
-        trim_reads        = FASTP.out.reads
         trim_json         = FASTP.out.json
         trim_html         = FASTP.out.html
         trim_log          = FASTP.out.log
         trim_reads_fail   = FASTP.out.reads_fail
         trim_reads_merged = FASTP.out.reads_merged
         ch_versions       = ch_versions.mix(FASTP.out.versions.first())
-        
-        // Trim 3' end nucleotides after adapter is removed, otherwise they are not really trimmed
-        if (params.three_prime_clip_r1){
-            FASTP3(
-                trim_reads
-            )
-            trim_reads        = FASTP3.out.reads
-            //trim_json         = FASTP3.out.json
 
-        }
-        trim_reads
-        .view()
-        .set{new_reads}
-        
         //
         // Filter FastQ files based on minimum trimmed read count after adapter trimming
         //
-        trim_reads
+        FASTP
+            .out
+            .reads
             .join(trim_json)
             .map { meta, reads, json -> [ meta, reads, getFastpReadsAfterFiltering(json, min_trimmed_reads.toLong()) ] }
             .set { ch_num_trimmed_reads }
@@ -155,7 +142,7 @@ workflow FASTQ_FASTQC_UMITOOLS_FASTP {
     }
 
     emit:
-    reads = new_reads  // channel: [ val(meta), [ reads ] ]
+    reads = trim_reads // channel: [ val(meta), [ reads ] ]
 
     fastqc_raw_html    // channel: [ val(meta), [ html ] ]
     fastqc_raw_zip     // channel: [ val(meta), [ zip ] ]
