@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#380]](https://github.com/nf-core/smrnaseq/pull/380) - Fix checking number of samples which causes error in plotMDS. Add nf-tests for local modules using custom R scripts: [edgeR_mirBase.R](https://github.com/nf-core/smrnaseq/issues/187).
 - [[#378]](https://github.com/nf-core/smrnaseq/pull/378) - Fix [`--mirtrace_species` bug](<(https://github.com/nf-core/smrnaseq/issues/348)>). Make `MIRTRACE` process conditional. Add mirgenedb test.
 - [[#375]](https://github.com/nf-core/smrnaseq/pull/375) - Test merging of [technical repeats](https://github.com/nf-core/smrnaseq/issues/212).
+- [[#383]](https://github.com/nf-core/smrnaseq/pull/383) - Fixes [parameter `--skip_fastp` throws an error](https://github.com/nf-core/smrnaseq/issues/263).
 - [[#382]](https://github.com/nf-core/smrnaseq/pull/382) - Add nf-tests for local modules using custom R scripts: [collapse_mirtop.R](https://github.com/nf-core/smrnaseq/issues/174).
 - [[#384]](https://github.com/nf-core/smrnaseq/pull/384) - Fix filter stats module and add filter contaminants test profile: [filter status bug fix](https://github.com/nf-core/smrnaseq/issues/360).
 

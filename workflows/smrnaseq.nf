@@ -160,12 +160,23 @@ workflow NFCORE_SMRNASEQ {
     //
     // MODULE: mirtrace QC
     //
-    FASTQ_FASTQC_UMITOOLS_FASTP.out.adapter_seq
-    .join( ch_reads_for_mirna )
-    .dump()
-    .map { meta, adapter_seq, reads -> [adapter_seq, meta.id, reads] }
-    .groupTuple()
-    .set { ch_mirtrace_inputs }
+
+    // Define the main adapter sequence channel
+    ch_adapter_seq = FASTQ_FASTQC_UMITOOLS_FASTP.out.adapter_seq
+
+    // Define a fallback channel with the default value "custom"
+    ch_fallback_adapter_seq = ch_reads_for_mirna.map { meta, reads -> [meta, 'custom'] }
+
+    // Change to fallback channel if ch_adapter_seq is empty
+    ch_adapter_seq = ch_adapter_seq ? ch_fallback_adapter_seq : ch_adapter_seq
+
+    // Now join the adapter sequence channel with the reads channel
+    ch_adapter_seq
+        .join(ch_reads_for_mirna)
+        .map { meta, adapter_seq, reads -> [adapter_seq, meta.id, reads] }
+        .groupTuple()
+        .map { adapter_seq, ids, reads_list -> [adapter_seq, ids, reads_list.flatten()] }
+        .set { ch_mirtrace_inputs }
 
     //
     // SUBWORKFLOW: MIRTRACE
