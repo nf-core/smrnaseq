@@ -53,7 +53,7 @@ workflow NFCORE_SMRNASEQ {
         }
 
     // Genome options
-    def mirna_gtf_from_species = params.mirtrace_species ? "https://mirbase.org/download/CURRENT/genomes/${params.mirtrace_species}.gff3" : false
+    def mirna_gtf_from_species = params.mirtrace_species ? (params.mirtrace_species == 'hsa' ? "https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${params.mirtrace_species}.gff3") : false
     def mirna_gtf = params.mirna_gtf ?: mirna_gtf_from_species
 
     if (!params.mirgenedb) {
