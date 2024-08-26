@@ -25,15 +25,16 @@ include { EDGER_QC             } from '../../modules/local/edger_qc/edger_qc.nf'
 
 workflow MIRNA_QUANT {
     take:
-    mature     // channel: [ val(meta), fasta file]
-    hairpin    // channel: [ val(meta), fasta file]
-    gtf        // channle: GTF file
-    reads      // channel: [ val(meta), [ reads ] ]
+    mature           // channel: [ val(meta), fasta file]
+    hairpin          // channel: [ val(meta), fasta file]
+    gtf              // channel: GTF file
+    reads            // channel: [ val(meta), [ reads ] ]
+    mirtrace_species // value  : params.mirtrace_species
 
     main:
     ch_versions = Channel.empty()
 
-    PARSE_MATURE ( mature ).parsed_fasta.set { mirna_parsed }
+    PARSE_MATURE ( mature, mirtrace_species ).parsed_fasta.set { mirna_parsed }
     ch_versions = ch_versions.mix(PARSE_MATURE.out.versions)
 
     FORMAT_MATURE ( mirna_parsed )
@@ -58,7 +59,7 @@ workflow MIRNA_QUANT {
     BAM_STATS_MATURE ( BOWTIE_MAP_MATURE.out.bam, FORMAT_MATURE.out.formatted_fasta )
     ch_versions = ch_versions.mix(BAM_STATS_MATURE.out.versions)
 
-    PARSE_HAIRPIN ( hairpin ).parsed_fasta.set { hairpin_parsed }
+    PARSE_HAIRPIN ( hairpin, mirtrace_species ).parsed_fasta.set { hairpin_parsed }
     ch_versions = ch_versions.mix(PARSE_HAIRPIN.out.versions)
 
     FORMAT_HAIRPIN ( hairpin_parsed )
@@ -95,8 +96,8 @@ workflow MIRNA_QUANT {
     ch_versions = ch_versions.mix(BOWTIE_MAP_SEQCLUSTER.out.versions)
 
     ch_mirtop_logs = Channel.empty()
-    if (params.mirtrace_species){
-        MIRTOP_QUANT ( BOWTIE_MAP_SEQCLUSTER.out.bam.collect{it[1]}, FORMAT_HAIRPIN.out.formatted_fasta.collect{it[1]}, gtf )
+    if (mirtrace_species){
+        MIRTOP_QUANT ( BOWTIE_MAP_SEQCLUSTER.out.bam.collect{it[1]}, FORMAT_HAIRPIN.out.formatted_fasta.collect{it[1]}, gtf, mirtrace_species )
         ch_mirtop_logs = MIRTOP_QUANT.out.logs
         ch_versions = ch_versions.mix(MIRTOP_QUANT.out.versions)
 
