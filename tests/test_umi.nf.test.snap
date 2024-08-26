@@ -28,19 +28,19 @@
     },
     "mirtrace": {
         "content": [
-            "mirtrace-stats-contamination_detailed.tsv:md5,428d2fd6ea0a6f2af1018a557e89bece",
-            "mirtrace-stats-mirna-complexity.tsv:md5,cd2f37963adeee159764a89688a4a6a5",
-            "mirtrace-stats-length.tsv:md5,3edbc31452dba97f8b829e3f8f635955",
-            "mirtrace-stats-contamination_basic.tsv:md5,3d54b37ab3206e9fec909fe3ea1a4777",
-            "mirtrace-stats-qcstatus.tsv:md5,de4f8a670b736bedf348d358cfdfb9fc",
+            "mirtrace-stats-contamination_detailed.tsv:md5,4015530b4d5935b241eb70bf0c51dfad",
+            "mirtrace-stats-mirna-complexity.tsv:md5,9ed7b0c56b5fe2913cadf9a47f2d4731",
+            "mirtrace-stats-length.tsv:md5,b9f57e2e6c950a065a28769928d7dbdd",
+            "mirtrace-stats-contamination_basic.tsv:md5,cf6ced069895d8d6183a5b391c532d1c",
+            "mirtrace-stats-qcstatus.tsv:md5,bc24cec6cfa63462005d86dba95cfdfd",
             "mirtrace-stats-phred.tsv:md5,8cf9fc2223b9aeb50f92c8845edbf535",
-            "mirtrace-stats-rnatype.tsv:md5,00e584439bec82f5de8d6485a73dec37"
+            "mirtrace-stats-rnatype.tsv:md5,b485dc91adfc66a2237f145430dfbc21"
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nf-test": "0.8.4",
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-22T22:52:15.212444825"
+        "timestamp": "2024-08-26T15:42:33.712941492"
     },
     "mirna_quant_reference": {
         "content": [
@@ -153,7 +153,7 @@
             "fastp_filtered_reads_plot.txt:md5,3aaa79e1ede44347971c26100d9e954b",
             true,
             "fastqc_sequence_counts_plot-1.txt:md5,24744e039ce4dbcbacf42edbfd642a8b",
-            "mirtrace_complexity_plot.txt:md5,5a860a872f793250b8c4482d031176a8",
+            "mirtrace_complexity_plot.txt:md5,03b2a5783383193eeee4a3a094612112",
             "fastqc_per_sequence_gc_content_plot-1_Percentages.txt:md5,351f949c0abf4fb7587f3f5d9a28d461",
             "multiqc_citations.txt:md5,3adbccd17a42d0d5d97ee7ebb476f433",
             true,
@@ -166,13 +166,13 @@
             "fastqc_per_base_n_content_plot.txt:md5,5b5b8cee3162d092c0bcddffbd000f34",
             "fastp-seq-quality-plot_Read_1_After_filtering.txt:md5,66a47c7ce00ede2053f8e6eb20ec3417",
             "fastqc_per_sequence_quality_scores_plot.txt:md5,3aa99649540afc898d32d2e49a364487",
-            "mirtrace_qc_plot.txt:md5,b08d11ea51c54e615f9608002644c787",
+            "mirtrace_qc_plot.txt:md5,b8e9e241fd258a3ddd13ae407d6dd746",
             "fastqc_per_sequence_quality_scores_plot-1.txt:md5,4108da6fe352558a652ee2b17d609e07",
-            "mirtrace_length_plot.txt:md5,440a84ce9bbdb89b736e4e2446382665",
+            "mirtrace_length_plot.txt:md5,3f84d4b3dd20053815b7524bc43f0261",
             true,
             "fastqc-status-check-heatmap-1.txt:md5,cb2ea844834808ae4c95c6440269cf2e",
             "fastqc_sequence_counts_plot.txt:md5,5e5c5132ff1969dfa40cb8b1eadf7a46",
-            "mirtrace_rna_categories_plot.txt:md5,6d08c297377a6241c4c1e82278d71f32",
+            "mirtrace_rna_categories_plot.txt:md5,d7d616cd1ef0797727299f8820f50ab9",
             "fastp-seq-quality-plot_Read_1_Before_filtering.txt:md5,f36b7cfd3057b26281367397db45033a",
             true,
             "fastqc_per_base_sequence_quality_plot.txt:md5,e2e187bc0b0c1f0d1abb3b666945c7b3",
@@ -180,7 +180,7 @@
             "fastp-seq-content-n-plot_Read_1_After_filtering.txt:md5,bbad2035ada86867c4ed579a93b78d64",
             true,
             true,
-            "mirtrace_contamination_check_plot.txt:md5,7f12917ce506127a729edb733fdda511",
+            "mirtrace_contamination_check_plot.txt:md5,46c2709ae5228d93ff117b88f9792620",
             "fastqc_adapter_content_plot.txt:md5,de1d7324ff5146b49fc9a2e6d4633962",
             "fastqc_sequence_duplication_levels_plot.txt:md5,fe7598e49f93bb980a7675a2bb4bd3b5",
             "fastqc_per_sequence_gc_content_plot_Percentages.txt:md5,c2f2f9282a50c3eef475664cc969b8ec",
@@ -192,10 +192,10 @@
             "fastp-seq-content-gc-plot_Read_1_After_filtering.txt:md5,d673e3b18c40c5af1edccffba386d678"
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nf-test": "0.8.4",
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-22T22:52:47.905877394"
+        "timestamp": "2024-08-26T15:42:34.218114878"
     },
     "mirna_quant_seqcluster": {
         "content": [
@@ -210,14 +210,14 @@
     },
     "mirtrace_qc_passed_reads.rnatype_unknown.collapsed": {
         "content": [
-            "SRX8195118_SRR11631014.fastp.fasta:md5,7db07b8c0b9e2b484eb3d42a04e480d1",
-            "SRX8195117_SRR11631013.fastp.fasta:md5,eb1ba9fa6f7d956e5d650fdd306d5634"
+            "SRX8195118_SRR11631014.fastp.fasta:md5,5aff6ac8bf0f5637b730ad8f49ac7a47",
+            "SRX8195117_SRR11631013.fastp.fasta:md5,08902643a45e944be04ad62dd4eaa610"
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nf-test": "0.8.4",
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-22T22:52:32.630636315"
+        "timestamp": "2024-08-26T15:42:34.012175996"
     },
     "genome_quant_bam": {
         "content": [
@@ -281,14 +281,14 @@
     },
     "mirtrace_qc_passed_reads.all.collapsed": {
         "content": [
-            "SRX8195118_SRR11631014.fastp.fasta:md5,99e2ce92ce102bd3fedc3a9d3b926873",
-            "SRX8195117_SRR11631013.fastp.fasta:md5,e0e31d882568a7853dea75b3c595108f"
+            "SRX8195118_SRR11631014.fastp.fasta:md5,472b73017f8a22c10855fd196f19c1c7",
+            "SRX8195117_SRR11631013.fastp.fasta:md5,d05deb2132050f04843341d613cc6e65"
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nf-test": "0.8.4",
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-22T22:52:22.862929991"
+        "timestamp": "2024-08-26T15:42:33.842847298"
     },
     "mirna_quant_mirtop": {
         "content": [
