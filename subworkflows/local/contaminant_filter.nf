@@ -5,7 +5,7 @@
 include { BLAT_MIRNA as BLAT_CDNA
         BLAT_MIRNA as BLAT_NCRNA
         BLAT_MIRNA as BLAT_PIRNA
-        BLAT_MIRNA as BLAT_OTHER } from '../../modules/local/blat_mirna'
+        BLAT_MIRNA as BLAT_OTHER } from '../../modules/local/blat_mirna/blat_mirna'
 
 include { INDEX_CONTAMINANTS as INDEX_RRNA
         INDEX_CONTAMINANTS as INDEX_TRNA
