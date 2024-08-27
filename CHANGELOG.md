@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#382]](https://github.com/nf-core/smrnaseq/pull/382) - Add [collapse_mirtop.R](https://github.com/nf-core/smrnaseq/issues/174) - Add nf-tests for local modules using custom R scripts.
 - [[#383]](https://github.com/nf-core/smrnaseq/pull/383) - Fix [parameter `--skip_fastp` throws an error](https://github.com/nf-core/smrnaseq/issues/263) - Fix parameter --skip_fastp.
 - [[#384]](https://github.com/nf-core/smrnaseq/pull/384) - Fix [filter status bug fix](https://github.com/nf-core/smrnaseq/issues/360) - Fix filter stats module and add filter contaminants test profile.
+- [[#387]](https://github.com/nf-core/smrnaseq/pull/387) - Add nf-test to local module `blat_mirna` and fixes [contaminant filter failure because the Docker image for BLAT cannot be pulled](https://github.com/nf-core/smrnaseq/issues/354). Adds a small test profile to test contaminant filter results.
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
