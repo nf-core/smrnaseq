@@ -44,7 +44,7 @@ workflow NFCORE_SMRNASEQ {
     ch_input            // channel: samplesheet file as specified to --input
     ch_samplesheet      // channel: sample fastqs parsed from --input
     fasta               // params.fasta
-    mirtrace_species    // mirtrace_species
+    mirtrace_species    // params.mirtrace_species
     bowtie_index        // params.bowtie_index
     ch_versions         // channel: [ path(versions.yml) ]
 
@@ -56,12 +56,12 @@ workflow NFCORE_SMRNASEQ {
         }
 
     // Genome options
-    mirna_gtf_from_species = mirtrace_species ? "https://mirbase.org/download/CURRENT/genomes/${mirtrace_species}.gff3" : false
+    mirna_gtf_from_species = mirtrace_species ? (mirtrace_species == 'hsa' ? "https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${mirtrace_species}.gff3") : false
     mirna_gtf = params.mirna_gtf ?: mirna_gtf_from_species
 
     if (!params.mirgenedb) {
-        if (params.mature) { reference_mature = Channel.fromPath(params.mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
-        if (params.hairpin) { reference_hairpin = Channel.fromPath(params.hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
+        if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
+        if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
     } else {
         if (params.mirgenedb_mature) { reference_mature = file(params.mirgenedb_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found via --mirgenedb_mature: ${params.mirgenedb_mature}" }
         if (params.mirgenedb_hairpin) { reference_hairpin = file(params.mirgenedb_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found via --mirgenedb_hairpin: ${params.mirgenedb_hairpin}" }
@@ -111,7 +111,7 @@ workflow NFCORE_SMRNASEQ {
     )
     ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.versions)
 
-    ch_fasta = fasta ? Channel.fromPath(fasta, checkIfExists: true): Channel.empty()
+    ch_fasta = fasta ? file(fasta): []
     ch_reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
 
     // even if bowtie index is specified, there still needs to be a fasta.
@@ -119,15 +119,15 @@ workflow NFCORE_SMRNASEQ {
     if(fasta) {
         //Prepare bowtie index, unless specified
         //This needs to be done here as the index is used by GENOME_QUANT
-        if(bowtie_index) {
-            ch_fasta = Channel.fromPath(fasta)
-            if (bowtie_index.endsWith(".tar.gz")) {
-                UNTAR_BOWTIE_INDEX ( [ [], bowtie_index ]).files.map { it[1] }.set {ch_bowtie_index}
+        if(params.bowtie_index) {
+            ch_fasta = Channel.fromPath(params.fasta)
+            if (params.bowtie_index.endsWith(".tar.gz")) {
+                UNTAR_BOWTIE_INDEX ( [ [], params.bowtie_index ]).files.map { it[1] }.set {ch_bowtie_index}
                 ch_versions  = ch_versions.mix(UNTAR_BOWTIE_INDEX.out.versions)
             } else {
-                Channel.fromPath("${bowtie_index}**ebwt", checkIfExists: true).ifEmpty{ error "Bowtie1 index directory not found: ${bowtie_index}" }.filter { it != null }.set { ch_bowtie_index }
+                Channel.fromPath("${params.bowtie_index}**ebwt", checkIfExists: true).ifEmpty{ error "Bowtie1 index directory not found: ${params.bowtie_index}" }.filter { it != null }.set { ch_bowtie_index }
             }
-            } else {
+        } else {
             INDEX_GENOME ( [ [:], ch_fasta ] )
             ch_versions = ch_versions.mix(INDEX_GENOME.out.versions)
             ch_bowtie_index = INDEX_GENOME.out.index
@@ -176,10 +176,10 @@ workflow NFCORE_SMRNASEQ {
     // Now join the adapter sequence channel with the reads channel
     ch_adapter_seq
         .join(ch_reads_for_mirna)
-    .map { meta, adapter_seq, reads -> [adapter_seq, meta.id, reads] }
-    .groupTuple()
-    .map { adapter_seq, ids, reads_list -> [adapter_seq, ids, reads_list.flatten()] }
-    .set { ch_mirtrace_inputs }
+        .map { meta, adapter_seq, reads -> [adapter_seq, meta.id, reads] }
+        .groupTuple()
+        .map { adapter_seq, ids, reads_list -> [adapter_seq, ids, reads_list.flatten()] }
+        .set { ch_mirtrace_inputs }
 
     //
     // SUBWORKFLOW: MIRTRACE
@@ -212,14 +212,13 @@ workflow NFCORE_SMRNASEQ {
         ch_reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
 
     }
-
+    //MIRNA_QUANT process should still run even if mirtrace_species is null when mirgendb is true
     MIRNA_QUANT (
-        reference_mature,
-        reference_hairpin,
-        mirna_gtf,
-        ch_reads_for_mirna,
-        mirtrace_species
-
+    [ [:], reference_mature],
+    [ [:], reference_hairpin],
+    mirna_gtf,
+    ch_reads_for_mirna,
+    mirtrace_species
     )
     ch_versions = ch_versions.mix(MIRNA_QUANT.out.versions)
 
