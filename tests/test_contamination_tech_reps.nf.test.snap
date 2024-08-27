@@ -1,0 +1,255 @@
+{
+    "mirtrace": {
+        "content": [
+            "mirtrace-stats-length.tsv:md5,803c113b9d358b90d06d751161f5b398",
+            "mirtrace-stats-contamination_basic.tsv:md5,e27f51e118896c51ffcf4e6876da32c3",
+            "mirtrace-stats-contamination_detailed.tsv:md5,2f3b3fd832e8c09fc4be81957b259e31",
+            "mirtrace-stats-mirna-complexity.tsv:md5,9df32e8dee2bc065908c5aa9093bb6b3",
+            "mirtrace-stats-qcstatus.tsv:md5,5a407e2d3b138d6229e371c7549870c5",
+            "mirtrace-stats-rnatype.tsv:md5,cc1ad36b61b9c5d6e40aff12b326b2ad",
+            "mirtrace-stats-phred.tsv:md5,8563f3941dffd4f1b786014411215391"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:50:54.900311947"
+    },
+    "contaminant_filter_index": {
+        "content": [
+            "fasta_bidx.rev.2.bt2:md5,e0b9889689c97be7490f8c62cd4adee0",
+            "fasta_bidx.3.bt2:md5,b4304a4319e562766527b75e3e120be3",
+            "fasta_bidx.2.bt2:md5,1f37734b74471ea7c791bfcdb3dfa7c4",
+            "fasta_bidx.1.bt2:md5,c496b6bcb84f7aa0ba9d4a54bf1243d3",
+            "fasta_bidx.rev.1.bt2:md5,f485042a707c4d3c8796e6d49d55f645",
+            "fasta_bidx.4.bt2:md5,f71edc7dd7e894156c9a0d1e5fd3d006"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:44:46.324973366"
+    },
+    "mirna_quant_reference": {
+        "content": [
+            "hairpin.fa_igenome.fa_idx.fa:md5,482b0327b0c1e36748c1ee3d3be9be77",
+            "hairpin.fa_igenome.fa:md5,5fb538f60d5288846600dba31010251e",
+            "mature.fa_igenome.fa:md5,ef4cabcbea05adf334ba6891a50c951a",
+            "mature.fa_igenome.fa_idx.fa:md5,ef4cabcbea05adf334ba6891a50c951a"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:46:28.248891273"
+    },
+    "software_versions": {
+        "content": [
+            "{BLAT_CDNA={blat=null}, BLAT_NCRNA={blat=null}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_MATURE={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.1, samtools=1.14}, CAT_FASTQ={cat=8.3}, FASTP={fastp=0.23.4}, FILTER_STATS={BusyBox=1.32.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_CDNA={bowtie2=2.4.5}, INDEX_HAIRPIN={bowtie=1.3.1}, INDEX_MATURE={bowtie=1.3.1}, INDEX_NCRNA={bowtie2=2.4.5}, INDEX_TRNA={bowtie2=2.4.5}, MAP_CDNA={bowtie2=2.4.5}, MAP_NCRNA={bowtie2=2.4.5}, MAP_TRNA={bowtie2=2.4.5}, MIRTOP_QUANT={mirtop=0.4.25}, MIRTRACE_RUN={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.2}, SAMTOOLS_IDXSTATS={samtools=1.2}, SAMTOOLS_INDEX={samtools=1.2}, SAMTOOLS_SORT={samtools=1.2}, SAMTOOLS_STATS={samtools=1.2}, SEQCLUSTER_SEQUENCES={seqcluster=1.2.9}, TABLE_MERGE={r-base=3.6.2}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:44:46.278688181"
+    },
+    "mirna_quant_bam": {
+        "content": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            "Clone1_N1_mature.sorted.idxstats:md5,9190c607095771fa8147c9266ca621c5",
+            "Clone1_N1_mature.sorted.stats:md5,c9c836c0b45b48128a62c3770b8209be",
+            "Control_N1_mature.sorted.stats:md5,a0892e93282faa9df950310a4975d635",
+            "Clone9_N3_mature.sorted.stats:md5,c498da62bb9071b83015224f09d60780",
+            "Control_N1_mature.sorted.idxstats:md5,9e7f8b428a5f6cca264cb5495c188358",
+            "Control_N1_mature.sorted.flagstat:md5,524e8d0f470e326a1eca841340c93eef",
+            "Clone1_N1_mature.sorted.flagstat:md5,88df2dc9ed7f6bec02012a2ec70ba174",
+            "Clone9_N3_mature.sorted.flagstat:md5,300b632f30cd5f22691e45f70e161fc5",
+            "Clone9_N3_mature.sorted.idxstats:md5,7c6df04fb1801e87ded6087cbec0c365",
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            "Clone1_N1_mature_hairpin.sorted.idxstats:md5,bd896fc09f6468ed6d94ba073b1edbf9",
+            "Control_N1_mature_hairpin.sorted.flagstat:md5,8b02d1292fb0722f0fc8ae738b182fcc",
+            "Control_N1_mature_hairpin.sorted.idxstats:md5,3365fc0c0957b0c99b10df68e3e7bcc1",
+            "Clone9_N3_mature_hairpin.sorted.stats:md5,1538d4438f55b501c2fc17a9feb58fa6",
+            "Control_N1_mature_hairpin.sorted.stats:md5,22f1b3fc90e66aea179563eaae77339b",
+            "Clone9_N3_mature_hairpin.sorted.idxstats:md5,eaf676c95844585e25eabdef5537b38a",
+            "Clone9_N3_mature_hairpin.sorted.flagstat:md5,a756ee2e60682a4db1e95dbfc3c0967a",
+            "Clone1_N1_mature_hairpin.sorted.stats:md5,32010a3788d21fcaa2e9b775cc18cd65",
+            "Clone1_N1_mature_hairpin.sorted.flagstat:md5,8b40952c62f96abf2dc8cb149236da88"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:47:43.19931735"
+    },
+    "mirna_quant_edger_qc": {
+        "content": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:48:21.743535163"
+    },
+    "contaminant_filter_filter": {
+        "content": [
+            "Clone1_N1.filtered.fastq.gz:md5,2f2a6bf0eecd1b41a6aff15a2271f25b",
+            "Control_N1.contamination_mqc.yaml:md5,46709a40dddb68e3229e5a13f93e9121",
+            "Control_N1.filtered.fastq.gz:md5,9781f2d98cc89c489cbdcfb12045b78d",
+            "Clone1_N1.contamination_mqc.yaml:md5,0c148c0246a2f2ddadd9f7260725cdb8",
+            "Clone9_N3.filtered.fastq.gz:md5,4d0a4b5bf2358bbd059af9c6db123647",
+            "Clone9_N3.contamination_mqc.yaml:md5,40a9ada9ca4913ba4521d91890dd24dd"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:45:49.378127578"
+    },
+    "mirna_quant_seqcluster": {
+        "content": [
+            "Control_N1.filtered_trimmed.fastq.gz:md5,75e5f01c0c2dabff7368f91a90358e2d",
+            "Clone1_N1.filtered_trimmed.fastq.gz:md5,bca0d85e930f775e6c040af4d85aa258",
+            "Clone9_N3.filtered_trimmed.fastq.gz:md5,ac1a36c33070ead4cc9e7631555255d1"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:47:05.415821736"
+    },
+    "mirtrace_qc_passed_reads.rnatype_unknown.collapsed": {
+        "content": [
+            "Clone1_N1.fastp.fasta:md5,ca0fbb7f10b8b14cab8988c97961d444",
+            "Control_N1.fastp.fasta:md5,446f3452ffac337eb1afa5861c2ba94a",
+            "Clone9_N3.fastp.fasta:md5,80a4b70ef276cf5628dfa2942c7e4988"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:52:11.660207172"
+    },
+    "contaminant_filter_blat": {
+        "content": [
+            "filtered.fa:md5,8fd42894e815999b4278b08297720aae"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:44:51.516119554"
+    },
+    "contaminant_filter_map": {
+        "content": [
+            "Clone9_N3.tRNA.filter.unmapped.contaminant.fastq:md5,5ea93f7c5c7c068a601324a53eb47b5d",
+            "Clone9_N3.filter.contaminant.sam:md5,9e956f43f6ceb09b8109eebc521d78f9",
+            "filtered.Clone9_N3_tRNA.stats:md5,28c69cfbb7af764b4f3d96a33b822a71",
+            "Clone9_N3.cDNA.filter.unmapped.contaminant.fastq:md5,f0c2dedd0306174324bb8a786babbc45",
+            "filtered.Clone9_N3_cDNA.stats:md5,df9990a9c0e70191e81b1bed5ab094c4",
+            "Clone9_N3.ncRNA.filter.unmapped.contaminant.fastq:md5,4d0a4b5bf2358bbd059af9c6db123647",
+            "filtered.Clone9_N3_ncRNA.stats:md5,4b98ddf3a738a7a439b3d194e7ce8f33",
+            "Clone1_N1.tRNA.filter.unmapped.contaminant.fastq:md5,01239552c153365f6e7c6315eb494ae2",
+            "Clone1_N1.filter.contaminant.sam:md5,f1dc7f81c7f5e71b413f4399b1031e2f",
+            "filtered.Clone1_N1_tRNA.stats:md5,15ad4ad7d50abaa24577621728a43931",
+            "Control_N1.filter.contaminant.sam:md5,438b784b05107dbc02a6116a1d54d87f",
+            "Control_N1.tRNA.filter.unmapped.contaminant.fastq:md5,2dae7bb33621fc004026fe6858e9fe25",
+            "filtered.Control_N1_tRNA.stats:md5,9dcfdf35df406d1f43bd482029e592b6",
+            "Clone1_N1.cDNA.filter.unmapped.contaminant.fastq:md5,47a7b05c7cb18141eb9b3b41d26a9f7c",
+            "filtered.Clone1_N1_cDNA.stats:md5,49bcc09af823f0d7b524e8f83de3c397",
+            "Control_N1.cDNA.filter.unmapped.contaminant.fastq:md5,20e1820d1028d15b403a5c989e671d1a",
+            "filtered.Control_N1_cDNA.stats:md5,1d1ebba88d761d509720b6cdb3c6012c",
+            "Control_N1.ncRNA.filter.unmapped.contaminant.fastq:md5,9781f2d98cc89c489cbdcfb12045b78d",
+            "filtered.Control_N1_ncRNA.stats:md5,dd5cbd1c95e8465c8541bcb035be735f",
+            "Clone1_N1.ncRNA.filter.unmapped.contaminant.fastq:md5,2f2a6bf0eecd1b41a6aff15a2271f25b",
+            "filtered.Clone1_N1_ncRNA.stats:md5,79008e34cbcdf5a2e043061d000bd618"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:44:57.811794416"
+    },
+    "bowtie_index_mirna_mature": {
+        "content": [
+            "fasta_bidx.4.ebwt:md5,78260e9dde22d8f31622c77d71bbb605",
+            "fasta_bidx.rev.2.ebwt:md5,ab52bc362b4c382cf213a71219e9efee",
+            "fasta_bidx.1.ebwt:md5,11a2f568aa785d32246cb8ce1aa8add4",
+            "fasta_bidx.3.ebwt:md5,7aeccc6ec919ce1cfcd2b1e40be743fe",
+            "fasta_bidx.rev.1.ebwt:md5,0520d43b6b75328f3c30254a2d6baa18",
+            "fasta_bidx.2.ebwt:md5,778bd05aa462c2119736f9a4056bc41f"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:50:16.420541184"
+    },
+    "bowtie_index_mirna_hairpin": {
+        "content": [
+            "fasta_bidx.1.ebwt:md5,40c2c142e094ab5ea531a0564ad62cee",
+            "fasta_bidx.3.ebwt:md5,5c60180e2f6fc2e0c399f10b9f9bbee2",
+            "fasta_bidx.2.ebwt:md5,6d99166d1a8a7a1bbf262e89db218278",
+            "fasta_bidx.4.ebwt:md5,c3d4dbfbb587261ddf29e906029c10b1",
+            "fasta_bidx.rev.1.ebwt:md5,4532fb1426b29163b23702c8daf84d62",
+            "fasta_bidx.rev.2.ebwt:md5,4270939b810aa3f461bacee1edc993aa"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:49:37.965781188"
+    },
+    "mirtrace_qc_passed_reads.all.collapsed": {
+        "content": [
+            "Clone1_N1.fastp.fasta:md5,d19b8ed86094047846b06dd280af0960",
+            "Control_N1.fastp.fasta:md5,888c2e9639dd152d2f63e3c00019376b",
+            "Clone9_N3.fastp.fasta:md5,43d45f4416d0028f9adadd0f5ca44d9c"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:51:32.873677789"
+    },
+    "mirna_quant_mirtop": {
+        "content": [
+            true,
+            true,
+            "mirtop_rawData.tsv:md5,35dce021fbc45446c37f4f4483b66b0a",
+            "mirna.tsv:md5,d672e30e5fce64a8389819837dd75a1d",
+            true
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
+        },
+        "timestamp": "2024-08-27T23:48:59.730518416"
+    }
+}

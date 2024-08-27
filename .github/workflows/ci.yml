@@ -30,10 +30,10 @@ jobs:
           - "23.04.0"
           - "latest-everything"
         profile:
-          - "test"
           - "test_umi"
-          - "test_technical_repeats"
           - "test_mirgenedb"
+          - "test_contamination_tech_reps"
+          - "test_skipfastp"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
