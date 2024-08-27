@@ -97,7 +97,7 @@ workflow MIRNA_QUANT {
 
     ch_mirtop_logs = Channel.empty()
     if (mirtrace_species){
-        MIRTOP_QUANT ( BOWTIE_MAP_SEQCLUSTER.out.bam.collect{it[1]}, FORMAT_HAIRPIN.out.formatted_fasta.collect{it[1]}, gtf, Channel.value(mirtrace_species_input) )
+        MIRTOP_QUANT ( BOWTIE_MAP_SEQCLUSTER.out.bam.collect{it[1]}, FORMAT_HAIRPIN.out.formatted_fasta.collect{it[1]}, gtf, Channel.value(mirtrace_species) )
         ch_mirtop_logs = MIRTOP_QUANT.out.logs
         ch_versions = ch_versions.mix(MIRTOP_QUANT.out.versions)
 
