@@ -4,7 +4,7 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/main'
-include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter'
+include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/contaminant_filter'
 include { FASTQC                           } from '../modules/nf-core/fastqc/main'
 include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
 include { FASTP as FASTP_LENGTH_FILTER     } from '../modules/nf-core/fastp'
