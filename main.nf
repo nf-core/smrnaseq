@@ -61,6 +61,9 @@ workflow {
     NFCORE_SMRNASEQ (
         Channel.of(file(params.input, checkIfExists: true)),
         PIPELINE_INITIALISATION.out.samplesheet,
+        params.fasta,
+        params.mirtrace_species,
+        params.bowtie_index,
         ch_versions
     )
 
