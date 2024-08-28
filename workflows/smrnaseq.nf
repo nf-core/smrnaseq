@@ -94,7 +94,7 @@ workflow NFCORE_SMRNASEQ {
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters & dedup UMIs if necessary / desired by the user
     //
-    if ( params.skip_fastp && params.skip_fastqc ) { 
+    if ( params.skip_fastp && params.skip_fastqc ) {
         log.error "At least one of skip_fastp or skip_fastqc must be false"
     }
 
