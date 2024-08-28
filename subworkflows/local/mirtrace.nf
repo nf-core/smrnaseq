@@ -6,7 +6,8 @@ include { MIRTRACE_RUN } from '../../modules/local/mirtrace'
 
 workflow MIRTRACE {
     take:
-    reads      // channel: [ val(adapterseq), [ val(ids) ], [ path(reads) ] ]
+    reads            // channel: [ val(adapterseq), [ val(ids) ], [ path(reads) ] ]
+    mirtrace_species // value  : params.mirtrace_species
 
     main:
 
@@ -20,7 +21,8 @@ workflow MIRTRACE {
 
     MIRTRACE_RUN (
         reads,
-        ch_mirtrace_config
+        ch_mirtrace_config,
+        mirtrace_species
     )
 
     emit:

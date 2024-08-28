@@ -10,6 +10,7 @@ process MIRTOP_QUANT {
     path ("bams/*")
     path hairpin
     path gtf
+    val mirtrace_species
 
     output:
     path "mirtop/mirtop.gff"        , emit: mirtop_gff
@@ -22,7 +23,7 @@ process MIRTOP_QUANT {
     task.ext.when == null || task.ext.when
 
     script:
-    def filter_species = params.mirgenedb ? params.mirgenedb_species : params.mirtrace_species
+    def filter_species = params.mirgenedb ? params.mirgenedb_species : mirtrace_species
     """
     #Cleanup the GTF if mirbase html form is broken
     GTF="$gtf"

@@ -8,6 +8,7 @@ process PARSE_FASTA_MIRNA {
 
     input:
     tuple val(meta2), path(fasta)
+    val filter_species
 
     output:
     tuple val(meta2), path('*_igenome.fa'), emit: parsed_fasta
@@ -17,7 +18,6 @@ process PARSE_FASTA_MIRNA {
     task.ext.when == null || task.ext.when
 
     script:
-    def filter_species = params.mirgenedb ? params.mirgenedb_species : params.mirtrace_species
     """
     # Uncompress FASTA reference files if necessary
     FASTA="$fasta"
