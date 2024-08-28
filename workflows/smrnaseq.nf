@@ -41,22 +41,22 @@ ch_fastp_adapters                     = Channel.fromPath(params.fastp_known_mirn
 workflow NFCORE_SMRNASEQ {
 
     take:
-    ch_input            // channel: samplesheet file as specified to --input
-    ch_samplesheet      // channel: sample fastqs parsed from --input
-    fasta               // params.fasta
-    mirtrace_species    // params.mirtrace_species
-    bowtie_index        // params.bowtie_index
-    ch_versions         // channel: [ path(versions.yml) ]
+    ch_input             // channel: samplesheet file as specified to --input
+    ch_samplesheet       // channel: sample fastqs parsed from --input
+    val_fasta            // params.fasta
+    val_mirtrace_species // params.mirtrace_species
+    bowtie_index         // params.bowtie_index
+    ch_versions          // channel: [ path(versions.yml) ]
 
     main:
     //Config checks
     // Check optional parameters
-    if (!params.mirgenedb && !mirtrace_species) {
+    if (!params.mirgenedb && !val_mirtrace_species) {
             exit 1, "Reference species for miRTrace is not defined via the --mirtrace_species parameter."
         }
 
     // Genome options
-    mirna_gtf_from_species = mirtrace_species ? (mirtrace_species == 'hsa' ? "https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${mirtrace_species}.gff3") : false
+    mirna_gtf_from_species = val_mirtrace_species ? (val_mirtrace_species == 'hsa' ? "https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${val_mirtrace_species}.gff3") : false
     mirna_gtf = params.mirna_gtf ?: mirna_gtf_from_species
 
     if (!params.mirgenedb) {
@@ -111,16 +111,16 @@ workflow NFCORE_SMRNASEQ {
     )
     ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.versions)
 
-    ch_fasta = fasta ? file(fasta): []
+    ch_fasta = val_fasta ? file(val_fasta): []
     ch_reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
 
     // even if bowtie index is specified, there still needs to be a fasta.
     // without fasta, no genome analysis.
-    if(fasta) {
+    if(val_fasta) {
         //Prepare bowtie index, unless specified
         //This needs to be done here as the index is used by GENOME_QUANT
         if(params.bowtie_index) {
-            ch_fasta = Channel.fromPath(params.fasta)
+            ch_fasta = Channel.fromPath(val_fasta)
             if (params.bowtie_index.endsWith(".tar.gz")) {
                 UNTAR_BOWTIE_INDEX ( [ [], params.bowtie_index ]).files.map { it[1] }.set {ch_bowtie_index}
                 ch_versions  = ch_versions.mix(UNTAR_BOWTIE_INDEX.out.versions)
@@ -184,8 +184,8 @@ workflow NFCORE_SMRNASEQ {
     //
     // SUBWORKFLOW: MIRTRACE
     //
-    if (mirtrace_species) {
-            MIRTRACE(ch_mirtrace_inputs, mirtrace_species)
+    if (val_mirtrace_species) {
+            MIRTRACE(ch_mirtrace_inputs, val_mirtrace_species)
             ch_versions = ch_versions.mix(MIRTRACE.out.versions)
         } else {
             log.warn "The parameter --mirtrace_species is absent. MIRTRACE quantification skipped."
@@ -218,7 +218,7 @@ workflow NFCORE_SMRNASEQ {
     [ [:], reference_hairpin],
     mirna_gtf,
     ch_reads_for_mirna,
-    mirtrace_species
+    val_mirtrace_species
     )
     ch_versions = ch_versions.mix(MIRNA_QUANT.out.versions)
 
@@ -226,7 +226,7 @@ workflow NFCORE_SMRNASEQ {
     // GENOME
     //
     genome_stats = Channel.empty()
-    if (fasta){
+    if (val_fasta){
         GENOME_QUANT ( ch_bowtie_index, ch_fasta, MIRNA_QUANT.out.unmapped )
         genome_stats = GENOME_QUANT.out.stats
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
@@ -310,7 +310,7 @@ workflow NFCORE_SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect().ifEmpty([]))
-        if (mirtrace_species) {
+        if (val_mirtrace_species) {
         ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([]))
             }
 
