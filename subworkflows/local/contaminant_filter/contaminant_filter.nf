@@ -78,7 +78,6 @@ workflow CONTAMINANT_FILTER {
 
     trna_reads.set { cdna_reads }
 
-
     if (cdna) {
         // Add metamap to input channels: cDNA and hairpin
         ch_cdna = Channel.value([[id:'cDNA'], cdna])
@@ -112,8 +111,11 @@ workflow CONTAMINANT_FILTER {
         INDEX_CDNA ( ch_filtered_cdna )
         ch_versions = ch_versions.mix(INDEX_CDNA.out.versions)
 
+        // Make the index a value channel
+        ch_cdna_index = INDEX_CDNA.out.index.first()
+
         // Map which input reads are not in the cDNA contaminants
-        MAP_CDNA ( trna_reads, INDEX_CDNA.out.index, 'cDNA' )
+        MAP_CDNA ( trna_reads, ch_cdna_index, 'cDNA' )
         ch_versions = ch_versions.mix(MAP_CDNA.out.versions)
 
         // Extract number of reads aligning to contaminants
@@ -156,7 +158,11 @@ workflow CONTAMINANT_FILTER {
         // Previous original code:
         INDEX_NCRNA ( ch_filtered_ncrna )
         ch_versions = ch_versions.mix(INDEX_NCRNA.out.versions)
-        MAP_NCRNA ( cdna_reads, INDEX_NCRNA.out.index, 'ncRNA' )
+
+        // Make the index a value channel
+        ch_ncrna_index = INDEX_NCRNA.out.index.first()
+
+        MAP_NCRNA ( cdna_reads, ch_ncrna_index, 'ncRNA' )
         ch_versions = ch_versions.mix(MAP_NCRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_NCRNA.out.stats.ifEmpty(null))
         MAP_NCRNA.out.unmapped.set { ncrna_reads }
@@ -194,7 +200,11 @@ workflow CONTAMINANT_FILTER {
         // Previous original code:
         INDEX_PIRNA ( ch_filtered_pirna )
         ch_versions = ch_versions.mix(INDEX_PIRNA.out.versions)
-        MAP_PIRNA ( ncrna_reads, INDEX_PIRNA.out.index, 'piRNA' )
+
+        // Make the index a value channel
+        ch_pirna_index = INDEX_PIRNA.out.index.first()
+
+        MAP_PIRNA ( ncrna_reads, ch_pirna_index, 'piRNA' )
         ch_versions = ch_versions.mix(MAP_PIRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_PIRNA.out.stats.ifEmpty(null))
         MAP_PIRNA.out.unmapped.set { pirna_reads }
@@ -232,6 +242,10 @@ workflow CONTAMINANT_FILTER {
         // Previous original code:
         INDEX_OTHER ( ch_filtered_other )
         ch_versions = ch_versions.mix(INDEX_OTHER.out.versions)
+
+        // Make the index a value channel
+        ch_other_index = INDEX_OTHER.out.index.first()
+
         MAP_OTHER ( ncrna_reads, INDEX_OTHER.out.index, 'other' )
         ch_versions = ch_versions.mix(MAP_OTHER.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_OTHER.out.stats.ifEmpty(null))
