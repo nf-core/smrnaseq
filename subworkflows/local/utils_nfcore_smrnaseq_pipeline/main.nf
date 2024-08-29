@@ -44,11 +44,12 @@ workflow PIPELINE_INITIALISATION {
 
     ch_versions = Channel.empty()
 
-    // Value channels
+    // Parameter channels
     ch_mirtrace_species    = val_mirtrace_species ? Channel.value(val_mirtrace_species) : Channel.empty()
     mirna_gtf_from_species = val_mirtrace_species ? (val_mirtrace_species == 'hsa' ? "https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${val_mirtrace_species}.gff3") : false
-    ch_mirna_gtf           = params.mirna_gtf ? Channel.empty() : Channel.from(mirna_gtf_from_species, checkIfExists:true)
-
+    ch_mirna_gtf           = params.mirna_gtf ? Channel.empty() : ( mirna_gtf_from_species ? Channel.fromPath(mirna_gtf_from_species, checkIfExists: true).collect() :  Channel.empty() )
+    //TODO for ch_mirna_gtf, shouldn't it try to build a channel.fromPath with params.mirna_gtf,  if true? (instead of setting it to empty). Is this parameter used for non mirgenedb runs?
+    
     //
     // Print version and exit if required and dump pipeline parameters to JSON file
     //
@@ -101,7 +102,7 @@ workflow PIPELINE_INITIALISATION {
         }
         ch_reference_mature  = params.mirgenedb_mature  ? Channel.fromPath(params.mirgenedb_mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : { exit 1, "Mature miRNA fasta file not found via --mirgenedb_mature: ${params.mirgenedb_mature}" }
         ch_reference_hairpin = params.mirgenedb_hairpin ? Channel.fromPath(params.mirgenedb_hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : { exit 1, "Hairpin miRNA fasta file not found via --mirgenedb_hairpin: ${params.mirgenedb_hairpin}" }
-        ch_mirna_gtf         = params.mirgenedb_gff     ? Channel.fromPath(params.mirgenedb_gff, checkIfExists: true)                                                     : { exit 1, "MirGeneDB gff file not found via --mirgenedb_gff: ${params.mirgenedb_gff}"}
+        ch_mirna_gtf         = params.mirgenedb_gff     ? Channel.fromPath(params.mirgenedb_gff, checkIfExists: true).collect()                                           : { exit 1, "MirGeneDB gff file not found via --mirgenedb_gff: ${params.mirgenedb_gff}"}
     }
 
     //

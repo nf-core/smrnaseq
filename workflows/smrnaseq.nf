@@ -50,8 +50,8 @@ workflow NFCORE_SMRNASEQ {
     ch_reference_mature  // channel: [ val(meta), fasta file] 
     ch_reference_hairpin // channel: [ val(meta), fasta file]
     ch_mirna_gtf         // channel: path GTF file
-    ch_fasta             // channel: path(genome.fasta)
-    ch_bowtie_index      // channel: directory: /path/to/bowtie/ //TODO check structure
+    ch_fasta             // channel: [ val(meta), fasta file]
+    ch_bowtie_index      // channel: [genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt]
     ch_versions          // channel: [ path(versions.yml) ]
 
     main:
@@ -147,7 +147,7 @@ workflow NFCORE_SMRNASEQ {
     //
     // SUBWORKFLOW: MIRTRACE
     //
-    //No need for conditional statement, wont run if ch_mirtrace_species is empty
+    //No need for conditional statement, wont run if ch_mirtrace_species is empty, TODO remove
     MIRTRACE(ch_mirtrace_inputs, ch_mirtrace_species)
     ch_versions = ch_versions.mix(MIRTRACE.out.versions)
 
@@ -172,7 +172,7 @@ workflow NFCORE_SMRNASEQ {
         ch_reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
 
     }
-    //MIRNA_QUANT process should still run even if mirtrace_species is null when mirgendb is true
+    //MIRNA_QUANT process should still run even if mirtrace_species is null, when mirgendb is true
     MIRNA_QUANT (
         ch_reference_mature,
         ch_reference_hairpin,
@@ -186,8 +186,12 @@ workflow NFCORE_SMRNASEQ {
     // GENOME
     //
     genome_stats = Channel.empty()
-    //Wont run if ch_fasta is empty, no need for conditional statement
-    GENOME_QUANT ( ch_bowtie_index, ch_fasta, MIRNA_QUANT.out.unmapped )
+    //Wont run if ch_fasta is empty, no need for conditional statement, TODO remove
+    GENOME_QUANT ( 
+        ch_bowtie_index,
+        ch_fasta,
+        MIRNA_QUANT.out.unmapped
+    )
     genome_stats = GENOME_QUANT.out.stats
     ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
@@ -270,7 +274,7 @@ workflow NFCORE_SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect().ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([])) //no need for conditional statement, wont run if mirtrace didn't run
+        ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([])) //no need for conditional statement, wont run if mirtrace didn't run, TODO remove
 
         MULTIQC (
             ch_multiqc_files.collect(),

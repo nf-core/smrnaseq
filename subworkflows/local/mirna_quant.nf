@@ -25,17 +25,17 @@ include { EDGER_QC             } from '../../modules/local/edger_qc/edger_qc.nf'
 
 workflow MIRNA_QUANT {
     take:
-    mature              // channel: [ val(meta), fasta file]
-    hairpin             // channel: [ val(meta), fasta file]
-    ch_gtf              // channel: path GTF file
-    ch_reads            // channel: [ val(meta), [ ch_reads ] ]
-    ch_mirtrace_species // val: params.mirtrace_species
+    ch_reference_mature  // channel: [ val(meta), fasta file]
+    ch_reference_hairpin // channel: [ val(meta), fasta file]
+    ch_mirna_gtf         // channel: path GTF file
+    ch_reads_for_mirna   // channel: [ val(meta), [ ch_reads ] ]
+    ch_mirtrace_species  // val: params.mirtrace_species
 
     main:
     ch_versions = Channel.empty()
     ch_parse_species_input = params.mirgenedb ? Channel.value(params.mirgenedb_species) : ch_mirtrace_species
 
-    PARSE_MATURE ( mature, ch_parse_species_input )
+    PARSE_MATURE ( ch_reference_mature, ch_parse_species_input )
     ch_mirna_parsed = PARSE_MATURE.out.parsed_fasta
     ch_versions = ch_versions.mix(PARSE_MATURE.out.versions)
 
@@ -46,7 +46,7 @@ workflow MIRNA_QUANT {
     ch_mature_bowtie = INDEX_MATURE.out.index
     ch_versions = ch_versions.mix(INDEX_MATURE.out.versions)
 
-    ch_reads_mirna = ch_reads
+    ch_reads_mirna = ch_reads_for_mirna
         .map { add_suffix(it, "mature") }
         .dump (tag:'msux')
 
@@ -60,7 +60,7 @@ workflow MIRNA_QUANT {
     BAM_STATS_MATURE ( BOWTIE_MAP_MATURE.out.bam, FORMAT_MATURE.out.formatted_fasta )
     ch_versions = ch_versions.mix(BAM_STATS_MATURE.out.versions)
 
-    PARSE_HAIRPIN ( hairpin, ch_parse_species_input )
+    PARSE_HAIRPIN ( ch_reference_hairpin, ch_parse_species_input )
     ch_hairpin_parsed = PARSE_HAIRPIN.out.parsed_fasta
     ch_versions = ch_versions.mix(PARSE_HAIRPIN.out.versions)
 
@@ -86,7 +86,7 @@ workflow MIRNA_QUANT {
     EDGER_QC ( ch_edger_input )
     ch_versions.mix(EDGER_QC.out.versions)
 
-    ch_reads_seqcluster = ch_reads
+    ch_reads_seqcluster = ch_reads_for_mirna
         .map { add_suffix(it, "seqcluster") }
         .dump (tag:'ssux')
 
@@ -98,8 +98,8 @@ workflow MIRNA_QUANT {
     ch_versions = ch_versions.mix(BOWTIE_MAP_SEQCLUSTER.out.versions)
 
     ch_mirtop_logs = Channel.empty()
-    //Block wont run if ch_mirtrace_species is emtpy, no need for conditional statement
-    MIRTOP_QUANT ( BOWTIE_MAP_SEQCLUSTER.out.bam.collect{it[1]}, FORMAT_HAIRPIN.out.formatted_fasta.collect{it[1]}, ch_gtf, ch_mirtrace_species )
+    //Block wont run if ch_mirtrace_species is emtpy, no need for conditional statement, TODO remove
+    MIRTOP_QUANT ( BOWTIE_MAP_SEQCLUSTER.out.bam.collect{it[1]}, FORMAT_HAIRPIN.out.formatted_fasta.collect{it[1]}, ch_mirna_gtf, ch_mirtrace_species )
     ch_mirtop_logs = MIRTOP_QUANT.out.logs
     ch_versions = ch_versions.mix(MIRTOP_QUANT.out.versions)
     TABLE_MERGE ( MIRTOP_QUANT.out.mirtop_table )
