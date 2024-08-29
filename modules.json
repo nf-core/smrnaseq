@@ -68,7 +68,8 @@
                     "seqkit/grep": {
                         "branch": "master",
                         "git_sha": "03fbf6c89e551bd8d77f3b751fb5c955f75b34c5",
-                        "installed_by": ["modules"]
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/seqkit/grep/seqkit-grep.diff"
                     },
                     "umicollapse": {
                         "branch": "master",
