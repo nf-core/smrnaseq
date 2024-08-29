@@ -30,12 +30,9 @@ jobs:
           - "23.04.0"
           - "latest-everything"
         profile:
-          - "test"
-          - "test_no_genome"
           - "test_umi"
-          - "test_index"
-          - "test_technical_repeats"
           - "test_mirgenedb"
+          - "test_contamination_tech_reps"
           - "test_skipfastp"
     steps:
       - name: Check out pipeline code
