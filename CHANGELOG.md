@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#388]](https://github.com/nf-core/smrnaseq/pull/388) - Fix [igenomes fix](https://github.com/nf-core/smrnaseq/issues/360) - Fix workflow scripts so that they can use igenome parameters.
 - [[#391]](https://github.com/nf-core/smrnaseq/pull/391) - Fix [error because of large chromosomes](https://github.com/nf-core/smrnaseq/issues/132) - Change `.bai` index for `.csi` index in `samtools_index` to fix .
 - [[#392]](https://github.com/nf-core/smrnaseq/pull/392) - Update [Reduce tests](https://github.com/orgs/nf-core/projects/74/views/7?pane=issue&itemId=76437974) - Combine and optimize tests, and reduce samplesheets sizes.
+- [[#397]](https://github.com/nf-core/smrnaseq/pull/397) - Fix [contaminant filter failure because of the Docker image for BLAT](https://github.com/nf-core/smrnaseq/issues/354) - Improvements to contaminant filter subworkflow and replacement for nf-core modules.
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
