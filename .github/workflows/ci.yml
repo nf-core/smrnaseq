@@ -1,7 +1,11 @@
 name: nf-core CI
 # This workflow runs the pipeline with the minimal test dataset to check that it completes without any syntax errors
 on:
-  pull_request:
+  push:
+    branches:
+      - dev
+      - master
+  pull_request: # Add the pull_request trigger
     branches:
       - dev
       - master
@@ -20,32 +24,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  define_nxf_versions:
-    name: Choose nextflow versions to test against depending on target branch
-    runs-on: ubuntu-latest
-    outputs:
-      matrix: ${{ steps.nxf_versions.outputs.matrix }}
-    steps:
-      - id: nxf_versions
-        run: |
-          if [[ "${{ github.event_name }}" == "pull_request" && "${{ github.base_ref }}" == "dev" && "${{ matrix.NXF_VER }}" != "latest-everything" ]]; then
-            echo matrix='["latest-stable"]' | tee -a $GITHUB_OUTPUT
-          else
-            echo matrix='["latest-stable", "23.04.0"]' | tee -a $GITHUB_OUTPUT
-          fi
-
   test:
     name: Run pipeline with test data
-    needs: define_nxf_versions
+    # Only run on push if this is the nf-core dev branch (merged PRs)
+    if: "${{ github.event_name != 'push' || (github.event_name == 'push' && github.repository == 'nf-core/smrnaseq') }}"
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3, 4]
-        NXF_VER: ${{ fromJson(needs.define_nxf_versions.outputs.matrix) }}
+        shard: [1, 2, 3]
+        NXF_VER:
+          - "23.04.0"
         profile: ["docker"]
     env:
-      SHARDS: "4"
+      SHARDS: "3"
     steps:
       - name: Check out pipeline code
         uses: actions/checkout@0ad4b8fadaa221de15dcec353f45205ec38ea70b # v4
@@ -85,3 +77,4 @@ jobs:
         if: always() # always run even if the previous step fails
         with:
           report_paths: test.xml
+          annotate_only: true
