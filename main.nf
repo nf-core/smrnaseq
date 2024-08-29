@@ -18,6 +18,7 @@ nextflow.enable.dsl = 2
 */
 
 include { NFCORE_SMRNASEQ         } from './workflows/smrnaseq'
+include { PREPARE_GENOME          } from './subworkflows/local/prepare_genome'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_smrnaseq_pipeline'
@@ -32,6 +33,7 @@ params.fasta            = getGenomeAttribute('fasta')
 params.mirtrace_species = getGenomeAttribute('mirtrace_species')
 params.bowtie_index     = getGenomeAttribute('bowtie')
 
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -43,6 +45,14 @@ workflow {
     ch_versions = Channel.empty()
 
     //
+    // SUBWORKFLOW : Prepare reference genome files
+    //
+    PREPARE_GENOME (
+        params.fasta,
+        params.bowtie_index,        
+    )
+
+    //
     // SUBWORKFLOW: Run initialisation tasks
     //
     PIPELINE_INITIALISATION (
@@ -52,7 +62,8 @@ workflow {
         params.monochrome_logs,
         args,
         params.outdir,
-        params.input
+        params.input,
+        params.mirtrace_species
     )
 
     //
@@ -61,9 +72,12 @@ workflow {
     NFCORE_SMRNASEQ (
         Channel.of(file(params.input, checkIfExists: true)),
         PIPELINE_INITIALISATION.out.samplesheet,
-        params.fasta,
-        params.mirtrace_species,
-        params.bowtie_index,
+        PIPELINE_INITIALISATION.out.mirtrace_species,
+        PIPELINE_INITIALISATION.out.reference_mature,
+        PIPELINE_INITIALISATION.out.reference_hairpin,
+        PIPELINE_INITIALISATION.out.mirna_gtf,
+        PREPARE_GENOME.out.fasta,
+        PREPARE_GENOME.out.bowtie_index,
         ch_versions
     )
 

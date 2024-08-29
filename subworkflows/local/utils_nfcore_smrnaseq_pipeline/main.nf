@@ -8,9 +8,8 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+//nf-core subworkflows
 include { UTILS_NFVALIDATION_PLUGIN } from '../../nf-core/utils_nfvalidation_plugin'
-include { paramsSummaryMap          } from 'plugin/nf-validation'
-include { fromSamplesheet           } from 'plugin/nf-validation'
 include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipeline'
 include { completionEmail           } from '../../nf-core/utils_nfcore_pipeline'
 include { completionSummary         } from '../../nf-core/utils_nfcore_pipeline'
@@ -19,6 +18,9 @@ include { nfCoreLogo                } from '../../nf-core/utils_nfcore_pipeline'
 include { imNotification            } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NFCORE_PIPELINE     } from '../../nf-core/utils_nfcore_pipeline'
 include { workflowCitation          } from '../../nf-core/utils_nfcore_pipeline'
+//plugins
+include { paramsSummaryMap          } from 'plugin/nf-validation'
+include { fromSamplesheet           } from 'plugin/nf-validation'
 
 /*
 ========================================================================================
@@ -29,17 +31,23 @@ include { workflowCitation          } from '../../nf-core/utils_nfcore_pipeline'
 workflow PIPELINE_INITIALISATION {
 
     take:
-    version           // boolean: Display version and exit
-    help              // boolean: Display help text
-    validate_params   // boolean: Boolean whether to validate parameters against the schema at runtime
-    monochrome_logs   // boolean: Do not use coloured log outputs
-    nextflow_cli_args //   array: List of positional nextflow CLI args
-    outdir            //  string: The output directory where the results will be saved
-    input             //  string: Path to input samplesheet
+    version              // boolean: Display version and exit
+    help                 // boolean: Display help text
+    validate_params      // boolean: Boolean whether to validate parameters against the schema at runtime
+    monochrome_logs      // boolean: Do not use coloured log outputs
+    nextflow_cli_args    //   array: List of positional nextflow CLI args
+    outdir               //  string: The output directory where the results will be saved
+    input                //  string: Path to input samplesheet
+    val_mirtrace_species //  string: params.mirtrace_species 
 
     main:
 
     ch_versions = Channel.empty()
+
+    // Value channels
+    ch_mirtrace_species    = val_mirtrace_species ? Channel.value(val_mirtrace_species) : Channel.empty()
+    mirna_gtf_from_species = val_mirtrace_species ? (val_mirtrace_species == 'hsa' ? "https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${val_mirtrace_species}.gff3") : false
+    ch_mirna_gtf           = params.mirna_gtf ? Channel.empty() : Channel.from(mirna_gtf_from_species, checkIfExists:true)
 
     //
     // Print version and exit if required and dump pipeline parameters to JSON file
@@ -77,11 +85,29 @@ workflow PIPELINE_INITIALISATION {
     //
     validateInputParameters()
 
+    //Config checks
+    // Check optional parameters
+    if (!params.mirgenedb && !val_mirtrace_species) {
+            exit 1, "Reference species for miRTrace is not defined via the --mirtrace_species parameter."
+        }
+
+    // Genome options
+    if (!params.mirgenedb) {
+        ch_reference_mature  = params.mature  ? Channel.fromPath(params.mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
+        ch_reference_hairpin = params.hairpin ? Channel.fromPath(params.hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
+    } else {
+        if (!params.mirgenedb_species) { 
+            exit 1, "MirGeneDB species not set, please specify via the --mirgenedb_species parameter"
+        }
+        ch_reference_mature  = params.mirgenedb_mature  ? Channel.fromPath(params.mirgenedb_mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : { exit 1, "Mature miRNA fasta file not found via --mirgenedb_mature: ${params.mirgenedb_mature}" }
+        ch_reference_hairpin = params.mirgenedb_hairpin ? Channel.fromPath(params.mirgenedb_hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : { exit 1, "Hairpin miRNA fasta file not found via --mirgenedb_hairpin: ${params.mirgenedb_hairpin}" }
+        ch_mirna_gtf         = params.mirgenedb_gff     ? Channel.fromPath(params.mirgenedb_gff, checkIfExists: true)                                                     : { exit 1, "MirGeneDB gff file not found via --mirgenedb_gff: ${params.mirgenedb_gff}"}
+    }
+
     //
     // Create channel from input file provided through params.input
     //
-    Channel
-        .fromSamplesheet("input")
+    ch_samplesheet = Channel.fromSamplesheet("input")
         .map {
             meta, fastq_1, fastq_2 ->
                 if (!fastq_2) {
@@ -98,11 +124,14 @@ workflow PIPELINE_INITIALISATION {
             meta, fastqs ->
                 return [ meta, fastqs.flatten() ]
         }
-        .set { ch_samplesheet }
 
     emit:
-    samplesheet = ch_samplesheet
-    versions    = ch_versions
+    samplesheet       = ch_samplesheet       // channel: sample fastqs parsed from --input
+    mirtrace_species  = ch_mirtrace_species  // channel: params.mirtrace_species
+    reference_mature  = ch_reference_mature  // channel: [ val(meta), fasta file]
+    reference_hairpin = ch_reference_hairpin // channel: [ val(meta), fasta file]
+    mirna_gtf         = ch_mirna_gtf         // channel: path GTF file
+    versions          = ch_versions          // channel: [ versions.yml ]  
 }
 
 /*

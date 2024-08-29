@@ -25,22 +25,20 @@ include { FILTER_STATS } from '../../modules/local/filter_stats'
 
 workflow CONTAMINANT_FILTER {
     take:
-    mirna
-    rrna
-    trna
-    cdna
-    ncrna
-    pirna
-    other
-    reads      // channel: [ val(meta), [ reads ] ]
+    ch_reference_hairpin // channel: [ val(meta), fasta file]
+    rrna                 // params.rrna
+    trna                 // params.trna
+    cdna                 // params.cdna
+    ncrna                // params.ncrna
+    pirna                // params.pirna
+    other                // params.other_contamination
+    reads                // channel: [ val(meta), [ reads ] ]
 
     main:
 
     ch_versions = Channel.empty()
     ch_filter_stats = Channel.empty()
     ch_mqc_results = Channel.empty()
-
-    rrna_reads = reads
 
     reads.set { rrna_reads }
 
@@ -70,7 +68,7 @@ workflow CONTAMINANT_FILTER {
 
 
     if (params.cdna) {
-        BLAT_CDNA ( 'cdna', mirna, cdna )
+        BLAT_CDNA ( 'cdna', ch_reference_hairpin, cdna )
         ch_versions = ch_versions.mix(BLAT_CDNA.out.versions)
         INDEX_CDNA ( BLAT_CDNA.out.filtered_set )
         ch_versions = ch_versions.mix(INDEX_CDNA.out.versions)
@@ -83,7 +81,7 @@ workflow CONTAMINANT_FILTER {
     cdna_reads.set { ncrna_reads }
 
     if (params.ncrna) {
-        BLAT_NCRNA ( 'ncrna', mirna, ncrna )
+        BLAT_NCRNA ( 'ncrna', ch_reference_hairpin, ncrna )
         ch_versions = ch_versions.mix(BLAT_NCRNA.out.versions)
         INDEX_NCRNA ( BLAT_NCRNA.out.filtered_set )
         ch_versions = ch_versions.mix(INDEX_NCRNA.out.versions)
@@ -96,7 +94,7 @@ workflow CONTAMINANT_FILTER {
     ncrna_reads.set { pirna_reads }
 
     if (params.pirna) {
-        BLAT_PIRNA ( 'other', mirna, pirna )
+        BLAT_PIRNA ( 'other', ch_reference_hairpin, pirna )
         ch_versions = ch_versions.mix(BLAT_PIRNA.out.versions)
         INDEX_PIRNA ( BLAT_PIRNA.out.filtered_set )
         ch_versions = ch_versions.mix(INDEX_PIRNA.out.versions)
@@ -109,7 +107,7 @@ workflow CONTAMINANT_FILTER {
     pirna_reads.set { other_cont_reads }
 
     if (other) {
-        BLAT_OTHER ( 'other', mirna, other)
+        BLAT_OTHER ( 'other', ch_reference_hairpin, other)
         ch_versions = ch_versions.mix(BLAT_OTHER.out.versions)
         INDEX_OTHER ( BLAT_OTHER.out.filtered_set )
         ch_versions = ch_versions.mix(INDEX_OTHER.out.versions)
