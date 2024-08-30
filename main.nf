@@ -70,7 +70,6 @@ workflow {
     // WORKFLOW: Run main workflow
     //
     NFCORE_SMRNASEQ (
-        Channel.of(file(params.input, checkIfExists: true)),
         PIPELINE_INITIALISATION.out.samplesheet,
         PIPELINE_INITIALISATION.out.mirtrace_species,
         PIPELINE_INITIALISATION.out.reference_mature,

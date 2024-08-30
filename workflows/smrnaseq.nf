@@ -44,7 +44,6 @@ ch_fastp_adapters                     = Channel.fromPath(params.fastp_known_mirn
 workflow NFCORE_SMRNASEQ {
 
     take:
-    ch_input             // channel: samplesheet file as specified to --input
     ch_samplesheet       // channel: sample fastqs parsed from --input
     ch_mirtrace_species  // channel: params.mirtrace_species
     ch_reference_mature  // channel: [ val(meta), fasta file] 
@@ -209,7 +208,6 @@ workflow NFCORE_SMRNASEQ {
         ch_versions = ch_versions.mix(MIRDEEP2.out.versions)
     }
     
-
     //
     // Collate and save software versions
     //
@@ -245,8 +243,8 @@ workflow NFCORE_SMRNASEQ {
         ch_workflow_summary = Channel.value(paramsSummaryMultiqc(summary_params))
 
         ch_multiqc_custom_methods_description = params.multiqc_methods_description ?
-            file(params.multiqc_methods_description, checkIfExists: true) :
-            file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
+            Channel.fromPath(params.multiqc_methods_description, checkIfExists: true) :
+            Channel.fromPath("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
         // ch_methods_description                = Channel.value(
         //     methodsDescriptionText(ch_multiqc_custom_methods_description))
 

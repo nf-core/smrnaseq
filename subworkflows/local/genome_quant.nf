@@ -8,7 +8,7 @@ include { BOWTIE_MAP_SEQ as BOWTIE_MAP_GENOME } from '../../modules/local/bowtie
 workflow GENOME_QUANT {
     take:
     ch_bowtie_index // channel: [genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt]
-    ch_fasta        // channel: path(genome.fasta)
+    ch_fasta        // channel: [ val(meta), path(fasta) ]
     reads           // channel: [ val(meta), [ reads ] ]
 
     main:

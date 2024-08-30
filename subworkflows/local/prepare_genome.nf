@@ -19,7 +19,7 @@ workflow PREPARE_GENOME {
     // Parameter channel handling
     // Path channels
     ch_fasta        = val_fasta            ? Channel.fromPath(val_fasta, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()        : Channel.empty()
-    ch_bowtie_index = val_bowtie_index     ? Channel.fromPath(val_bowtie_index, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : Channel.empty()
+    ch_bowtie_index = val_bowtie_index     ? Channel.fromPath(val_bowtie_index, checkIfExists: true).map{ it -> [ [], it ] }.collect() : Channel.empty()
     
     // even if bowtie index is specified, there still needs to be a fasta.
     // without fasta, no genome analysis.

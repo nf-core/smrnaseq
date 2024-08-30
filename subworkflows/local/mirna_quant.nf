@@ -113,10 +113,9 @@ workflow MIRNA_QUANT {
     fasta_mature        = FORMAT_MATURE.out.formatted_fasta
     fasta_hairpin       = FORMAT_HAIRPIN.out.formatted_fasta
     unmapped            = ch_reads_genome
-    mature_stats        = BAM_STATS_MATURE.out.stats
-    hairpin_stats       = BAM_STATS_HAIRPIN.out.stats
-    mirtop_logs         = ch_mirtop_logs
-
+    mature_stats        = BAM_STATS_MATURE.out.stats //TODO not used for antything, should we remove them?
+    hairpin_stats       = BAM_STATS_HAIRPIN.out.stats //TODO not used for antything, should we remove them?
+    mirtop_logs         = ch_mirtop_logs //TODO not used for antything, should we remove them?
     versions            = ch_versions
 }
 

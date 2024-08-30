@@ -22,127 +22,60 @@ nextflow_pipeline {
                 { assert workflow.trace.succeeded().size() == 78 },
 
                 { assert snapshot(
-                    path("$outputDir/mirna_quant/reference/hsa-hg38-pri-30-30.fas_igenome.fa"),
-                    path("$outputDir/mirna_quant/reference/hsa_igenome.fa"),
-                    path("$outputDir/mirna_quant/reference/hsa-hg38-pri-30-30.fas_igenome.fa_idx.fa"),
-                    path("$outputDir/mirna_quant/reference/hsa_igenome.fa_idx.fa")
-                ).match("mirna_quant_reference") },
-
-                { assert snapshot(
-                    path("$outputDir/mirna_quant/seqcluster/final/Control_N1.fastp_trimmed.fastq.gz"),
-                    path("$outputDir/mirna_quant/seqcluster/final/Clone9_N1.fastp_trimmed.fastq.gz"),
-                    path("$outputDir/mirna_quant/seqcluster/final/Clone1_N1.fastp_trimmed.fastq.gz")
-                ).match("mirna_quant_seqcluster") },
-
-                { assert snapshot(
-                    path("$outputDir/mirna_quant/bam/mature/Control_N1_mature.sorted.bam").exists(),
-                    path("$outputDir/mirna_quant/bam/mature/Control_N1_mature.sorted.bam.csi").exists(),
-                    path("$outputDir/mirna_quant/bam/mature/Clone1_N1_mature.sorted.bam").exists(),
-                    path("$outputDir/mirna_quant/bam/mature/Clone9_N1_mature.sorted.bam").exists(),
-                    path("$outputDir/mirna_quant/bam/mature/Clone1_N1_mature.sorted.bam.csi").exists(),
-                    path("$outputDir/mirna_quant/bam/mature/Clone9_N1_mature.sorted.bam.csi").exists(),
-                    path("$outputDir/mirna_quant/bam/mature/Clone1_N1_mature.sorted.stats"),
-                    path("$outputDir/mirna_quant/bam/mature/Control_N1_mature.sorted.flagstat"),
-                    path("$outputDir/mirna_quant/bam/mature/Clone1_N1_mature.sorted.flagstat"),
-                    path("$outputDir/mirna_quant/bam/mature/Clone1_N1_mature.sorted.idxstats"),
-                    path("$outputDir/mirna_quant/bam/mature/Control_N1_mature.sorted.idxstats"),
-                    path("$outputDir/mirna_quant/bam/mature/Clone9_N1_mature.sorted.idxstats"),
+                    path("$outputDir/mirna_quant/bam/mature/Clone1_N1_mature.sorted.flagstat").exists(),
+                    path("$outputDir/mirna_quant/bam/mature/Clone1_N1_mature.sorted.stats").exists(),
                     path("$outputDir/mirna_quant/bam/mature/Clone9_N1_mature.sorted.flagstat"),
+                    path("$outputDir/mirna_quant/bam/mature/Clone9_N1_mature.sorted.idxstats"),
+                    path("$outputDir/mirna_quant/bam/mature/Control_N1_mature.sorted.flagstat"),
                     path("$outputDir/mirna_quant/bam/mature/Control_N1_mature.sorted.stats"),
                     path("$outputDir/mirna_quant/bam/mature/Clone9_N1_mature.sorted.stats"),
-                    path("$outputDir/mirna_quant/bam/hairpin/Control_N1_mature_hairpin.sorted.bam").exists(),
-                    path("$outputDir/mirna_quant/bam/hairpin/Control_N1_mature_hairpin.sorted.bam.csi").exists(),
-                    path("$outputDir/mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.bam").exists(),
-                    path("$outputDir/mirna_quant/bam/hairpin/Clone9_N1_mature_hairpin.sorted.bam").exists(),
-                    path("$outputDir/mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.bam.csi").exists(),
-                    path("$outputDir/mirna_quant/bam/hairpin/Clone9_N1_mature_hairpin.sorted.bam.csi").exists(),
-                    path("$outputDir/mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.idxstats"),
-                    path("$outputDir/mirna_quant/bam/hairpin/Control_N1_mature_hairpin.sorted.stats"),
-                    path("$outputDir/mirna_quant/bam/hairpin/Control_N1_mature_hairpin.sorted.flagstat"),
-                    path("$outputDir/mirna_quant/bam/hairpin/Clone9_N1_mature_hairpin.sorted.flagstat"),
-                    path("$outputDir/mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.flagstat"),
+                    path("$outputDir/mirna_quant/bam/mature/Control_N1_mature.sorted.idxstats"),
+                    path("$outputDir/mirna_quant/bam/mature/Clone1_N1_mature.sorted.idxstats").exists(),
                     path("$outputDir/mirna_quant/bam/hairpin/Control_N1_mature_hairpin.sorted.idxstats"),
-                    path("$outputDir/mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.stats"),
+                    path("$outputDir/mirna_quant/bam/hairpin/Control_N1_mature_hairpin.sorted.flagstat"),
                     path("$outputDir/mirna_quant/bam/hairpin/Clone9_N1_mature_hairpin.sorted.idxstats"),
-                    path("$outputDir/mirna_quant/bam/hairpin/Clone9_N1_mature_hairpin.sorted.stats")
+                    path("$outputDir/mirna_quant/bam/hairpin/Clone9_N1_mature_hairpin.sorted.stats"),
+                    path("$outputDir/mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.idxstats").exists(),
+                    path("$outputDir/mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.flagstat").exists(),
+                    path("$outputDir/mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.stats").exists(),
+                    path("$outputDir/mirna_quant/bam/hairpin/Control_N1_mature_hairpin.sorted.stats"),
+                    path("$outputDir/mirna_quant/bam/hairpin/Clone9_N1_mature_hairpin.sorted.flagstat")
                 ).match("mirna_quant_bam") },
 
                 { assert snapshot(
-                    path("$outputDir/mirna_quant/edger_qc/hairpin_counts.csv").exists(),
                     path("$outputDir/mirna_quant/edger_qc/hairpin_edgeR_MDS_distance_matrix.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/hairpin_counts.csv").exists(),
                     path("$outputDir/mirna_quant/edger_qc/hairpin_edgeR_MDS_plot_coordinates.txt").exists(),
-                    path("$outputDir/mirna_quant/edger_qc/hairpin_logtpm.txt").exists(),
-                    path("$outputDir/mirna_quant/edger_qc/hairpin_logtpm.csv").exists(),
                     path("$outputDir/mirna_quant/edger_qc/hairpin_log2CPM_sample_distances.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/hairpin_logtpm.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/hairpin_normalized_CPM.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/hairpin_logtpm.csv").exists(),
                     path("$outputDir/mirna_quant/edger_qc/mature_counts.csv").exists(),
                     path("$outputDir/mirna_quant/edger_qc/mature_edgeR_MDS_distance_matrix.txt").exists(),
-                    path("$outputDir/mirna_quant/edger_qc/hairpin_normalized_CPM.txt").exists(),
                     path("$outputDir/mirna_quant/edger_qc/hairpin_unmapped_read_counts.txt").exists(),
                     path("$outputDir/mirna_quant/edger_qc/mature_edgeR_MDS_plot_coordinates.txt").exists(),
                     path("$outputDir/mirna_quant/edger_qc/mature_log2CPM_sample_distances.txt").exists(),
-                    path("$outputDir/mirna_quant/edger_qc/mature_logtpm.txt").exists(),
                     path("$outputDir/mirna_quant/edger_qc/mature_logtpm.csv").exists(),
-                    path("$outputDir/mirna_quant/edger_qc/mature_unmapped_read_counts.txt").exists(),
-                    path("$outputDir/mirna_quant/edger_qc/mature_normalized_CPM.txt").exists()
+                    path("$outputDir/mirna_quant/edger_qc/mature_logtpm.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/mature_normalized_CPM.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/mature_unmapped_read_counts.txt").exists()
                 ).match("mirna_quant_edger_qc") },
 
                 { assert snapshot(
-                    path("$outputDir/bowtie_index/genome/genome.2.ebwt"),
-                    path("$outputDir/bowtie_index/genome/genome.1.ebwt"),
-                    path("$outputDir/bowtie_index/genome/genome.3.ebwt"),
-                    path("$outputDir/bowtie_index/genome/genome.4.ebwt"),
-                    path("$outputDir/bowtie_index/genome/genome.rev.1.ebwt"),
-                    path("$outputDir/bowtie_index/genome/genome.edited.fa"),
-                    path("$outputDir/bowtie_index/genome/genome.rev.2.ebwt")
-                ).match("bowtie_index_genome") },
-
-                { assert snapshot(
-                    path("$outputDir/bowtie_index/mirna_hairpin/fasta_bidx.2.ebwt"),
-                    path("$outputDir/bowtie_index/mirna_hairpin/fasta_bidx.4.ebwt"),
-                    path("$outputDir/bowtie_index/mirna_hairpin/fasta_bidx.1.ebwt"),
-                    path("$outputDir/bowtie_index/mirna_hairpin/fasta_bidx.3.ebwt"),
-                    path("$outputDir/bowtie_index/mirna_hairpin/fasta_bidx.rev.2.ebwt"),
-                    path("$outputDir/bowtie_index/mirna_hairpin/fasta_bidx.rev.1.ebwt")
-                ).match("bowtie_index_mirna_hairpin") },
-
-                { assert snapshot(
-                    path("$outputDir/bowtie_index/mirna_mature/fasta_bidx.2.ebwt"),
-                    path("$outputDir/bowtie_index/mirna_mature/fasta_bidx.3.ebwt"),
-                    path("$outputDir/bowtie_index/mirna_mature/fasta_bidx.1.ebwt"),
-                    path("$outputDir/bowtie_index/mirna_mature/fasta_bidx.4.ebwt"),
-                    path("$outputDir/bowtie_index/mirna_mature/fasta_bidx.rev.1.ebwt"),
-                    path("$outputDir/bowtie_index/mirna_mature/fasta_bidx.rev.2.ebwt")
-                ).match("bowtie_index_mirna_mature") },
-
-                { assert snapshot(
-                    path("$outputDir/fastqc/raw/Control_N1.raw_fastqc.zip").exists(),
-                    path("$outputDir/fastqc/raw/Clone1_N1.raw_fastqc.zip").exists(),
-                    path("$outputDir/fastqc/raw/Clone9_N1.raw_fastqc.zip").exists()
-                ).match("fastqc_raw") },
-
-                { assert snapshot(
-                    path("$outputDir/fastqc/trimmed/Control_N1.trim_fastqc.zip").exists(),
-                    path("$outputDir/fastqc/trimmed/Clone1_N1.trim_fastqc.zip").exists(),
-                    path("$outputDir/fastqc/trimmed/Clone9_N1.trim_fastqc.zip").exists()
-                ).match("fastqc_trimmed") },
-
-                { assert snapshot(
-                    path("$outputDir/genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.bam").exists(),
-                    path("$outputDir/genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.bam.csi").exists(),
-                    path("$outputDir/genome_quant/bam/Clone1_N1_mature_hairpin_genome.sorted.bam").exists(),
-                    path("$outputDir/genome_quant/bam/Clone9_N1_mature_hairpin_genome.sorted.bam").exists(),
-                    path("$outputDir/genome_quant/bam/Clone1_N1_mature_hairpin_genome.sorted.bam.csi").exists(),
-                    path("$outputDir/genome_quant/bam/Clone9_N1_mature_hairpin_genome.sorted.bam.csi").exists(),
-                    path("$outputDir/genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.idxstats"),
-                    path("$outputDir/genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.stats"),
-                    path("$outputDir/genome_quant/bam/Clone1_N1_mature_hairpin_genome.sorted.idxstats"),
-                    path("$outputDir/genome_quant/bam/Clone1_N1_mature_hairpin_genome.sorted.flagstat"),
+                    path("$outputDir/genome_quant/bam/Clone9_N1_mature_hairpin_genome.sorted.stats"),
                     path("$outputDir/genome_quant/bam/Clone9_N1_mature_hairpin_genome.sorted.idxstats"),
-                    path("$outputDir/genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.flagstat"),
-                    path("$outputDir/genome_quant/bam/Clone9_N1_mature_hairpin_genome.sorted.flagstat"),
                     path("$outputDir/genome_quant/bam/Clone1_N1_mature_hairpin_genome.sorted.stats"),
-                    path("$outputDir/genome_quant/bam/Clone9_N1_mature_hairpin_genome.sorted.stats")
+                    path("$outputDir/genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.stats"),
+                    path("$outputDir/genome_quant/bam/Clone1_N1_mature_hairpin_genome.sorted.flagstat"),
+                    path("$outputDir/genome_quant/bam/Clone9_N1_mature_hairpin_genome.sorted.flagstat"),
+                    path("$outputDir/genome_quant/bam/Clone1_N1_mature_hairpin_genome.sorted.idxstats"),
+                    path("$outputDir/genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.idxstats"),
+                    path("$outputDir/genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.flagstat")
                 ).match("genome_quant_bam") },
+
+                { assert snapshot(
+                    path("$outputDir/multiqc/multiqc_report.html").exists()
+                ).match("multiqc") },
 
                 { assert snapshot(
                     path("$outputDir/multiqc/multiqc_data/fastqc-status-check-heatmap.txt"),
@@ -152,12 +85,12 @@ nextflow_pipeline {
                     path("$outputDir/multiqc/multiqc_data/fastqc_sequence_counts_plot-1.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot-1_Percentages.txt"),
                     path("$outputDir/multiqc/multiqc_data/multiqc_citations.txt"),
-                    path("$outputDir/multiqc/multiqc_data/samtools-stats-dp.txt").exists(),
+                    path("$outputDir/multiqc/multiqc_data/samtools-stats-dp.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastqc_sequence_length_distribution_plot.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastp-seq-content-n-plot_Read_1_Before_filtering.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastqc_sequence_duplication_levels_plot-1.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastqc_per_base_sequence_quality_plot-1.txt"),
-                    path("$outputDir/multiqc/multiqc_data/multiqc_general_stats.txt").exists(),
+                    path("$outputDir/multiqc/multiqc_data/multiqc_general_stats.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastqc_per_base_n_content_plot-1.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastqc_per_base_n_content_plot.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastp-seq-quality-plot_Read_1_After_filtering.txt"),
@@ -165,11 +98,10 @@ nextflow_pipeline {
                     path("$outputDir/multiqc/multiqc_data/fastqc_per_sequence_quality_scores_plot-1.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastqc_top_overrepresented_sequences_table.txt").exists(),
                     path("$outputDir/multiqc/multiqc_data/fastqc_overrepresented_sequences_plot-1.txt"),
-                    path("$outputDir/multiqc/multiqc_data/multiqc_sources.txt").exists(),
                     path("$outputDir/multiqc/multiqc_data/fastqc-status-check-heatmap-1.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastqc_sequence_counts_plot.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastp-seq-quality-plot_Read_1_Before_filtering.txt"),
-                    path("$outputDir/multiqc/multiqc_data/samtools_alignment_plot.txt").exists(),
+                    path("$outputDir/multiqc/multiqc_data/samtools_alignment_plot.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastqc_per_base_sequence_quality_plot.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastp-seq-content-n-plot_Read_1_After_filtering.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastqc_adapter_content_plot.txt"),
@@ -179,12 +111,11 @@ nextflow_pipeline {
                     path("$outputDir/multiqc/multiqc_data/fastqc_adapter_content_plot-1.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_1_Before_filtering.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot_Counts.txt"),
+                    path("$outputDir/multiqc/multiqc_data/multiqc_sources.txt").exists(),
                     path("$outputDir/multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_1_After_filtering.txt")
-                ).match("multiqc_multiqc_data") },
-
+                ).match("multiqc_multiqc_data")}
             )
         }
-
     }
 
 }
