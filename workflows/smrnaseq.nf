@@ -46,7 +46,7 @@ workflow NFCORE_SMRNASEQ {
     take:
     ch_samplesheet       // channel: sample fastqs parsed from --input
     ch_mirtrace_species  // channel: params.mirtrace_species
-    ch_reference_mature  // channel: [ val(meta), fasta file] 
+    ch_reference_mature  // channel: [ val(meta), fasta file]
     ch_reference_hairpin // channel: [ val(meta), fasta file]
     ch_mirna_gtf         // channel: path GTF file
     ch_fasta             // channel: [ val(meta), fasta file]
@@ -186,7 +186,7 @@ workflow NFCORE_SMRNASEQ {
     //
     genome_stats = Channel.empty()
     //Wont run if ch_fasta is empty, no need for conditional statement, TODO remove
-    GENOME_QUANT ( 
+    GENOME_QUANT (
         ch_bowtie_index,
         ch_fasta,
         MIRNA_QUANT.out.unmapped
@@ -207,7 +207,7 @@ workflow NFCORE_SMRNASEQ {
         )
         ch_versions = ch_versions.mix(MIRDEEP2.out.versions)
     }
-    
+
     //
     // Collate and save software versions
     //

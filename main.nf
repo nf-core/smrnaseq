@@ -49,7 +49,7 @@ workflow {
     //
     PREPARE_GENOME (
         params.fasta,
-        params.bowtie_index,        
+        params.bowtie_index,
     )
 
     //

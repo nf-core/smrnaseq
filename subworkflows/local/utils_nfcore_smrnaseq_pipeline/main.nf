@@ -38,7 +38,7 @@ workflow PIPELINE_INITIALISATION {
     nextflow_cli_args    //   array: List of positional nextflow CLI args
     outdir               //  string: The output directory where the results will be saved
     input                //  string: Path to input samplesheet
-    val_mirtrace_species //  string: params.mirtrace_species 
+    val_mirtrace_species //  string: params.mirtrace_species
 
     main:
 
@@ -49,7 +49,7 @@ workflow PIPELINE_INITIALISATION {
     mirna_gtf_from_species = val_mirtrace_species ? (val_mirtrace_species == 'hsa' ? "https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${val_mirtrace_species}.gff3") : false
     ch_mirna_gtf           = params.mirna_gtf ? Channel.empty() : ( mirna_gtf_from_species ? Channel.fromPath(mirna_gtf_from_species, checkIfExists: true).collect() :  Channel.empty() )
     //TODO for ch_mirna_gtf, shouldn't it try to build a channel.fromPath with params.mirna_gtf,  if true? (instead of setting it to empty). Is this parameter used for non mirgenedb runs?
-    
+
     //
     // Print version and exit if required and dump pipeline parameters to JSON file
     //
@@ -97,7 +97,7 @@ workflow PIPELINE_INITIALISATION {
         ch_reference_mature  = params.mature  ? Channel.fromPath(params.mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
         ch_reference_hairpin = params.hairpin ? Channel.fromPath(params.hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
     } else {
-        if (!params.mirgenedb_species) { 
+        if (!params.mirgenedb_species) {
             exit 1, "MirGeneDB species not set, please specify via the --mirgenedb_species parameter"
         }
         ch_reference_mature  = params.mirgenedb_mature  ? Channel.fromPath(params.mirgenedb_mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : { exit 1, "Mature miRNA fasta file not found via --mirgenedb_mature: ${params.mirgenedb_mature}" }
@@ -132,7 +132,7 @@ workflow PIPELINE_INITIALISATION {
     reference_mature  = ch_reference_mature  // channel: [ val(meta), fasta file]
     reference_hairpin = ch_reference_hairpin // channel: [ val(meta), fasta file]
     mirna_gtf         = ch_mirna_gtf         // channel: path GTF file
-    versions          = ch_versions          // channel: [ versions.yml ]  
+    versions          = ch_versions          // channel: [ versions.yml ]
 }
 
 /*

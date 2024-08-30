@@ -20,13 +20,13 @@ nextflow_pipeline {
                 { assert workflow.success },
                 { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
                 { assert workflow.trace.succeeded().size() == 73 },
-                
+
                 { assert snapshot(
                     path("$outputDir/contaminant_filter/filter/Clone1_N1_trimmed.contamination_mqc.yaml").exists(), //TODO see if we can make these deterministic or why they are non-deterministic
                     path("$outputDir/contaminant_filter/filter/Clone1_N3_trimmed.contamination_mqc.yaml").exists(),
                     path("$outputDir/contaminant_filter/filter/Clone1_N1.contamination_mqc.yaml").exists()
                 ).match("contaminant_filter_filter") },
-                
+
                 { assert snapshot(
                     path("$outputDir/mirna_quant/bam/mature/Clone1_N3_trimmed_mature.sorted.stats").exists(),
                     path("$outputDir/mirna_quant/bam/mature/Clone1_N1_mature.sorted.stats").exists(),

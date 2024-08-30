@@ -70,8 +70,8 @@ jobs:
               --changed-since HEAD^ \
               --profile "+${{ matrix.profile }}" \
               --filter pipeline \
-              --junitxml=test.xml
-              --verbose
+              --junitxml=test.xml \
+              --verbose \
               --debug
 
       - name: Publish Test Report
