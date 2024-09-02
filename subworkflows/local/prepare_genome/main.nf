@@ -10,18 +10,17 @@ include { INDEX_GENOME                     } from '../../../modules/local/bowtie
 
 workflow PREPARE_GENOME {
     take:
-    val_fasta                  // file: /path/to/genome.fasta
-    val_bowtie_index           // file or directory: /path/to/bowtie/ or /path/to/bowtie.tar.gz
-    val_mirtrace_species       // string: Species for miRTrace
-    val_rrna                   // string: Path to the rRNA fasta file to be used as contamination database.
-    val_trna                   // string: Path to the tRNA fasta file to be used as contamination database.
-    val_cdna                   // string: Path to the cDNA fasta file to be used as contamination database.
-    val_ncrna                  // string: Path to the ncRNA fasta file to be used as contamination database.
-    val_pirna                  // string: Path to the piRNA fasta file to be used as contamination database.
-    val_other_contamination    // string: Path to the additional fasta file to be used as contamination database.
-    fastp_known_mirna_adapters // string: Path to Fasta with known miRNA adapter sequences for adapter trimming
-    val_mirna_gtf              // string: Path to GFF/GTF file with coordinates positions of precursor and miRNAs
-    bool_with_umi              // boolean
+    val_fasta                      // file: /path/to/genome.fasta
+    val_bowtie_index               // file or directory: /path/to/bowtie/ or /path/to/bowtie.tar.gz
+    val_mirtrace_species           // string: Species for miRTrace
+    val_rrna                       // string: Path to the rRNA fasta file to be used as contamination database.
+    val_trna                       // string: Path to the tRNA fasta file to be used as contamination database.
+    val_cdna                       // string: Path to the cDNA fasta file to be used as contamination database.
+    val_ncrna                      // string: Path to the ncRNA fasta file to be used as contamination database.
+    val_pirna                      // string: Path to the piRNA fasta file to be used as contamination database.
+    val_other_contamination        // string: Path to the additional fasta file to be used as contamination database.
+    val_fastp_known_mirna_adapters // string: Path to Fasta with known miRNA adapter sequences for adapter trimming
+    val_mirna_gtf                  // string: Path to GFF/GTF file with coordinates positions of precursor and miRNAs
 
     main:
     ch_versions = Channel.empty()
@@ -29,15 +28,15 @@ workflow PREPARE_GENOME {
     // Parameter channel handling
     ch_fasta                  = val_fasta                     ? Channel.fromPath(val_fasta, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()        : Channel.empty()
     ch_bowtie_index           = val_bowtie_index              ? Channel.fromPath(val_bowtie_index, checkIfExists: true).map{ it -> [ [], it ] }.collect() : Channel.empty()
-    
+
     bool_mirtrace_species     = val_mirtrace_species          ? true : false
     bool_has_fasta            = val_fasta                     ? true : false
-    
+
     ch_mirtrace_species       = val_mirtrace_species          ? Channel.value(val_mirtrace_species) : Channel.empty()
     mirna_gtf_from_species    = val_mirtrace_species          ? (val_mirtrace_species == 'hsa' ? "https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${val_mirtrace_species}.gff3") : false
     ch_mirna_gtf              = val_mirna_gtf                 ? Channel.empty() : ( mirna_gtf_from_species ? Channel.fromPath(mirna_gtf_from_species, checkIfExists: true).collect() :  Channel.empty() )    //TODO for ch_mirna_gtf, shouldn't it try to build a channel.fromPath with params.mirna_gtf,  if true? (instead of setting it to empty). Is this parameter used for non mirgenedb runs?
-    ch_mirna_adapters         = bool_with_umi                 ? [] : Channel.fromPath(fastp_known_mirna_adapters, checkIfExists: true).collect()
-    
+    ch_mirna_adapters         = params.with_umi               ? [] : Channel.fromPath(val_fastp_known_mirna_adapters, checkIfExists: true).collect()
+
     ch_rrna                   = val_rrna                      ? Channel.fromPath(val_rrna)                : Channel.empty()
     ch_trna                   = val_trna                      ? Channel.fromPath(val_trna)                : Channel.empty()
     ch_cdna                   = val_cdna                      ? Channel.fromPath(val_cdna)                : Channel.empty()

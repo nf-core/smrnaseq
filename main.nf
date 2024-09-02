@@ -65,7 +65,6 @@ workflow {
         params.pirna,
         params.other_contamination,
         params.fastp_known_mirna_adapters,
-        params.with_umi,
         params.mirna_gtf
     )
 
