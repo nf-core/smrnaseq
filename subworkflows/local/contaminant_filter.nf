@@ -25,14 +25,14 @@ include { FILTER_STATS } from '../../modules/local/filter_stats'
 
 workflow CONTAMINANT_FILTER {
     take:
-    ch_reference_hairpin // channel: [ val(meta), fasta file]
-    rrna                 // channel: [ path(fasta) ]
-    trna                 // channel: [ path(fasta) ]
-    cdna                 // channel: [ path(fasta) ]
-    ncrna                // channel: [ path(fasta) ]
-    pirna                // channel: [ path(fasta) ]
-    other                // channel: [ path(fasta) ]
-    ch_reads_for_mirna   // channel: [ val(meta), [ reads ] ]
+    ch_reference_hairpin   // channel: [ val(meta), fasta file]
+    ch_rrna                // channel: [ path(fasta) ]
+    ch_trna                // channel: [ path(fasta) ]
+    ch_cdna                // channel: [ path(fasta) ]
+    ch_ncrna               // channel: [ path(fasta) ]
+    ch_pirna               // channel: [ path(fasta) ]
+    ch_other_contamination // channel: [ path(fasta) ]
+    ch_reads_for_mirna     // channel: [ val(meta), [ reads ] ]
 
     main:
 
@@ -44,9 +44,9 @@ workflow CONTAMINANT_FILTER {
 
     if (params.rrna) {
         // Index DB and filter $reads emit: $rrna_reads
-        INDEX_RRNA ( rrna )
+        INDEX_RRNA ( ch_rrna )
         ch_versions = ch_versions.mix(INDEX_RRNA.out.versions)
-        MAP_RRNA ( ch_reads_for_mirna, INDEX_RRNA.out.index, 'rRNA' )
+        MAP_RRNA ( ch_reads_for_mirna, INDEX_RRNA.out.index, Channel.value('rRNA') )
         ch_versions = ch_versions.mix(MAP_RRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_RRNA.out.stats.ifEmpty(null))
         MAP_RRNA.out.unmapped.set { rrna_reads }
@@ -56,9 +56,9 @@ workflow CONTAMINANT_FILTER {
 
     if (params.trna) {
         // Index DB and filter $rrna_reads emit: $trna_reads
-        INDEX_TRNA ( trna )
+        INDEX_TRNA ( ch_trna )
         ch_versions = ch_versions.mix(INDEX_TRNA.out.versions)
-        MAP_TRNA ( rrna_reads, INDEX_TRNA.out.index, 'tRNA')
+        MAP_TRNA ( rrna_reads, INDEX_TRNA.out.index, Channel.value("tRNA") )
         ch_versions = ch_versions.mix(MAP_TRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_TRNA.out.stats.ifEmpty(null))
         MAP_TRNA.out.unmapped.set { trna_reads }
@@ -68,11 +68,11 @@ workflow CONTAMINANT_FILTER {
 
 
     if (params.cdna) {
-        BLAT_CDNA ( 'cdna', ch_reference_hairpin, cdna )
+        BLAT_CDNA ( Channel.value( 'cdna' ), ch_reference_hairpin, ch_cdna )
         ch_versions = ch_versions.mix(BLAT_CDNA.out.versions)
         INDEX_CDNA ( BLAT_CDNA.out.filtered_set )
         ch_versions = ch_versions.mix(INDEX_CDNA.out.versions)
-        MAP_CDNA ( trna_reads, INDEX_CDNA.out.index, 'cDNA' )
+        MAP_CDNA ( trna_reads, INDEX_CDNA.out.index, Channel.value('cDNA'))
         ch_versions = ch_versions.mix(MAP_CDNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_CDNA.out.stats.ifEmpty(null))
         MAP_CDNA.out.unmapped.set { cdna_reads }
@@ -81,11 +81,11 @@ workflow CONTAMINANT_FILTER {
     cdna_reads.set { ncrna_reads }
 
     if (params.ncrna) {
-        BLAT_NCRNA ( 'ncrna', ch_reference_hairpin, ncrna )
+        BLAT_NCRNA ( Channel.value( 'ncrna' ), ch_reference_hairpin, ch_ncrna )
         ch_versions = ch_versions.mix(BLAT_NCRNA.out.versions)
         INDEX_NCRNA ( BLAT_NCRNA.out.filtered_set )
         ch_versions = ch_versions.mix(INDEX_NCRNA.out.versions)
-        MAP_NCRNA ( cdna_reads, INDEX_NCRNA.out.index, 'ncRNA' )
+        MAP_NCRNA ( cdna_reads, INDEX_NCRNA.out.index, Channel.value('ncRNA') )
         ch_versions = ch_versions.mix(MAP_NCRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_NCRNA.out.stats.ifEmpty(null))
         MAP_NCRNA.out.unmapped.set { ncrna_reads }
@@ -94,11 +94,11 @@ workflow CONTAMINANT_FILTER {
     ncrna_reads.set { pirna_reads }
 
     if (params.pirna) {
-        BLAT_PIRNA ( 'other', ch_reference_hairpin, pirna )
+        BLAT_PIRNA ( Channel.value( 'other' ), ch_reference_hairpin, ch_pirna )
         ch_versions = ch_versions.mix(BLAT_PIRNA.out.versions)
         INDEX_PIRNA ( BLAT_PIRNA.out.filtered_set )
         ch_versions = ch_versions.mix(INDEX_PIRNA.out.versions)
-        MAP_PIRNA ( ncrna_reads, INDEX_PIRNA.out.index, 'piRNA' )
+        MAP_PIRNA ( ncrna_reads, INDEX_PIRNA.out.index, Channel.value('piRNA'))
         ch_versions = ch_versions.mix(MAP_PIRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_PIRNA.out.stats.ifEmpty(null))
         MAP_PIRNA.out.unmapped.set { pirna_reads }
@@ -106,12 +106,12 @@ workflow CONTAMINANT_FILTER {
 
     pirna_reads.set { other_cont_reads }
 
-    if (other) {
-        BLAT_OTHER ( 'other', ch_reference_hairpin, other)
+    if (params.other_contamination) {
+        BLAT_OTHER ( Channel.value( 'other' ), ch_reference_hairpin, ch_other_contamination)
         ch_versions = ch_versions.mix(BLAT_OTHER.out.versions)
         INDEX_OTHER ( BLAT_OTHER.out.filtered_set )
         ch_versions = ch_versions.mix(INDEX_OTHER.out.versions)
-        MAP_OTHER ( ncrna_reads, INDEX_OTHER.out.index, 'other' )
+        MAP_OTHER ( ncrna_reads, INDEX_OTHER.out.index, Channel.value('other'))
         ch_versions = ch_versions.mix(MAP_OTHER.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_OTHER.out.stats.ifEmpty(null))
         MAP_OTHER.out.unmapped.set { other_cont_reads }

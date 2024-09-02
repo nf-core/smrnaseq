@@ -27,8 +27,8 @@ workflow MIRNA_QUANT {
     take:
     ch_reference_mature  // channel: [ val(meta), fasta file]
     ch_reference_hairpin // channel: [ val(meta), fasta file]
-    ch_mirna_gtf         // channel: path GTF file
-    ch_reads_for_mirna   // channel: [ val(meta), [ ch_reads ] ]
+    ch_mirna_gtf         // channel: [ path(GTF) ]
+    ch_reads_for_mirna   // channel: [ val(meta), [ reads ] ]
     ch_mirtrace_species  // channel: [ val(string) ]
 
     main:

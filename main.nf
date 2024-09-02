@@ -76,7 +76,6 @@ workflow {
         params.help,
         params.validate_params,
         params.monochrome_logs,
-        params.with_umi,
         args,
         params.outdir,
         params.input
