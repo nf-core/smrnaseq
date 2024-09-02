@@ -39,13 +39,13 @@ workflow PIPELINE_INITIALISATION {
     nextflow_cli_args          //   array: List of positional nextflow CLI args
     outdir                     //  string: The output directory where the results will be saved
     input                      //  string: Path to input samplesheet
-    fastp_known_mirna_adapters //  string: Fasta with known miRNA adapter sequences for adapter trimming
+    fastp_known_mirna_adapters //  string: Path to Fasta with known miRNA adapter sequences for adapter trimming
 
     main:
 
     //Channel definitions
     ch_versions       = Channel.empty()
-    ch_mirna_adapters = with_umi ? [] : Channel.value(fastp_known_mirna_adapters).ifEmpty([])
+    ch_mirna_adapters = with_umi ? [] : Channel.fromPath(fastp_known_mirna_adapters, checkIfExists: true)
 
     //
     // Print version and exit if required and dump pipeline parameters to JSON file

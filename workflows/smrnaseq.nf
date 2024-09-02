@@ -89,12 +89,12 @@ workflow NFCORE_SMRNASEQ {
         params.skip_fastqc,
         params.with_umi,
         params.skip_umi_extract_before_dedup,
-        Channel.value(params.umi_discard_read).ifEmpty([]),
+        params.umi_discard_read,
         params.skip_fastp,
         ch_mirna_adapters,
         params.save_trimmed_fail,
         params.save_merged,
-        Channel.value(params.min_trimmed_reads).ifEmpty([])
+        params.min_trimmed_reads
     )
     ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.versions)
 
