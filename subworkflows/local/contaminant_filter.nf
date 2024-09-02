@@ -26,12 +26,12 @@ include { FILTER_STATS } from '../../modules/local/filter_stats'
 workflow CONTAMINANT_FILTER {
     take:
     ch_reference_hairpin // channel: [ val(meta), fasta file]
-    rrna                 // channel: [ val(rrna.fasta)]
-    trna                 // channel: [ val(trna.fasta) ]
-    cdna                 // channel: [ val(cdna.fasta) ]
-    ncrna                // channel: [ val(ncrna.fasta) ]
-    pirna                // channel: [ val(pirna.fasta) ]
-    other                // channel: [ val(other_contamination.fasta) ]
+    rrna                 // channel: [ path(fasta) ]
+    trna                 // channel: [ path(fasta) ]
+    cdna                 // channel: [ path(fasta) ]
+    ncrna                // channel: [ path(fasta) ]
+    pirna                // channel: [ path(fasta) ]
+    other                // channel: [ path(fasta) ]
     ch_reads_for_mirna   // channel: [ val(meta), [ reads ] ]
 
     main:

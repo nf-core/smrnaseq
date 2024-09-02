@@ -44,17 +44,23 @@ ch_fastp_adapters                     = Channel.fromPath(params.fastp_known_mirn
 workflow NFCORE_SMRNASEQ {
 
     take:
-    has_fasta            // boolean
-    has_mirtrace_species // boolean
-    ch_samplesheet       // channel: sample fastqs parsed from --input
-    ch_mirna_adapters    // channel: [ val(string) ]
-    ch_mirtrace_species  // channel: [ val(string) ]
-    ch_reference_mature  // channel: [ val(meta), path(fasta) ]
-    ch_reference_hairpin // channel: [ val(meta), path(fasta) ]
-    ch_mirna_gtf         // channel: [ path(GTF) ]
-    ch_fasta             // channel: [ val(meta), path(fasta) ]
-    ch_bowtie_index      // channel: [genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt ]
-    ch_versions          // channel: [ path(versions.yml) ]
+    has_fasta              // boolean
+    has_mirtrace_species   // boolean
+    ch_mirna_adapters      // channel: [ val(string) ]
+    ch_mirtrace_species    // channel: [ val(string) ]
+    ch_reference_mature    // channel: [ val(meta), path(fasta) ]
+    ch_reference_hairpin   // channel: [ val(meta), path(fasta) ]
+    ch_mirna_gtf           // channel: [ path(GTF) ]
+    ch_fasta               // channel: [ val(meta), path(fasta) ]
+    ch_bowtie_index        // channel: [ genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt ]
+    ch_rrna                // channel: [ path(fasta) ]
+    ch_trna                // channel: [ path(fasta) ]
+    ch_cdna                // channel: [ path(fasta) ]
+    ch_ncrna               // channel: [ path(fasta) ]
+    ch_pirna               // channel: [ path(fasta) ]
+    ch_other_contamination // channel: [ path(fasta) ]
+    ch_versions            // channel: [ path(versions.yml) ]
+    ch_samplesheet         // channel: sample fastqs parsed from --input
 
     main:
     //
@@ -161,12 +167,12 @@ workflow NFCORE_SMRNASEQ {
     if (params.filter_contamination){
         CONTAMINANT_FILTER (
             ch_reference_hairpin.map{meta,file -> file},
-            Channel.value(params.rrna).ifEmpty([]),
-            Channel.value(params.trna).ifEmpty([]),
-            Channel.value(params.cdna).ifEmpty([]),
-            Channel.value(params.ncrna).ifEmpty([]),
-            Channel.value(params.pirna).ifEmpty([]),
-            Channel.value(params.other_contamination).ifEmpty([]),
+            ch_rrna,
+            ch_trna,
+            ch_cdna,
+            ch_ncrna,
+            ch_pirna,
+            ch_other_contamination,
             ch_reads_for_mirna
         )
         contamination_stats = CONTAMINANT_FILTER.out.filter_stats

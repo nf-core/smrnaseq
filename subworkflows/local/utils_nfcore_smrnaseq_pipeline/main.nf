@@ -39,13 +39,11 @@ workflow PIPELINE_INITIALISATION {
     nextflow_cli_args          //   array: List of positional nextflow CLI args
     outdir                     //  string: The output directory where the results will be saved
     input                      //  string: Path to input samplesheet
-    fastp_known_mirna_adapters //  string: Path to Fasta with known miRNA adapter sequences for adapter trimming
 
     main:
 
     //Channel definitions
     ch_versions       = Channel.empty()
-    ch_mirna_adapters = with_umi ? [] : Channel.fromPath(fastp_known_mirna_adapters, checkIfExists: true)
 
     //
     // Print version and exit if required and dump pipeline parameters to JSON file
@@ -107,7 +105,6 @@ workflow PIPELINE_INITIALISATION {
     emit:
     samplesheet    = ch_samplesheet    // channel: sample fastqs parsed from --input
     versions       = ch_versions       // channel: [ versions.yml ]
-    mirna_adapters = ch_mirna_adapters // channel: [ val(string) ]
 }
 
 /*
