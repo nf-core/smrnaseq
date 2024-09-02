@@ -26,13 +26,13 @@ include { FILTER_STATS } from '../../modules/local/filter_stats'
 workflow CONTAMINANT_FILTER {
     take:
     ch_reference_hairpin // channel: [ val(meta), fasta file]
-    rrna                 // params.rrna
-    trna                 // params.trna
-    cdna                 // params.cdna
-    ncrna                // params.ncrna
-    pirna                // params.pirna
-    other                // params.other_contamination
-    reads                // channel: [ val(meta), [ reads ] ]
+    rrna                 // channel: [ val(rrna.fasta)]
+    trna                 // channel: [ val(trna.fasta) ]
+    cdna                 // channel: [ val(cdna.fasta) ]
+    ncrna                // channel: [ val(ncrna.fasta) ]
+    pirna                // channel: [ val(pirna.fasta) ]
+    other                // channel: [ val(other_contamination.fasta) ]
+    ch_reads_for_mirna   // channel: [ val(meta), [ reads ] ]
 
     main:
 
@@ -40,13 +40,13 @@ workflow CONTAMINANT_FILTER {
     ch_filter_stats = Channel.empty()
     ch_mqc_results = Channel.empty()
 
-    reads.set { rrna_reads }
+    ch_reads_for_mirna.set { rrna_reads }
 
     if (params.rrna) {
         // Index DB and filter $reads emit: $rrna_reads
         INDEX_RRNA ( rrna )
         ch_versions = ch_versions.mix(INDEX_RRNA.out.versions)
-        MAP_RRNA ( reads, INDEX_RRNA.out.index, 'rRNA' )
+        MAP_RRNA ( ch_reads_for_mirna, INDEX_RRNA.out.index, 'rRNA' )
         ch_versions = ch_versions.mix(MAP_RRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_RRNA.out.stats.ifEmpty(null))
         MAP_RRNA.out.unmapped.set { rrna_reads }

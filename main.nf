@@ -50,6 +50,7 @@ workflow {
     PREPARE_GENOME (
         params.fasta,
         params.bowtie_index,
+        params.mirtrace_species
     )
 
     //
@@ -60,21 +61,25 @@ workflow {
         params.help,
         params.validate_params,
         params.monochrome_logs,
+        params.with_umi,
         args,
         params.outdir,
         params.input,
-        params.mirtrace_species
+        params.fastp_known_mirna_adapters
     )
 
     //
     // WORKFLOW: Run main workflow
     //
     NFCORE_SMRNASEQ (
+        PREPARE_GENOME.out.has_fasta,
+        PREPARE_GENOME.out.has_mirtrace_species,
         PIPELINE_INITIALISATION.out.samplesheet,
-        PIPELINE_INITIALISATION.out.mirtrace_species,
-        PIPELINE_INITIALISATION.out.reference_mature,
-        PIPELINE_INITIALISATION.out.reference_hairpin,
-        PIPELINE_INITIALISATION.out.mirna_gtf,
+        PIPELINE_INITIALISATION.out.mirna_adapters,
+        PREPARE_GENOME.out.mirtrace_species,
+        PREPARE_GENOME.out.reference_mature,
+        PREPARE_GENOME.out.reference_hairpin,
+        PREPARE_GENOME.out.mirna_gtf,
         PREPARE_GENOME.out.fasta,
         PREPARE_GENOME.out.bowtie_index,
         ch_versions

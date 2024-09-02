@@ -9,12 +9,12 @@ workflow GENOME_QUANT {
     take:
     ch_bowtie_index // channel: [genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt]
     ch_fasta        // channel: [ val(meta), path(fasta) ]
-    reads           // channel: [ val(meta), [ reads ] ]
+    ch_reads        // channel: [ val(meta), [ reads ] ]
 
     main:
     ch_versions = Channel.empty()
 
-    BOWTIE_MAP_GENOME ( reads, ch_bowtie_index )
+    BOWTIE_MAP_GENOME ( ch_reads, ch_bowtie_index )
     ch_versions = ch_versions.mix(BOWTIE_MAP_GENOME.out.versions)
 
     BAM_SORT_STATS_SAMTOOLS ( BOWTIE_MAP_GENOME.out.bam,  ch_fasta )

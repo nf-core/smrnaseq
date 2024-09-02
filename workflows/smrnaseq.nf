@@ -44,13 +44,16 @@ ch_fastp_adapters                     = Channel.fromPath(params.fastp_known_mirn
 workflow NFCORE_SMRNASEQ {
 
     take:
+    has_fasta            // boolean
+    has_mirtrace_species // boolean
     ch_samplesheet       // channel: sample fastqs parsed from --input
-    ch_mirtrace_species  // channel: params.mirtrace_species
-    ch_reference_mature  // channel: [ val(meta), fasta file]
-    ch_reference_hairpin // channel: [ val(meta), fasta file]
-    ch_mirna_gtf         // channel: path GTF file
-    ch_fasta             // channel: [ val(meta), fasta file]
-    ch_bowtie_index      // channel: [genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt]
+    ch_mirna_adapters    // channel: [ val(string) ]
+    ch_mirtrace_species  // channel: [ val(string) ]
+    ch_reference_mature  // channel: [ val(meta), path(fasta) ]
+    ch_reference_hairpin // channel: [ val(meta), path(fasta) ]
+    ch_mirna_gtf         // channel: [ path(GTF) ]
+    ch_fasta             // channel: [ val(meta), path(fasta) ]
+    ch_bowtie_index      // channel: [genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt ]
     ch_versions          // channel: [ path(versions.yml) ]
 
     main:
@@ -74,8 +77,6 @@ workflow NFCORE_SMRNASEQ {
     ch_cat_fastq = CAT_FASTQ.out.reads.mix(ch_fastq.single)
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first())
 
-    mirna_adapters = params.with_umi ? [] : params.fastp_known_mirna_adapters
-
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters & dedup UMIs if necessary / desired by the user
     //
@@ -88,12 +89,12 @@ workflow NFCORE_SMRNASEQ {
         params.skip_fastqc,
         params.with_umi,
         params.skip_umi_extract_before_dedup,
-        params.umi_discard_read,
+        Channel.value(params.umi_discard_read).ifEmpty([]),
         params.skip_fastp,
-        mirna_adapters,
+        ch_mirna_adapters,
         params.save_trimmed_fail,
         params.save_merged,
-        params.min_trimmed_reads
+        Channel.value(params.min_trimmed_reads).ifEmpty([])
     )
     ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.versions)
 
@@ -113,7 +114,7 @@ workflow NFCORE_SMRNASEQ {
         // Filter out sequences smaller than params.fastp_min_length
         FASTP_LENGTH_FILTER (
             UMITOOLS_EXTRACT.out.reads,
-            mirna_adapters,
+            ch_mirna_adapters,
             false,
             params.save_trimmed_fail,
             params.save_merged
@@ -146,9 +147,12 @@ workflow NFCORE_SMRNASEQ {
     //
     // SUBWORKFLOW: MIRTRACE
     //
-    //No need for conditional statement, wont run if ch_mirtrace_species is empty, TODO remove
-    MIRTRACE(ch_mirtrace_inputs, ch_mirtrace_species)
-    ch_versions = ch_versions.mix(MIRTRACE.out.versions)
+    if (has_mirtrace_species){
+        MIRTRACE(ch_mirtrace_inputs, ch_mirtrace_species)
+        ch_versions = ch_versions.mix(MIRTRACE.out.versions)
+    } else {
+        log.warn "The parameter --mirtrace_species is absent. MIRTRACE quantification skipped."
+    }
 
     //
     // SUBWORKFLOW: remove contaminants from reads
@@ -157,20 +161,19 @@ workflow NFCORE_SMRNASEQ {
     if (params.filter_contamination){
         CONTAMINANT_FILTER (
             ch_reference_hairpin.map{meta,file -> file},
-            params.rrna,
-            params.trna,
-            params.cdna,
-            params.ncrna,
-            params.pirna,
-            params.other_contamination,
+            Channel.value(params.rrna).ifEmpty([]),
+            Channel.value(params.trna).ifEmpty([]),
+            Channel.value(params.cdna).ifEmpty([]),
+            Channel.value(params.ncrna).ifEmpty([]),
+            Channel.value(params.pirna).ifEmpty([]),
+            Channel.value(params.other_contamination).ifEmpty([]),
             ch_reads_for_mirna
         )
-
         contamination_stats = CONTAMINANT_FILTER.out.filter_stats
         ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
         ch_reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
-
     }
+
     //MIRNA_QUANT process should still run even if mirtrace_species is null, when mirgendb is true
     MIRNA_QUANT (
         ch_reference_mature,
@@ -185,27 +188,28 @@ workflow NFCORE_SMRNASEQ {
     // GENOME
     //
     genome_stats = Channel.empty()
-    //Wont run if ch_fasta is empty, no need for conditional statement, TODO remove
-    GENOME_QUANT (
-        ch_bowtie_index,
-        ch_fasta,
-        MIRNA_QUANT.out.unmapped
-    )
-    genome_stats = GENOME_QUANT.out.stats
-    ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
-
-    hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
-    mature_clean  = MIRNA_QUANT.out.fasta_mature.map { it -> it[1] }
-
-    if (!params.skip_mirdeep) {
-        MIRDEEP2 (
-            ch_reads_for_mirna,
-            GENOME_QUANT.out.fasta,
-            GENOME_QUANT.out.index.collect(),
-            hairpin_clean,
-            mature_clean
+    if (has_fasta){
+        GENOME_QUANT (
+            ch_bowtie_index,
+            ch_fasta,
+            MIRNA_QUANT.out.unmapped
         )
-        ch_versions = ch_versions.mix(MIRDEEP2.out.versions)
+        genome_stats = GENOME_QUANT.out.stats
+        ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
+
+        hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
+        mature_clean  = MIRNA_QUANT.out.fasta_mature.map { it -> it[1] }
+
+        if (!params.skip_mirdeep) {
+            MIRDEEP2 (
+                ch_reads_for_mirna,
+                GENOME_QUANT.out.fasta,
+                GENOME_QUANT.out.index.collect(),
+                hairpin_clean,
+                mature_clean
+            )
+            ch_versions = ch_versions.mix(MIRDEEP2.out.versions)
+        }
     }
 
     //
@@ -272,7 +276,9 @@ workflow NFCORE_SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect().ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([])) //no need for conditional statement, wont run if mirtrace didn't run, TODO remove
+        if (has_mirtrace_species){
+            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([]))
+        }
 
         MULTIQC (
             ch_multiqc_files.collect(),

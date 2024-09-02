@@ -29,7 +29,7 @@ workflow MIRNA_QUANT {
     ch_reference_hairpin // channel: [ val(meta), fasta file]
     ch_mirna_gtf         // channel: path GTF file
     ch_reads_for_mirna   // channel: [ val(meta), [ ch_reads ] ]
-    ch_mirtrace_species  // val: params.mirtrace_species
+    ch_mirtrace_species  // channel: [ val(string) ]
 
     main:
     ch_versions = Channel.empty()
@@ -48,14 +48,12 @@ workflow MIRNA_QUANT {
 
     ch_reads_mirna = ch_reads_for_mirna
         .map { add_suffix(it, "mature") }
-        .dump (tag:'msux')
 
     BOWTIE_MAP_MATURE ( ch_reads_mirna, ch_mature_bowtie.collect() )
     ch_versions = ch_versions.mix(BOWTIE_MAP_MATURE.out.versions)
 
     ch_reads_hairpin = BOWTIE_MAP_MATURE.out.unmapped
         .map { add_suffix(it, "hairpin") }
-        .dump (tag:'hsux')
 
     BAM_STATS_MATURE ( BOWTIE_MAP_MATURE.out.bam, FORMAT_MATURE.out.formatted_fasta )
     ch_versions = ch_versions.mix(BAM_STATS_MATURE.out.versions)
@@ -79,7 +77,6 @@ workflow MIRNA_QUANT {
 
     ch_edger_input = BAM_STATS_MATURE.out.idxstats.collect{it[1]}
         .mix(BAM_STATS_HAIRPIN.out.idxstats.collect{it[1]})
-        .dump(tag:'edger')
         .flatten()
         .collect()
 
@@ -88,7 +85,6 @@ workflow MIRNA_QUANT {
 
     ch_reads_seqcluster = ch_reads_for_mirna
         .map { add_suffix(it, "seqcluster") }
-        .dump (tag:'ssux')
 
     SEQCLUSTER_SEQUENCES ( ch_reads_seqcluster )
     ch_reads_collapsed = SEQCLUSTER_SEQUENCES.out.collapsed
@@ -107,12 +103,11 @@ workflow MIRNA_QUANT {
 
     ch_reads_genome = BOWTIE_MAP_HAIRPIN.out.unmapped
         .map { add_suffix(it, "genome") }
-        .dump (tag:'gsux')
 
     emit:
-    fasta_mature        = FORMAT_MATURE.out.formatted_fasta
-    fasta_hairpin       = FORMAT_HAIRPIN.out.formatted_fasta
-    unmapped            = ch_reads_genome
+    fasta_mature        = FORMAT_MATURE.out.formatted_fasta // channel: [ val(meta), path(fasta) ]
+    fasta_hairpin       = FORMAT_HAIRPIN.out.formatted_fasta // channel: [ val(meta), path(fasta) ]
+    unmapped            = ch_reads_genome // channel: [ val(meta), path(bam) ]
     mature_stats        = BAM_STATS_MATURE.out.stats //TODO not used for antything, should we remove them?
     hairpin_stats       = BAM_STATS_HAIRPIN.out.stats //TODO not used for antything, should we remove them?
     mirtop_logs         = ch_mirtop_logs //TODO not used for antything, should we remove them?
