@@ -2,7 +2,7 @@ def VERSION = '2.0.1'
 
 process MIRDEEP2_RUN {
     label 'process_medium'
-    errorStrategy 'ignore'
+    errorStrategy 'ignore' //TODO why was it set like this?
 
     conda 'bioconda::mirdeep2=2.0.1.2'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

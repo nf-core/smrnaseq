@@ -22,7 +22,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#387]](https://github.com/nf-core/smrnaseq/pull/387) - Add [contaminant filter failure because the Docker image for BLAT cannot be pulled](https://github.com/nf-core/smrnaseq/issues/354) - Add nf-test to local module `blat_mirna` and fixes . Adds a small test profile to test contaminant filter results.
 - [[#388]](https://github.com/nf-core/smrnaseq/pull/388) - Fix [igenomes fix](https://github.com/nf-core/smrnaseq/issues/360) - Fix workflow scripts so that they can use igenome parameters.
 - [[#391]](https://github.com/nf-core/smrnaseq/pull/391) - Fix [error because of large chromosomes](https://github.com/nf-core/smrnaseq/issues/132) - Change `.bai` index for `.csi` index in `samtools_index` to fix .
-- [[#392]](https://github.com/nf-core/smrnaseq/pull/392) - Update [Reduce tests](https://github.com/orgs/nf-core/projects/74/views/7?pane=issue&itemId=76437974) - Combine and optimize tests, and reduce samplesheets sizes.
+- [[#392]](https://github.com/nf-core/smrnaseq/pull/392) - Update [Reduce tests](https://github.com/nf-core/smrnaseq/issues/389) - Combine and optimize tests, and reduce samplesheets sizes.
+- [[#398]](https://github.com/nf-core/smrnaseq/pull/398) - Update [Input channels](https://github.com/nf-core/smrnaseq/issues/390) - Updated channel and params handling through workflows.
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 

@@ -8,9 +8,8 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
+//nf-core subworkflows
 include { UTILS_NFVALIDATION_PLUGIN } from '../../nf-core/utils_nfvalidation_plugin'
-include { paramsSummaryMap          } from 'plugin/nf-validation'
-include { fromSamplesheet           } from 'plugin/nf-validation'
 include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipeline'
 include { completionEmail           } from '../../nf-core/utils_nfcore_pipeline'
 include { completionSummary         } from '../../nf-core/utils_nfcore_pipeline'
@@ -19,6 +18,9 @@ include { nfCoreLogo                } from '../../nf-core/utils_nfcore_pipeline'
 include { imNotification            } from '../../nf-core/utils_nfcore_pipeline'
 include { UTILS_NFCORE_PIPELINE     } from '../../nf-core/utils_nfcore_pipeline'
 include { workflowCitation          } from '../../nf-core/utils_nfcore_pipeline'
+//plugins
+include { paramsSummaryMap          } from 'plugin/nf-validation'
+include { fromSamplesheet           } from 'plugin/nf-validation'
 
 /*
 ========================================================================================
@@ -29,17 +31,18 @@ include { workflowCitation          } from '../../nf-core/utils_nfcore_pipeline'
 workflow PIPELINE_INITIALISATION {
 
     take:
-    version           // boolean: Display version and exit
-    help              // boolean: Display help text
-    validate_params   // boolean: Boolean whether to validate parameters against the schema at runtime
-    monochrome_logs   // boolean: Do not use coloured log outputs
-    nextflow_cli_args //   array: List of positional nextflow CLI args
-    outdir            //  string: The output directory where the results will be saved
-    input             //  string: Path to input samplesheet
+    version                    // boolean: Display version and exit
+    help                       // boolean: Display help text
+    validate_params            // boolean: Boolean whether to validate parameters against the schema at runtime
+    monochrome_logs            // boolean: Do not use coloured log outputs
+    nextflow_cli_args          //   array: List of positional nextflow CLI args
+    outdir                     //  string: The output directory where the results will be saved
+    input                      //  string: Path to input samplesheet
 
     main:
 
-    ch_versions = Channel.empty()
+    //Channel definitions
+    ch_versions       = Channel.empty()
 
     //
     // Print version and exit if required and dump pipeline parameters to JSON file
@@ -80,8 +83,7 @@ workflow PIPELINE_INITIALISATION {
     //
     // Create channel from input file provided through params.input
     //
-    Channel
-        .fromSamplesheet("input")
+    ch_samplesheet = Channel.fromSamplesheet("input")
         .map {
             meta, fastq_1, fastq_2 ->
                 if (!fastq_2) {
@@ -98,11 +100,10 @@ workflow PIPELINE_INITIALISATION {
             meta, fastqs ->
                 return [ meta, fastqs.flatten() ]
         }
-        .set { ch_samplesheet }
 
     emit:
-    samplesheet = ch_samplesheet
-    versions    = ch_versions
+    samplesheet    = ch_samplesheet    // channel: sample fastqs parsed from --input
+    versions       = ch_versions       // channel: [ versions.yml ]
 }
 
 /*

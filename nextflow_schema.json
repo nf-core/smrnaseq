@@ -258,7 +258,7 @@
                     "exists": true,
                     "mimetype": "text/plain",
                     "default": "${projectDir}/assets/known_adapters.fa",
-                    "description": "FastA with known miRNA adapter sequences for adapter trimming",
+                    "description": "Fasta with known miRNA adapter sequences for adapter trimming",
                     "fa_icon": "far fa-question-circle"
                 },
                 "min_trimmed_reads": {
