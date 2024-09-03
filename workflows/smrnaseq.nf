@@ -6,7 +6,6 @@
 
 // nf-core modules
 include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/main'
-include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/contaminant_filter'
 include { FASTQC                           } from '../modules/nf-core/fastqc/main'
 include { FASTP as FASTP_LENGTH_FILTER     } from '../modules/nf-core/fastp'
 include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
