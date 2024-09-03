@@ -1,57 +1,30 @@
 {
     "mirtrace": {
         "content": [
+            true,
             "mirtrace-stats-contamination_detailed.tsv:md5,adc318a1605d86d0e582e5f797a8c1b6",
-            "mirtrace-stats-length.tsv:md5,59c6c28066c4ffa6e0b310c1bc40eb21",
-            "mirtrace-stats-phred.tsv:md5,88c98f5bd1ad107b489c3a69ee0508aa",
-            "mirtrace-stats-mirna-complexity.tsv:md5,ac796f3a6dd2dad071367fc62733c74e",
             "mirtrace-stats-contamination_basic.tsv:md5,ab830334fa4c2ca77bd605f9b7e90ff4",
+            "mirtrace-stats-length.tsv:md5,59c6c28066c4ffa6e0b310c1bc40eb21",
+            "mirtrace-stats-mirna-complexity.tsv:md5,ac796f3a6dd2dad071367fc62733c74e",
+            "mirtrace-stats-phred.tsv:md5,88c98f5bd1ad107b489c3a69ee0508aa",
             "mirtrace-stats-qcstatus.tsv:md5,6102df8f6afa6e4dd5cb6316cf6ff506",
             "mirtrace-stats-rnatype.tsv:md5,4422eb47d199bb1df38db794b430cc47"
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-28T14:38:18.035064331"
-    },
-    "contaminant_filter_index": {
-        "content": [
-            "fasta_bidx.3.bt2:md5,762f2a1b2095b2c437cdb3617b962091",
-            "fasta_bidx.2.bt2:md5,eb25e874a767bd35a03ab2f7396ff05e",
-            "fasta_bidx.4.bt2:md5,9cdd50c0928395b851d50bbfbdaa56d7",
-            "fasta_bidx.rev.2.bt2:md5,ff4b4a4707ad2086d6afb2e42ab74854",
-            "fasta_bidx.1.bt2:md5,2ca6ccbcac9fbd36112d07ad30fb9a6d",
-            "fasta_bidx.rev.1.bt2:md5,74692528713e508aab08de9d75040e8a"
-        ],
-        "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
-        },
-        "timestamp": "2024-08-29T20:20:56.312284787"
-    },
-    "mirna_quant_reference": {
-        "content": [
-            "mature.fa_igenome.fa:md5,ef4cabcbea05adf334ba6891a50c951a",
-            "hairpin.fa_igenome.fa:md5,5fb538f60d5288846600dba31010251e",
-            "mature.fa_igenome.fa_idx.fa:md5,ef4cabcbea05adf334ba6891a50c951a",
-            "hairpin.fa_igenome.fa_idx.fa:md5,482b0327b0c1e36748c1ee3d3be9be77"
-        ],
-        "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
-        },
-        "timestamp": "2024-08-28T14:36:52.570153594"
+        "timestamp": "2024-08-30T20:19:41.747572614"
     },
     "software_versions": {
         "content": [
             "{BLAT_CDNA={blat=36}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_MATURE={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.1, samtools=1.14}, CAT_FASTQ={cat=8.3}, FASTP={fastp=0.23.4}, FILTER_STATS={BusyBox=1.32.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, GAWK_CDNA={gawk=5.3.0}, GAWK_NCRNA={gawk=5.3.0}, INDEX_CDNA={bowtie2=2.4.5}, INDEX_HAIRPIN={bowtie=1.3.1}, INDEX_MATURE={bowtie=1.3.1}, INDEX_NCRNA={bowtie2=2.4.5}, INDEX_TRNA={bowtie2=2.4.5}, MAP_CDNA={bowtie2=2.4.5}, MAP_NCRNA={bowtie2=2.4.5}, MAP_TRNA={bowtie2=2.4.5}, MIRTOP_QUANT={mirtop=0.4.25}, MIRTRACE_RUN={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.2}, SAMTOOLS_IDXSTATS={samtools=1.2}, SAMTOOLS_INDEX={samtools=1.2}, SAMTOOLS_SORT={samtools=1.2}, SAMTOOLS_STATS={samtools=1.2}, SEQCLUSTER_SEQUENCES={seqcluster=1.2.9}, SEQKIT_GREP_CDNA={seqkit=2.8.0}, SEQKIT_GREP_NCRNA={seqkit=2.8.0}, TABLE_MERGE={r-base=3.6.2}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-29T14:36:18.444785022"
+        "timestamp": "2024-08-30T20:19:41.634223161"
     },
     "mirna_quant_bam": {
         "content": [
@@ -61,36 +34,24 @@
             true,
             true,
             true,
-            "Clone1_N1_trimmed_mature.sorted.idxstats:md5,8c2bbcde56baa2b314404b93a020567f",
-            "Clone1_N1_trimmed_mature.sorted.stats:md5,088ba6bc7ba16a7fe795735d1b8d6923",
-            "Clone1_N3_trimmed_mature.sorted.idxstats:md5,fc67d3c97ac30f5f0cd5d09fc7c9fe57",
-            "Clone1_N1_trimmed_mature.sorted.flagstat:md5,1d03810df60fc58875e17f3734e908ab",
-            "Clone1_N1_mature.sorted.idxstats:md5,cf28da83c1063c2425c7bae548554cc8",
-            "Clone1_N3_trimmed_mature.sorted.flagstat:md5,2087da12bea640440fbed79a681608d7",
-            "Clone1_N3_trimmed_mature.sorted.stats:md5,7a1a48332e7d2779bb41c3466665e8c3",
-            "Clone1_N1_mature.sorted.stats:md5,ee5a60d2d759e884062cdf427e4d47af",
-            "Clone1_N1_mature.sorted.flagstat:md5,d23318288c499fe20ffa88f0790296ae",
             true,
             true,
             true,
             true,
             true,
             true,
-            "Clone1_N3_trimmed_mature_hairpin.sorted.idxstats:md5,7edfc6b287cb050911f7b72fc3af0b37",
-            "Clone1_N1_trimmed_mature_hairpin.sorted.idxstats:md5,31b6f541b163629dc05a7f6144160b7c",
-            "Clone1_N1_trimmed_mature_hairpin.sorted.stats:md5,a8343bbb1dc69c87f9716446ed4dc84c",
-            "Clone1_N1_trimmed_mature_hairpin.sorted.flagstat:md5,7451581242369f8380dc12a3342110b7",
-            "Clone1_N1_mature_hairpin.sorted.flagstat:md5,bec2c48b409e783d74da5022ec6771c5",
-            "Clone1_N1_mature_hairpin.sorted.idxstats:md5,c812cc489750a03ad56d76b88b38c4c9",
-            "Clone1_N3_trimmed_mature_hairpin.sorted.flagstat:md5,e10991fd1d6e780a28e0570f5c19e609",
-            "Clone1_N3_trimmed_mature_hairpin.sorted.stats:md5,a5282f3776cb7bae2c659157551f49e5",
-            "Clone1_N1_mature_hairpin.sorted.stats:md5,2b16b986551b23820476a8789c2eee0f"
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-29T20:20:54.6977479"
+        "timestamp": "2024-08-30T20:19:41.723544538"
     },
     "mirna_quant_edger_qc": {
         "content": [
@@ -112,131 +73,22 @@
             true
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-28T14:36:55.632846453"
+        "timestamp": "2024-08-30T20:19:41.731224378"
     },
     "contaminant_filter_filter": {
         "content": [
-            "Clone1_N1_trimmed.contamination_mqc.yaml:md5,b3dcbdf4a96668cfd16cdf17ff740b17",
-            true,
-            "Clone1_N3_trimmed.contamination_mqc.yaml:md5,8b064d451cda42c60cf1d432c97c5e3a",
-            true,
-            true,
-            "Clone1_N1.contamination_mqc.yaml:md5,b791c09b0a07029dc10632af655df0c9"
-        ],
-        "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
-        },
-        "timestamp": "2024-08-28T15:32:15.210486427"
-    },
-    "mirna_quant_seqcluster": {
-        "content": [
             true,
             true,
             true
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-29T20:20:54.557509139"
-    },
-    "mirtrace_qc_passed_reads.rnatype_unknown.collapsed": {
-        "content": [
-            "Clone1_N1_trimmed.fastp.fasta:md5,5f24e13b644a35565766e71077f5dd74",
-            "Clone1_N3_trimmed.fastp.fasta:md5,96135c887479eb09db546add31b4241b",
-            "Clone1_N1.fastp.fasta:md5,14d8c36020fe58309e3d6ea13e55a774"
-        ],
-        "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
-        },
-        "timestamp": "2024-08-28T14:38:56.746349427"
-    },
-    "contaminant_filter_blat": {
-        "content": [
-            "filtered.fa:md5,8fd42894e815999b4278b08297720aae"
-        ],
-        "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
-        },
-        "timestamp": "2024-08-28T14:36:59.857640713"
-    },
-    "contaminant_filter_map": {
-        "content": [
-            true,
-            "filtered.Clone1_N3_trimmed_tRNA.stats:md5,cb443ad296bb8bfaded2e4570fab59f0",
-            "filtered.Clone1_N1_trimmed_tRNA.stats:md5,bbcc8736e249e05548c302de185f88c7",
-            true,
-            "filtered.Clone1_N1_tRNA.stats:md5,f7a5c1c39e173d138d3f79788b23adbf",
-            true,
-            true,
-            "filtered.Clone1_N3_trimmed_cDNA.stats:md5,4f8f88045d5ad57203ffe078baa54543",
-            true,
-            "filtered.Clone1_N1_trimmed_cDNA.stats:md5,50afd79bb11a1b26363582eed73b3b95",
-            true,
-            "filtered.Clone1_N1_cDNA.stats:md5,dd68ae152931a87f1266aa29169ca95b",
-            true,
-            "filtered.Clone1_N3_trimmed_ncRNA.stats:md5,f453f4b02f41b3f290ad63ebb4e33dae",
-            true,
-            "filtered.Clone1_N1_trimmed_ncRNA.stats:md5,df5d830fe025dc16c86f969afdbb4ed3",
-            true,
-            true,
-            "filtered.Clone1_N1_ncRNA.stats:md5,19521aae02f1c54019cb272147694083",
-            true,
-            true
-        ],
-        "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
-        },
-        "timestamp": "2024-08-29T20:20:58.378474293"
-    },
-    "bowtie_index_mirna_mature": {
-        "content": [
-            "fasta_bidx.1.ebwt:md5,11a2f568aa785d32246cb8ce1aa8add4",
-            "fasta_bidx.2.ebwt:md5,778bd05aa462c2119736f9a4056bc41f",
-            "fasta_bidx.4.ebwt:md5,78260e9dde22d8f31622c77d71bbb605",
-            "fasta_bidx.3.ebwt:md5,7aeccc6ec919ce1cfcd2b1e40be743fe",
-            "fasta_bidx.rev.2.ebwt:md5,ab52bc362b4c382cf213a71219e9efee",
-            "fasta_bidx.rev.1.ebwt:md5,0520d43b6b75328f3c30254a2d6baa18"
-        ],
-        "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
-        },
-        "timestamp": "2024-08-28T14:37:39.72940919"
-    },
-    "bowtie_index_mirna_hairpin": {
-        "content": [
-            "fasta_bidx.1.ebwt:md5,40c2c142e094ab5ea531a0564ad62cee",
-            "fasta_bidx.3.ebwt:md5,5c60180e2f6fc2e0c399f10b9f9bbee2",
-            "fasta_bidx.4.ebwt:md5,c3d4dbfbb587261ddf29e906029c10b1",
-            "fasta_bidx.rev.1.ebwt:md5,4532fb1426b29163b23702c8daf84d62",
-            "fasta_bidx.rev.2.ebwt:md5,4270939b810aa3f461bacee1edc993aa",
-            "fasta_bidx.2.ebwt:md5,6d99166d1a8a7a1bbf262e89db218278"
-        ],
-        "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
-        },
-        "timestamp": "2024-08-28T14:37:58.841291544"
-    },
-    "mirtrace_qc_passed_reads.all.collapsed": {
-        "content": [
-            "Clone1_N1_trimmed.fastp.fasta:md5,44a8385f2bc8af7ad754b32c12176209",
-            "Clone1_N3_trimmed.fastp.fasta:md5,cbcdbf92f25bfb7e6985a5eca8d478b3",
-            "Clone1_N1.fastp.fasta:md5,24991c6d6bceb6d2bfb7c405ca046c89"
-        ],
-        "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
-        },
-        "timestamp": "2024-08-28T14:38:37.260516705"
+        "timestamp": "2024-08-30T20:19:41.714603496"
     },
     "mirna_quant_mirtop": {
         "content": [
@@ -247,9 +99,9 @@
             true
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
+            "nf-test": "0.9.0",
+            "nextflow": "23.10.0"
         },
-        "timestamp": "2024-08-28T15:32:13.337820483"
+        "timestamp": "2024-08-30T20:19:41.738958154"
     }
 }
