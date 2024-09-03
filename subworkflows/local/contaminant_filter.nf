@@ -2,10 +2,14 @@
 // Filter contamination by rrna, trna, cdna, ncma, pirna
 //
 
-include { BLAT_MIRNA as BLAT_CDNA
+include {
         BLAT_MIRNA as BLAT_NCRNA
         BLAT_MIRNA as BLAT_PIRNA
         BLAT_MIRNA as BLAT_OTHER } from '../../modules/local/blat_mirna/blat_mirna'
+
+include { BLAT as BLAT_CDNA                } from '../../modules/nf-core/blat/main'
+include { GAWK as GAWK_CDNA                } from '../../modules/nf-core/gawk/main'
+include { SEQKIT_GREP as SEQKIT_GREP_CDNA  } from '../../modules/nf-core/seqkit/grep/main'
 
 include { INDEX_CONTAMINANTS as INDEX_RRNA
         INDEX_CONTAMINANTS as INDEX_TRNA
@@ -42,6 +46,9 @@ workflow CONTAMINANT_FILTER {
 
     ch_reads_for_mirna.set { rrna_reads }
 
+    // Add metamap to input channels: hairpin
+    ch_mirna = ch_reference_hairpin.map{ it -> [ [id:'hairpin'], it ] }
+
     if (params.rrna) {
         // Index DB and filter $reads emit: $rrna_reads
         INDEX_RRNA ( ch_rrna )
@@ -66,11 +73,32 @@ workflow CONTAMINANT_FILTER {
 
     trna_reads.set { cdna_reads }
 
-
     if (params.cdna) {
-        BLAT_CDNA ( Channel.value( 'cdna' ), ch_reference_hairpin, ch_cdna )
+        // Search which hairpin miRNAs are present in the cDNA data
+        BLAT_CDNA(ch_mirna, ch_cdna)
         ch_versions = ch_versions.mix(BLAT_CDNA.out.versions)
-        INDEX_CDNA ( BLAT_CDNA.out.filtered_set )
+
+        // Extract the significant hits
+        ch_program = Channel.of('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
+        GAWK_CDNA(BLAT_CDNA.out.psl, ch_program)
+        ch_versions = ch_versions.mix(GAWK_CDNA.out.versions)
+
+        // Get only unique elements of the list
+        ch_pattern = GAWK_CDNA.out.output
+                .map { meta, file -> file.text.readLines() }
+                .flatten()
+                .unique()
+                .collectFile(name: 'ch_hairpin_cDNA_unique.txt', newLine: true)
+
+        // Remove the hairpin miRNAs from the cDNA data
+        SEQKIT_GREP_CDNA(ch_cdna, ch_pattern)
+        ch_versions = ch_versions.mix(SEQKIT_GREP_CDNA.out.versions)
+
+        // Remove metamap to make it compatible with previous code
+        ch_filtered_cdna = SEQKIT_GREP_CDNA.out.filter.map{meta, file -> [file]}
+
+        // Previous original code:
+        INDEX_CDNA ( ch_filtered_cdna )
         ch_versions = ch_versions.mix(INDEX_CDNA.out.versions)
         MAP_CDNA ( trna_reads, INDEX_CDNA.out.index.first(), Channel.value('cDNA'))
         ch_versions = ch_versions.mix(MAP_CDNA.out.versions)
