@@ -35,30 +35,28 @@ include { FILTER_STATS } from '../../../modules/local/filter_stats'
 
 workflow CONTAMINANT_FILTER {
     take:
-    mirna
-    rrna
-    trna
-    cdna
-    ncrna
-    pirna
-    other
-    reads      // channel: [ val(meta), [ reads ] ]
+    ch_reference_hairpin   // channel: [ val(meta), path(fasta) ]
+    ch_rrna                // channel: [ path(fasta) ]
+    ch_trna                // channel: [ path(fasta) ]
+    ch_cdna                // channel: [ val(meta), path(fasta) ]
+    ch_ncrna               // channel: [ val(meta), path(fasta) ]
+    ch_pirna               // channel: [ val(meta), path(fasta) ]
+    ch_other_contamination // channel: [ val(meta), path(fasta) ]
+    ch_reads_for_mirna     // channel: [ val(meta), [ reads ] ]
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions     = Channel.empty()
     ch_filter_stats = Channel.empty()
-    ch_mqc_results = Channel.empty()
+    ch_mqc_results  = Channel.empty()
 
-    rrna_reads = reads
+    ch_reads_for_mirna.set { rrna_reads }
 
-    reads.set { rrna_reads }
-
-    if (rrna) {
+    if (params.rrna) {
         // Index DB and filter $reads emit: $rrna_reads
-        INDEX_RRNA ( rrna )
+        INDEX_RRNA ( ch_rrna )
         ch_versions = ch_versions.mix(INDEX_RRNA.out.versions)
-        MAP_RRNA ( reads, INDEX_RRNA.out.index, 'rRNA' )
+        MAP_RRNA ( ch_reads_for_mirna, INDEX_RRNA.out.index.first(), Channel.value('rRNA') )
         ch_versions = ch_versions.mix(MAP_RRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_RRNA.out.stats.ifEmpty(null))
         MAP_RRNA.out.unmapped.set { rrna_reads }
@@ -66,11 +64,11 @@ workflow CONTAMINANT_FILTER {
 
     rrna_reads.set { trna_reads }
 
-    if (trna) {
+    if (params.trna) {
         // Index DB and filter $rrna_reads emit: $trna_reads
-        INDEX_TRNA ( trna )
+        INDEX_TRNA ( ch_trna )
         ch_versions = ch_versions.mix(INDEX_TRNA.out.versions)
-        MAP_TRNA ( rrna_reads, INDEX_TRNA.out.index, 'tRNA')
+        MAP_TRNA ( rrna_reads, INDEX_TRNA.out.index.first(), Channel.value("tRNA") )
         ch_versions = ch_versions.mix(MAP_TRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_TRNA.out.stats.ifEmpty(null))
         MAP_TRNA.out.unmapped.set { trna_reads }
@@ -78,13 +76,9 @@ workflow CONTAMINANT_FILTER {
 
     trna_reads.set { cdna_reads }
 
-    if (cdna) {
-        // Add metamap to input channels: cDNA and hairpin
-        ch_cdna = Channel.value([[id:'cDNA'], cdna])
-        ch_mirna = Channel.value([[id:'hairpin'], mirna])
-
+    if (params.cdna) {
         // Search which hairpin miRNAs are present in the cDNA data
-        BLAT_CDNA(ch_mirna, ch_cdna)
+        BLAT_CDNA(ch_reference_hairpin, ch_cdna)
         ch_versions = ch_versions.mix(BLAT_CDNA.out.versions)
 
         // Extract the significant hits
@@ -107,34 +101,19 @@ workflow CONTAMINANT_FILTER {
         ch_filtered_cdna = SEQKIT_GREP_CDNA.out.filter.map{meta, file -> [file]}
 
         // Previous original code:
-        // Index filtered cDNA
         INDEX_CDNA ( ch_filtered_cdna )
         ch_versions = ch_versions.mix(INDEX_CDNA.out.versions)
-
-        // Make the index a value channel
-        ch_cdna_index = INDEX_CDNA.out.index.first()
-
-        // Map which input reads are not in the cDNA contaminants
-        MAP_CDNA ( trna_reads, ch_cdna_index, 'cDNA' )
+        MAP_CDNA ( trna_reads, INDEX_CDNA.out.index.first(), Channel.value('cDNA'))
         ch_versions = ch_versions.mix(MAP_CDNA.out.versions)
-
-        // Extract number of reads aligning to contaminants
         ch_filter_stats = ch_filter_stats.mix(MAP_CDNA.out.stats.ifEmpty(null))
-
-        // Create a channel with the set of input reads without cDNA
         MAP_CDNA.out.unmapped.set { cdna_reads }
     }
 
     cdna_reads.set { ncrna_reads }
 
-    if (ncrna) {
-
-        // Add metamap to input channels: ncRNA and hairpin
-        ch_ncrna = Channel.value([[id:'ncRNA'], ncrna])
-        ch_mirna = Channel.value([[id:'hairpin'], mirna])
-
+    if (params.ncrna) {
         // Search which hairpin miRNAs are present in the ncRNA data
-        BLAT_NCRNA(ch_mirna, ch_ncrna)
+        BLAT_NCRNA(ch_reference_hairpin, ch_ncrna)
 
         // Extract the significant hits
         ch_program = Channel.of('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
@@ -158,11 +137,7 @@ workflow CONTAMINANT_FILTER {
         // Previous original code:
         INDEX_NCRNA ( ch_filtered_ncrna )
         ch_versions = ch_versions.mix(INDEX_NCRNA.out.versions)
-
-        // Make the index a value channel
-        ch_ncrna_index = INDEX_NCRNA.out.index.first()
-
-        MAP_NCRNA ( cdna_reads, ch_ncrna_index, 'ncRNA' )
+        MAP_NCRNA ( cdna_reads, INDEX_NCRNA.out.index.first(), Channel.value('ncRNA') )
         ch_versions = ch_versions.mix(MAP_NCRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_NCRNA.out.stats.ifEmpty(null))
         MAP_NCRNA.out.unmapped.set { ncrna_reads }
@@ -170,13 +145,9 @@ workflow CONTAMINANT_FILTER {
 
     ncrna_reads.set { pirna_reads }
 
-    if (pirna) {
-        // Add metamap to input channels: piRNA and hairpin
-        ch_pirna = Channel.value([[id:'piRNA'], pirna])
-        ch_mirna = Channel.value([[id:'hairpin'], mirna])
-
+    if (params.pirna) {
         // Search which hairpin miRNAs are present in the piRNA data
-        BLAT_PIRNA(ch_mirna, ch_pirna)
+        BLAT_PIRNA(ch_reference_hairpin, ch_pirna)
 
         // Extract the significant hits
         ch_program = Channel.of('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
@@ -200,11 +171,7 @@ workflow CONTAMINANT_FILTER {
         // Previous original code:
         INDEX_PIRNA ( ch_filtered_pirna )
         ch_versions = ch_versions.mix(INDEX_PIRNA.out.versions)
-
-        // Make the index a value channel
-        ch_pirna_index = INDEX_PIRNA.out.index.first()
-
-        MAP_PIRNA ( ncrna_reads, ch_pirna_index, 'piRNA' )
+        MAP_PIRNA ( ncrna_reads, INDEX_PIRNA.out.index.first(), Channel.value('piRNA'))
         ch_versions = ch_versions.mix(MAP_PIRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_PIRNA.out.stats.ifEmpty(null))
         MAP_PIRNA.out.unmapped.set { pirna_reads }
@@ -212,13 +179,9 @@ workflow CONTAMINANT_FILTER {
 
     pirna_reads.set { other_cont_reads }
 
-    if (other) {
-        // Add metamap to input channels: other and hairpin
-        ch_other = Channel.value([[id:'other'], other])
-        ch_mirna = Channel.value([[id:'hairpin'], mirna])
-
+    if (params.other_contamination) {
         // Search which hairpin miRNAs are present in the other data
-        BLAT_OTHER(ch_mirna, ch_other)
+        BLAT_OTHER(ch_reference_hairpin, ch_other_contamination)
 
         // Extract the significant hits
         ch_program = Channel.of('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
@@ -233,7 +196,7 @@ workflow CONTAMINANT_FILTER {
                 .collectFile(name: 'ch_hairpin_other_unique.txt', newLine: true)
 
         // Remove the hairpin miRNAs from the other data
-        SEQKIT_GREP_OTHER(ch_other, ch_pattern)
+        SEQKIT_GREP_OTHER(ch_other_contamination, ch_pattern)
         ch_versions = ch_versions.mix(SEQKIT_GREP_OTHER.out.versions)
 
         // Remove metamap to make it compatible with previous code
@@ -242,11 +205,7 @@ workflow CONTAMINANT_FILTER {
         // Previous original code:
         INDEX_OTHER ( ch_filtered_other )
         ch_versions = ch_versions.mix(INDEX_OTHER.out.versions)
-
-        // Make the index a value channel
-        ch_other_index = INDEX_OTHER.out.index.first()
-
-        MAP_OTHER ( ncrna_reads, INDEX_OTHER.out.index, 'other' )
+        MAP_OTHER ( ncrna_reads, INDEX_OTHER.out.index.first(), Channel.value('other'))
         ch_versions = ch_versions.mix(MAP_OTHER.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_OTHER.out.stats.ifEmpty(null))
         MAP_OTHER.out.unmapped.set { other_cont_reads }
