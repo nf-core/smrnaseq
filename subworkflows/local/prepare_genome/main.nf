@@ -40,9 +40,9 @@ workflow PREPARE_GENOME {
     ch_rrna                   = val_rrna                      ? Channel.fromPath(val_rrna)                : Channel.empty()
     ch_trna                   = val_trna                      ? Channel.fromPath(val_trna)                : Channel.empty()
     ch_cdna                   = val_cdna                      ? Channel.fromPath(val_cdna).map{ it -> [ [id:'cDNA'], it ] }.collect()                : Channel.empty()
-    ch_ncrna                  = val_ncrna                     ? Channel.fromPath(val_ncrna)               : Channel.empty()
-    ch_pirna                  = val_pirna                     ? Channel.fromPath(val_pirna)               : Channel.empty()
-    ch_other_contamination    = val_other_contamination       ? Channel.fromPath(val_other_contamination) : Channel.empty()
+    ch_ncrna                  = val_ncrna                     ? Channel.fromPath(val_ncrna).map{ it -> [ [id:'ncRNA'], it ] }.collect()               : Channel.empty()
+    ch_pirna                  = val_pirna                     ? Channel.fromPath(val_pirna).map{ it -> [ [id:'piRNA'], it ] }.collect()               : Channel.empty()
+    ch_other_contamination    = val_other_contamination       ? Channel.fromPath(val_other_contamination).map{ it -> [ [id:'other'], it ] }.collect() : Channel.empty()
 
     // even if bowtie index is specified, there still needs to be a fasta.
     // without fasta, no genome analysis.

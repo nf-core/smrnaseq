@@ -55,10 +55,10 @@ workflow NFCORE_SMRNASEQ {
     ch_bowtie_index        // channel: [ genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt ]
     ch_rrna                // channel: [ path(fasta) ]
     ch_trna                // channel: [ path(fasta) ]
-    ch_cdna                // channel: [ path(fasta) ]
-    ch_ncrna               // channel: [ path(fasta) ]
-    ch_pirna               // channel: [ path(fasta) ]
-    ch_other_contamination // channel: [ path(fasta) ]
+    ch_cdna                // channel: [ val(meta), path(fasta) ]
+    ch_ncrna               // channel: [ val(meta), path(fasta) ]
+    ch_pirna               // channel: [ val(meta), path(fasta) ]
+    ch_other_contamination // channel: [ val(meta), path(fasta) ]
     ch_versions            // channel: [ path(versions.yml) ]
     ch_samplesheet         // channel: sample fastqs parsed from --input
 
@@ -166,7 +166,7 @@ workflow NFCORE_SMRNASEQ {
     contamination_stats = Channel.empty()
     if (params.filter_contamination){
         CONTAMINANT_FILTER (
-            ch_reference_hairpin.map{meta,file -> file},
+            ch_reference_hairpin,
             ch_rrna,
             ch_trna,
             ch_cdna,
