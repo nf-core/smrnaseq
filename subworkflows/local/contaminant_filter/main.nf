@@ -76,13 +76,15 @@ workflow CONTAMINANT_FILTER {
 
     trna_reads.set { cdna_reads }
 
+    // Define how to filter significant BLAT hits
+    ch_program = Channel.value('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
+
     if (params.cdna) {
         // Search which hairpin miRNAs are present in the cDNA data
         BLAT_CDNA(ch_reference_hairpin, ch_cdna)
         ch_versions = ch_versions.mix(BLAT_CDNA.out.versions)
 
         // Extract the significant hits
-        ch_program = Channel.of('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
         GAWK_CDNA(BLAT_CDNA.out.psl, ch_program)
         ch_versions = ch_versions.mix(GAWK_CDNA.out.versions)
 
@@ -114,9 +116,9 @@ workflow CONTAMINANT_FILTER {
     if (params.ncrna) {
         // Search which hairpin miRNAs are present in the ncRNA data
         BLAT_NCRNA(ch_reference_hairpin, ch_ncrna)
+        ch_versions = ch_versions.mix(BLAT_NCRNA.out.versions)
 
         // Extract the significant hits
-        ch_program = Channel.of('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
         GAWK_NCRNA(BLAT_NCRNA.out.psl, ch_program)
         ch_versions = ch_versions.mix(GAWK_NCRNA.out.versions)
 
@@ -148,9 +150,9 @@ workflow CONTAMINANT_FILTER {
     if (params.pirna) {
         // Search which hairpin miRNAs are present in the piRNA data
         BLAT_PIRNA(ch_reference_hairpin, ch_pirna)
+        ch_versions = ch_versions.mix(BLAT_PIRNA.out.versions)
 
         // Extract the significant hits
-        ch_program = Channel.of('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
         GAWK_PIRNA(BLAT_PIRNA.out.psl, ch_program)
         ch_versions = ch_versions.mix(GAWK_PIRNA.out.versions)
 
@@ -182,9 +184,9 @@ workflow CONTAMINANT_FILTER {
     if (params.other_contamination) {
         // Search which hairpin miRNAs are present in the other data
         BLAT_OTHER(ch_reference_hairpin, ch_other_contamination)
+        ch_versions = ch_versions.mix(BLAT_OTHER.out.versions)
 
         // Extract the significant hits
-        ch_program = Channel.of('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
         GAWK_OTHER(BLAT_OTHER.out.psl, ch_program)
         ch_versions = ch_versions.mix(GAWK_OTHER.out.versions)
 
