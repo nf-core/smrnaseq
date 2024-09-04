@@ -2,14 +2,20 @@
 // Filter contamination by rrna, trna, cdna, ncma, pirna
 //
 
-include {
-        BLAT_MIRNA as BLAT_NCRNA
-        BLAT_MIRNA as BLAT_PIRNA
-        BLAT_MIRNA as BLAT_OTHER } from '../../modules/local/blat_mirna/blat_mirna'
-
 include { BLAT as BLAT_CDNA                } from '../../modules/nf-core/blat/main'
+include { BLAT as BLAT_NCRNA               } from '../../modules/nf-core/blat/main'
+include { BLAT as BLAT_PIRNA               } from '../../modules/nf-core/blat/main'
+include { BLAT as BLAT_OTHER               } from '../../modules/nf-core/blat/main'
+
 include { GAWK as GAWK_CDNA                } from '../../modules/nf-core/gawk/main'
+include { GAWK as GAWK_NCRNA               } from '../../modules/nf-core/gawk/main'
+include { GAWK as GAWK_PIRNA               } from '../../modules/nf-core/gawk/main'
+include { GAWK as GAWK_OTHER               } from '../../modules/nf-core/gawk/main'
+
 include { SEQKIT_GREP as SEQKIT_GREP_CDNA  } from '../../modules/nf-core/seqkit/grep/main'
+include { SEQKIT_GREP as SEQKIT_GREP_NCRNA } from '../../modules/nf-core/seqkit/grep/main'
+include { SEQKIT_GREP as SEQKIT_GREP_PIRNA } from '../../modules/nf-core/seqkit/grep/main'
+include { SEQKIT_GREP as SEQKIT_GREP_OTHER } from '../../modules/nf-core/seqkit/grep/main'
 
 include { INDEX_CONTAMINANTS as INDEX_RRNA
         INDEX_CONTAMINANTS as INDEX_TRNA
@@ -29,25 +35,22 @@ include { FILTER_STATS } from '../../modules/local/filter_stats'
 
 workflow CONTAMINANT_FILTER {
     take:
-    ch_reference_hairpin   // channel: [ val(meta), fasta file]
+    ch_reference_hairpin   // channel: [ val(meta), path(fasta) ]
     ch_rrna                // channel: [ path(fasta) ]
     ch_trna                // channel: [ path(fasta) ]
-    ch_cdna                // channel: [ path(fasta) ]
-    ch_ncrna               // channel: [ path(fasta) ]
-    ch_pirna               // channel: [ path(fasta) ]
-    ch_other_contamination // channel: [ path(fasta) ]
+    ch_cdna                // channel: [ val(meta), path(fasta) ]
+    ch_ncrna               // channel: [ val(meta), path(fasta) ]
+    ch_pirna               // channel: [ val(meta), path(fasta) ]
+    ch_other_contamination // channel: [ val(meta), path(fasta) ]
     ch_reads_for_mirna     // channel: [ val(meta), [ reads ] ]
 
     main:
 
-    ch_versions = Channel.empty()
+    ch_versions     = Channel.empty()
     ch_filter_stats = Channel.empty()
-    ch_mqc_results = Channel.empty()
+    ch_mqc_results  = Channel.empty()
 
     ch_reads_for_mirna.set { rrna_reads }
-
-    // Add metamap to input channels: hairpin
-    ch_mirna = ch_reference_hairpin.map{ it -> [ [id:'hairpin'], it ] }
 
     if (params.rrna) {
         // Index DB and filter $reads emit: $rrna_reads
@@ -75,7 +78,7 @@ workflow CONTAMINANT_FILTER {
 
     if (params.cdna) {
         // Search which hairpin miRNAs are present in the cDNA data
-        BLAT_CDNA(ch_mirna, ch_cdna)
+        BLAT_CDNA(ch_reference_hairpin, ch_cdna)
         ch_versions = ch_versions.mix(BLAT_CDNA.out.versions)
 
         // Extract the significant hits
@@ -109,9 +112,30 @@ workflow CONTAMINANT_FILTER {
     cdna_reads.set { ncrna_reads }
 
     if (params.ncrna) {
-        BLAT_NCRNA ( Channel.value( 'ncrna' ), ch_reference_hairpin, ch_ncrna )
-        ch_versions = ch_versions.mix(BLAT_NCRNA.out.versions)
-        INDEX_NCRNA ( BLAT_NCRNA.out.filtered_set )
+        // Search which hairpin miRNAs are present in the ncRNA data
+        BLAT_NCRNA(ch_reference_hairpin, ch_ncrna)
+
+        // Extract the significant hits
+        ch_program = Channel.of('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
+        GAWK_NCRNA(BLAT_NCRNA.out.psl, ch_program)
+        ch_versions = ch_versions.mix(GAWK_NCRNA.out.versions)
+
+        // Get only unique elements of the list
+        ch_pattern = GAWK_NCRNA.out.output
+                .map { meta, file -> file.text.readLines() }
+                .flatten()
+                .unique()
+                .collectFile(name: 'ch_hairpin_ncRNA_unique.txt', newLine: true)
+
+        // Remove the hairpin miRNAs from the ncRNA data
+        SEQKIT_GREP_NCRNA(ch_ncrna, ch_pattern)
+        ch_versions = ch_versions.mix(SEQKIT_GREP_NCRNA.out.versions)
+
+        // Remove metamap to make it compatible with previous code
+        ch_filtered_ncrna = SEQKIT_GREP_NCRNA.out.filter.map{meta, file -> [file]}
+
+        // Previous original code:
+        INDEX_NCRNA ( ch_filtered_ncrna )
         ch_versions = ch_versions.mix(INDEX_NCRNA.out.versions)
         MAP_NCRNA ( cdna_reads, INDEX_NCRNA.out.index.first(), Channel.value('ncRNA') )
         ch_versions = ch_versions.mix(MAP_NCRNA.out.versions)
@@ -122,9 +146,30 @@ workflow CONTAMINANT_FILTER {
     ncrna_reads.set { pirna_reads }
 
     if (params.pirna) {
-        BLAT_PIRNA ( Channel.value( 'other' ), ch_reference_hairpin, ch_pirna )
-        ch_versions = ch_versions.mix(BLAT_PIRNA.out.versions)
-        INDEX_PIRNA ( BLAT_PIRNA.out.filtered_set )
+        // Search which hairpin miRNAs are present in the piRNA data
+        BLAT_PIRNA(ch_reference_hairpin, ch_pirna)
+
+        // Extract the significant hits
+        ch_program = Channel.of('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
+        GAWK_PIRNA(BLAT_PIRNA.out.psl, ch_program)
+        ch_versions = ch_versions.mix(GAWK_PIRNA.out.versions)
+
+        // Get only unique elements of the list
+        ch_pattern = GAWK_PIRNA.out.output
+                .map { meta, file -> file.text.readLines() }
+                .flatten()
+                .unique()
+                .collectFile(name: 'ch_hairpin_piRNA_unique.txt', newLine: true)
+
+        // Remove the hairpin miRNAs from the piRNA data
+        SEQKIT_GREP_PIRNA(ch_pirna, ch_pattern)
+        ch_versions = ch_versions.mix(SEQKIT_GREP_PIRNA.out.versions)
+
+        // Remove metamap to make it compatible with previous code
+        ch_filtered_pirna = SEQKIT_GREP_PIRNA.out.filter.map{meta, file -> [file]}
+
+        // Previous original code:
+        INDEX_PIRNA ( ch_filtered_pirna )
         ch_versions = ch_versions.mix(INDEX_PIRNA.out.versions)
         MAP_PIRNA ( ncrna_reads, INDEX_PIRNA.out.index.first(), Channel.value('piRNA'))
         ch_versions = ch_versions.mix(MAP_PIRNA.out.versions)
@@ -135,9 +180,30 @@ workflow CONTAMINANT_FILTER {
     pirna_reads.set { other_cont_reads }
 
     if (params.other_contamination) {
-        BLAT_OTHER ( Channel.value( 'other' ), ch_reference_hairpin, ch_other_contamination)
-        ch_versions = ch_versions.mix(BLAT_OTHER.out.versions)
-        INDEX_OTHER ( BLAT_OTHER.out.filtered_set )
+        // Search which hairpin miRNAs are present in the other data
+        BLAT_OTHER(ch_reference_hairpin, ch_other_contamination)
+
+        // Extract the significant hits
+        ch_program = Channel.of('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
+        GAWK_OTHER(BLAT_OTHER.out.psl, ch_program)
+        ch_versions = ch_versions.mix(GAWK_OTHER.out.versions)
+
+        // Get only unique elements of the list
+        ch_pattern = GAWK_OTHER.out.output
+                .map { meta, file -> file.text.readLines() }
+                .flatten()
+                .unique()
+                .collectFile(name: 'ch_hairpin_other_unique.txt', newLine: true)
+
+        // Remove the hairpin miRNAs from the other data
+        SEQKIT_GREP_OTHER(ch_other_contamination, ch_pattern)
+        ch_versions = ch_versions.mix(SEQKIT_GREP_OTHER.out.versions)
+
+        // Remove metamap to make it compatible with previous code
+        ch_filtered_other = SEQKIT_GREP_OTHER.out.filter.map{meta, file -> [file]}
+
+        // Previous original code:
+        INDEX_OTHER ( ch_filtered_other )
         ch_versions = ch_versions.mix(INDEX_OTHER.out.versions)
         MAP_OTHER ( ncrna_reads, INDEX_OTHER.out.index.first(), Channel.value('other'))
         ch_versions = ch_versions.mix(MAP_OTHER.out.versions)
