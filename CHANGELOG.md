@@ -24,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#391]](https://github.com/nf-core/smrnaseq/pull/391) - Fix [error because of large chromosomes](https://github.com/nf-core/smrnaseq/issues/132) - Change `.bai` index for `.csi` index in `samtools_index` to fix .
 - [[#392]](https://github.com/nf-core/smrnaseq/pull/392) - Update [Reduce tests](https://github.com/nf-core/smrnaseq/issues/389) - Combine and optimize tests, and reduce samplesheets sizes.
 - [[#398]](https://github.com/nf-core/smrnaseq/pull/398) - Update [Input channels](https://github.com/nf-core/smrnaseq/issues/390) - Updated channel and params handling through workflows.
+- [[#405]](https://github.com/nf-core/smrnaseq/pull/405) - Fix [Umicollapse algo wrong set](https://github.com/nf-core/smrnaseq/issues/404) - Fix potential bug in Umicollapse (not effective as we do not allow PE data in smrnaseq - but for consistency)
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
