@@ -35,6 +35,11 @@
                         "git_sha": "cf3ed075695639b0a0924eb0901146df1996dc08",
                         "installed_by": ["modules"]
                     },
+                    "mirtrace/qc": {
+                        "branch": "master",
+                        "git_sha": "d576f75438a1df605da93f134485e0271312d444",
+                        "installed_by": ["modules"]
+                    },
                     "multiqc": {
                         "branch": "master",
                         "git_sha": "b80f5fd12ff7c43938f424dd76392a2704fa2396",
