@@ -7,8 +7,8 @@ include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/
 include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter'
 include { FASTQC                           } from '../modules/nf-core/fastqc/main'
 include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
-include { FASTP3                           } from '../modules/local/trim3p.nf'
 include { FASTP as FASTP_LENGTH_FILTER     } from '../modules/nf-core/fastp'
+include { FASTP as FASTP3                  } from '../modules/nf-core/fastp'
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant'
 include { INDEX_GENOME                     } from '../modules/local/bowtie_genome'
 include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant'
@@ -114,10 +114,13 @@ workflow NFCORE_SMRNASEQ {
     // Trim 3' end nucleotides after adapter is removed, otherwise they are not really trimmed
     if (params.three_prime_clip_r1){
         FASTP3(
-            ch_reads_for_mirna
+            ch_reads_for_mirna,
+            [],
+            false,
+            false,
+            false
         )
         ch_reads_for_mirna  = FASTP3.out.reads
-        //trim_json         = FASTP3.out.json
     }
 
     // even if bowtie index is specified, there still needs to be a fasta.
