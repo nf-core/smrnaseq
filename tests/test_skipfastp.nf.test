@@ -19,7 +19,7 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 54 },
+                { assert workflow.trace.succeeded().size() == 55 },
 
                 { assert snapshot(
                     path("$outputDir/mirna_quant/mirtop/mirtop.gff").exists(),
@@ -58,14 +58,22 @@ nextflow_pipeline {
                 ).match("mirna_quant_edger_qc") },
 
                 { assert snapshot(
-                    path("$outputDir/mirtrace/mirtrace-report.html").exists(),
-                    path("$outputDir/mirtrace/mirtrace-stats-contamination_basic.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-length.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-mirna-complexity.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-contamination_detailed.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-phred.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-rnatype.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-qcstatus.tsv")
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-report.html").exists(),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-contamination_basic.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-length.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-mirna-complexity.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-contamination_detailed.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-phred.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-rnatype.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-qcstatus.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3/mirtrace-report.html").exists(),
+                    path("$outputDir/mirtrace/Clone1_N3/mirtrace-stats-contamination_basic.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3/mirtrace-stats-length.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3/mirtrace-stats-mirna-complexity.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3/mirtrace-stats-contamination_detailed.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3/mirtrace-stats-phred.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3/mirtrace-stats-rnatype.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3/mirtrace-stats-qcstatus.tsv")
                 ).match("mirtrace") },
 
                 { assert snapshot(

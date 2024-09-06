@@ -2,29 +2,45 @@
     "mirtrace": {
         "content": [
             true,
-            "mirtrace-stats-contamination_detailed.tsv:md5,adc318a1605d86d0e582e5f797a8c1b6",
-            "mirtrace-stats-contamination_basic.tsv:md5,ab830334fa4c2ca77bd605f9b7e90ff4",
-            "mirtrace-stats-length.tsv:md5,59c6c28066c4ffa6e0b310c1bc40eb21",
-            "mirtrace-stats-mirna-complexity.tsv:md5,ac796f3a6dd2dad071367fc62733c74e",
-            "mirtrace-stats-phred.tsv:md5,88c98f5bd1ad107b489c3a69ee0508aa",
-            "mirtrace-stats-qcstatus.tsv:md5,6102df8f6afa6e4dd5cb6316cf6ff506",
-            "mirtrace-stats-rnatype.tsv:md5,4422eb47d199bb1df38db794b430cc47"
-        ],
-        "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
-        },
-        "timestamp": "2024-08-30T20:19:41.747572614"
-    },
-    "software_versions": {
-        "content": [
-            "{BLAT_CDNA={blat=36}, BLAT_NCRNA={blat=36}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_MATURE={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.1, samtools=1.14}, CAT_FASTQ={cat=8.3}, FASTP={fastp=0.23.4}, FILTER_STATS={BusyBox=1.32.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, GAWK_CDNA={gawk=5.3.0}, GAWK_NCRNA={gawk=5.3.0}, INDEX_CDNA={bowtie2=2.4.5}, INDEX_HAIRPIN={bowtie=1.3.1}, INDEX_MATURE={bowtie=1.3.1}, INDEX_NCRNA={bowtie2=2.4.5}, INDEX_TRNA={bowtie2=2.4.5}, MAP_CDNA={bowtie2=2.4.5}, MAP_NCRNA={bowtie2=2.4.5}, MAP_TRNA={bowtie2=2.4.5}, MIRTOP_QUANT={mirtop=0.4.25}, MIRTRACE_RUN={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.2}, SAMTOOLS_IDXSTATS={samtools=1.2}, SAMTOOLS_INDEX={samtools=1.2}, SAMTOOLS_SORT={samtools=1.2}, SAMTOOLS_STATS={samtools=1.2}, SEQCLUSTER_SEQUENCES={seqcluster=1.2.9}, SEQKIT_GREP_CDNA={seqkit=2.8.0}, SEQKIT_GREP_NCRNA={seqkit=2.8.0}, TABLE_MERGE={r-base=3.6.2}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
+            "mirtrace-stats-contamination_detailed.tsv:md5,663a7a5e7ebfc012a278186a96179790",
+            "mirtrace-stats-contamination_basic.tsv:md5,6e8d8bc93931fbbded2899f31aac3e3d",
+            "mirtrace-stats-length.tsv:md5,f687c7ba38cb6a4c4f7178aff385522e",
+            "mirtrace-stats-mirna-complexity.tsv:md5,4b16d7d2767f8d2db1053f9cc879d508",
+            "mirtrace-stats-phred.tsv:md5,07d8b5416961ef3725f86089df8db132",
+            "mirtrace-stats-qcstatus.tsv:md5,71ed8e813730d698418de2d94f266c7d",
+            "mirtrace-stats-rnatype.tsv:md5,3e98f069e8bb7492b3c80ac77831ccf6",
+            true,
+            "mirtrace-stats-contamination_detailed.tsv:md5,0b189d549c002cbcc70e2f740436ac3c",
+            "mirtrace-stats-contamination_basic.tsv:md5,2fa99aa67f1f835abebedbddcd84770e",
+            "mirtrace-stats-length.tsv:md5,72d9194d5e101d5575b978082a3a38f3",
+            "mirtrace-stats-mirna-complexity.tsv:md5,215c1b6fa0965e6bf141fd26fe537364",
+            "mirtrace-stats-phred.tsv:md5,9f7af4ed3888a41c9a9ad8fa926c8d62",
+            "mirtrace-stats-qcstatus.tsv:md5,73177136ba84b3dfca600005695a3331",
+            "mirtrace-stats-rnatype.tsv:md5,f1f950519e20706b1ada7d7c953a3b40",
+            true,
+            "mirtrace-stats-contamination_detailed.tsv:md5,e760eac5053b74a2bd3fe3bee33d020f",
+            "mirtrace-stats-contamination_basic.tsv:md5,5e848ae99f2f54b6a663816d78657512",
+            "mirtrace-stats-length.tsv:md5,4dab1089f2bd2f6d49b4409591a4e945",
+            "mirtrace-stats-mirna-complexity.tsv:md5,8fcbc04a6538f4a36d19bbf9294016b1",
+            "mirtrace-stats-phred.tsv:md5,2c94697ff2a9d1ff8507fda4d62b19a3",
+            "mirtrace-stats-qcstatus.tsv:md5,650819c1549894183ee0558db2be75fa",
+            "mirtrace-stats-rnatype.tsv:md5,ba98a0a2b7a3dd0be7ec667d9a2ffd91"
         ],
         "meta": {
             "nf-test": "0.8.4",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-04T19:24:40.396011682"
+        "timestamp": "2024-09-06T13:46:55.643429949"
+    },
+    "software_versions": {
+        "content": [
+            "{BLAT_CDNA={blat=36}, BLAT_NCRNA={blat=36}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_MATURE={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.1, samtools=1.14}, CAT_FASTQ={cat=8.3}, FASTP={fastp=0.23.4}, FILTER_STATS={BusyBox=1.32.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, GAWK_CDNA={gawk=5.3.0}, GAWK_NCRNA={gawk=5.3.0}, INDEX_CDNA={bowtie2=2.4.5}, INDEX_HAIRPIN={bowtie=1.3.1}, INDEX_MATURE={bowtie=1.3.1}, INDEX_NCRNA={bowtie2=2.4.5}, INDEX_TRNA={bowtie2=2.4.5}, MAP_CDNA={bowtie2=2.4.5}, MAP_NCRNA={bowtie2=2.4.5}, MAP_TRNA={bowtie2=2.4.5}, MIRTOP_QUANT={mirtop=0.4.25}, MIRTRACE_QC={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.2}, SAMTOOLS_IDXSTATS={samtools=1.2}, SAMTOOLS_INDEX={samtools=1.2}, SAMTOOLS_SORT={samtools=1.2}, SAMTOOLS_STATS={samtools=1.2}, SEQCLUSTER_SEQUENCES={seqcluster=1.2.9}, SEQKIT_GREP_CDNA={seqkit=2.8.0}, SEQKIT_GREP_NCRNA={seqkit=2.8.0}, TABLE_MERGE={r-base=3.6.2}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
+        ],
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "24.04.4"
+        },
+        "timestamp": "2024-09-06T13:46:55.527170826"
     },
     "mirna_quant_bam": {
         "content": [

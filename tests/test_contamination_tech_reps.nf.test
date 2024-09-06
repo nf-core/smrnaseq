@@ -19,7 +19,7 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 77 },
+                { assert workflow.trace.succeeded().size() == 79 },
 
                 { assert snapshot(
                     path("$outputDir/contaminant_filter/filter/Clone1_N1_trimmed.contamination_mqc.yaml").exists(), //TODO see if we can make these deterministic or why they are non-deterministic
@@ -76,14 +76,30 @@ nextflow_pipeline {
                 ).match("mirna_quant_mirtop") },
 
                 { assert snapshot(
-                    path("$outputDir/mirtrace/mirtrace-report.html").exists(),
-                    path("$outputDir/mirtrace/mirtrace-stats-contamination_detailed.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-contamination_basic.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-length.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-mirna-complexity.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-phred.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-qcstatus.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-rnatype.tsv")
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-report.html").exists(),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-contamination_detailed.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-contamination_basic.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-length.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-mirna-complexity.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-phred.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-qcstatus.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1/mirtrace-stats-rnatype.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1_trimmed/mirtrace-report.html").exists(),
+                    path("$outputDir/mirtrace/Clone1_N1_trimmed/mirtrace-stats-contamination_detailed.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1_trimmed/mirtrace-stats-contamination_basic.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1_trimmed/mirtrace-stats-length.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1_trimmed/mirtrace-stats-mirna-complexity.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1_trimmed/mirtrace-stats-phred.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1_trimmed/mirtrace-stats-qcstatus.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N1_trimmed/mirtrace-stats-rnatype.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3_trimmed/mirtrace-report.html").exists(),
+                    path("$outputDir/mirtrace/Clone1_N3_trimmed/mirtrace-stats-contamination_detailed.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3_trimmed/mirtrace-stats-contamination_basic.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3_trimmed/mirtrace-stats-length.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3_trimmed/mirtrace-stats-mirna-complexity.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3_trimmed/mirtrace-stats-phred.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3_trimmed/mirtrace-stats-qcstatus.tsv"),
+                    path("$outputDir/mirtrace/Clone1_N3_trimmed/mirtrace-stats-rnatype.tsv")
                 ).match("mirtrace") }
             )
         }
