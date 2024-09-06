@@ -3,24 +3,27 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
+
+// nf-core modules
 include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/main'
-include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter'
 include { FASTQC                           } from '../modules/nf-core/fastqc/main'
-include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
-include { FASTP3                           } from '../modules/local/trim3p.nf'
 include { FASTP as FASTP_LENGTH_FILTER     } from '../modules/nf-core/fastp'
-include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant'
-include { INDEX_GENOME                     } from '../modules/local/bowtie_genome'
-include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant'
-include { MIRDEEP2                         } from '../subworkflows/local/mirdeep2'
-include { MIRTRACE                         } from '../subworkflows/local/mirtrace'
+include { FASTP as FASTP3                  } from '../modules/nf-core/fastp'
 include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
 include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
 include { UMITOOLS_EXTRACT                 } from '../modules/nf-core/umitools/extract/main'
-include { UNTARFILES as UNTAR_BOWTIE_INDEX } from '../modules/nf-core/untarfiles'
-include { paramsSummaryMap                 } from 'plugin/nf-validation'
+// nf-core subworkflows
+include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
 include { paramsSummaryMultiqc             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+// local subworkflows
+include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/main'
+include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant'
+include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant'
+include { MIRDEEP2                         } from '../subworkflows/local/mirdeep2'
+include { MIRTRACE                         } from '../subworkflows/local/mirtrace'
+// plugins
+include { paramsSummaryMap                 } from 'plugin/nf-validation'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -42,34 +45,29 @@ ch_fastp_adapters                     = Channel.fromPath(params.fastp_known_mirn
 workflow NFCORE_SMRNASEQ {
 
     take:
-    ch_input            // channel: samplesheet file as specified to --input
-    ch_samplesheet      // channel: sample fastqs parsed from --input
-    ch_versions         // channel: [ path(versions.yml) ]
+    has_fasta              // boolean
+    has_mirtrace_species   // boolean
+    ch_mirna_adapters      // channel: [ val(string) ]
+    ch_mirtrace_species    // channel: [ val(string) ]
+    ch_reference_mature    // channel: [ val(meta), path(fasta) ]
+    ch_reference_hairpin   // channel: [ val(meta), path(fasta) ]
+    ch_mirna_gtf           // channel: [ path(GTF) ]
+    ch_fasta               // channel: [ val(meta), path(fasta) ]
+    ch_bowtie_index        // channel: [ genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt ]
+    ch_rrna                // channel: [ path(fasta) ]
+    ch_trna                // channel: [ path(fasta) ]
+    ch_cdna                // channel: [ val(meta), path(fasta) ]
+    ch_ncrna               // channel: [ val(meta), path(fasta) ]
+    ch_pirna               // channel: [ val(meta), path(fasta) ]
+    ch_other_contamination // channel: [ val(meta), path(fasta) ]
+    ch_versions            // channel: [ path(versions.yml) ]
+    ch_samplesheet         // channel: sample fastqs parsed from --input
 
     main:
-    //Config checks
-    // Check optional parameters
-    if (!params.mirgenedb && !params.mirtrace_species) {
-            exit 1, "Reference species for miRTrace is not defined via the --mirtrace_species parameter."
-        }
-
-    // Genome options
-    def mirna_gtf_from_species = params.mirtrace_species ? "https://mirbase.org/download/CURRENT/genomes/${params.mirtrace_species}.gff3" : false
-    def mirna_gtf = params.mirna_gtf ?: mirna_gtf_from_species
-
-    if (!params.mirgenedb) {
-        if (params.mature) { reference_mature = file(params.mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found: ${params.mature}" }
-        if (params.hairpin) { reference_hairpin = file(params.hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found: ${params.hairpin}" }
-    } else {
-        if (params.mirgenedb_mature) { reference_mature = file(params.mirgenedb_mature, checkIfExists: true) } else { exit 1, "Mature miRNA fasta file not found via --mirgenedb_mature: ${params.mirgenedb_mature}" }
-        if (params.mirgenedb_hairpin) { reference_hairpin = file(params.mirgenedb_hairpin, checkIfExists: true) } else { exit 1, "Hairpin miRNA fasta file not found via --mirgenedb_hairpin: ${params.mirgenedb_hairpin}" }
-        if (params.mirgenedb_gff) { mirna_gtf = file(params.mirgenedb_gff, checkIfExists: true) } else { exit 1, "MirGeneDB gff file not found via --mirgenedb_gff: ${params.mirgenedb_gff}"}
-        if (!params.mirgenedb_species) { exit 1, "MirGeneDB species not set, please specify via the --mirgenedb_species parameter"}
-    }
     //
     // Create separate channels for samples that have single/multiple FastQ files to merge
     //
-    ch_samplesheet
+    ch_fastq = ch_samplesheet
         .branch {
             meta, fastqs ->
                 single  : fastqs.size() == 1
@@ -77,24 +75,22 @@ workflow NFCORE_SMRNASEQ {
                 multiple: fastqs.size() > 1
                     return [ meta, fastqs.flatten() ]
         }
-        .set { ch_fastq }
-
+    //
     // MODULE: Concatenate FastQ files from same sample if required
     //
     CAT_FASTQ (
         ch_fastq.multiple
     )
-    .reads
-    .mix(ch_fastq.single)
-    .set { ch_cat_fastq }
-
+    ch_cat_fastq = CAT_FASTQ.out.reads.mix(ch_fastq.single)
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first())
-
-    mirna_adapters = params.with_umi ? [] : params.fastp_known_mirna_adapters
 
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters & dedup UMIs if necessary / desired by the user
     //
+    if ( params.skip_fastp && params.skip_fastqc ) {
+        exit 1, "At least one of skip_fastp or skip_fastqc must be false"
+    }
+
     FASTQ_FASTQC_UMITOOLS_FASTP (
         ch_cat_fastq,
         params.skip_fastqc,
@@ -102,44 +98,24 @@ workflow NFCORE_SMRNASEQ {
         params.skip_umi_extract_before_dedup,
         params.umi_discard_read,
         params.skip_fastp,
-        mirna_adapters,
+        ch_mirna_adapters,
         params.save_trimmed_fail,
         params.save_merged,
         params.min_trimmed_reads
     )
     ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.versions)
 
-    ch_fasta = params.fasta ? file(params.fasta): []
     ch_reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
     // Trim 3' end nucleotides after adapter is removed, otherwise they are not really trimmed
     if (params.three_prime_clip_r1){
         FASTP3(
-            ch_reads_for_mirna
+            ch_reads_for_mirna,
+            [],
+            false,
+            false,
+            false
         )
         ch_reads_for_mirna  = FASTP3.out.reads
-        //trim_json         = FASTP3.out.json
-    }
-
-    // even if bowtie index is specified, there still needs to be a fasta.
-    // without fasta, no genome analysis.
-    if(params.fasta) {
-        //Prepare bowtie index, unless specified
-        //This needs to be done here as the index is used by GENOME_QUANT
-        if(params.bowtie_index) {
-            ch_fasta = Channel.fromPath(params.fasta)
-            if (params.bowtie_index.endsWith(".tar.gz")) {
-                UNTAR_BOWTIE_INDEX ( [ [], params.bowtie_index ]).files.map { it[1] }.set {ch_bowtie_index}
-                ch_versions  = ch_versions.mix(UNTAR_BOWTIE_INDEX.out.versions)
-            } else {
-                Channel.fromPath("${params.bowtie_index}**ebwt", checkIfExists: true).ifEmpty{ error "Bowtie1 index directory not found: ${params.bowtie_index}" }.filter { it != null }.set { ch_bowtie_index }
-            }
-            } else {
-            INDEX_GENOME ( [ [:], ch_fasta ] )
-            ch_versions = ch_versions.mix(INDEX_GENOME.out.versions)
-            ch_bowtie_index = INDEX_GENOME.out.index
-            // set to reformatted fasta as generated by `bowtie index`
-            ch_fasta = INDEX_GENOME.out.fasta
-        }
     }
 
     // UMI Dedup for fastq input
@@ -156,7 +132,7 @@ workflow NFCORE_SMRNASEQ {
         // Filter out sequences smaller than params.fastp_min_length
         FASTP_LENGTH_FILTER (
             UMITOOLS_EXTRACT.out.reads,
-            mirna_adapters,
+            ch_mirna_adapters,
             false,
             params.save_trimmed_fail,
             params.save_merged
@@ -169,22 +145,32 @@ workflow NFCORE_SMRNASEQ {
     //
     // MODULE: mirtrace QC
     //
-    FASTQ_FASTQC_UMITOOLS_FASTP.out.adapter_seq
-    .join( ch_reads_for_mirna )
-    .dump()
-    .map { meta, adapter_seq, reads -> [adapter_seq, meta.id, reads] }
-    .groupTuple()
-    .set { ch_mirtrace_inputs }
+
+    // Define the main adapter sequence channel
+    ch_adapter_seq = FASTQ_FASTQC_UMITOOLS_FASTP.out.adapter_seq
+
+    // Define a fallback channel with the default value "custom"
+    ch_fallback_adapter_seq = ch_reads_for_mirna.map { meta, reads -> [meta, 'custom'] }
+
+    // Change to fallback channel if ch_adapter_seq is empty
+    ch_adapter_seq = ch_adapter_seq ? ch_fallback_adapter_seq : ch_adapter_seq
+
+    // Now join the adapter sequence channel with the reads channel
+    ch_mirtrace_inputs = ch_adapter_seq
+        .join(ch_reads_for_mirna)
+        .map { meta, adapter_seq, reads -> [adapter_seq, meta.id, reads] }
+        .groupTuple()
+        .map { adapter_seq, ids, reads_list -> [adapter_seq, ids, reads_list.flatten()] }
 
     //
     // SUBWORKFLOW: MIRTRACE
     //
-    if (params.mirtrace_species) {
-            MIRTRACE(ch_mirtrace_inputs)
-            ch_versions = ch_versions.mix(MIRTRACE.out.versions)
-        } else {
-            log.warn "The parameter --mirtrace_species is absent. MIRTRACE quantification skipped."
-        }
+    if (has_mirtrace_species){
+        MIRTRACE(ch_mirtrace_inputs, ch_mirtrace_species)
+        ch_versions = ch_versions.mix(MIRTRACE.out.versions)
+    } else {
+        log.warn "The parameter --mirtrace_species is absent. MIRTRACE quantification skipped."
+    }
 
     //
     // SUBWORKFLOW: remove contaminants from reads
@@ -192,27 +178,27 @@ workflow NFCORE_SMRNASEQ {
     contamination_stats = Channel.empty()
     if (params.filter_contamination){
         CONTAMINANT_FILTER (
-            reference_hairpin,
-            params.rrna,
-            params.trna,
-            params.cdna,
-            params.ncrna,
-            params.pirna,
-            params.other_contamination,
+            ch_reference_hairpin,
+            ch_rrna,
+            ch_trna,
+            ch_cdna,
+            ch_ncrna,
+            ch_pirna,
+            ch_other_contamination,
             ch_reads_for_mirna
         )
-
         contamination_stats = CONTAMINANT_FILTER.out.filter_stats
         ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
         ch_reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
-
     }
 
+    //MIRNA_QUANT process should still run even if mirtrace_species is null, when mirgendb is true
     MIRNA_QUANT (
-        [ [:], reference_mature],
-        [ [:], reference_hairpin],
-        mirna_gtf,
-        ch_reads_for_mirna
+        ch_reference_mature,
+        ch_reference_hairpin,
+        ch_mirna_gtf,
+        ch_reads_for_mirna,
+        ch_mirtrace_species
     )
     ch_versions = ch_versions.mix(MIRNA_QUANT.out.versions)
 
@@ -220,8 +206,12 @@ workflow NFCORE_SMRNASEQ {
     // GENOME
     //
     genome_stats = Channel.empty()
-    if (params.fasta){
-        GENOME_QUANT ( ch_bowtie_index, ch_fasta, MIRNA_QUANT.out.unmapped )
+    if (has_fasta){
+        GENOME_QUANT (
+            ch_bowtie_index,
+            ch_fasta,
+            MIRNA_QUANT.out.unmapped
+        )
         genome_stats = GENOME_QUANT.out.stats
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
@@ -275,8 +265,8 @@ workflow NFCORE_SMRNASEQ {
         ch_workflow_summary = Channel.value(paramsSummaryMultiqc(summary_params))
 
         ch_multiqc_custom_methods_description = params.multiqc_methods_description ?
-            file(params.multiqc_methods_description, checkIfExists: true) :
-            file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
+            Channel.fromPath(params.multiqc_methods_description, checkIfExists: true) :
+            Channel.fromPath("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
         // ch_methods_description                = Channel.value(
         //     methodsDescriptionText(ch_multiqc_custom_methods_description))
 
@@ -304,9 +294,9 @@ workflow NFCORE_SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect().ifEmpty([]))
-        if (params.mirtrace_species) {
-        ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([]))
-            }
+        if (has_mirtrace_species){
+            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([]))
+        }
 
         MULTIQC (
             ch_multiqc_files.collect(),

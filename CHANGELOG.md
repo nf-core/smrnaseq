@@ -5,19 +5,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.4.0dev - 2024-XX-XX - X
 
-- [[#365]](https://github.com/nf-core/smrnaseq/issues/365) by [[#386]](https://github.com/nf-core/smrnaseq/pull/386). Fix Nextflex trimming support.
-- [[#332]](https://github.com/nf-core/smrnaseq/issues/332) by [[#361]](https://github.com/nf-core/smrnaseq/pull/361) - Fix documentation to use only single-end
-- [[#349]](https://github.com/nf-core/smrnaseq/pull/349) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347), change conda-base to conda-forge channel
-- [[#350]](https://github.com/nf-core/smrnaseq/pull/350) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347), set python version to 3.7 to fix pysam issue
-- [[#351]](https://github.com/nf-core/smrnaseq/issues/351) - Fix [Protocol inheritance issue](https://github.com/nf-core/smrnaseq/pull/364) - fixing protocol inheritance from subworkflow with move to config profile(s) for different protocols.
-- [[#369]](https://github.com/nf-core/smrnaseq/issues/369) - Fix [Linting](https://github.com/nf-core/smrnaseq/pull/377) - Fixed linting warnings and updated modules & subworkflows.
+- [[#349]](https://github.com/nf-core/smrnaseq/pull/349) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347) - change conda-base to conda-forge channel.
+- [[#350]](https://github.com/nf-core/smrnaseq/pull/350) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347) - set python version to 3.7 to fix pysam issue.
+- [[#361]](https://github.com/nf-core/smrnaseq/pull/361) - Fix [[#332]](https://github.com/nf-core/smrnaseq/issues/332) - Fix documentation to use only single-end.
+- [[#364]](https://github.com/nf-core/smrnaseq/pull/364) - Fix [Protocol inheritance issue](https://github.com/nf-core/smrnaseq/issues/351) - fixing protocol inheritance from subworkflow with move to config profile(s) for different protocols.
+- [[#372]](https://github.com/nf-core/smrnaseq/pull/372) - Fix [Plain test profile](https://github.com/nf-core/smrnaseq/issues/371) - Updated default protocol value to "custom".
 - [[#374]](https://github.com/nf-core/smrnaseq/pull/374) - Fix [default tests](https://github.com/nf-core/smrnaseq/issues/375) so that they do not require additional profiles in CI. Change GitHub CI fail-fast strategy to false.
-- [[#371]](https://github.com/nf-core/smrnaseq/issues/371) - Fix [Plain test profile](https://github.com/nf-core/smrnaseq/pull/372) - Updated default protocol value to "custom".
-- [[#380]](https://github.com/nf-core/smrnaseq/pull/380) - Fix checking number of samples which causes error in plotMDS. Add nf-tests for local modules using custom R scripts: [edgeR_mirBase.R](https://github.com/nf-core/smrnaseq/issues/187).
-- [[#378]](https://github.com/nf-core/smrnaseq/pull/378) - Fix [`--mirtrace_species` bug](<(https://github.com/nf-core/smrnaseq/issues/348)>). Make `MIRTRACE` process conditional. Add mirgenedb test.
-- [[#375]](https://github.com/nf-core/smrnaseq/pull/375) - Test merging of [technical repeats](https://github.com/nf-core/smrnaseq/issues/212).
-- [[#382]](https://github.com/nf-core/smrnaseq/pull/382) - Add nf-tests for local modules using custom R scripts: [collapse_mirtop.R](https://github.com/nf-core/smrnaseq/issues/174).
-- [[#384]](https://github.com/nf-core/smrnaseq/pull/384) - Fix filter stats module and add filter contaminants test profile: [filter status bug fix](https://github.com/nf-core/smrnaseq/issues/360).
+- [[#375]](https://github.com/nf-core/smrnaseq/pull/375) - Test [technical repeats](https://github.com/nf-core/smrnaseq/issues/212) - Test merging of technical repeats.
+- [[#377]](https://github.com/nf-core/smrnaseq/pull/377) - Fix [Linting](https://github.com/nf-core/smrnaseq/issues/369) - Fixed linting warnings and updated modules & subworkflows.
+- [[#378]](https://github.com/nf-core/smrnaseq/pull/378) - Fix [`--mirtrace_species` bug](<(https://github.com/nf-core/smrnaseq/issues/348)>) - Make `MIRTRACE` process conditional. Add mirgenedb test.
+- [[#380]](https://github.com/nf-core/smrnaseq/pull/380) - Fix [edgeR_mirBase.R](https://github.com/nf-core/smrnaseq/issues/187) - Fix checking number of samples which causes error in plotMDS. Add nf-tests for local modules using custom R scripts.
+- [[#381]](https://github.com/nf-core/smrnaseq/pull/381) - Update [Convert tests to nf-tests](https://github.com/nf-core/smrnaseq/issues/379) - CI tests to nf-tests.
+- [[#382]](https://github.com/nf-core/smrnaseq/pull/382) - Add [collapse_mirtop.R](https://github.com/nf-core/smrnaseq/issues/174) - Add nf-tests for local modules using custom R scripts.
+- [[#383]](https://github.com/nf-core/smrnaseq/pull/383) - Fix [parameter `--skip_fastp` throws an error](https://github.com/nf-core/smrnaseq/issues/263) - Fix parameter --skip_fastp.
+- [[#384]](https://github.com/nf-core/smrnaseq/pull/384) - Fix [filter status bug fix](https://github.com/nf-core/smrnaseq/issues/360) - Fix filter stats module and add filter contaminants test profile.
+- [[#386]](https://github.com/nf-core/smrnaseq/pull/386) - Fix [Nextflex trimming support](https://github.com/nf-core/smrnaseq/issues/365) - Fix Nextflex trimming support.
+- [[#387]](https://github.com/nf-core/smrnaseq/pull/387) - Add [contaminant filter failure because the Docker image for BLAT cannot be pulled](https://github.com/nf-core/smrnaseq/issues/354) - Add nf-test to local module `blat_mirna` and fixes . Adds a small test profile to test contaminant filter results.
+- [[#388]](https://github.com/nf-core/smrnaseq/pull/388) - Fix [igenomes fix](https://github.com/nf-core/smrnaseq/issues/360) - Fix workflow scripts so that they can use igenome parameters.
+- [[#391]](https://github.com/nf-core/smrnaseq/pull/391) - Fix [error because of large chromosomes](https://github.com/nf-core/smrnaseq/issues/132) - Change `.bai` index for `.csi` index in `samtools_index` to fix .
+- [[#392]](https://github.com/nf-core/smrnaseq/pull/392) - Update [Reduce tests](https://github.com/nf-core/smrnaseq/issues/389) - Combine and optimize tests, and reduce samplesheets sizes.
+- [[#397]](https://github.com/nf-core/smrnaseq/pull/397) - Fix [contaminant filter failure because of the Docker image for BLAT](https://github.com/nf-core/smrnaseq/issues/354) - Improvements to contaminant filter subworkflow and replacement for nf-core modules.
+- [[#398]](https://github.com/nf-core/smrnaseq/pull/398) - Update [Input channels](https://github.com/nf-core/smrnaseq/issues/390) - Updated channel and params handling through workflows.
+- [[#405]](https://github.com/nf-core/smrnaseq/pull/405) - Fix [Umicollapse algo wrong set](https://github.com/nf-core/smrnaseq/issues/404) - Fix potential bug in Umicollapse (not effective as we do not allow PE data in smrnaseq - but for consistency)
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
