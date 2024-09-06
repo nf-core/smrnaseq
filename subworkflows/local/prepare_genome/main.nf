@@ -34,7 +34,7 @@ workflow PREPARE_GENOME {
 
     ch_mirtrace_species       = val_mirtrace_species          ? Channel.value(val_mirtrace_species) : Channel.empty()
     mirna_gtf_from_species    = val_mirtrace_species          ? (val_mirtrace_species == 'hsa' ? "https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${val_mirtrace_species}.gff3") : false
-    ch_mirna_gtf              = val_mirna_gtf                 ? Channel.empty() : ( mirna_gtf_from_species ? Channel.fromPath(mirna_gtf_from_species, checkIfExists: true).collect() :  Channel.empty() )    //TODO for ch_mirna_gtf, shouldn't it try to build a channel.fromPath with params.mirna_gtf,  if true? (instead of setting it to empty). Is this parameter used for non mirgenedb runs?
+    ch_mirna_gtf              = val_mirna_gtf                 ? Channel.fromPath(val_mirna_gtf, checkIfExists: true) : ( mirna_gtf_from_species ? Channel.fromPath(mirna_gtf_from_species, checkIfExists: true).collect() :  Channel.empty() )
     ch_mirna_adapters         = params.with_umi               ? [] : Channel.fromPath(val_fastp_known_mirna_adapters, checkIfExists: true).collect()
 
     ch_rrna                   = val_rrna                      ? Channel.fromPath(val_rrna)                : Channel.empty()
