@@ -5,6 +5,11 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+                    "blat": {
+                        "branch": "master",
+                        "git_sha": "3f5420aa22e00bd030a2556dfdffc9e164ec0ec5",
+                        "installed_by": ["modules"]
+                    },
                     "cat/cat": {
                         "branch": "master",
                         "git_sha": "5bb8ca085e17549e185e1823495ab8d20727a805",
@@ -24,6 +29,11 @@
                         "branch": "master",
                         "git_sha": "46eca555142d6e597729fcb682adcc791796f514",
                         "installed_by": ["fastq_fastqc_umitools_fastp"]
+                    },
+                    "gawk": {
+                        "branch": "master",
+                        "git_sha": "cf3ed075695639b0a0924eb0901146df1996dc08",
+                        "installed_by": ["modules"]
                     },
                     "multiqc": {
                         "branch": "master",
@@ -54,6 +64,12 @@
                         "branch": "master",
                         "git_sha": "1fe379cf6e6c1e6fa5e32bcbeefea0f1e874dac6",
                         "installed_by": ["bam_stats_samtools", "modules"]
+                    },
+                    "seqkit/grep": {
+                        "branch": "master",
+                        "git_sha": "03fbf6c89e551bd8d77f3b751fb5c955f75b34c5",
+                        "installed_by": ["modules"],
+                        "patch": "modules/nf-core/seqkit/grep/seqkit-grep.diff"
                     },
                     "umicollapse": {
                         "branch": "master",

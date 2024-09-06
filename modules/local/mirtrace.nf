@@ -9,6 +9,7 @@ process MIRTRACE_RUN {
     input:
     tuple val(adapter), val(ids), path(reads)
     path(mirtrace_config)
+    val mirtrace_species
 
     output:
     path "mirtrace/*"  , emit: mirtrace
@@ -30,7 +31,7 @@ process MIRTRACE_RUN {
     export mirtracejar=\$(dirname \$(which mirtrace))
 
     java $java_mem -jar \$mirtracejar/mirtrace.jar --mirtrace-wrapper-name mirtrace qc  \\
-        --species $params.mirtrace_species \\
+        --species $mirtrace_species \\
         $protocol \\
         --config $mirtrace_config \\
         --write-fasta \\
