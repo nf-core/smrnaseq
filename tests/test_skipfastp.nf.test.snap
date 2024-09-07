@@ -2,19 +2,27 @@
     "mirtrace": {
         "content": [
             true,
-            "mirtrace-stats-contamination_basic.tsv:md5,af4ef7d436a78b63ebbdbd5736757736",
-            "mirtrace-stats-length.tsv:md5,48e4ec1a5572c2f4f58355125b95f614",
-            "mirtrace-stats-mirna-complexity.tsv:md5,761ad553ef141cb5f7845cf476b323d9",
-            "mirtrace-stats-contamination_detailed.tsv:md5,4aa73df82130f7cf2d056b4c61cd9d2a",
-            "mirtrace-stats-phred.tsv:md5,a56d0e1fd11b9284b9705bed63b30c02",
-            "mirtrace-stats-rnatype.tsv:md5,c7cb1b388ecd16ae79e1ebdf8d896342",
-            "mirtrace-stats-qcstatus.tsv:md5,9f8357437ea532505d3f3a461be476b0"
+            "mirtrace-stats-contamination_basic.tsv:md5,bd4f4fd2f1fc1f3a95eea00454690f8a",
+            "mirtrace-stats-length.tsv:md5,cdf870fe73562baf4155fbe64059ddeb",
+            "mirtrace-stats-mirna-complexity.tsv:md5,1468ba5abce470a1616035200b109f6f",
+            "mirtrace-stats-contamination_detailed.tsv:md5,480921ffc209467301ca1157541c84f0",
+            "mirtrace-stats-phred.tsv:md5,24820772ab8b18c3acd671f0779e9447",
+            "mirtrace-stats-rnatype.tsv:md5,f666ba45361c51edb88d8a200477e851",
+            "mirtrace-stats-qcstatus.tsv:md5,fec4db411a257fd7f8396788fdccc535",
+            true,
+            "mirtrace-stats-contamination_basic.tsv:md5,d28798d409ac2849fcca181511d49392",
+            "mirtrace-stats-length.tsv:md5,4e8d5fe8bd30f97524d7de552b67c3cd",
+            "mirtrace-stats-mirna-complexity.tsv:md5,9e60eb34dc31b4725f349cfe6f5f6558",
+            "mirtrace-stats-contamination_detailed.tsv:md5,5bd6f354352a6c245acd802f6f3b0ab3",
+            "mirtrace-stats-phred.tsv:md5,8652061f887a3087b22cd33705600459",
+            "mirtrace-stats-rnatype.tsv:md5,c8adfd35d3a306a7245518fe9bb13b35",
+            "mirtrace-stats-qcstatus.tsv:md5,adf0bd24ef3822d6edbe81b29646d8dc"
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nf-test": "0.8.4",
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-30T20:38:26.554341544"
+        "timestamp": "2024-09-06T12:51:20.853104383"
     },
     "genome_quant_bam": {
         "content": [
@@ -33,13 +41,13 @@
     },
     "software_versions": {
         "content": [
-            "{BOWTIE_MAP_GENOME={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_MATURE={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.1, samtools=1.14}, FASTQC_RAW={fastqc=0.12.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_HAIRPIN={bowtie=1.3.1}, INDEX_MATURE={bowtie=1.3.1}, MIRTOP_QUANT={mirtop=0.4.25}, MIRTRACE_RUN={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.2}, SAMTOOLS_IDXSTATS={samtools=1.2}, SAMTOOLS_INDEX={samtools=1.2}, SAMTOOLS_SORT={samtools=1.2}, SAMTOOLS_STATS={samtools=1.2}, SEQCLUSTER_SEQUENCES={seqcluster=1.2.9}, TABLE_MERGE={r-base=3.6.2}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
+            "{BOWTIE_MAP_GENOME={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_MATURE={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.1, samtools=1.14}, FASTQC_RAW={fastqc=0.12.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_HAIRPIN={bowtie=1.3.1}, INDEX_MATURE={bowtie=1.3.1}, MIRTOP_QUANT={mirtop=0.4.25}, MIRTRACE_QC={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.2}, SAMTOOLS_IDXSTATS={samtools=1.2}, SAMTOOLS_INDEX={samtools=1.2}, SAMTOOLS_SORT={samtools=1.2}, SAMTOOLS_STATS={samtools=1.2}, SEQCLUSTER_SEQUENCES={seqcluster=1.2.9}, TABLE_MERGE={r-base=3.6.2}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nf-test": "0.8.4",
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-30T20:38:26.491920033"
+        "timestamp": "2024-09-06T12:51:20.749909389"
     },
     "mirna_quant_bam": {
         "content": [
@@ -85,18 +93,18 @@
         "content": [
             "fastqc-status-check-heatmap.txt:md5,a16737b9ae7b9b70b0ef7e462101a729",
             "fastqc_overrepresented_sequences_plot.txt:md5,0cacfefcbc37b292ae21564f845dfaa6",
-            "mirtrace_complexity_plot.txt:md5,8c3fae2d2b8fbbe922efd861b8675805",
+            "mirtrace_complexity_plot.txt:md5,e643240bc8f2c05dc2824b40b061ab02",
             "multiqc_citations.txt:md5,f46d2983044658a4a89bdec5ba20fda3",
             "samtools-stats-dp.txt:md5,d1854b0ed73a4c9ae62a3a625c19d4b2",
             "fastqc_sequence_length_distribution_plot.txt:md5,ff2def0eab8321d4ed590b483641f43b",
             "multiqc_general_stats.txt:md5,7c9c0251144da2945ae3020bb36b5d0a",
             "fastqc_per_base_n_content_plot.txt:md5,c345fe5430e3a17ad1dbcc14e7595f50",
             "fastqc_per_sequence_quality_scores_plot.txt:md5,edf4d21e2928d37d94bb33a25e1d92a6",
-            "mirtrace_qc_plot.txt:md5,82c1758d3f20a3e58eff3ebd456ee2f1",
-            "mirtrace_length_plot.txt:md5,69721d1a60f4a055da2bf091cedd48b3",
+            "mirtrace_qc_plot.txt:md5,b57e341683641653a33e3614bb603691",
+            "mirtrace_length_plot.txt:md5,f4546e74c15192d35a8e44931c0880a0",
             true,
             "fastqc_sequence_counts_plot.txt:md5,da84941084250726e3828e8908640f8b",
-            "mirtrace_rna_categories_plot.txt:md5,bf50773cc4c0a82a0dd5b4fe91471062",
+            "mirtrace_rna_categories_plot.txt:md5,8504637dc3fe046f66f4264f6a374155",
             "samtools_alignment_plot.txt:md5,2e7b7ce5aa4c69ee2b563c0376c40769",
             "fastqc_per_base_sequence_quality_plot.txt:md5,60f539c88c503680c0b2603749494948",
             "mirtop_read_count_plot.txt:md5,6a1de58ae85a70fa7cbd294b57c92914",
@@ -108,10 +116,10 @@
             true
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nf-test": "0.8.4",
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-30T20:38:26.63544219"
+        "timestamp": "2024-09-06T12:51:20.921117648"
     },
     "multiqc": {
         "content": [

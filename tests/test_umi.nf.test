@@ -19,7 +19,7 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 64 },
+                { assert workflow.trace.succeeded().size() == 65 },
 
                 { assert snapshot(
                     path("$outputDir/mirna_quant/bam/mature/SRX8195118_SRR11631014_mature.sorted.stats"),
@@ -58,14 +58,22 @@ nextflow_pipeline {
                 ).match("mirna_quant_mirtop") },
 
                 { assert snapshot(
-                    path("$outputDir/mirtrace/mirtrace-report.html").exists(),
-                    path("$outputDir/mirtrace/mirtrace-stats-contamination_detailed.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-contamination_basic.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-length.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-qcstatus.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-mirna-complexity.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-phred.tsv"),
-                    path("$outputDir/mirtrace/mirtrace-stats-rnatype.tsv")
+                    path("$outputDir/mirtrace/SRX8195117_SRR11631013/mirtrace-report.html").exists(),
+                    path("$outputDir/mirtrace/SRX8195117_SRR11631013/mirtrace-stats-contamination_detailed.tsv"),
+                    path("$outputDir/mirtrace/SRX8195117_SRR11631013/mirtrace-stats-contamination_basic.tsv"),
+                    path("$outputDir/mirtrace/SRX8195117_SRR11631013/mirtrace-stats-length.tsv"),
+                    path("$outputDir/mirtrace/SRX8195117_SRR11631013/mirtrace-stats-qcstatus.tsv"),
+                    path("$outputDir/mirtrace/SRX8195117_SRR11631013/mirtrace-stats-mirna-complexity.tsv"),
+                    path("$outputDir/mirtrace/SRX8195117_SRR11631013/mirtrace-stats-phred.tsv"),
+                    path("$outputDir/mirtrace/SRX8195117_SRR11631013/mirtrace-stats-rnatype.tsv"),
+                    path("$outputDir/mirtrace/SRX8195118_SRR11631014/mirtrace-report.html").exists(),
+                    path("$outputDir/mirtrace/SRX8195118_SRR11631014/mirtrace-stats-contamination_detailed.tsv"),
+                    path("$outputDir/mirtrace/SRX8195118_SRR11631014/mirtrace-stats-contamination_basic.tsv"),
+                    path("$outputDir/mirtrace/SRX8195118_SRR11631014/mirtrace-stats-length.tsv"),
+                    path("$outputDir/mirtrace/SRX8195118_SRR11631014/mirtrace-stats-qcstatus.tsv"),
+                    path("$outputDir/mirtrace/SRX8195118_SRR11631014/mirtrace-stats-mirna-complexity.tsv"),
+                    path("$outputDir/mirtrace/SRX8195118_SRR11631014/mirtrace-stats-phred.tsv"),
+                    path("$outputDir/mirtrace/SRX8195118_SRR11631014/mirtrace-stats-rnatype.tsv")
                 ).match("mirtrace") },
 
                 { assert snapshot(

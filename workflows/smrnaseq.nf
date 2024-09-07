@@ -12,6 +12,7 @@ include { FASTP as FASTP3                  } from '../modules/nf-core/fastp'
 include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
 include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
 include { UMITOOLS_EXTRACT                 } from '../modules/nf-core/umitools/extract/main'
+include { MIRTRACE_QC                      } from '../modules/nf-core/mirtrace/qc/main'
 // nf-core subworkflows
 include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
 include { paramsSummaryMultiqc             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
@@ -21,7 +22,6 @@ include { CONTAMINANT_FILTER               } from '../subworkflows/local/contami
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant'
 include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant'
 include { MIRDEEP2                         } from '../subworkflows/local/mirdeep2'
-include { MIRTRACE                         } from '../subworkflows/local/mirtrace'
 // plugins
 include { paramsSummaryMap                 } from 'plugin/nf-validation'
 
@@ -146,28 +146,9 @@ workflow NFCORE_SMRNASEQ {
     // MODULE: mirtrace QC
     //
 
-    // Define the main adapter sequence channel
-    ch_adapter_seq = FASTQ_FASTQC_UMITOOLS_FASTP.out.adapter_seq
-
-    // Define a fallback channel with the default value "custom"
-    ch_fallback_adapter_seq = ch_reads_for_mirna.map { meta, reads -> [meta, 'custom'] }
-
-    // Change to fallback channel if ch_adapter_seq is empty
-    ch_adapter_seq = ch_adapter_seq ? ch_fallback_adapter_seq : ch_adapter_seq
-
-    // Now join the adapter sequence channel with the reads channel
-    ch_mirtrace_inputs = ch_adapter_seq
-        .join(ch_reads_for_mirna)
-        .map { meta, adapter_seq, reads -> [adapter_seq, meta.id, reads] }
-        .groupTuple()
-        .map { adapter_seq, ids, reads_list -> [adapter_seq, ids, reads_list.flatten()] }
-
-    //
-    // SUBWORKFLOW: MIRTRACE
-    //
     if (has_mirtrace_species){
-        MIRTRACE(ch_mirtrace_inputs, ch_mirtrace_species)
-        ch_versions = ch_versions.mix(MIRTRACE.out.versions)
+        MIRTRACE_QC(ch_reads_for_mirna, ch_mirtrace_species)
+        ch_versions = ch_versions.mix(MIRTRACE_QC.out.versions)
     } else {
         log.warn "The parameter --mirtrace_species is absent. MIRTRACE quantification skipped."
     }
@@ -295,7 +276,9 @@ workflow NFCORE_SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect().ifEmpty([]))
         if (has_mirtrace_species){
-            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE.out.results.collect().ifEmpty([]))
+            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.html.collect({it[1]}).ifEmpty([]))
+            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.json.collect({it[1]}).ifEmpty([]))
+            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.tsv.collect({it[1]}).ifEmpty([]))
         }
 
         MULTIQC (
