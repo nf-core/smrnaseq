@@ -8,6 +8,7 @@
 include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                           } from '../modules/nf-core/fastqc/main'
 include { FASTP as FASTP_LENGTH_FILTER     } from '../modules/nf-core/fastp'
+include { FASTP as FASTP3                  } from '../modules/nf-core/fastp'
 include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
 include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
 include { UMITOOLS_EXTRACT                 } from '../modules/nf-core/umitools/extract/main'
@@ -105,6 +106,17 @@ workflow NFCORE_SMRNASEQ {
     ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.versions)
 
     ch_reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
+    // Trim 3' end nucleotides after adapter is removed, otherwise they are not really trimmed
+    if (params.three_prime_clip_r1){
+        FASTP3(
+            ch_reads_for_mirna,
+            [],
+            false,
+            false,
+            false
+        )
+        ch_reads_for_mirna  = FASTP3.out.reads
+    }
 
     // UMI Dedup for fastq input
     // This involves running on the sequencing adapter trimmed remnants of the entire reads
