@@ -19,6 +19,7 @@ include {   BAM_SORT_STATS_SAMTOOLS as BAM_STATS_MATURE
             BAM_SORT_STATS_SAMTOOLS as BAM_STATS_HAIRPIN   } from '../nf-core/bam_sort_stats_samtools'
 
 include { SEQCLUSTER_SEQUENCES } from '../../modules/local/seqcluster_collapse.nf'
+include { SEQCLUSTER_COLLAPSE  } from '../../modules/nf-core/seqcluster/collapse/main'
 include { MIRTOP_QUANT         } from '../../modules/local/mirtop_quant.nf'
 include { TABLE_MERGE          } from '../../modules/local/datatable_merge/datatable_merge.nf'
 include { EDGER_QC             } from '../../modules/local/edger_qc/edger_qc.nf'
@@ -83,12 +84,10 @@ workflow MIRNA_QUANT {
     EDGER_QC ( ch_edger_input )
     ch_versions.mix(EDGER_QC.out.versions)
 
-    ch_reads_seqcluster = ch_reads_for_mirna
-        .map { add_suffix(it, "seqcluster") }
+    SEQCLUSTER_COLLAPSE ( ch_reads_for_mirna )
+    ch_versions = ch_versions.mix(SEQCLUSTER_COLLAPSE.out.versions)
 
-    SEQCLUSTER_SEQUENCES ( ch_reads_seqcluster )
-    ch_reads_collapsed = SEQCLUSTER_SEQUENCES.out.collapsed
-    ch_versions = ch_versions.mix(SEQCLUSTER_SEQUENCES.out.versions)
+    ch_reads_collapsed = SEQCLUSTER_COLLAPSE.out.fastq
 
     BOWTIE_MAP_SEQCLUSTER ( ch_reads_collapsed, hairpin_bowtie.collect() )
     ch_versions = ch_versions.mix(BOWTIE_MAP_SEQCLUSTER.out.versions)
