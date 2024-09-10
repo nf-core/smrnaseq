@@ -18,7 +18,6 @@ include {   BOWTIE_MAP_SEQ  as BOWTIE_MAP_MATURE
 include {   BAM_SORT_STATS_SAMTOOLS as BAM_STATS_MATURE
             BAM_SORT_STATS_SAMTOOLS as BAM_STATS_HAIRPIN   } from '../nf-core/bam_sort_stats_samtools'
 
-include { SEQCLUSTER_SEQUENCES } from '../../modules/local/seqcluster_collapse.nf'
 include { SEQCLUSTER_COLLAPSE  } from '../../modules/nf-core/seqcluster/collapse/main'
 include { MIRTOP_QUANT         } from '../../modules/local/mirtop_quant.nf'
 include { TABLE_MERGE          } from '../../modules/local/datatable_merge/datatable_merge.nf'
