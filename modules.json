@@ -37,7 +37,7 @@
                     },
                     "mirtrace/qc": {
                         "branch": "master",
-                        "git_sha": "d576f75438a1df605da93f134485e0271312d444",
+                        "git_sha": "6dd363c9b9b7cf30c4418597d20b6861848f0475",
                         "installed_by": ["modules"]
                     },
                     "multiqc": {
