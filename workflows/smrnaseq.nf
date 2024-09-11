@@ -148,22 +148,26 @@ workflow NFCORE_SMRNASEQ {
     three_prime_adapter = Channel.value(params.three_prime_adapter)
     phred_offset        = Channel.value(params.phred_offset)
 
-    if (has_mirtrace_species){
-        ch_mirtrace_config = ch_reads_for_mirna
-                .combine(three_prime_adapter)
-                .combine(phred_offset)
-                .collectFile { meta, reads, adapter, phred ->
-                def config_filename = "${meta.id}.data"
-                [ config_filename, "./${reads.getFileName()},${meta.id},${adapter},${phred}\n" ]
-                }
-                .map { config_file ->
-                def base_name = config_file.getBaseName()
-                [ ['id':base_name], config_file ]
-            }
+    ch_reads_for_mirna.dump(tag:"ch_reads_for_mirna")
 
-        ch_mirtrace_qc_inputs = ch_reads_for_mirna
-                .map{meta, reads -> [[id: meta.id], reads]}
-                .join(ch_mirtrace_config)
+    ch_mirtrace_config = ch_reads_for_mirna
+        .transpose()
+        .combine(three_prime_adapter)
+        .combine(phred_offset)
+        .collectFile { meta, reads, adapter, phred ->
+        def config_filename = "${meta.id}.data"
+        [ config_filename, "./${reads.getFileName().toString()},${meta.id},${adapter},${phred}\n" ]
+        }
+        .map { config_file ->
+        def base_name = config_file.getBaseName()
+        [ ['id':base_name], config_file ]
+    }
+
+    ch_mirtrace_qc_inputs = ch_reads_for_mirna
+            .map{meta, reads -> [[id: meta.id], reads]}
+            .join(ch_mirtrace_config)
+
+    if (has_mirtrace_species){
 
         MIRTRACE_QC(ch_mirtrace_qc_inputs, ch_mirtrace_species)
         ch_versions = ch_versions.mix(MIRTRACE_QC.out.versions)
