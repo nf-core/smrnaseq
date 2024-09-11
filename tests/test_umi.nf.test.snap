@@ -120,8 +120,8 @@
             "fastqc_per_base_sequence_quality_plot.txt:md5,e2e187bc0b0c1f0d1abb3b666945c7b3",
             "mirtop_read_count_plot.txt:md5,5f2ef354f45930b2f82515a82dc40342",
             "fastp-seq-content-n-plot_Read_1_After_filtering.txt:md5,bbad2035ada86867c4ed579a93b78d64",
-            "mirtop_unique_read_count_plot.txt:md5,5082d66ba230c780e87b78be589a2c3d",
-            "mirtop_mean_read_count_plot.txt:md5,5e2897fd0291f6e81a350786620f9b5a",
+            "mirtop_unique_read_count_plot.txt:md5,2915bda64fbf0017c0261fa98c0646d5",
+            "mirtop_mean_read_count_plot.txt:md5,d61d3cf683a251d83283443e478e4d71",
             "mirtrace_contamination_check_plot.txt:md5,7f12917ce506127a729edb733fdda511",
             "fastqc_adapter_content_plot.txt:md5,de1d7324ff5146b49fc9a2e6d4633962",
             "fastqc_sequence_duplication_levels_plot.txt:md5,fe7598e49f93bb980a7675a2bb4bd3b5",
@@ -137,8 +137,7 @@
             "nf-test": "0.8.4",
             "nextflow": "24.04.4"
         },
-
-        "timestamp": "2024-09-11T14:33:25.70167873"
+        "timestamp": "2024-09-11T20:03:41.24999389"
     },
     "multiqc": {
         "content": [
