@@ -70,6 +70,11 @@
                         "git_sha": "1fe379cf6e6c1e6fa5e32bcbeefea0f1e874dac6",
                         "installed_by": ["bam_stats_samtools", "modules"]
                     },
+                    "seqcluster/collapse": {
+                        "branch": "master",
+                        "git_sha": "407ff4b579f5ae5a3b842b675cd75005d112b8ba",
+                        "installed_by": ["modules"]
+                    },
                     "seqkit/grep": {
                         "branch": "master",
                         "git_sha": "03fbf6c89e551bd8d77f3b751fb5c955f75b34c5",
