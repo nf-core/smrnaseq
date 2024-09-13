@@ -108,7 +108,7 @@ workflow MIRNA_QUANT {
             .collect()
 
     BAM_STATS_MIRNA_MIRTOP(
-            BOWTIE_MAP_SEQCLUSTER.out.bam, // TODO: Parallelize by running each BOWTIE_MAP_SEQCLUSTER.out.bam separately when mirtop solves this issue: https://github.com/miRTop/mirtop/issues/83
+            ch_bams, // TODO: Parallelize by running each BOWTIE_MAP_SEQCLUSTER.out.bam separately when mirtop solves this issue: https://github.com/miRTop/mirtop/issues/83
             FORMAT_HAIRPIN.out.formatted_fasta,
             ch_mirna_gtf_species )
 
@@ -127,7 +127,7 @@ workflow MIRNA_QUANT {
     unmapped            = ch_reads_genome // channel: [ val(meta), path(bam) ]
     mature_stats        = BAM_STATS_MATURE.out.stats //TODO not used for antything, should we remove them?
     hairpin_stats       = BAM_STATS_HAIRPIN.out.stats //TODO not used for antything, should we remove them?
-    mirtop_logs         = ch_mirtop_logs //TODO not used for antything, should we remove them?
+    mirtop_logs         = ch_mirtop_logs // channel: [ val(meta), path(log) ]
     versions            = ch_versions
 }
 
