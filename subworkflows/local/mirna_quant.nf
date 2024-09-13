@@ -108,14 +108,14 @@ workflow MIRNA_QUANT {
             .collect()
 
     BAM_STATS_MIRNA_MIRTOP(
-            ch_bams, // TODO: Parallelize by running each BOWTIE_MAP_SEQCLUSTER.out.bam separately when mirtop solves this issue: https://github.com/miRTop/mirtop/issues/83
+            BOWTIE_MAP_SEQCLUSTER.out.bam, // TODO: Parallelize by running each BOWTIE_MAP_SEQCLUSTER.out.bam separately when mirtop solves this issue: https://github.com/miRTop/mirtop/issues/83
             FORMAT_HAIRPIN.out.formatted_fasta,
             ch_mirna_gtf_species )
 
     ch_mirtop_logs = BAM_STATS_MIRNA_MIRTOP.out.stats_log
     ch_versions = ch_versions.mix(BAM_STATS_MIRNA_MIRTOP.out.versions)
 
-    TABLE_MERGE ( BAM_STATS_MIRNA_MIRTOP.out.mirtop_table.map{ id, tsv -> [tsv] } )
+    TABLE_MERGE ( BAM_STATS_MIRNA_MIRTOP.out.counts.map{ id, tsv -> [tsv] } )
     ch_versions = ch_versions.mix(TABLE_MERGE.out.versions)
 
     ch_reads_genome = BOWTIE_MAP_HAIRPIN.out.unmapped
