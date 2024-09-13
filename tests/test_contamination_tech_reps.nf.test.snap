@@ -2,35 +2,35 @@
     "mirtrace": {
         "content": [
             true,
-            "mirtrace-stats-contamination_detailed.tsv:md5,663a7a5e7ebfc012a278186a96179790",
-            "mirtrace-stats-contamination_basic.tsv:md5,6e8d8bc93931fbbded2899f31aac3e3d",
-            "mirtrace-stats-length.tsv:md5,f687c7ba38cb6a4c4f7178aff385522e",
-            "mirtrace-stats-mirna-complexity.tsv:md5,4b16d7d2767f8d2db1053f9cc879d508",
-            "mirtrace-stats-phred.tsv:md5,07d8b5416961ef3725f86089df8db132",
-            "mirtrace-stats-qcstatus.tsv:md5,71ed8e813730d698418de2d94f266c7d",
-            "mirtrace-stats-rnatype.tsv:md5,3e98f069e8bb7492b3c80ac77831ccf6",
+            "mirtrace-stats-contamination_detailed.tsv:md5,141f6f46a4f9fcfac91303c125a2fc75",
+            "mirtrace-stats-contamination_basic.tsv:md5,34005177b3038da76236b5d8fb468825",
+            "mirtrace-stats-length.tsv:md5,7d835805aca881496e65f6f96aa60d7d",
+            "mirtrace-stats-mirna-complexity.tsv:md5,3605fb37445fe2773d6b606a2171fbf8",
+            "mirtrace-stats-phred.tsv:md5,0f84ab70c67a94bab6820cf97c63d10f",
+            "mirtrace-stats-qcstatus.tsv:md5,aeeebcd9a4305a57d0f13fb2e3dec4cb",
+            "mirtrace-stats-rnatype.tsv:md5,406fdb7bde295573d4d92b57a1c59767",
             true,
-            "mirtrace-stats-contamination_detailed.tsv:md5,0b189d549c002cbcc70e2f740436ac3c",
-            "mirtrace-stats-contamination_basic.tsv:md5,2fa99aa67f1f835abebedbddcd84770e",
-            "mirtrace-stats-length.tsv:md5,72d9194d5e101d5575b978082a3a38f3",
-            "mirtrace-stats-mirna-complexity.tsv:md5,215c1b6fa0965e6bf141fd26fe537364",
-            "mirtrace-stats-phred.tsv:md5,9f7af4ed3888a41c9a9ad8fa926c8d62",
-            "mirtrace-stats-qcstatus.tsv:md5,73177136ba84b3dfca600005695a3331",
-            "mirtrace-stats-rnatype.tsv:md5,f1f950519e20706b1ada7d7c953a3b40",
+            "mirtrace-stats-contamination_detailed.tsv:md5,c1af2894292fcd3242fe27a4adcaef49",
+            "mirtrace-stats-contamination_basic.tsv:md5,307eceb1b067f014aaad9e09263cebfc",
+            "mirtrace-stats-length.tsv:md5,4bca762e07f887e245d3757834ecbf4c",
+            "mirtrace-stats-mirna-complexity.tsv:md5,854e5d79c69685dd72922cc7d2135564",
+            "mirtrace-stats-phred.tsv:md5,1e74ce76a5247ce6bce716de7f0d9377",
+            "mirtrace-stats-qcstatus.tsv:md5,319be3a39d281282fb139baed4c7cbbb",
+            "mirtrace-stats-rnatype.tsv:md5,d0323854e2950c8ff7454227ff22dfd1",
             true,
-            "mirtrace-stats-contamination_detailed.tsv:md5,e760eac5053b74a2bd3fe3bee33d020f",
-            "mirtrace-stats-contamination_basic.tsv:md5,5e848ae99f2f54b6a663816d78657512",
-            "mirtrace-stats-length.tsv:md5,4dab1089f2bd2f6d49b4409591a4e945",
-            "mirtrace-stats-mirna-complexity.tsv:md5,8fcbc04a6538f4a36d19bbf9294016b1",
-            "mirtrace-stats-phred.tsv:md5,2c94697ff2a9d1ff8507fda4d62b19a3",
-            "mirtrace-stats-qcstatus.tsv:md5,650819c1549894183ee0558db2be75fa",
-            "mirtrace-stats-rnatype.tsv:md5,ba98a0a2b7a3dd0be7ec667d9a2ffd91"
+            "mirtrace-stats-contamination_detailed.tsv:md5,329c0800ed9e59553e74e121b927047a",
+            "mirtrace-stats-contamination_basic.tsv:md5,651b466f7a6c8f4abff9f9ec44be06fd",
+            "mirtrace-stats-length.tsv:md5,ac1d2301e09318eff98336459de0b2ca",
+            "mirtrace-stats-mirna-complexity.tsv:md5,27e7eb5cdb0c5fe3b80217383f1f0570",
+            "mirtrace-stats-phred.tsv:md5,2b34bed301cb94ff1d24e08a503b92ee",
+            "mirtrace-stats-qcstatus.tsv:md5,212b57cf93930422c2a0119dc5959b1d",
+            "mirtrace-stats-rnatype.tsv:md5,eb2d397090cd2c511590ee53470033a5"
         ],
         "meta": {
             "nf-test": "0.8.4",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-06T13:46:55.643429949"
+        "timestamp": "2024-09-11T15:16:30.896336965"
     },
     "software_versions": {
         "content": [

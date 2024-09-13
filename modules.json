@@ -57,7 +57,7 @@
                     },
                     "mirtrace/qc": {
                         "branch": "master",
-                        "git_sha": "d576f75438a1df605da93f134485e0271312d444",
+                        "git_sha": "6dd363c9b9b7cf30c4418597d20b6861848f0475",
                         "installed_by": ["modules"]
                     },
                     "multiqc": {
@@ -89,6 +89,11 @@
                         "branch": "master",
                         "git_sha": "1fe379cf6e6c1e6fa5e32bcbeefea0f1e874dac6",
                         "installed_by": ["bam_stats_samtools", "modules"]
+                    },
+                    "seqcluster/collapse": {
+                        "branch": "master",
+                        "git_sha": "407ff4b579f5ae5a3b842b675cd75005d112b8ba",
+                        "installed_by": ["modules"]
                     },
                     "seqkit/grep": {
                         "branch": "master",
