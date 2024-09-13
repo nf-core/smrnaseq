@@ -8,12 +8,12 @@ process MIRTOP_GFF {
         'biocontainers/mulled-v2-0c13ef770dd7cc5c76c2ce23ba6669234cf03385:63be019f50581cc5dfe4fc0f73ae50f2d4d661f7-0' }"
 
     input:
-    tuple val(meta), path(bam, arity: '1..*')
+    tuple val(meta), path(bam, arity:'1..*')
     tuple val(meta2), path(hairpin)
     tuple val(meta3), path(gtf), val(species)
 
     output:
-    tuple val(meta), path("mirtop/mirtop.gff")           , emit: mirtop_gff
+    tuple val(meta), path("mirtop/*mirtop.gff")           , emit: gff
     path "versions.yml"                                  , emit: versions
 
     when:
@@ -31,6 +31,8 @@ process MIRTOP_GFF {
         --gtf $gtf \\
         -o mirtop \\
         $bam
+
+    mv mirtop/mirtop.gff mirtop/${prefix}_mirtop.gff
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
