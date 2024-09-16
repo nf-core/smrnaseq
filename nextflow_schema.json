@@ -47,6 +47,11 @@
                     "default": "custom",
                     "fa_icon": "fas fa-atom",
                     "enum": ["custom", "illumina", "nextflex", "qiaseq", "cats"]
+                },
+                "save_intermediates": {
+                    "type": "boolean",
+                    "description": "Save all intermediate files (e.g. fastq, bams) to output directory",
+                    "fa_icon": "fas fa-save"
                 }
             }
         },
@@ -184,19 +189,6 @@
                     "description": "Save generated reference genome files to results.",
                     "help_text": "Saving generated references means that you can use them for future pipeline runs, reducing processing times.",
                     "fa_icon": "fas fa-save"
-                },
-                "save_aligned": {
-                    "type": "boolean",
-                    "fa_icon": "fas fa-save",
-                    "help_text": "Save aligned reads of initial bowtie mapping.",
-                    "description": "Save aligned reads of initial mapping in bam format."
-                },
-                "save_aligned_mirna_quant": {
-                    "type": "boolean",
-                    "fa_icon": "fas fa-save",
-                    "default": true,
-                    "help_text": "Save aligned reads of the bowtie runs in BOWTIE_MAP_MATURE, BOWTIE_MAP_HAIRPIN, and BOWTIE_MAP_SEQCLUSTER.",
-                    "description": "Save aligned reads of miRNA quant subworkflow in bam format."
                 },
                 "igenomes_ignore": {
                     "type": "boolean",
