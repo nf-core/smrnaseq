@@ -19,7 +19,6 @@ include {   BAM_SORT_STATS_SAMTOOLS as BAM_STATS_MATURE
             BAM_SORT_STATS_SAMTOOLS as BAM_STATS_HAIRPIN   } from '../nf-core/bam_sort_stats_samtools'
 
 include { SEQCLUSTER_COLLAPSE  } from '../../modules/nf-core/seqcluster/collapse/main'
-include { MIRTOP_QUANT         } from '../../modules/local/mirtop_quant.nf'
 include { TABLE_MERGE          } from '../../modules/local/datatable_merge/datatable_merge.nf'
 include { EDGER_QC             } from '../../modules/local/edger_qc/edger_qc.nf'
 include { BAM_STATS_MIRNA_MIRTOP } from '../../subworkflows/nf-core/bam_stats_mirna_mirtop/main'
