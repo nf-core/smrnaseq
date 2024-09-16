@@ -45,6 +45,11 @@
                         "git_sha": "b80f5fd12ff7c43938f424dd76392a2704fa2396",
                         "installed_by": ["modules"]
                     },
+                    "pigz/uncompress": {
+                        "branch": "master",
+                        "git_sha": "c00055a0b13d622b4f1f51a8e5be31deaf99ded7",
+                        "installed_by": ["modules"]
+                    },
                     "samtools/flagstat": {
                         "branch": "master",
                         "git_sha": "46eca555142d6e597729fcb682adcc791796f514",
