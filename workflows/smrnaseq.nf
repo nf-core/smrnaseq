@@ -297,7 +297,7 @@ workflow NFCORE_SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect().ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect({it[1]}).ifEmpty([]))
         if (has_mirtrace_species){
             ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.html.collect({it[1]}).ifEmpty([]))
             ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.json.collect({it[1]}).ifEmpty([]))

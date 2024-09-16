@@ -19,12 +19,12 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 55 },
+                { assert workflow.trace.succeeded().size() == 58 },
 
                 { assert snapshot(
-                    path("$outputDir/mirna_quant/mirtop/mirtop.gff").exists(),
-                    path("$outputDir/mirna_quant/mirtop/mirtop_rawData.tsv").exists(),
-                    path("$outputDir/mirna_quant/mirtop/mirtop.tsv").exists(),
+                    path("$outputDir/mirna_quant/mirtop/mirtop/bams_mirtop.gff").exists(),
+                    path("$outputDir/mirna_quant/mirtop/counts/bams_mirtop.tsv").exists(),
+                    path("$outputDir/mirna_quant/mirtop/export/bams_mirtop_rawData.tsv").exists(),
                     path("$outputDir/mirna_quant/mirtop/mirna.tsv").exists(),
                     path("$outputDir/mirna_quant/mirtop/stats/mirtop_stats.txt").exists()
                 ).match("mirna_quant_mirtop") },

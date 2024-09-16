@@ -41,13 +41,13 @@
     },
     "software_versions": {
         "content": [
-            "{BOWTIE_MAP_GENOME={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_MATURE={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.1, samtools=1.14}, FASTP={fastp=0.23.4}, FASTP_LENGTH_FILTER={fastp=0.23.4}, FASTQC_RAW={fastqc=0.12.1}, FASTQC_TRIM={fastqc=0.12.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_HAIRPIN={bowtie=1.3.1}, INDEX_MATURE={bowtie=1.3.1}, MIRTOP_QUANT={mirtop=0.4.25}, MIRTRACE_QC={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.2}, SAMTOOLS_IDXSTATS={samtools=1.2}, SAMTOOLS_INDEX={samtools=1.2}, SAMTOOLS_SORT={samtools=1.2}, SAMTOOLS_STATS={samtools=1.2}, SEQCLUSTER_COLLAPSE={seqcluster=1.2.9}, TABLE_MERGE={r-base=3.6.2}, UMICOLLAPSE_FASTQ={umicollapse=1.0.0-1}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
+            "{BOWTIE_MAP_GENOME={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_MATURE={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.1, samtools=1.14}, FASTP={fastp=0.23.4}, FASTP_LENGTH_FILTER={fastp=0.23.4}, FASTQC_RAW={fastqc=0.12.1}, FASTQC_TRIM={fastqc=0.12.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_HAIRPIN={bowtie=1.3.1}, INDEX_MATURE={bowtie=1.3.1}, MIRTOP_COUNTS={mirtop=0.4.25}, MIRTOP_EXPORT={mirtop=0.4.25}, MIRTOP_GFF={mirtop=0.4.25}, MIRTOP_STATS={mirtop=0.4.25}, MIRTRACE_QC={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.2}, SAMTOOLS_IDXSTATS={samtools=1.2}, SAMTOOLS_INDEX={samtools=1.2}, SAMTOOLS_SORT={samtools=1.2}, SAMTOOLS_STATS={samtools=1.2}, SEQCLUSTER_COLLAPSE={seqcluster=1.2.9}, TABLE_MERGE={r-base=3.6.2}, UMICOLLAPSE_FASTQ={umicollapse=1.0.0-1}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
         ],
         "meta": {
             "nf-test": "0.8.4",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-10T13:26:12.664220062"
+        "timestamp": "2024-09-13T22:21:28.19095018"
     },
     "mirna_quant_bam": {
         "content": [
@@ -103,7 +103,7 @@
             "fastp-seq-content-n-plot_Read_1_Before_filtering.txt:md5,dfdb23f41359b8a6b84d6626a0474d02",
             "fastqc_sequence_duplication_levels_plot-1.txt:md5,b5ae95ecd73055798ed70947dda3747c",
             "fastqc_per_base_sequence_quality_plot-1.txt:md5,89adfa92b1cde0ad4e401b430bbc68ce",
-            "multiqc_general_stats.txt:md5,d71c6e8ae53b82fbd220c6a54cb24cb1",
+            "multiqc_general_stats.txt:md5,77248c05a5e2f0e16616603dd77dc73c",
             "fastqc_per_base_n_content_plot-1.txt:md5,db081d3aa63007e5a78113f0fc26f27d",
             "fastqc_per_base_n_content_plot.txt:md5,5b5b8cee3162d092c0bcddffbd000f34",
             "fastp-seq-quality-plot_Read_1_After_filtering.txt:md5,66a47c7ce00ede2053f8e6eb20ec3417",
@@ -118,10 +118,10 @@
             "fastp-seq-quality-plot_Read_1_Before_filtering.txt:md5,f36b7cfd3057b26281367397db45033a",
             "samtools_alignment_plot.txt:md5,5e828961dbd55a6d6872221c49dfdc59",
             "fastqc_per_base_sequence_quality_plot.txt:md5,e2e187bc0b0c1f0d1abb3b666945c7b3",
-            "mirtop_read_count_plot.txt:md5,5f2ef354f45930b2f82515a82dc40342",
+            "mirtop_read_count_plot.txt:md5,4c8069a2123e23ece79dcc93d97f5bc4",
             "fastp-seq-content-n-plot_Read_1_After_filtering.txt:md5,bbad2035ada86867c4ed579a93b78d64",
-            "mirtop_unique_read_count_plot.txt:md5,2915bda64fbf0017c0261fa98c0646d5",
-            "mirtop_mean_read_count_plot.txt:md5,d61d3cf683a251d83283443e478e4d71",
+            "mirtop_unique_read_count_plot.txt:md5,12ddd823066b8218e9bf9fbac471a0b1",
+            "mirtop_mean_read_count_plot.txt:md5,b2a73544ddafa79e0c39879b95b62736",
             "mirtrace_contamination_check_plot.txt:md5,7f12917ce506127a729edb733fdda511",
             "fastqc_adapter_content_plot.txt:md5,de1d7324ff5146b49fc9a2e6d4633962",
             "fastqc_sequence_duplication_levels_plot.txt:md5,fe7598e49f93bb980a7675a2bb4bd3b5",
@@ -137,7 +137,7 @@
             "nf-test": "0.8.4",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-11T20:03:41.24999389"
+        "timestamp": "2024-09-13T22:21:28.306265591"
     },
     "multiqc": {
         "content": [
@@ -158,9 +158,9 @@
             true
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nf-test": "0.8.4",
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-30T20:47:03.92977678"
+        "timestamp": "2024-09-13T21:33:55.981422488"
     }
 }
