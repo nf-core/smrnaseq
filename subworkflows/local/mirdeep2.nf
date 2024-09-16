@@ -2,7 +2,6 @@
 // Quantify mirna with bowtie and mirtop
 //
 
-include { MIRDEEP2_PIGZ   } from '../../modules/local/mirdeep2_prepare'
 include { PIGZ_UNCOMPRESS } from '../../modules/nf-core/pigz/uncompress/main'
 include { MIRDEEP2_MAPPER } from '../../modules/local/mirdeep2_mapper'
 include { MIRDEEP2_RUN    } from '../../modules/local/mirdeep2_run'
