@@ -29,7 +29,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#405]](https://github.com/nf-core/smrnaseq/pull/405) - Fix [Umicollapse algo wrong set](https://github.com/nf-core/smrnaseq/issues/404) - Fix potential bug in Umicollapse (not effective as we do not allow PE data in smrnaseq - but for consistency)
 - [[#420]](https://github.com/nf-core/smrnaseq/pull/420) - Fix [mirTrace produces an error in test nextflex](https://github.com/nf-core/smrnaseq/issues/419) - Allow config mode to be used in mirtrace/qc
 - [[#425]](https://github.com/nf-core/smrnaseq/pull/425) - Raise [minimum required NXF version for pipeline](https://github.com/nf-core/smrnaseq/issues/424) - usage of `arity` in some modules now requires this
+- [[#426]](https://github.com/nf-core/smrnaseq/pull/426) - Add [nf-core mirtop](https://github.com/nf-core/smrnaseq/issues/426) - replace local for nf-core `mirtop`
 - [[#429]](https://github.com/nf-core/smrnaseq/pull/429) - Make [saving of intermediate files optional](https://github.com/nf-core/smrnaseq/issues/424) - Allows user to choose whether to save intermediate files or not. Replaces several params that referred to the same such as `params.save_aligned` and `params.save_aligned_mirna_quant`.
+
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 

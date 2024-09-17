@@ -31,3 +31,6 @@ module_order:
       info: "This section of the report shows FastQC results after UMI-based deduplication."
       path_filters:
         - "**/*.deduplicated_fastqc.zip"
+sp:
+  mirtop:
+    fn: mirtop_stats.log
