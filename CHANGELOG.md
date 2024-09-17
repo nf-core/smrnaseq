@@ -31,6 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#425]](https://github.com/nf-core/smrnaseq/pull/425) - Raise [minimum required NXF version for pipeline](https://github.com/nf-core/smrnaseq/issues/424) - usage of `arity` in some modules now requires this
 - [[#426]](https://github.com/nf-core/smrnaseq/pull/426) - Add [nf-core mirtop](https://github.com/nf-core/smrnaseq/issues/426) - replace local for nf-core `mirtop`
 - [[#430]](https://github.com/nf-core/smrnaseq/pull/430) - Emit a [warning if paired-end end data is used](https://github.com/nf-core/smrnaseq/issues/423) - pipeline handles SE data
+- [[#427]](https://github.com/nf-core/smrnaseq/pull/427) - Add [nf-core pigz uncompress](https://github.com/nf-core/smrnaseq/issues/422) - replace local `mirdeep_pigz`
 - [[#429]](https://github.com/nf-core/smrnaseq/pull/429) - Make [saving of intermediate files optional](https://github.com/nf-core/smrnaseq/issues/424) - Allows user to choose whether to save intermediate files or not. Replaces several params that referred to the same such as `params.save_aligned` and `params.save_aligned_mirna_quant`.
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
