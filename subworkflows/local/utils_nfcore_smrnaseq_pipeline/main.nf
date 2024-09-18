@@ -170,6 +170,13 @@ def validateInputSamplesheet(input) {
         error("Please check input samplesheet -> Multiple runs of a sample must be of the same datatype i.e. single-end or paired-end: ${metas[0].id}")
     }
 
+    // Emit a warning if `single_end` is false
+    if (metas[0].single_end == false) {
+        log.warn "Sample ${metas[0].id} is detected as paired-end reads (fastq_1 and fastq_2). The pipeline only handles SE data. Samplesheets with fastq_1 and fastq_2 are supported but fastq_2 is removed."
+        // Remove fastq_2 from the list and keep only fastq_1
+        fastqs = fastqs.collect { it.take(1) }
+    }
+
     return [ metas[0], fastqs ]
 }
 //
