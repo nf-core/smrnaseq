@@ -17,12 +17,12 @@ include { SEQKIT_GREP as SEQKIT_GREP_NCRNA } from '../../../modules/nf-core/seqk
 include { SEQKIT_GREP as SEQKIT_GREP_PIRNA } from '../../../modules/nf-core/seqkit/grep/main'
 include { SEQKIT_GREP as SEQKIT_GREP_OTHER } from '../../../modules/nf-core/seqkit/grep/main'
 
-include { INDEX_CONTAMINANTS as INDEX_RRNA
-        INDEX_CONTAMINANTS as INDEX_TRNA
-        INDEX_CONTAMINANTS as INDEX_CDNA
-        INDEX_CONTAMINANTS as INDEX_NCRNA
-        INDEX_CONTAMINANTS as INDEX_PIRNA
-        INDEX_CONTAMINANTS as INDEX_OTHER } from '../../../modules/local/bowtie_contaminants'
+include { BOWTIE2_BUILD as INDEX_TRNA      } from '../../../modules/nf-core/bowtie2/build/main'
+include { BOWTIE2_BUILD as INDEX_CDNA      } from '../../../modules/nf-core/bowtie2/build/main'
+include { BOWTIE2_BUILD as INDEX_NCRNA     } from '../../../modules/nf-core/bowtie2/build/main'
+include { BOWTIE2_BUILD as INDEX_PIRNA     } from '../../../modules/nf-core/bowtie2/build/main'
+include { BOWTIE2_BUILD as INDEX_OTHER     } from '../../../modules/nf-core/bowtie2/build/main'
+include { BOWTIE2_BUILD as INDEX_RRNA      } from '../../../modules/nf-core/bowtie2/build/main'
 
 include { BOWTIE_MAP_CONTAMINANTS as MAP_RRNA
         BOWTIE_MAP_CONTAMINANTS as MAP_TRNA
@@ -54,9 +54,9 @@ workflow CONTAMINANT_FILTER {
 
     if (params.rrna) {
         // Index DB and filter $reads emit: $rrna_reads
-        INDEX_RRNA ( ch_rrna )
+        INDEX_RRNA ( ch_rrna.map{it -> return [[id:"rRNA"], it]} )
         ch_versions = ch_versions.mix(INDEX_RRNA.out.versions)
-        MAP_RRNA ( ch_reads_for_mirna, INDEX_RRNA.out.index.first(), Channel.value('rRNA') )
+        MAP_RRNA ( ch_reads_for_mirna, INDEX_RRNA.out.index.map{meta, it -> return [it]}, Channel.value('rRNA') )
         ch_versions = ch_versions.mix(MAP_RRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_RRNA.out.stats.ifEmpty(null))
         MAP_RRNA.out.unmapped.set { rrna_reads }
@@ -66,9 +66,9 @@ workflow CONTAMINANT_FILTER {
 
     if (params.trna) {
         // Index DB and filter $rrna_reads emit: $trna_reads
-        INDEX_TRNA ( ch_trna )
+        INDEX_TRNA ( ch_trna.map{it -> return [[id:"tRNA"], it]} )
         ch_versions = ch_versions.mix(INDEX_TRNA.out.versions)
-        MAP_TRNA ( rrna_reads, INDEX_TRNA.out.index.first(), Channel.value("tRNA") )
+        MAP_TRNA ( rrna_reads, INDEX_TRNA.out.index.map{meta, it -> return [it]}, Channel.value("tRNA") )
         ch_versions = ch_versions.mix(MAP_TRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_TRNA.out.stats.ifEmpty(null))
         MAP_TRNA.out.unmapped.set { trna_reads }
@@ -103,9 +103,9 @@ workflow CONTAMINANT_FILTER {
         ch_filtered_cdna = SEQKIT_GREP_CDNA.out.filter.map{meta, file -> [file]}
 
         // Previous original code:
-        INDEX_CDNA ( ch_filtered_cdna )
+        INDEX_CDNA ( SEQKIT_GREP_CDNA.out.filter )
         ch_versions = ch_versions.mix(INDEX_CDNA.out.versions)
-        MAP_CDNA ( trna_reads, INDEX_CDNA.out.index.first(), Channel.value('cDNA'))
+        MAP_CDNA ( trna_reads, INDEX_CDNA.out.index.map{meta, it -> return [it]}, Channel.value('cDNA'))
         ch_versions = ch_versions.mix(MAP_CDNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_CDNA.out.stats.ifEmpty(null))
         MAP_CDNA.out.unmapped.set { cdna_reads }
@@ -137,9 +137,9 @@ workflow CONTAMINANT_FILTER {
         ch_filtered_ncrna = SEQKIT_GREP_NCRNA.out.filter.map{meta, file -> [file]}
 
         // Previous original code:
-        INDEX_NCRNA ( ch_filtered_ncrna )
+        INDEX_NCRNA ( SEQKIT_GREP_NCRNA.out.filter )
         ch_versions = ch_versions.mix(INDEX_NCRNA.out.versions)
-        MAP_NCRNA ( cdna_reads, INDEX_NCRNA.out.index.first(), Channel.value('ncRNA') )
+        MAP_NCRNA ( cdna_reads, INDEX_NCRNA.out.index.map{meta, it -> return [it]}, Channel.value('ncRNA') )
         ch_versions = ch_versions.mix(MAP_NCRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_NCRNA.out.stats.ifEmpty(null))
         MAP_NCRNA.out.unmapped.set { ncrna_reads }
@@ -171,9 +171,9 @@ workflow CONTAMINANT_FILTER {
         ch_filtered_pirna = SEQKIT_GREP_PIRNA.out.filter.map{meta, file -> [file]}
 
         // Previous original code:
-        INDEX_PIRNA ( ch_filtered_pirna )
+        INDEX_PIRNA ( SEQKIT_GREP_PIRNA.out.filter )
         ch_versions = ch_versions.mix(INDEX_PIRNA.out.versions)
-        MAP_PIRNA ( ncrna_reads, INDEX_PIRNA.out.index.first(), Channel.value('piRNA'))
+        MAP_PIRNA ( ncrna_reads, INDEX_PIRNA.out.index.map{meta, it -> return [it]}, Channel.value('piRNA'))
         ch_versions = ch_versions.mix(MAP_PIRNA.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_PIRNA.out.stats.ifEmpty(null))
         MAP_PIRNA.out.unmapped.set { pirna_reads }
@@ -205,9 +205,9 @@ workflow CONTAMINANT_FILTER {
         ch_filtered_other = SEQKIT_GREP_OTHER.out.filter.map{meta, file -> [file]}
 
         // Previous original code:
-        INDEX_OTHER ( ch_filtered_other )
+        INDEX_OTHER ( SEQKIT_GREP_OTHER.out.filter )
         ch_versions = ch_versions.mix(INDEX_OTHER.out.versions)
-        MAP_OTHER ( ncrna_reads, INDEX_OTHER.out.index.first(), Channel.value('other'))
+        MAP_OTHER ( ncrna_reads, INDEX_OTHER.out.index.map{meta, it -> return [it]}, Channel.value('other'))
         ch_versions = ch_versions.mix(MAP_OTHER.out.versions)
         ch_filter_stats = ch_filter_stats.mix(MAP_OTHER.out.stats.ifEmpty(null))
         MAP_OTHER.out.unmapped.set { other_cont_reads }

@@ -8,8 +8,8 @@ include {   PARSE_FASTA_MIRNA  as PARSE_MATURE
 include {   FORMAT_FASTA_MIRNA  as FORMAT_MATURE
             FORMAT_FASTA_MIRNA  as FORMAT_HAIRPIN    } from '../../modules/local/format_fasta_mirna'
 
-include {   INDEX_MIRNA  as INDEX_MATURE
-            INDEX_MIRNA  as INDEX_HAIRPIN            } from '../../modules/local/bowtie_mirna'
+include { BOWTIE_BUILD  as INDEX_MATURE     } from '../../modules/nf-core/bowtie/build/main'
+include { BOWTIE_BUILD  as INDEX_HAIRPIN    } from '../../modules/nf-core/bowtie/build/main'
 
 include {   BOWTIE_MAP_SEQ  as BOWTIE_MAP_MATURE
             BOWTIE_MAP_SEQ  as BOWTIE_MAP_HAIRPIN
@@ -49,7 +49,7 @@ workflow MIRNA_QUANT {
     ch_reads_mirna = ch_reads_for_mirna
         .map { add_suffix(it, "mature") }
 
-    BOWTIE_MAP_MATURE ( ch_reads_mirna, ch_mature_bowtie.collect() )
+    BOWTIE_MAP_MATURE ( ch_reads_mirna, INDEX_MATURE.out.index.map{meta, it -> return [it]} )
     ch_versions = ch_versions.mix(BOWTIE_MAP_MATURE.out.versions)
 
     ch_reads_hairpin = BOWTIE_MAP_MATURE.out.unmapped
@@ -69,7 +69,7 @@ workflow MIRNA_QUANT {
     hairpin_bowtie = INDEX_HAIRPIN.out.index
     ch_versions = ch_versions.mix(INDEX_HAIRPIN.out.versions)
 
-    BOWTIE_MAP_HAIRPIN ( ch_reads_hairpin, hairpin_bowtie.collect() )
+    BOWTIE_MAP_HAIRPIN ( ch_reads_hairpin, INDEX_HAIRPIN.out.index.map{meta, it -> return [it]} )
     ch_versions = ch_versions.mix(BOWTIE_MAP_HAIRPIN.out.versions)
 
     BAM_STATS_HAIRPIN ( BOWTIE_MAP_HAIRPIN.out.bam, FORMAT_HAIRPIN.out.formatted_fasta )
@@ -88,7 +88,7 @@ workflow MIRNA_QUANT {
 
     ch_reads_collapsed = SEQCLUSTER_COLLAPSE.out.fastq
 
-    BOWTIE_MAP_SEQCLUSTER ( ch_reads_collapsed, hairpin_bowtie.collect() )
+    BOWTIE_MAP_SEQCLUSTER ( ch_reads_collapsed, INDEX_HAIRPIN.out.index.map{meta, it -> return [it]} )
     ch_versions = ch_versions.mix(BOWTIE_MAP_SEQCLUSTER.out.versions)
 
     ch_mirtop_logs = Channel.empty()
