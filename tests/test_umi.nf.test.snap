@@ -30,14 +30,14 @@
             "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.flagstat:md5,977e88cbe62027285df73e1f7f9cd9bc",
             "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.idxstats:md5,cc0413bf90252c3b3af8926fd64bc873",
             "SRX8195118_SRR11631014_mature_hairpin_genome.sorted.idxstats:md5,a4874de294706a7ead30258944ff2dad",
-            "SRX8195118_SRR11631014_mature_hairpin_genome.sorted.stats:md5,c5b28a7e26947619e8c8b511a102b25f",
-            "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.stats:md5,a7a4ccbdfd92684914be7b921c5c7969"
+            "SRX8195118_SRR11631014_mature_hairpin_genome.sorted.stats:md5,89f8dd2287a390cf347627c51b0d2ec2",
+            "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.stats:md5,910348e352583b44c3f30cfd6332d846"
         ],
         "meta": {
             "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-30T20:47:04.010896775"
+        "timestamp": "2024-09-19T15:35:36.816602685"
     },
     "software_versions": {
         "content": [
@@ -51,24 +51,24 @@
     },
     "mirna_quant_bam": {
         "content": [
-            "SRX8195118_SRR11631014_mature.sorted.stats:md5,bf67cbae75e68e5de07d042487010498",
+            "SRX8195118_SRR11631014_mature.sorted.stats:md5,a49f7118b3cba5e304cf018089cefc8e",
             "SRX8195118_SRR11631014_mature.sorted.flagstat:md5,57c6d477394d367ebae59f7267b430a5",
             "SRX8195118_SRR11631014_mature.sorted.idxstats:md5,8b9cf0f1647b938f058b80522df24667",
-            "SRX8195117_SRR11631013_mature.sorted.stats:md5,c5ed9f69f29172af201968f97b49be67",
+            "SRX8195117_SRR11631013_mature.sorted.stats:md5,6847689129964daf73e845cd5ee086db",
             "SRX8195117_SRR11631013_mature.sorted.flagstat:md5,171387fb18ba9868e28ca03d24a7daca",
             "SRX8195117_SRR11631013_mature.sorted.idxstats:md5,fb6c4000f82a66654b4f2a40570649b5",
             "SRX8195117_SRR11631013_mature_hairpin.sorted.idxstats:md5,4e7c1c98804febf6210cee5e3941709e",
             "SRX8195117_SRR11631013_mature_hairpin.sorted.flagstat:md5,b86bd14dc687a26ba5a84d1015f4b70a",
-            "SRX8195117_SRR11631013_mature_hairpin.sorted.stats:md5,b3ff5680bfebaaf6e30bb43a29a3031c",
-            "SRX8195118_SRR11631014_mature_hairpin.sorted.stats:md5,da76c29d304c53210242909c3e23a29a",
+            "SRX8195117_SRR11631013_mature_hairpin.sorted.stats:md5,c7d9fb0a872991e46fecdd941085ed9e",
+            "SRX8195118_SRR11631014_mature_hairpin.sorted.stats:md5,168c0b770fc77bf9a7f85085aceff75a",
             "SRX8195118_SRR11631014_mature_hairpin.sorted.idxstats:md5,f4485713620f31d97a5006acdf6d8a5d",
             "SRX8195118_SRR11631014_mature_hairpin.sorted.flagstat:md5,e0c44533bc7813d552de4864d997c916"
         ],
         "meta": {
             "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-30T20:47:03.820560405"
+        "timestamp": "2024-09-19T15:35:36.685710047"
     },
     "mirna_quant_edger_qc": {
         "content": [
@@ -92,42 +92,42 @@
     "multiqc_multiqc_data": {
         "content": [
             "fastqc-status-check-heatmap.txt:md5,c1509fdd74b21a718fe099de64514995",
-            "fastp_filtered_reads_plot.txt:md5,3aaa79e1ede44347971c26100d9e954b",
+            "fastp_filtered_reads_plot.txt:md5,54caeafa94c6ec8de2e5fda261aee04a",
             true,
-            "fastqc_sequence_counts_plot-1.txt:md5,24744e039ce4dbcbacf42edbfd642a8b",
+            "fastqc-1_sequence_counts_plot.txt:md5,036a1ca02aa27567988d53bcefce1959",
             "mirtrace_complexity_plot.txt:md5,5a860a872f793250b8c4482d031176a8",
-            "fastqc_per_sequence_gc_content_plot-1_Percentages.txt:md5,351f949c0abf4fb7587f3f5d9a28d461",
-            "multiqc_citations.txt:md5,3adbccd17a42d0d5d97ee7ebb476f433",
+            "fastqc-1_per_sequence_gc_content_plot_Percentages.txt:md5,351f949c0abf4fb7587f3f5d9a28d461",
+            "multiqc_citations.txt:md5,02ab194a83114a3c2c22c2749cd27717",
             "samtools-stats-dp.txt:md5,74808822577fb62efb39811272e6919e",
             "fastqc_sequence_length_distribution_plot.txt:md5,8c34b57ec084e2da9d62c254c0a517f4",
             "fastp-seq-content-n-plot_Read_1_Before_filtering.txt:md5,dfdb23f41359b8a6b84d6626a0474d02",
-            "fastqc_sequence_duplication_levels_plot-1.txt:md5,b5ae95ecd73055798ed70947dda3747c",
-            "fastqc_per_base_sequence_quality_plot-1.txt:md5,89adfa92b1cde0ad4e401b430bbc68ce",
-            "multiqc_general_stats.txt:md5,77248c05a5e2f0e16616603dd77dc73c",
-            "fastqc_per_base_n_content_plot-1.txt:md5,db081d3aa63007e5a78113f0fc26f27d",
+            "fastqc-1_sequence_duplication_levels_plot.txt:md5,b5ae95ecd73055798ed70947dda3747c",
+            "fastqc-1_per_base_sequence_quality_plot.txt:md5,89adfa92b1cde0ad4e401b430bbc68ce",
+            "multiqc_general_stats.txt:md5,ce8b899534249cb71157e744ea0c2fd0",
+            "fastqc-1_per_base_n_content_plot.txt:md5,db081d3aa63007e5a78113f0fc26f27d",
             "fastqc_per_base_n_content_plot.txt:md5,5b5b8cee3162d092c0bcddffbd000f34",
             "fastp-seq-quality-plot_Read_1_After_filtering.txt:md5,66a47c7ce00ede2053f8e6eb20ec3417",
             "fastqc_per_sequence_quality_scores_plot.txt:md5,3aa99649540afc898d32d2e49a364487",
-            "mirtrace_qc_plot.txt:md5,b08d11ea51c54e615f9608002644c787",
-            "fastqc_per_sequence_quality_scores_plot-1.txt:md5,4108da6fe352558a652ee2b17d609e07",
+            "mirtrace_qc_plot.txt:md5,98a104b1e65164016ae4081b8815f33e",
+            "fastqc-1_per_sequence_quality_scores_plot.txt:md5,4108da6fe352558a652ee2b17d609e07",
             "mirtrace_length_plot.txt:md5,440a84ce9bbdb89b736e4e2446382665",
             true,
-            "fastqc-status-check-heatmap-1.txt:md5,cb2ea844834808ae4c95c6440269cf2e",
-            "fastqc_sequence_counts_plot.txt:md5,5e5c5132ff1969dfa40cb8b1eadf7a46",
-            "mirtrace_rna_categories_plot.txt:md5,6d08c297377a6241c4c1e82278d71f32",
+            "fastqc-1-status-check-heatmap.txt:md5,cb2ea844834808ae4c95c6440269cf2e",
+            "fastqc_sequence_counts_plot.txt:md5,78f80dbdcc711e490c779a998f94b69a",
+            "mirtrace_rna_categories_plot.txt:md5,57039a101b0062b1849dadf994df3a88",
             "fastp-seq-quality-plot_Read_1_Before_filtering.txt:md5,f36b7cfd3057b26281367397db45033a",
-            "samtools_alignment_plot.txt:md5,5e828961dbd55a6d6872221c49dfdc59",
+            "samtools_alignment_plot.txt:md5,b5d5a2f86d2b715f310fa8d6a008123d",
             "fastqc_per_base_sequence_quality_plot.txt:md5,e2e187bc0b0c1f0d1abb3b666945c7b3",
-            "mirtop_read_count_plot.txt:md5,4c8069a2123e23ece79dcc93d97f5bc4",
+            "mirtop_read_count_plot.txt:md5,33aaf0d8761ec2864813274f5da75943",
             "fastp-seq-content-n-plot_Read_1_After_filtering.txt:md5,bbad2035ada86867c4ed579a93b78d64",
-            "mirtop_unique_read_count_plot.txt:md5,12ddd823066b8218e9bf9fbac471a0b1",
+            "mirtop_unique_read_count_plot.txt:md5,c1f1ea56b0a975957c3897516900df1f",
             "mirtop_mean_read_count_plot.txt:md5,b2a73544ddafa79e0c39879b95b62736",
-            "mirtrace_contamination_check_plot.txt:md5,7f12917ce506127a729edb733fdda511",
+            "mirtrace_contamination_check_plot.txt:md5,2e4a51b79b8d062ff195822bfd5a91a6",
             "fastqc_adapter_content_plot.txt:md5,de1d7324ff5146b49fc9a2e6d4633962",
             "fastqc_sequence_duplication_levels_plot.txt:md5,fe7598e49f93bb980a7675a2bb4bd3b5",
             "fastqc_per_sequence_gc_content_plot_Percentages.txt:md5,c2f2f9282a50c3eef475664cc969b8ec",
-            "fastqc_per_sequence_gc_content_plot-1_Counts.txt:md5,15d8fa32e0c11ef0d3d10fc28370972c",
-            "fastqc_adapter_content_plot-1.txt:md5,89cd342fdc6fbba5f67078c9a2f0c684",
+            "fastqc-1_per_sequence_gc_content_plot_Counts.txt:md5,15d8fa32e0c11ef0d3d10fc28370972c",
+            "fastqc-1_adapter_content_plot.txt:md5,89cd342fdc6fbba5f67078c9a2f0c684",
             "fastp-seq-content-gc-plot_Read_1_Before_filtering.txt:md5,f832e92fb36db181ed1079be110edb2a",
             "fastqc_per_sequence_gc_content_plot_Counts.txt:md5,488e25de89d18d20f29b86f2580a8df9",
             true,
@@ -137,7 +137,7 @@
             "nf-test": "0.8.4",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-13T22:21:28.306265591"
+        "timestamp": "2024-09-18T21:24:25.956368202"
     },
     "multiqc": {
         "content": [
