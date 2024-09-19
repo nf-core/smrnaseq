@@ -30,34 +30,34 @@
             "Clone1_N3_mature_hairpin_genome.sorted.idxstats:md5,2620288b88bba1ea3315414016c083a1",
             "Clone1_N1_mature_hairpin_genome.sorted.idxstats:md5,e0e4a95f5c21a926f7894cf1fbe3110b",
             "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,62208acf0c7418d590b41318d7e17d67",
-            "Clone1_N3_mature_hairpin_genome.sorted.stats:md5,91fdc857d4ed17552b2c3666e0bad342",
-            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,ff101b4b88c7fbe2877b7e240e337bb6"
+            "Clone1_N3_mature_hairpin_genome.sorted.stats:md5,471571deab69bf7a6f4cb679035398d2",
+            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,cce099859e44a7e0adf1c304fdb14f4f"
         ],
         "meta": {
             "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-30T20:38:26.578558444"
+        "timestamp": "2024-09-19T15:26:42.738485563"
     },
     "software_versions": {
         "content": [
-            "{BOWTIE_MAP_GENOME={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_MATURE={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.1, samtools=1.14}, FASTQC_RAW={fastqc=0.12.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_HAIRPIN={bowtie=1.3.1}, INDEX_MATURE={bowtie=1.3.1}, MIRTOP_COUNTS={mirtop=0.4.25}, MIRTOP_EXPORT={mirtop=0.4.25}, MIRTOP_GFF={mirtop=0.4.25}, MIRTOP_STATS={mirtop=0.4.25}, MIRTRACE_QC={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.2}, SAMTOOLS_IDXSTATS={samtools=1.2}, SAMTOOLS_INDEX={samtools=1.2}, SAMTOOLS_SORT={samtools=1.2}, SAMTOOLS_STATS={samtools=1.2}, SEQCLUSTER_COLLAPSE={seqcluster=1.2.9}, TABLE_MERGE={r-base=3.6.2}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
+            "{BOWTIE_MAP_GENOME={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_MATURE={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.1, samtools=1.14}, FASTQC_RAW={fastqc=0.12.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_HAIRPIN={bowtie=1.3.1}, INDEX_MATURE={bowtie=1.3.1}, MIRTOP_COUNTS={mirtop=0.4.25}, MIRTOP_EXPORT={mirtop=0.4.25}, MIRTOP_GFF={mirtop=0.4.25}, MIRTOP_STATS={mirtop=0.4.25}, MIRTRACE_QC={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.21}, SAMTOOLS_IDXSTATS={samtools=1.21}, SAMTOOLS_INDEX={samtools=1.21}, SAMTOOLS_SORT={samtools=1.21}, SAMTOOLS_STATS={samtools=1.21}, SEQCLUSTER_COLLAPSE={seqcluster=1.2.9}, TABLE_MERGE={r-base=3.6.2}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
         ],
         "meta": {
-            "nf-test": "0.8.4",
+            "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-13T22:24:37.39903141"
+        "timestamp": "2024-09-19T15:26:42.572253025"
     },
     "mirna_quant_bam": {
         "content": [
             "Clone1_N3_mature_hairpin.sorted.flagstat:md5,1630edf055b591303d7c68d013745938",
             true,
-            "Clone1_N3_mature_hairpin.sorted.stats:md5,4fbda712e789f98124583069f4f35187",
+            "Clone1_N3_mature_hairpin.sorted.stats:md5,b41149b9cb862c46d60ef21498f29e40",
             true,
             "Clone1_N3_mature_hairpin.sorted.idxstats:md5,b44fb26f6be2accc7d52bc38efff69f4",
             true,
-            "Clone1_N3_mature.sorted.stats:md5,e028b49e804c55056fca34090cd3d836",
+            "Clone1_N3_mature.sorted.stats:md5,b1e54f83ae8a387a2071eda43ef3f9cb",
             true,
             true,
             true,
@@ -66,9 +66,9 @@
         ],
         "meta": {
             "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-30T20:38:26.516593603"
+        "timestamp": "2024-09-19T15:26:42.634182624"
     },
     "mirna_quant_edger_qc": {
         "content": [
@@ -92,24 +92,24 @@
     "multiqc_multiqc_data": {
         "content": [
             "fastqc-status-check-heatmap.txt:md5,a16737b9ae7b9b70b0ef7e462101a729",
-            "fastqc_overrepresented_sequences_plot.txt:md5,0cacfefcbc37b292ae21564f845dfaa6",
+            "fastqc_overrepresented_sequences_plot.txt:md5,3c1ffe7d55bbf2815e6bc427a2d27a2c",
             "mirtrace_complexity_plot.txt:md5,e27fb1e870985b3fe76744c027ce1c40",
             "multiqc_citations.txt:md5,f46d2983044658a4a89bdec5ba20fda3",
             "samtools-stats-dp.txt:md5,d1854b0ed73a4c9ae62a3a625c19d4b2",
             "fastqc_sequence_length_distribution_plot.txt:md5,ff2def0eab8321d4ed590b483641f43b",
-            "multiqc_general_stats.txt:md5,4f9fbcd8b4395d3eb093aa242a484562",
+            "multiqc_general_stats.txt:md5,c548851f6cbf36dc8d0f7435b443edcd",
             "fastqc_per_base_n_content_plot.txt:md5,c345fe5430e3a17ad1dbcc14e7595f50",
             "fastqc_per_sequence_quality_scores_plot.txt:md5,edf4d21e2928d37d94bb33a25e1d92a6",
-            "mirtrace_qc_plot.txt:md5,75ee638eca3a02d61f2be321574488ed",
+            "mirtrace_qc_plot.txt:md5,49c178fc849a1aa44781ddc67c85927c",
             "mirtrace_length_plot.txt:md5,7023ffcd95379998adbd65204b9998ee",
             true,
-            "fastqc_sequence_counts_plot.txt:md5,da84941084250726e3828e8908640f8b",
-            "mirtrace_rna_categories_plot.txt:md5,6f2b9465b699df7e5c7062b6495199af",
-            "samtools_alignment_plot.txt:md5,2e7b7ce5aa4c69ee2b563c0376c40769",
+            "fastqc_sequence_counts_plot.txt:md5,a8680d3b059401e71c7c0fe2404f5933",
+            "mirtrace_rna_categories_plot.txt:md5,606174b789bdb9841f8e99206d147bb9",
+            "samtools_alignment_plot.txt:md5,2778636ce5b6c9432b67014382fc35af",
             "fastqc_per_base_sequence_quality_plot.txt:md5,60f539c88c503680c0b2603749494948",
-            "mirtop_read_count_plot.txt:md5,6820f657dc610579c53342b87fc2dcbb",
-            "mirtop_unique_read_count_plot.txt:md5,5015a4e2f305a707b0d2e6ddc0498eb6",
-            "mirtop_mean_read_count_plot.txt:md5,0148ef880eecae0c74b6a6ef2137e641",
+            "mirtop_read_count_plot.txt:md5,420dda9dbd3348b5c685e888dbe2a85a",
+            "mirtop_unique_read_count_plot.txt:md5,ade512aac4f23e63239b7db54d2544c8",
+            "mirtop_mean_read_count_plot.txt:md5,9f9cee399a861fd17f0627fc843b7c15",
             "fastqc_sequence_duplication_levels_plot.txt:md5,7e7eb4105b8f963bdf68e422e4ebce67",
             "fastqc_per_sequence_gc_content_plot_Percentages.txt:md5,7ac995de6a861676f64879b02d04f819",
             "fastqc_per_sequence_gc_content_plot_Counts.txt:md5,c18bf431a08ec1230720d83781e8903b",
@@ -119,7 +119,7 @@
             "nf-test": "0.8.4",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-11T14:28:01.054069548"
+        "timestamp": "2024-09-19T12:36:50.504361044"
     },
     "multiqc": {
         "content": [
