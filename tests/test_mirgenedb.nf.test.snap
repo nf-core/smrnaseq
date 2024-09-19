@@ -1,10 +1,10 @@
 {
     "genome_quant_bam": {
         "content": [
-            "Clone9_N1_mature_hairpin_genome.sorted.stats:md5,26c8e55e56641f2d4387a37b099ff0c2",
+            "Clone9_N1_mature_hairpin_genome.sorted.stats:md5,4fd911c09cf6e80d7914e0d77128187b",
             "Clone9_N1_mature_hairpin_genome.sorted.idxstats:md5,aa37c5da7c2b4505ce58c3a21f97121c",
-            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,03d3f6227829c80c0e29cb49df9b6a27",
-            "Control_N1_mature_hairpin_genome.sorted.stats:md5,6a53b78cc7e4ca2338c76095af080151",
+            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,eb3081fb2598ec16dd7dc369d9cefdb2",
+            "Control_N1_mature_hairpin_genome.sorted.stats:md5,f5b778668a95f1e4dfe2128b1168b1de",
             "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,5bb521c495f1c450835299b1eb88dc84",
             "Clone9_N1_mature_hairpin_genome.sorted.flagstat:md5,6a8ad3be2ca0fa924fd32a04293d4ce4",
             "Clone1_N1_mature_hairpin_genome.sorted.idxstats:md5,d92f9eae7657418858e6d2b69436f74f",
@@ -13,19 +13,19 @@
         ],
         "meta": {
             "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-30T20:30:51.089034552"
+        "timestamp": "2024-09-19T15:14:06.322733602"
     },
     "software_versions": {
         "content": [
-            "{BOWTIE_MAP_GENOME={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_MATURE={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.1, samtools=1.14}, FASTP={fastp=0.23.4}, FASTQC_RAW={fastqc=0.12.1}, FASTQC_TRIM={fastqc=0.12.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_HAIRPIN={bowtie=1.3.1}, INDEX_MATURE={bowtie=1.3.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.2}, SAMTOOLS_IDXSTATS={samtools=1.2}, SAMTOOLS_INDEX={samtools=1.2}, SAMTOOLS_SORT={samtools=1.2}, SAMTOOLS_STATS={samtools=1.2}, SEQCLUSTER_COLLAPSE={seqcluster=1.2.9}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
+            "{BOWTIE_MAP_GENOME={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_MATURE={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.1, samtools=1.14}, FASTP={fastp=0.23.4}, FASTQC_RAW={fastqc=0.12.1}, FASTQC_TRIM={fastqc=0.12.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_HAIRPIN={bowtie=1.3.1}, INDEX_MATURE={bowtie=1.3.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.21}, SAMTOOLS_IDXSTATS={samtools=1.21}, SAMTOOLS_INDEX={samtools=1.21}, SAMTOOLS_SORT={samtools=1.21}, SAMTOOLS_STATS={samtools=1.21}, SEQCLUSTER_COLLAPSE={seqcluster=1.2.9}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
         ],
         "meta": {
-            "nf-test": "0.8.4",
+            "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-10T13:46:22.882190844"
+        "timestamp": "2024-09-19T15:14:06.140642153"
     },
     "mirna_quant_bam": {
         "content": [
@@ -34,25 +34,25 @@
             "Clone9_N1_mature.sorted.flagstat:md5,adf40ba27907b6ef726d6c5923a731b9",
             "Clone9_N1_mature.sorted.idxstats:md5,8302f401476f5c8fee3333e1c742c05e",
             "Control_N1_mature.sorted.flagstat:md5,f8df7690d20014518f47dc2fe39debec",
-            "Control_N1_mature.sorted.stats:md5,a21d0381c35d543ce9bf10a5432a6bcb",
-            "Clone9_N1_mature.sorted.stats:md5,74abf7850ffea9ebdefb2e596d7e8e6c",
+            "Control_N1_mature.sorted.stats:md5,35a03b446785dbf240d755ea9edac0f6",
+            "Clone9_N1_mature.sorted.stats:md5,d2cb555133269b4503e4eb490dd81b3e",
             "Control_N1_mature.sorted.idxstats:md5,b7a382b1d0f5cba6cb94b3b5a6b18f84",
             true,
             "Control_N1_mature_hairpin.sorted.idxstats:md5,79dc5e82ff88e7379c893549224cd87f",
             "Control_N1_mature_hairpin.sorted.flagstat:md5,1dc7b98f0014a99a20de7c09a6b95340",
             "Clone9_N1_mature_hairpin.sorted.idxstats:md5,f3ed5bf23f73d41c42d3da0bf30f89ea",
-            "Clone9_N1_mature_hairpin.sorted.stats:md5,7ddfdc19d4697fa272a3eb35e98dd084",
+            "Clone9_N1_mature_hairpin.sorted.stats:md5,9fda01757030fe96a60171965117b2e4",
             true,
             true,
             true,
-            "Control_N1_mature_hairpin.sorted.stats:md5,696feb8110c8925b70bb3e009ec6da5e",
+            "Control_N1_mature_hairpin.sorted.stats:md5,a96b6d37b444f52c66a3dac9d7de0f36",
             "Clone9_N1_mature_hairpin.sorted.flagstat:md5,678f4f9e98c3e1fcc5af54e8dd06fbbc"
         ],
         "meta": {
             "nf-test": "0.9.0",
-            "nextflow": "23.10.0"
+            "nextflow": "24.04.4"
         },
-        "timestamp": "2024-08-30T20:30:50.869676065"
+        "timestamp": "2024-09-19T15:14:06.231457002"
     },
     "mirna_quant_edger_qc": {
         "content": [
