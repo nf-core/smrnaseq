@@ -20,6 +20,11 @@
                         "git_sha": "06c8865e36741e05ad32ef70ab3fac127486af48",
                         "installed_by": ["modules"]
                     },
+                    "csvtk/join": {
+                        "branch": "master",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
+                        "installed_by": ["modules"]
+                    },
                     "fastp": {
                         "branch": "master",
                         "git_sha": "06c8865e36741e05ad32ef70ab3fac127486af48",
@@ -37,22 +42,22 @@
                     },
                     "mirtop/counts": {
                         "branch": "master",
-                        "git_sha": "43b2b702abd8ab2cb1aa1365763f518413ad5721",
+                        "git_sha": "196062335bb9ec979075bf2212f64a369b927b0d",
                         "installed_by": ["bam_stats_mirna_mirtop"]
                     },
                     "mirtop/export": {
                         "branch": "master",
-                        "git_sha": "43b2b702abd8ab2cb1aa1365763f518413ad5721",
+                        "git_sha": "196062335bb9ec979075bf2212f64a369b927b0d",
                         "installed_by": ["bam_stats_mirna_mirtop"]
                     },
                     "mirtop/gff": {
                         "branch": "master",
-                        "git_sha": "43b2b702abd8ab2cb1aa1365763f518413ad5721",
+                        "git_sha": "196062335bb9ec979075bf2212f64a369b927b0d",
                         "installed_by": ["bam_stats_mirna_mirtop"]
                     },
                     "mirtop/stats": {
                         "branch": "master",
-                        "git_sha": "43b2b702abd8ab2cb1aa1365763f518413ad5721",
+                        "git_sha": "196062335bb9ec979075bf2212f64a369b927b0d",
                         "installed_by": ["bam_stats_mirna_mirtop"]
                     },
                     "mirtrace/qc": {
@@ -132,7 +137,7 @@
                     },
                     "bam_stats_mirna_mirtop": {
                         "branch": "master",
-                        "git_sha": "43b2b702abd8ab2cb1aa1365763f518413ad5721",
+                        "git_sha": "196062335bb9ec979075bf2212f64a369b927b0d",
                         "installed_by": ["subworkflows"]
                     },
                     "bam_stats_samtools": {
