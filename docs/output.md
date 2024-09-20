@@ -140,9 +140,9 @@ If `--save_intermediates` is specified, these files will be placed in this direc
 
 **Output directory: `results/mirtop`**
 
-- `mirtop.gff`: [mirgff3](https://github.com/miRTop/mirGFF3) file
-- `mirtop.tsv`: tabular file of the previous file for easy integration with downstream analysis.
-- `mirtop_rawData.tsv`: File compatible with [isomiRs](http://lpantano.github.io/isomiRs/reference/IsomirDataSeqFromMirtop.html) Bioconductor package to perform isomiRs analysis.
+- `gff/{sample.id}.gff`: [mirgff3](https://github.com/miRTop/mirGFF3) file
+- `joined_samples_mirtop.tsv`: tabular file of the previous file for easy integration with downstream analysis.
+- `export/{sample.id}_mirtop_rawData.tsv`: File compatible with [isomiRs](http://lpantano.github.io/isomiRs/reference/IsomirDataSeqFromMirtop.html) Bioconductor package to perform isomiRs analysis.
 - `mirna.tsv`: tabular file with miRNA counts after summarizing unique isomiRs for each miRNA
 
 ## miRDeep2

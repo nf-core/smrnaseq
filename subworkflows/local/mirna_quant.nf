@@ -22,6 +22,7 @@ include { SEQCLUSTER_COLLAPSE  } from '../../modules/nf-core/seqcluster/collapse
 include { TABLE_MERGE          } from '../../modules/local/datatable_merge/datatable_merge.nf'
 include { EDGER_QC             } from '../../modules/local/edger_qc/edger_qc.nf'
 include { BAM_STATS_MIRNA_MIRTOP } from '../../subworkflows/nf-core/bam_stats_mirna_mirtop/main'
+include { CSVTK_JOIN             } from '../../modules/nf-core/csvtk/join/main'
 
 workflow MIRNA_QUANT {
     take:
@@ -97,24 +98,26 @@ workflow MIRNA_QUANT {
 
     // nf-core/mirtop
 
-    ch_bams = BOWTIE_MAP_SEQCLUSTER.out.bam
-            .collect{it[1]}
-            .map{it -> return [[id:"bams"], it]}
-
     ch_mirna_gtf_species = ch_mirna_gtf
             .combine(ch_mirtrace_species)
             .map{ gtf, species -> [ [id:species.toString()], gtf, species ] }
             .collect()
 
     BAM_STATS_MIRNA_MIRTOP(
-            ch_bams, // TODO: Parallelize by running each BOWTIE_MAP_SEQCLUSTER.out.bam separately when mirtop solves this issue: https://github.com/miRTop/mirtop/issues/83
+            BOWTIE_MAP_SEQCLUSTER.out.bam,
             FORMAT_HAIRPIN.out.formatted_fasta,
             ch_mirna_gtf_species )
 
     ch_mirtop_logs = BAM_STATS_MIRNA_MIRTOP.out.stats_log
     ch_versions = ch_versions.mix(BAM_STATS_MIRNA_MIRTOP.out.versions)
 
-    TABLE_MERGE ( BAM_STATS_MIRNA_MIRTOP.out.counts.map{ id, tsv -> [tsv] } )
+    ch_tsvs = BAM_STATS_MIRNA_MIRTOP.out.counts
+        .collect{it[1]}
+        .map{it -> return [[id:"TSVs"], it]}
+
+    CSVTK_JOIN ( ch_tsvs )
+
+    TABLE_MERGE ( CSVTK_JOIN.out.csv )
     ch_versions = ch_versions.mix(TABLE_MERGE.out.versions)
 
     ch_reads_genome = BOWTIE_MAP_HAIRPIN.out.unmapped

@@ -7,7 +7,7 @@ process TABLE_MERGE {
         'biocontainers/r-data.table:1.12.2' }"
 
     input:
-    path mirtop
+    tuple val(meta), path(mirtop)
 
     output:
     path "mirna.tsv"   , emit: mirna_tsv

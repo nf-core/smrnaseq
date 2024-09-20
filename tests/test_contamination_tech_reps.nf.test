@@ -5,6 +5,7 @@ nextflow_pipeline {
     script "main.nf"
     profile "test_contamination_tech_reps"
     tag "test_contamination_tech_reps"
+    tag "contamination"
     tag "pipeline"
 
     test("test_contamination_tech_reps") {
@@ -19,7 +20,7 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 82 },
+                { assert workflow.trace.succeeded().size() == 91 },
 
                 { assert snapshot(
                     path("$outputDir/contaminant_filter/filter/Clone1_N1_trimmed.contamination_mqc.yaml").exists(), //TODO see if we can make these deterministic or why they are non-deterministic
@@ -68,11 +69,8 @@ nextflow_pipeline {
                 ).match("mirna_quant_edger_qc") },
 
                 { assert snapshot(
-                    path("$outputDir/mirna_quant/mirtop/mirtop/bams_mirtop.gff").exists(),
-                    path("$outputDir/mirna_quant/mirtop/counts/bams_mirtop.tsv").exists(),
-                    path("$outputDir/mirna_quant/mirtop/export/bams_mirtop_rawData.tsv").exists(),
+                    path("$outputDir/mirna_quant/mirtop/joined_samples_mirtop.tsv").exists(),
                     path("$outputDir/mirna_quant/mirtop/mirna.tsv").exists(),
-                    path("$outputDir/mirna_quant/mirtop/stats/mirtop_stats.txt").exists()
                 ).match("mirna_quant_mirtop") },
 
                 { assert snapshot(

@@ -4,7 +4,7 @@ nextflow_pipeline {
     name "Test Workflow main.nf - test_nextflex"
     script "main.nf"
     profile "test_nextflex"
-    tag "test_nextflex"
+    tag "nextflex"
     tag "pipeline"
 
     test("test_nextflex") {
@@ -19,7 +19,7 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 70 },
+                { assert workflow.trace.succeeded().size() == 79 },
 
                 { assert snapshot(
                     path("$outputDir/mirna_quant/bam/mature/sample2_mature.sorted.idxstats"),
