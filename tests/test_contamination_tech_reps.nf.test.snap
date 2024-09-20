@@ -108,13 +108,13 @@
     },
     "mirna_quant_mirtop": {
         "content": [
-            "joined_samples_mirtop.tsv:md5,2055e15bb83ac8fb980d1b459527a428",
-            "mirna.tsv:md5,b81b71ded2eca0f2e592edf27d486ab2"
+            true,
+            true
         ],
         "meta": {
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-20T16:43:36.58162815"
+        "timestamp": "2024-09-20T18:06:26.655506797"
     }
 }

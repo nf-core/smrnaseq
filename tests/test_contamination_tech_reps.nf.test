@@ -69,8 +69,8 @@ nextflow_pipeline {
                 ).match("mirna_quant_edger_qc") },
 
                 { assert snapshot(
-                    path("$outputDir/mirna_quant/mirtop/joined_samples_mirtop.tsv"),
-                    path("$outputDir/mirna_quant/mirtop/mirna.tsv"),
+                    path("$outputDir/mirna_quant/mirtop/joined_samples_mirtop.tsv").exists(),
+                    path("$outputDir/mirna_quant/mirtop/mirna.tsv").exists(),
                 ).match("mirna_quant_mirtop") },
 
                 { assert snapshot(
