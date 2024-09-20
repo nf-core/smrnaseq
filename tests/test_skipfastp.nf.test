@@ -4,7 +4,7 @@ nextflow_pipeline {
     name "Test Workflow main.nf - test_skipfastp"
     script "main.nf"
     profile "test_skipfastp"
-    tag "test_skipfastp"
+    tag "skipfastp"
     tag "pipeline"
 
     test("test_skipfastp") {
@@ -19,14 +19,11 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 58 },
+                { assert workflow.trace.succeeded().size() == 63 },
 
                 { assert snapshot(
-                    path("$outputDir/mirna_quant/mirtop/mirtop/bams_mirtop.gff").exists(),
-                    path("$outputDir/mirna_quant/mirtop/counts/bams_mirtop.tsv").exists(),
-                    path("$outputDir/mirna_quant/mirtop/export/bams_mirtop_rawData.tsv").exists(),
-                    path("$outputDir/mirna_quant/mirtop/mirna.tsv").exists(),
-                    path("$outputDir/mirna_quant/mirtop/stats/mirtop_stats.txt").exists()
+                    path("$outputDir/mirna_quant/mirtop/joined_samples_mirtop.tsv"),
+                    path("$outputDir/mirna_quant/mirtop/mirna.tsv"),
                 ).match("mirna_quant_mirtop") },
 
                 { assert snapshot(
