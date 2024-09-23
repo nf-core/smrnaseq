@@ -57,8 +57,6 @@ workflow MIRNA_QUANT {
 
     BAM_STATS_MATURE ( BOWTIE_MAP_MATURE.out.bam, FORMAT_MATURE.out.formatted_fasta )
     ch_versions = ch_versions.mix(BAM_STATS_MATURE.out.versions)
-        BAM_STATS_MATURE.out.stats.dump(tag:"BAM_STATS_MATURE")
-
 
     PARSE_HAIRPIN ( ch_reference_hairpin, ch_parse_species_input )
     ch_hairpin_parsed = PARSE_HAIRPIN.out.parsed_fasta
