@@ -29,15 +29,12 @@ include { BOWTIE_MAP_CONTAMINANTS as MAP_RRNA
         BOWTIE_MAP_CONTAMINANTS as MAP_PIRNA
         BOWTIE_MAP_CONTAMINANTS as MAP_OTHER } from '../../../modules/local/bowtie_map_contaminants'
 
-include { BOWTIE2_ALIGN as MAP_TRNA} from '../../../modules/nf-core/bowtie2/align/main'
 include { BOWTIE2_ALIGN as MAP_CDNA} from '../../../modules/nf-core/bowtie2/align/main'
+include { BOWTIE2_ALIGN as BOWTIE2_ALIGN_TRNA } from '../../../modules/nf-core/bowtie2/align/main'
+include { BOWTIE2_ALIGN as BOWTIE2_ALIGN_CDNA } from '../../../modules/nf-core/bowtie2/align/main'
 
-include { PIGZ_UNCOMPRESS } from '../../../modules/nf-core/pigz/uncompress/main'
 include { GAWK as STATS_GAWK_TRNA                } from '../../../modules/nf-core/gawk/main'
 include { GAWK as STATS_GAWK_CDNA                } from '../../../modules/nf-core/gawk/main'
-
-
-
 
 include { FILTER_STATS } from '../../../modules/local/filter_stats'
 
@@ -77,12 +74,16 @@ workflow CONTAMINANT_FILTER {
         INDEX_TRNA ( ch_trna )
         ch_versions = ch_versions.mix(INDEX_TRNA.out.versions)
 
+        // Add meta.contaminant to input reads channel
+        rrna_reads = rrna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "tRNA", single_end:meta.single_end], fastq]}
+
         // Map which reads are tRNAs
-        MAP_TRNA(rrna_reads, INDEX_TRNA.out.index.first(), [[],[]], true, false)
-        ch_versions = ch_versions.mix(MAP_TRNA.out.versions)
+        BOWTIE2_ALIGN_TRNA(rrna_reads, INDEX_TRNA.out.index.first(), [[],[]], true, false)
+        BOWTIE2_ALIGN_TRNA.out.fastq.dump(tag:"BOWTIE2_ALIGN_TRNA.fastq")
+        ch_versions = ch_versions.mix(BOWTIE2_ALIGN_TRNA.out.versions)
 
         // Obtain how many hits were contaminants
-        ch_bowtie = MAP_TRNA.out.log.map{meta, log -> return [[id:meta.id, contaminant: "tRNA", single_end:meta.single_end], log]}
+        ch_bowtie = BOWTIE2_ALIGN_TRNA.out.log
 
         STATS_GAWK_TRNA(ch_bowtie, [])
         ch_versions = ch_versions.mix(STATS_GAWK_TRNA.out.versions)
@@ -94,7 +95,7 @@ workflow CONTAMINANT_FILTER {
                         .ifEmpty(null))
 
         // Assign clean reads to new channel
-        trna_reads = MAP_TRNA.out.fastq
+        trna_reads = BOWTIE2_ALIGN_TRNA.out.fastq
     }
 
     trna_reads.set { cdna_reads }
@@ -122,26 +123,19 @@ workflow CONTAMINANT_FILTER {
         SEQKIT_GREP_CDNA(ch_cdna, ch_pattern)
         ch_versions = ch_versions.mix(SEQKIT_GREP_CDNA.out.versions)
 
-        // Remove metamap to make it compatible with previous code
-        ch_filtered_cdna = SEQKIT_GREP_CDNA.out.filter.map{meta, file -> [file]}
-
         // Previous original code:
         INDEX_CDNA ( SEQKIT_GREP_CDNA.out.filter )
         ch_versions = ch_versions.mix(INDEX_CDNA.out.versions)
 
+        // Add meta.contaminant to input reads channel
+        trna_reads = trna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "cDNA", single_end:meta.single_end], fastq]}
+
         // Map which reads are cDNA
-        //MAP_CDNA ( trna_reads, INDEX_CDNA.out.index.map{meta, it -> return [it]}.first(), Channel.value('cDNA'))
-        trna_reads.dump(tag:"trna_reads")
-        MAP_CDNA(trna_reads, INDEX_CDNA.out.index.first(), [[],[]], true, false)
-        MAP_CDNA.out.fastq.dump(tag:"MAP_CDNA.out.fastq")
-        MAP_CDNA.out.log.dump(tag:"MAP_CDNA.out.log")
-        ch_versions = ch_versions.mix(MAP_CDNA.out.versions)
+        BOWTIE2_ALIGN_CDNA(trna_reads, INDEX_CDNA.out.index.first(), [[],[]], true, false)
+        ch_versions = ch_versions.mix(BOWTIE2_ALIGN_CDNA.out.versions)
 
         // Obtain how many hits were contaminants
-        ch_bowtie = MAP_CDNA.out.log.map{meta, log -> return [[id:meta.id, contaminant: "cDNA", single_end:meta.single_end], log]}
-
-        STATS_GAWK_CDNA(ch_bowtie, [])
-        STATS_GAWK_CDNA.out.output.dump(tag:"STATS_GAWK_CDNA")
+        STATS_GAWK_CDNA(BOWTIE2_ALIGN_CDNA.out.log, [])
         ch_versions = ch_versions.mix(STATS_GAWK_CDNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
@@ -151,12 +145,7 @@ workflow CONTAMINANT_FILTER {
                         .ifEmpty(null))
 
         // Assign clean reads to new channel
-        cdna_reads = MAP_CDNA.out.fastq
-        cdna_reads.dump(tag:"cdna_reads")
-
-
-        //ch_filter_stats = ch_filter_stats.mix(MAP_CDNA.out.stats.ifEmpty(null))
-        //MAP_CDNA.out.unmapped.set { cdna_reads }
+        cdna_reads = BOWTIE2_ALIGN_CDNA.out.fastq
     }
 
     cdna_reads.set { ncrna_reads }
@@ -261,15 +250,12 @@ workflow CONTAMINANT_FILTER {
         MAP_OTHER.out.unmapped.set { other_cont_reads }
     }
 
-    // Uncompress all fastqgz files to fastq
-    PIGZ_UNCOMPRESS ( other_cont_reads )
-    PIGZ_UNCOMPRESS.out.file.dump(tag:"PIGZ_UNCOMPRESS")
+    // Remove meta.contaminant from reads
+    other_cont_reads = other_cont_reads
+                        .map{meta, reads -> return [[id:meta.id, single_end:meta.single_end], reads]}
 
     // Create channel with reads and contaminants
-    ch_filter_stats.dump(tag:"ch_filter_stats")
-    other_cont_reads.dump(tag:"other_cont_reads")
-    ch_reads_contaminants = other_cont_reads.cross(ch_filter_stats)
-    ch_reads_contaminants.dump(tag:"ch_reads_contaminants")
+    ch_reads_contaminants = other_cont_reads.join(ch_filter_stats.groupTuple())
 
     // Filter all contaminant stats and create MultiQC file
     FILTER_STATS ( ch_reads_contaminants )
