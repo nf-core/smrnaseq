@@ -11,9 +11,9 @@ include {   FORMAT_FASTA_MIRNA  as FORMAT_MATURE
 include { BOWTIE_BUILD  as INDEX_MATURE     } from '../../modules/nf-core/bowtie/build/main'
 include { BOWTIE_BUILD  as INDEX_HAIRPIN    } from '../../modules/nf-core/bowtie/build/main'
 
-include {   BOWTIE_MAP_SEQ  as BOWTIE_MAP_MATURE
-            BOWTIE_MAP_SEQ  as BOWTIE_MAP_HAIRPIN
-            BOWTIE_MAP_SEQ  as BOWTIE_MAP_SEQCLUSTER } from '../../modules/local/bowtie_map_mirna'
+include {   BOWTIE_ALIGN  as BOWTIE_MAP_MATURE
+            BOWTIE_ALIGN  as BOWTIE_MAP_HAIRPIN
+            BOWTIE_ALIGN  as BOWTIE_MAP_SEQCLUSTER } from '../../modules/nf-core/bowtie/align/main'
 
 include {   BAM_SORT_STATS_SAMTOOLS as BAM_STATS_MATURE
             BAM_SORT_STATS_SAMTOOLS as BAM_STATS_HAIRPIN   } from '../nf-core/bam_sort_stats_samtools'
@@ -44,16 +44,16 @@ workflow MIRNA_QUANT {
     ch_versions = ch_versions.mix(FORMAT_MATURE.out.versions)
 
     INDEX_MATURE ( FORMAT_MATURE.out.formatted_fasta )
-    ch_mature_bowtie = INDEX_MATURE.out.index.map{meta, it -> return [it]}.collect().first()
+    ch_mature_bowtie = INDEX_MATURE.out.index.first()
     ch_versions = ch_versions.mix(INDEX_MATURE.out.versions)
 
     ch_reads_mirna = ch_reads_for_mirna
         .map { add_suffix(it, "mature") }
 
-    BOWTIE_MAP_MATURE ( ch_reads_mirna, ch_mature_bowtie )
+    BOWTIE_MAP_MATURE ( ch_reads_mirna, ch_mature_bowtie, true )
     ch_versions = ch_versions.mix(BOWTIE_MAP_MATURE.out.versions)
 
-    ch_reads_hairpin = BOWTIE_MAP_MATURE.out.unmapped
+    ch_reads_hairpin = BOWTIE_MAP_MATURE.out.fastq
         .map { add_suffix(it, "hairpin") }
 
     BAM_STATS_MATURE ( BOWTIE_MAP_MATURE.out.bam, FORMAT_MATURE.out.formatted_fasta )
@@ -67,10 +67,10 @@ workflow MIRNA_QUANT {
     ch_versions = ch_versions.mix(FORMAT_HAIRPIN.out.versions)
 
     INDEX_HAIRPIN ( FORMAT_HAIRPIN.out.formatted_fasta )
-    hairpin_bowtie = INDEX_HAIRPIN.out.index.map{meta, it -> return [it]}.collect().first()
+    hairpin_bowtie = INDEX_HAIRPIN.out.index.first()
     ch_versions = ch_versions.mix(INDEX_HAIRPIN.out.versions)
 
-    BOWTIE_MAP_HAIRPIN ( ch_reads_hairpin, hairpin_bowtie )
+    BOWTIE_MAP_HAIRPIN ( ch_reads_hairpin, hairpin_bowtie, true )
     ch_versions = ch_versions.mix(BOWTIE_MAP_HAIRPIN.out.versions)
 
     BAM_STATS_HAIRPIN ( BOWTIE_MAP_HAIRPIN.out.bam, FORMAT_HAIRPIN.out.formatted_fasta )
@@ -89,7 +89,7 @@ workflow MIRNA_QUANT {
 
     ch_reads_collapsed = SEQCLUSTER_COLLAPSE.out.fastq
 
-    BOWTIE_MAP_SEQCLUSTER ( ch_reads_collapsed, hairpin_bowtie )
+    BOWTIE_MAP_SEQCLUSTER ( ch_reads_collapsed, hairpin_bowtie, true )
     ch_versions = ch_versions.mix(BOWTIE_MAP_SEQCLUSTER.out.versions)
 
     ch_mirtop_logs = Channel.empty()
@@ -118,7 +118,7 @@ workflow MIRNA_QUANT {
     TABLE_MERGE ( CSVTK_JOIN.out.csv )
     ch_versions = ch_versions.mix(TABLE_MERGE.out.versions)
 
-    ch_reads_genome = BOWTIE_MAP_HAIRPIN.out.unmapped
+    ch_reads_genome = BOWTIE_MAP_HAIRPIN.out.fastq
         .map { add_suffix(it, "genome") }
 
     emit:
@@ -132,9 +132,7 @@ workflow MIRNA_QUANT {
 }
 
 def add_suffix(row, suffix) {
-    def meta = [:]
-    meta.id = "${row[0].id}_${suffix}"
-    def array = []
-    array = [ meta, row[1] ]
-    return array
+    def meta_clone = row[0].clone()
+    meta_clone.id = "${row[0].id}_${suffix}"
+    return [ meta_clone, row[1] ]
 }
