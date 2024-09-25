@@ -4,7 +4,7 @@ nextflow_pipeline {
     name "Test Workflow main.nf - test_mirgenedb"
     script "main.nf"
     profile "test_mirgenedb"
-    tag "test_mirgenedb"
+    tag "mirgenedb"
     tag "pipeline"
 
     test("test_mirgenedb") {
