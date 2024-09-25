@@ -64,17 +64,12 @@ workflow CONTAMINANT_FILTER {
         // Index DB and filter $reads emit: $rrna_reads
         INDEX_RRNA ( ch_rrna )
         ch_versions = ch_versions.mix(INDEX_RRNA.out.versions)
-        // MAP_RRNA ( ch_reads_for_mirna, INDEX_RRNA.out.index.map{meta, it -> return [it]}.first(), Channel.value('rRNA') )
-        // ch_versions = ch_versions.mix(MAP_RRNA.out.versions)
-        // ch_filter_stats = ch_filter_stats.mix(MAP_RRNA.out.stats.ifEmpty(null))
-        // MAP_RRNA.out.unmapped.set { rrna_reads }
 
         // Add meta.contaminant to input reads channel
         ch_reads_for_mirna = ch_reads_for_mirna.map{meta, fastq -> return [[id:meta.id, contaminant: "rRNA", single_end:meta.single_end], fastq]}
 
         // Map which reads are rRNAs
         BOWTIE2_ALIGN_RRNA(ch_reads_for_mirna, INDEX_RRNA.out.index.first(), [[],[]], true, false)
-        BOWTIE2_ALIGN_RRNA.out.fastq.dump(tag:"BOWTIE2_ALIGN_RRNA.fastq")
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_RRNA.out.versions)
 
         // Obtain how many hits were contaminants
@@ -105,7 +100,6 @@ workflow CONTAMINANT_FILTER {
 
         // Map which reads are tRNAs
         BOWTIE2_ALIGN_TRNA(rrna_reads, INDEX_TRNA.out.index.first(), [[],[]], true, false)
-        BOWTIE2_ALIGN_TRNA.out.fastq.dump(tag:"BOWTIE2_ALIGN_TRNA.fastq")
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_TRNA.out.versions)
 
         // Obtain how many hits were contaminants
