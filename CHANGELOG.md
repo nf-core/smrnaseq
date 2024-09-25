@@ -37,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#435]](https://github.com/nf-core/smrnaseq/pull/435) - Replace local instances of bowtie for nf-core [`bowtie2`](https://github.com/nf-core/smrnaseq/issues/434) and [`bowtie1`](https://github.com/nf-core/smrnaseq/issues/433) - Additionally adds a `bioawk` module that cleans fasta files.
 - [[#438]](https://github.com/nf-core/smrnaseq/pull/438) - Update [Mirtop to latest version](https://github.com/nf-core/smrnaseq/issues/437) - Process samples separately and join results with `CSVTK_JOIN`.
 - [[#439]](https://github.com/nf-core/smrnaseq/pull/439) - Fix [Fix paired end samples processing](https://github.com/nf-core/smrnaseq/issues/415) - Fix paired end sample handling and add test profile.
+- [[#441]](https://github.com/nf-core/smrnaseq/pull/441) - Migrate [local contaminant bowtie to nf-core](https://github.com/nf-core/smrnaseq/issues/436) - Replace local processes with `BOWTIE2_ALIGN`.
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
