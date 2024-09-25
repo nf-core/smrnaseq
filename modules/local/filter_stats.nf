@@ -12,7 +12,7 @@ process FILTER_STATS {
 
     output:
     path "*_mqc.yaml"                           , emit: stats
-    tuple val(meta), path('*.filtered.fastq.gz'), emit: reads
+    tuple val(meta), path('*.filtered.fastq.gz'), emit: reads, optional: true
     path "versions.yml"                         , emit: versions
 
     when:
