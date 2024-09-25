@@ -52,10 +52,10 @@ workflow PREPARE_GENOME {
         if(val_bowtie_index) {
             if (val_bowtie_index.endsWith(".tar.gz")) {
                 UNTAR_BOWTIE_INDEX ( ch_bowtie_index )
-                ch_bowtie_index = UNTAR_BOWTIE_INDEX.out.files.map { it[1] }
+                ch_bowtie_index = UNTAR_BOWTIE_INDEX.out.files
                 ch_versions  = ch_versions.mix(UNTAR_BOWTIE_INDEX.out.versions)
             } else {
-                ch_bowtie_index = Channel.fromPath("${val_bowtie_index}**ebwt", checkIfExists: true)
+                ch_bowtie_index = Channel.fromPath("${val_bowtie_index}**ebwt", checkIfExists: true).map{it -> [ [id:it.baseName], it ] }.collect()
                     .ifEmpty{ error "Bowtie1 index directory not found: ${val_bowtie_index}" }
                     .filter { it != null }
             }
@@ -70,7 +70,7 @@ workflow PREPARE_GENOME {
 
             // Set channels: clean fasta and its index
             ch_fasta         = CLEAN_FASTA.out.output
-            ch_bowtie_index  = INDEX_GENOME.out.index.map{ meta, it -> [ it ] }.collect()
+            ch_bowtie_index  = INDEX_GENOME.out.index.collect()
         }
     }
 
