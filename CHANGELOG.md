@@ -30,13 +30,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#420]](https://github.com/nf-core/smrnaseq/pull/420) - Fix [mirTrace produces an error in test nextflex](https://github.com/nf-core/smrnaseq/issues/419) - Allow config mode to be used in mirtrace/qc
 - [[#425]](https://github.com/nf-core/smrnaseq/pull/425) - Raise [minimum required NXF version for pipeline](https://github.com/nf-core/smrnaseq/issues/424) - usage of `arity` in some modules now requires this
 - [[#426]](https://github.com/nf-core/smrnaseq/pull/426) - Add [nf-core mirtop](https://github.com/nf-core/smrnaseq/issues/426) - replace local for nf-core `mirtop`
-- [[#430]](https://github.com/nf-core/smrnaseq/pull/430) - Emit a [warning if paired-end end data is used](https://github.com/nf-core/smrnaseq/issues/423) - pipeline handles SE data
 - [[#427]](https://github.com/nf-core/smrnaseq/pull/427) - Add [nf-core pigz uncompress](https://github.com/nf-core/smrnaseq/issues/422) - replace local `mirdeep_pigz`
 - [[#429]](https://github.com/nf-core/smrnaseq/pull/429) - Make [saving of intermediate files optional](https://github.com/nf-core/smrnaseq/issues/424) - Allows user to choose whether to save intermediate files or not. Replaces several params that referred to the same such as `params.save_aligned` and `params.save_aligned_mirna_quant`.
-- [[#433]](https://github.com/nf-core/smrnaseq/pull/433) - Replace local instances of bowtie for nf-core [`bowtie2`](https://github.com/nf-core/smrnaseq/issues/434) and [`bowtie1`](https://github.com/nf-core/smrnaseq/issues/433) - Additionally adds a `bioawk` module that cleans fasta files.
+- [[#430]](https://github.com/nf-core/smrnaseq/pull/430) - Emit a [warning if paired-end end data is used](https://github.com/nf-core/smrnaseq/issues/423) - pipeline handles SE data
 - [[#432]](https://github.com/nf-core/smrnaseq/pull/432) - Update [MultiQC and all modules to latest version](https://github.com/nf-core/smrnaseq/issues/428) - Include UMIcollapse module in MultiQC.
-- [[#435]](https://github.com/nf-core/smrnaseq/pull/435) - Update [Mirtop to latest version](https://github.com/nf-core/smrnaseq/issues/437) - Process samples separately and join results with `CSVTK_JOIN`.
-- [[#441]](https://github.com/nf-core/smrnaseq/pull/441) - Migrate [local contaminant bowtie to nf-core](https://github.com/nf-core/smrnaseq/issues/436) - Replace local processes with `BOWTIE2_ALIGN`.
+- [[#435]](https://github.com/nf-core/smrnaseq/pull/435) - Replace local instances of bowtie for nf-core [`bowtie2`](https://github.com/nf-core/smrnaseq/issues/434) and [`bowtie1`](https://github.com/nf-core/smrnaseq/issues/433) - Additionally adds a `bioawk` module that cleans fasta files.
+- [[#438]](https://github.com/nf-core/smrnaseq/pull/438) - Update [Mirtop to latest version](https://github.com/nf-core/smrnaseq/issues/437) - Process samples separately and join results with `CSVTK_JOIN`.
+- [[#439]](https://github.com/nf-core/smrnaseq/pull/439) - Fix [Fix paired end samples processing](https://github.com/nf-core/smrnaseq/issues/415) - Fix paired end sample handling and add test profile.
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
