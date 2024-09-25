@@ -108,7 +108,7 @@ If `--save_intermediates` is specified, these files will be placed in this direc
 
 ## SAMtools
 
-[SAMtools](http://samtools.sourceforge.net/) is used for sorting and indexing the output BAM files from Bowtie. In addition, the numbers of features are counted with the `idxstats` option. 
+[SAMtools](http://samtools.sourceforge.net/) is used for sorting and indexing the output BAM files from Bowtie. In addition, the numbers of features are counted with the `idxstats` option.
 
 **Output directory: `results/samtools/samtools_stats`**
 
