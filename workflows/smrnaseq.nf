@@ -54,8 +54,8 @@ workflow NFCORE_SMRNASEQ {
     ch_mirna_gtf           // channel: [ path(GTF) ]
     ch_fasta               // channel: [ val(meta), path(fasta) ]
     ch_bowtie_index        // channel: [ genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt ]
-    ch_rrna                // channel: [ path(fasta) ]
-    ch_trna                // channel: [ path(fasta) ]
+    ch_rrna                // channel: [ val(meta), path(fasta) ]
+    ch_trna                // channel: [ val(meta), path(fasta) ]
     ch_cdna                // channel: [ val(meta), path(fasta) ]
     ch_ncrna               // channel: [ val(meta), path(fasta) ]
     ch_pirna               // channel: [ val(meta), path(fasta) ]
@@ -217,16 +217,16 @@ workflow NFCORE_SMRNASEQ {
         genome_stats = GENOME_QUANT.out.stats
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
-        hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
-        mature_clean  = MIRNA_QUANT.out.fasta_mature.map { it -> it[1] }
+        ch_hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
+        ch_mature_clean  = MIRNA_QUANT.out.fasta_mature.map { it -> it[1] }
 
         if (!params.skip_mirdeep) {
             MIRDEEP2 (
                 ch_reads_for_mirna,
-                GENOME_QUANT.out.fasta,
-                GENOME_QUANT.out.index.collect(),
-                hairpin_clean,
-                mature_clean
+                ch_fasta,
+                ch_bowtie_index,
+                ch_hairpin_clean,
+                ch_mature_clean
             )
             ch_versions = ch_versions.mix(MIRDEEP2.out.versions)
         }

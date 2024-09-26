@@ -318,7 +318,7 @@ workflow CONTAMINANT_FILTER {
     FILTER_STATS.out.stats.dump(tag:"FILTER_STATS.out.stats")
 
     emit:
-    filtered_reads  = other_cont_reads          // channel: [ val(meta), path(fastq) ]
-    filter_stats    = FILTER_STATS.out.stats    // channel: [  path(stats) ]
-    versions        = ch_versions.mix(FILTER_STATS.out.versions)
+    filtered_reads  = other_cont_reads                           // channel: [ val(meta), path(fastq) ]
+    filter_stats    = FILTER_STATS.out.stats                     // channel: [  path(stats) ]
+    versions        = ch_versions.mix(FILTER_STATS.out.versions) // channel: [ versions.yml ]
 }

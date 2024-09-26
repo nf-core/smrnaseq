@@ -122,13 +122,13 @@ workflow MIRNA_QUANT {
         .map { add_suffix(it, "genome") }
 
     emit:
-    fasta_mature        = FORMAT_MATURE.out.formatted_fasta // channel: [ val(meta), path(fasta) ]
+    fasta_mature        = FORMAT_MATURE.out.formatted_fasta  // channel: [ val(meta), path(fasta) ]
     fasta_hairpin       = FORMAT_HAIRPIN.out.formatted_fasta // channel: [ val(meta), path(fasta) ]
-    unmapped            = ch_reads_genome // channel: [ val(meta), path(bam) ]
-    mature_stats        = BAM_STATS_MATURE.out.stats //TODO not used for antything, should we remove them?
-    hairpin_stats       = BAM_STATS_HAIRPIN.out.stats //TODO not used for antything, should we remove them?
-    mirtop_logs         = ch_mirtop_logs // channel: [ val(meta), path(log) ]
-    versions            = ch_versions
+    unmapped            = ch_reads_genome                    // channel: [ val(meta), path(bam) ]
+    mature_stats        = BAM_STATS_MATURE.out.stats         // channel: [ val(meta), [ stats ] ]
+    hairpin_stats       = BAM_STATS_HAIRPIN.out.stats        // channel: [ val(meta), [ stats ] ]
+    mirtop_logs         = ch_mirtop_logs                     // channel: [ val(meta), path(log) ]
+    versions            = ch_versions                        // channel: [ versions.yml ]
 }
 
 def add_suffix(row, suffix) {
