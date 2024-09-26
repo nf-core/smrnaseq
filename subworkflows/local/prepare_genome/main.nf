@@ -37,8 +37,8 @@ workflow PREPARE_GENOME {
     ch_mirna_gtf              = val_mirna_gtf                 ? Channel.fromPath(val_mirna_gtf, checkIfExists: true) : ( mirna_gtf_from_species ? Channel.fromPath(mirna_gtf_from_species, checkIfExists: true).collect() :  Channel.empty() )
     ch_mirna_adapters         = params.with_umi               ? [] : Channel.fromPath(val_fastp_known_mirna_adapters, checkIfExists: true).collect()
 
-    ch_rrna                   = val_rrna                      ? Channel.fromPath(val_rrna)                : Channel.empty()
-    ch_trna                   = val_trna                      ? Channel.fromPath(val_trna)                : Channel.empty()
+    ch_rrna                   = val_rrna                      ? Channel.fromPath(val_rrna).map{ it -> [ [id:'rRNA'], it ] }                : Channel.empty()
+    ch_trna                   = val_trna                      ? Channel.fromPath(val_trna).map{ it -> [ [id:'tRNA'], it ] }.collect()                   : Channel.empty()
     ch_cdna                   = val_cdna                      ? Channel.fromPath(val_cdna).map{ it -> [ [id:'cDNA'], it ] }.collect()                : Channel.empty()
     ch_ncrna                  = val_ncrna                     ? Channel.fromPath(val_ncrna).map{ it -> [ [id:'ncRNA'], it ] }.collect()               : Channel.empty()
     ch_pirna                  = val_pirna                     ? Channel.fromPath(val_pirna).map{ it -> [ [id:'piRNA'], it ] }.collect()               : Channel.empty()

@@ -148,8 +148,6 @@ workflow NFCORE_SMRNASEQ {
     three_prime_adapter = Channel.value(params.three_prime_adapter)
     phred_offset        = Channel.value(params.phred_offset)
 
-    ch_reads_for_mirna.dump(tag:"ch_reads_for_mirna")
-
     ch_mirtrace_config = ch_reads_for_mirna
         .transpose()
         .combine(three_prime_adapter)
