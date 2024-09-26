@@ -221,15 +221,21 @@ workflow NFCORE_SMRNASEQ {
         hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
         mature_clean  = MIRNA_QUANT.out.fasta_mature.map { it -> it[1] }
 
+        ch_mature_hairpin = mature_clean
+                .combine(hairpin_clean)
+                .map { mature, hairpin ->
+                    [[id: 'mature_hairpin'], mature, hairpin, []]
+                }
+                .first()
+
         if (!params.skip_mirdeep) {
-            MIRDEEP2 (
-                ch_reads_for_mirna,
-                GENOME_QUANT.out.fasta,
-                GENOME_QUANT.out.index.collect(),
-                hairpin_clean,
-                mature_clean
-            )
-            ch_versions = ch_versions.mix(MIRDEEP2.out.versions)
+                FASTQ_FIND_MIRNA_MIRDEEP2 (
+                        ch_reads_for_mirna,
+                        ch_fasta,
+                        ch_bowtie_index,
+                        ch_mature_hairpin,
+                )
+        ch_versions = ch_versions.mix(FASTQ_FIND_MIRNA_MIRDEEP2.out.versions)
         }
     }
 
