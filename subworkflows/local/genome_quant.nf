@@ -2,8 +2,8 @@
 // Quantify mirna with bowtie and mirtop
 //
 
-include { BAM_SORT_STATS_SAMTOOLS } from '../nf-core/bam_sort_stats_samtools'
-include { BOWTIE_MAP_SEQ as BOWTIE_MAP_GENOME } from '../../modules/local/bowtie_map_mirna'
+include { BAM_SORT_STATS_SAMTOOLS           } from '../nf-core/bam_sort_stats_samtools'
+include { BOWTIE_ALIGN as BOWTIE_MAP_GENOME } from '../../modules/nf-core/bowtie/align/main'
 
 workflow GENOME_QUANT {
     take:
@@ -14,7 +14,7 @@ workflow GENOME_QUANT {
     main:
     ch_versions = Channel.empty()
 
-    BOWTIE_MAP_GENOME ( ch_reads, ch_bowtie_index )
+    BOWTIE_MAP_GENOME ( ch_reads, ch_bowtie_index, true )
     ch_versions = ch_versions.mix(BOWTIE_MAP_GENOME.out.versions)
 
     BAM_SORT_STATS_SAMTOOLS ( BOWTIE_MAP_GENOME.out.bam,  ch_fasta )
