@@ -34,13 +34,13 @@
     },
     "software_versions": {
         "content": [
-            "{BOWTIE_MAP_HAIRPIN={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_MATURE={bowtie=1.3.1, samtools=1.14}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.1, samtools=1.14}, FASTP={fastp=0.23.4}, FASTQC_RAW={fastqc=0.12.1}, FASTQC_TRIM={fastqc=0.12.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_HAIRPIN={bowtie=1.3.0}, INDEX_MATURE={bowtie=1.3.0}, MIRTOP_COUNTS={mirtop=0.4.28}, MIRTOP_EXPORT={mirtop=0.4.28}, MIRTOP_GFF={mirtop=0.4.28}, MIRTOP_STATS={mirtop=0.4.28}, MIRTRACE_QC={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.21}, SAMTOOLS_IDXSTATS={samtools=1.21}, SAMTOOLS_INDEX={samtools=1.21}, SAMTOOLS_SORT={samtools=1.21}, SAMTOOLS_STATS={samtools=1.21}, SEQCLUSTER_COLLAPSE={seqcluster=1.2.9}, TABLE_MERGE={r-base=3.6.2}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
+            "{BOWTIE_MAP_HAIRPIN={bowtie=1.3.0, samtools=1.16.1}, BOWTIE_MAP_MATURE={bowtie=1.3.0, samtools=1.16.1}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.0, samtools=1.16.1}, FASTP={fastp=0.23.4}, FASTQC_RAW={fastqc=0.12.1}, FASTQC_TRIM={fastqc=0.12.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_HAIRPIN={bowtie=1.3.0}, INDEX_MATURE={bowtie=1.3.0}, MIRTOP_COUNTS={mirtop=0.4.28}, MIRTOP_EXPORT={mirtop=0.4.28}, MIRTOP_GFF={mirtop=0.4.28}, MIRTOP_STATS={mirtop=0.4.28}, MIRTRACE_QC={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.21}, SAMTOOLS_IDXSTATS={samtools=1.21}, SAMTOOLS_INDEX={samtools=1.21}, SAMTOOLS_SORT={samtools=1.21}, SAMTOOLS_STATS={samtools=1.21}, SEQCLUSTER_COLLAPSE={seqcluster=1.2.9}, TABLE_MERGE={r-base=3.6.2}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
         ],
         "meta": {
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-20T17:11:24.272157529"
+        "timestamp": "2024-09-26T00:29:08.657006"
     },
     "mirna_quant_bam": {
         "content": [
