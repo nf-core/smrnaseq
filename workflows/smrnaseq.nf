@@ -209,7 +209,7 @@ workflow NFCORE_SMRNASEQ {
     // GENOME
     //
     genome_stats = Channel.empty()
-    if (has_fasta == true){
+    if (has_fasta){
         GENOME_QUANT (
             ch_bowtie_index,
             ch_fasta,

@@ -49,7 +49,7 @@ workflow PREPARE_GENOME {
     if(val_fasta) {
         //Prepare bowtie index, unless specified
         //This needs to be done here as the index is used by GENOME_QUANT
-        if(val_bowtie_index && params.skip_mirdeep) {         // If user wants mirdeep, we should still clean and prepare the index
+        if(val_bowtie_index) {
             if (val_bowtie_index.endsWith(".tar.gz")) {
                 UNTAR_BOWTIE_INDEX ( ch_bowtie_index )
                 ch_bowtie_index = UNTAR_BOWTIE_INDEX.out.files
