@@ -53,7 +53,7 @@ workflow NFCORE_SMRNASEQ {
     ch_reference_hairpin   // channel: [ val(meta), path(fasta) ]
     ch_mirna_gtf           // channel: [ path(GTF) ]
     ch_fasta               // channel: [ val(meta), path(fasta) ]
-    ch_bowtie_index        // channel: [ genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt ]
+    ch_bowtie_index        // channel: [ val(meta), path(index) ]
     ch_rrna                // channel: [ val(meta), path(fasta) ]
     ch_trna                // channel: [ val(meta), path(fasta) ]
     ch_cdna                // channel: [ val(meta), path(fasta) ]

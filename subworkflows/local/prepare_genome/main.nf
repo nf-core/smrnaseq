@@ -96,7 +96,7 @@ workflow PREPARE_GENOME {
     emit:
     fasta                 = ch_fasta               // channel: [ val(meta), path(fasta) ]
     has_fasta             = bool_has_fasta         // boolean
-    bowtie_index          = ch_bowtie_index        // channel: [ genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt ]
+    bowtie_index          = ch_bowtie_index        // channel: [ val(meta), path(index) ]
     versions              = ch_versions            // channel: [ versions.yml ]
     mirtrace_species      = ch_mirtrace_species    // channel: [ val(string) ]
     has_mirtrace_species  = bool_mirtrace_species  // boolean
