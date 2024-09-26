@@ -134,9 +134,14 @@ For more details about the output files and reports, please refer to the
 
 nf-core/smrnaseq was originally written by P. Ewels, C. Wang, R. Hammarén, L. Pantano, A. Peltzer.
 
+Lorena Pantano ([@lpantano](https://github.com/lpantano)) from MIT updated the pipeline to Nextflow DSL2.
+
 We thank the following people for their extensive assistance in the development of this pipeline:
 
-Lorena Pantano ([@lpantano](https://github.com/lpantano)) from MIT updated the pipeline to Nextflow DSL2.
+- [@atrigila] Anabella Trigila
+- [@nschcolnicov] Nicolás Alejandro Schcolnicov
+- [@christopher-mohr] Christopher Mohr
+- [@grst] Gregor Sturm
 
 ## Contributions and Support
 
