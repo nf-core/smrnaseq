@@ -22,7 +22,6 @@ include { FASTQ_FIND_MIRNA_MIRDEEP2        } from '../subworkflows/nf-core/fastq
 include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/main'
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant'
 include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant'
-include { MIRDEEP2                         } from '../subworkflows/local/mirdeep2'
 // plugins
 include { paramsSummaryMap                 } from 'plugin/nf-validation'
 
