@@ -66,6 +66,16 @@
                         "git_sha": "06c8865e36741e05ad32ef70ab3fac127486af48",
                         "installed_by": ["modules"]
                     },
+                    "mirdeep2/mapper": {
+                        "branch": "master",
+                        "git_sha": "757f60e5656283122cd6ec37d4679483bebb7312",
+                        "installed_by": ["fastq_find_mirna_mirdeep2"]
+                    },
+                    "mirdeep2/mirdeep2": {
+                        "branch": "master",
+                        "git_sha": "757f60e5656283122cd6ec37d4679483bebb7312",
+                        "installed_by": ["fastq_find_mirna_mirdeep2"]
+                    },
                     "mirtop/counts": {
                         "branch": "master",
                         "git_sha": "196062335bb9ec979075bf2212f64a369b927b0d",
@@ -131,11 +141,21 @@
                         "git_sha": "407ff4b579f5ae5a3b842b675cd75005d112b8ba",
                         "installed_by": ["modules"]
                     },
+                    "seqkit/fq2fa": {
+                        "branch": "master",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
+                        "installed_by": ["fastq_find_mirna_mirdeep2"]
+                    },
                     "seqkit/grep": {
                         "branch": "master",
                         "git_sha": "06c8865e36741e05ad32ef70ab3fac127486af48",
                         "installed_by": ["modules"],
                         "patch": "modules/nf-core/seqkit/grep/seqkit-grep.diff"
+                    },
+                    "seqkit/replace": {
+                        "branch": "master",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
+                        "installed_by": ["fastq_find_mirna_mirdeep2"]
                     },
                     "umicollapse": {
                         "branch": "master",
@@ -174,6 +194,11 @@
                     "fastq_fastqc_umitools_fastp": {
                         "branch": "master",
                         "git_sha": "46eca555142d6e597729fcb682adcc791796f514",
+                        "installed_by": ["subworkflows"]
+                    },
+                    "fastq_find_mirna_mirdeep2": {
+                        "branch": "master",
+                        "git_sha": "757f60e5656283122cd6ec37d4679483bebb7312",
                         "installed_by": ["subworkflows"]
                     },
                     "utils_nextflow_pipeline": {

@@ -19,7 +19,8 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 79 },
+                { assert workflow.trace.succeeded().size() == 90 },
+                { assert workflow.trace.failed().size() == 1 },
 
                 { assert snapshot(
                     path("$outputDir/mirna_quant/bam/mature/Clone1_N1_mature.sorted.flagstat").exists(),
@@ -72,6 +73,15 @@ nextflow_pipeline {
                     path("$outputDir/genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.idxstats"),
                     path("$outputDir/genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.flagstat")
                 ).match("genome_quant_bam") },
+
+                { assert snapshot(
+                    path("$outputDir/mirdeep2/result_Clone1_N1.csv").exists(),
+                    path("$outputDir/mirdeep2/result_Control_N1.csv").exists(),
+                    path("$outputDir/mirdeep2/result_Control_N1.bed").exists(),
+                    path("$outputDir/mirdeep2/result_Control_N1.bed").exists(),
+                    path("$outputDir/mirdeep2/result_Control_N1.html").exists(),
+                    path("$outputDir/mirdeep2/result_Control_N1.html").exists()
+                ).match("mirdeep2") },
 
                 { assert snapshot(
                     path("$outputDir/multiqc/multiqc_report.html").exists()
