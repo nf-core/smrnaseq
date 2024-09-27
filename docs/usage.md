@@ -63,6 +63,12 @@ Contamination filtering of the sequencing reads is optional and can be invoked u
 - `pirna`: Used to supply a FASTA file containing piRNA contamination sequence. e.g. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 - `other_contamination`: Used to supply an additional filtering set. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 
+## mirDeep2
+
+If the software encounters an error with exit status 255, it will be ignored, and the pipeline will continue to complete. In such cases, the pipeline will log a note that includes the path to the work directory where the issue occurred. You can inspect this work directory to examine your input data and troubleshoot the issue.
+
+Error 255 is typically related to the core algorithm of miRDeep generating empty output files. This often happens when the reads being processed do not correspond to putative mature miRNA sequences, or if the provided precursors do not meet the criteria for valid miRNA precursors, both of which may stem from the input reads used. A common cause of this error is running the pipeline with a small subset of the input reads.
+
 ### UMI handling
 
 The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire read sequence after 3'adapter removal. Followed by Umitools-extract to extract the miRNA adapter and UMI. This can be achieved by using the parameters for UMI handling as follows (in this case for QIAseq miRNA Library Kit):

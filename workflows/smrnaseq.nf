@@ -17,11 +17,11 @@ include { MIRTRACE_QC                      } from '../modules/nf-core/mirtrace/q
 include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
 include { paramsSummaryMultiqc             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { FASTQ_FIND_MIRNA_MIRDEEP2        } from '../subworkflows/nf-core/fastq_find_mirna_mirdeep2/main'
 // local subworkflows
 include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/main'
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant'
 include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant'
-include { MIRDEEP2                         } from '../subworkflows/local/mirdeep2'
 // plugins
 include { paramsSummaryMap                 } from 'plugin/nf-validation'
 
@@ -220,15 +220,21 @@ workflow NFCORE_SMRNASEQ {
         ch_hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
         ch_mature_clean  = MIRNA_QUANT.out.fasta_mature.map { it -> it[1] }
 
+        ch_mature_hairpin = mature_clean
+                .combine(hairpin_clean)
+                .map { mature, hairpin ->
+                    [[id: 'mature_hairpin'], mature, hairpin, []]
+                }
+                .first()
+
         if (!params.skip_mirdeep) {
-            MIRDEEP2 (
-                ch_reads_for_mirna,
-                ch_fasta,
-                ch_bowtie_index,
-                ch_hairpin_clean,
-                ch_mature_clean
-            )
-            ch_versions = ch_versions.mix(MIRDEEP2.out.versions)
+                FASTQ_FIND_MIRNA_MIRDEEP2 (
+                        ch_reads_for_mirna,
+                        ch_fasta,
+                        ch_bowtie_index,
+                        ch_mature_hairpin,
+                )
+        ch_versions = ch_versions.mix(FASTQ_FIND_MIRNA_MIRDEEP2.out.versions)
         }
     }
 

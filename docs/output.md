@@ -151,9 +151,9 @@ If `--save_intermediates` is specified, these files will be placed in this direc
 
 **Output directory: `results/mirdeep2`**
 
-- `mirdeep/timestamp_sample.bed` File with the known and novel miRNAs in bed format.
-- `mirdeep/timestamp_sample.csv` File with an overview of all detected miRNAs (known and novel) in csv format.
-- `mirdeep/timestamp_sample.html` A HTML report with an overview of all detected miRNAs (known and novel) in html format.
+- `mirdeep2/result_{sample.id}.bed` File with the known and novel miRNAs in bed format.
+- `mirdeep2/result_{sample.id}.csv` File with an overview of all detected miRNAs (known and novel) in csv format.
+- `mirdeep2/result_{sample.id}.html` A HTML report with an overview of all detected miRNAs (known and novel) in html format.
 
 ## miRTrace
 
