@@ -145,13 +145,13 @@ workflow NFCORE_SMRNASEQ {
     //
     // MODULE: mirtrace QC
     //
-    three_prime_adapter = Channel.value(params.three_prime_adapter)
-    phred_offset        = Channel.value(params.phred_offset)
+    ch_three_prime_adapter = Channel.value(params.three_prime_adapter)
+    ch_phred_offset        = Channel.value(params.phred_offset)
 
     ch_mirtrace_config = ch_reads_for_mirna
         .transpose()
-        .combine(three_prime_adapter)
-        .combine(phred_offset)
+        .combine(ch_three_prime_adapter)
+        .combine(ch_phred_offset)
         .collectFile { meta, reads, adapter, phred ->
         def config_filename = "${meta.id}.data"
         [ config_filename, "./${reads.getFileName().toString()},${meta.id},${adapter},${phred}\n" ]
@@ -220,8 +220,8 @@ workflow NFCORE_SMRNASEQ {
         ch_hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
         ch_mature_clean  = MIRNA_QUANT.out.fasta_mature.map { it -> it[1] }
 
-        ch_mature_hairpin = mature_clean
-                .combine(hairpin_clean)
+        ch_mature_hairpin = ch_mature_clean
+                .combine(ch_hairpin_clean)
                 .map { mature, hairpin ->
                     [[id: 'mature_hairpin'], mature, hairpin, []]
                 }
