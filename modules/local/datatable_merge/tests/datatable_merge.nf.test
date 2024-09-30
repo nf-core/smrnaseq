@@ -15,7 +15,7 @@ nextflow_process {
             }
             process {
                 """
-                input[0] = [file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/datatable_merge/small_mirtop_dataset.txt", checkIfExists: true)]
+                input[0] = [[],file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/datatable_merge/small_mirtop_dataset.txt", checkIfExists: true)]
                 """
             }
         }
@@ -46,7 +46,7 @@ nextflow_process {
             }
             process {
                 """
-                input[0] = [file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/datatable_merge/small_mirtop_dataset.txt", checkIfExists: true)]
+                input[0] = [[],file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/datatable_merge/small_mirtop_dataset.txt", checkIfExists: true)]
                 """
             }
         }
