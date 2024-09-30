@@ -39,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#439]](https://github.com/nf-core/smrnaseq/pull/439) - Fix [Fix paired end samples processing](https://github.com/nf-core/smrnaseq/issues/415) - Fix paired end sample handling and add test profile.
 - [[#441]](https://github.com/nf-core/smrnaseq/pull/441) - Migrate [local contaminant bowtie to nf-core](https://github.com/nf-core/smrnaseq/issues/436) - Replace local processes with `BOWTIE2_ALIGN`.
 - [[#443]](https://github.com/nf-core/smrnaseq/pull/443) - Migrate [mirna and genome_quant bowtie to nf-core](https://github.com/nf-core/smrnaseq/issues/436) - Replace local processes with `BOWTIE_ALIGN`.
+- [[#447]](https://github.com/nf-core/smrnaseq/pull/447) - Fix [Minor fixes and general pipeline cleanup](https://github.com/nf-core/smrnaseq/issues/400) - Update variable and processes names, update channel comments, remove unused modules and params.
 - [[#448]](https://github.com/nf-core/smrnaseq/pull/448) - Migrate local mirdeep to [nf-core mirdeep2 modules and subworkflow](https://github.com/nf-core/smrnaseq/issues/443) and generate [test profile for mirdeep2](https://github.com/nf-core/smrnaseq/issues/399).
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch

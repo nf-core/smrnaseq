@@ -51,17 +51,19 @@ workflow NFCORE_SMRNASEQ {
     ch_mirtrace_species    // channel: [ val(string) ]
     ch_reference_mature    // channel: [ val(meta), path(fasta) ]
     ch_reference_hairpin   // channel: [ val(meta), path(fasta) ]
-    ch_mirna_gtf           // channel: [ path(GTF) ]
+    ch_mirna_gtf           // channel: [ val(meta), path(gtf) ]
     ch_fasta               // channel: [ val(meta), path(fasta) ]
-    ch_bowtie_index        // channel: [ genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt ]
-    ch_rrna                // channel: [ path(fasta) ]
-    ch_trna                // channel: [ path(fasta) ]
+    ch_bowtie_index        // channel: [ val(meta), [ path(directory_index) ] ]
+    ch_rrna                // channel: [ val(meta), path(fasta) ]
+    ch_trna                // channel: [ val(meta), path(fasta) ]
     ch_cdna                // channel: [ val(meta), path(fasta) ]
     ch_ncrna               // channel: [ val(meta), path(fasta) ]
     ch_pirna               // channel: [ val(meta), path(fasta) ]
     ch_other_contamination // channel: [ val(meta), path(fasta) ]
     ch_versions            // channel: [ path(versions.yml) ]
     ch_samplesheet         // channel: sample fastqs parsed from --input
+    ch_three_prime_adapter // channel: [ val(string) ]
+    ch_phred_offset        // channel: [ val(string) ]
 
     main:
     //
@@ -145,13 +147,11 @@ workflow NFCORE_SMRNASEQ {
     //
     // MODULE: mirtrace QC
     //
-    three_prime_adapter = Channel.value(params.three_prime_adapter)
-    phred_offset        = Channel.value(params.phred_offset)
 
     ch_mirtrace_config = ch_reads_for_mirna
         .transpose()
-        .combine(three_prime_adapter)
-        .combine(phred_offset)
+        .combine(ch_three_prime_adapter)
+        .combine(ch_phred_offset)
         .collectFile { meta, reads, adapter, phred ->
         def config_filename = "${meta.id}.data"
         [ config_filename, "./${reads.getFileName().toString()},${meta.id},${adapter},${phred}\n" ]
@@ -217,11 +217,11 @@ workflow NFCORE_SMRNASEQ {
         genome_stats = GENOME_QUANT.out.stats
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
-        hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
-        mature_clean  = MIRNA_QUANT.out.fasta_mature.map { it -> it[1] }
+        ch_hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
+        ch_mature_clean  = MIRNA_QUANT.out.fasta_mature.map { it -> it[1] }
 
-        ch_mature_hairpin = mature_clean
-                .combine(hairpin_clean)
+        ch_mature_hairpin = ch_mature_clean
+                .combine(ch_hairpin_clean)
                 .map { mature, hairpin ->
                     [[id: 'mature_hairpin'], mature, hairpin, []]
                 }

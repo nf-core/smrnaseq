@@ -18,9 +18,9 @@ include {   BOWTIE_ALIGN  as BOWTIE_MAP_MATURE
 include {   BAM_SORT_STATS_SAMTOOLS as BAM_STATS_MATURE
             BAM_SORT_STATS_SAMTOOLS as BAM_STATS_HAIRPIN   } from '../nf-core/bam_sort_stats_samtools'
 
-include { SEQCLUSTER_COLLAPSE  } from '../../modules/nf-core/seqcluster/collapse/main'
-include { TABLE_MERGE          } from '../../modules/local/datatable_merge/datatable_merge.nf'
-include { EDGER_QC             } from '../../modules/local/edger_qc/edger_qc.nf'
+include { SEQCLUSTER_COLLAPSE    } from '../../modules/nf-core/seqcluster/collapse/main'
+include { DATATABLE_MERGE        } from '../../modules/local/datatable_merge/main'
+include { EDGER_QC               } from '../../modules/local/edger_qc/main'
 include { BAM_STATS_MIRNA_MIRTOP } from '../../subworkflows/nf-core/bam_stats_mirna_mirtop/main'
 include { CSVTK_JOIN             } from '../../modules/nf-core/csvtk/join/main'
 
@@ -28,7 +28,7 @@ workflow MIRNA_QUANT {
     take:
     ch_reference_mature  // channel: [ val(meta), fasta file]
     ch_reference_hairpin // channel: [ val(meta), fasta file]
-    ch_mirna_gtf         // channel: [ path(GTF) ]
+    ch_mirna_gtf         // channel: [ val(meta), path(gtf) ]
     ch_reads_for_mirna   // channel: [ val(meta), [ reads ] ]
     ch_mirtrace_species  // channel: [ val(string) ]
 
@@ -96,7 +96,7 @@ workflow MIRNA_QUANT {
 
     // nf-core/mirtop
 
-    ch_mirna_gtf_species = ch_mirna_gtf
+    ch_mirna_gtf_species = ch_mirna_gtf.map{ meta,gtf -> gtf }
             .combine(ch_mirtrace_species)
             .map{ gtf, species -> [ [id:species.toString()], gtf, species ] }
             .collect()
@@ -115,20 +115,20 @@ workflow MIRNA_QUANT {
 
     CSVTK_JOIN ( ch_tsvs )
 
-    TABLE_MERGE ( CSVTK_JOIN.out.csv )
-    ch_versions = ch_versions.mix(TABLE_MERGE.out.versions)
+    DATATABLE_MERGE ( CSVTK_JOIN.out.csv )
+    ch_versions = ch_versions.mix(DATATABLE_MERGE.out.versions)
 
     ch_reads_genome = BOWTIE_MAP_HAIRPIN.out.fastq
         .map { add_suffix(it, "genome") }
 
     emit:
-    fasta_mature        = FORMAT_MATURE.out.formatted_fasta // channel: [ val(meta), path(fasta) ]
+    fasta_mature        = FORMAT_MATURE.out.formatted_fasta  // channel: [ val(meta), path(fasta) ]
     fasta_hairpin       = FORMAT_HAIRPIN.out.formatted_fasta // channel: [ val(meta), path(fasta) ]
-    unmapped            = ch_reads_genome // channel: [ val(meta), path(bam) ]
-    mature_stats        = BAM_STATS_MATURE.out.stats //TODO not used for antything, should we remove them?
-    hairpin_stats       = BAM_STATS_HAIRPIN.out.stats //TODO not used for antything, should we remove them?
-    mirtop_logs         = ch_mirtop_logs // channel: [ val(meta), path(log) ]
-    versions            = ch_versions
+    unmapped            = ch_reads_genome                    // channel: [ val(meta), path(bam) ]
+    mature_stats        = BAM_STATS_MATURE.out.stats         // channel: [ val(meta), [ stats ] ]
+    hairpin_stats       = BAM_STATS_HAIRPIN.out.stats        // channel: [ val(meta), [ stats ] ]
+    mirtop_logs         = ch_mirtop_logs                     // channel: [ val(meta), path(log) ]
+    versions            = ch_versions                        // channel: [ versions.yml ]
 }
 
 def add_suffix(row, suffix) {

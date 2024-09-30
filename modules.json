@@ -36,11 +36,6 @@
                         "git_sha": "06c8865e36741e05ad32ef70ab3fac127486af48",
                         "installed_by": ["modules"]
                     },
-                    "cat/cat": {
-                        "branch": "master",
-                        "git_sha": "06c8865e36741e05ad32ef70ab3fac127486af48",
-                        "installed_by": ["modules"]
-                    },
                     "cat/fastq": {
                         "branch": "master",
                         "git_sha": "06c8865e36741e05ad32ef70ab3fac127486af48",
@@ -106,11 +101,6 @@
                         "git_sha": "7c316cae26baf55e0add993bed2b0c9f7105c653",
                         "installed_by": ["modules"]
                     },
-                    "pigz/uncompress": {
-                        "branch": "master",
-                        "git_sha": "c00055a0b13d622b4f1f51a8e5be31deaf99ded7",
-                        "installed_by": ["modules"]
-                    },
                     "samtools/flagstat": {
                         "branch": "master",
                         "git_sha": "763d4b5c05ffda3ac1ac969dc67f7458cfb2eb1d",
@@ -169,7 +159,7 @@
                     },
                     "untarfiles": {
                         "branch": "master",
-                        "git_sha": "958e4a6031deefa327f339f11d9baf1ab5a32d5f",
+                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
                         "installed_by": ["modules"]
                     }
                 }

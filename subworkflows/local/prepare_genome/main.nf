@@ -26,23 +26,23 @@ workflow PREPARE_GENOME {
     ch_versions = Channel.empty()
 
     // Parameter channel handling
-    ch_fasta                  = val_fasta                     ? Channel.fromPath(val_fasta, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()        : Channel.empty()
-    ch_bowtie_index           = val_bowtie_index              ? Channel.fromPath(val_bowtie_index, checkIfExists: true).map{ it -> [ [], it ] }.collect() : Channel.empty()
+    ch_fasta                  = val_fasta                     ? Channel.fromPath(val_fasta, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()           : Channel.empty()
+    ch_bowtie_index           = val_bowtie_index              ? Channel.fromPath(val_bowtie_index, checkIfExists: true).map{ it -> [ [], it ] }.collect()                  : Channel.empty()
 
     bool_mirtrace_species     = val_mirtrace_species          ? true : false
     bool_has_fasta            = val_fasta                     ? true : false
 
     ch_mirtrace_species       = val_mirtrace_species          ? Channel.value(val_mirtrace_species) : Channel.empty()
     mirna_gtf_from_species    = val_mirtrace_species          ? (val_mirtrace_species == 'hsa' ? "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${val_mirtrace_species}.gff3") : false
-    ch_mirna_gtf              = val_mirna_gtf                 ? Channel.fromPath(val_mirna_gtf, checkIfExists: true) : ( mirna_gtf_from_species ? Channel.fromPath(mirna_gtf_from_species, checkIfExists: true).collect() :  Channel.empty() )
+    ch_mirna_gtf              = val_mirna_gtf                 ? Channel.fromPath(val_mirna_gtf, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : ( mirna_gtf_from_species ? Channel.fromPath(mirna_gtf_from_species, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() :  Channel.empty() )
     ch_mirna_adapters         = params.with_umi               ? [] : Channel.fromPath(val_fastp_known_mirna_adapters, checkIfExists: true).collect()
 
-    ch_rrna                   = val_rrna                      ? Channel.fromPath(val_rrna).map{ it -> [ [id:'rRNA'], it ] }                : Channel.empty()
-    ch_trna                   = val_trna                      ? Channel.fromPath(val_trna).map{ it -> [ [id:'tRNA'], it ] }.collect()                   : Channel.empty()
-    ch_cdna                   = val_cdna                      ? Channel.fromPath(val_cdna).map{ it -> [ [id:'cDNA'], it ] }.collect()                : Channel.empty()
-    ch_ncrna                  = val_ncrna                     ? Channel.fromPath(val_ncrna).map{ it -> [ [id:'ncRNA'], it ] }.collect()               : Channel.empty()
-    ch_pirna                  = val_pirna                     ? Channel.fromPath(val_pirna).map{ it -> [ [id:'piRNA'], it ] }.collect()               : Channel.empty()
-    ch_other_contamination    = val_other_contamination       ? Channel.fromPath(val_other_contamination).map{ it -> [ [id:'other'], it ] }.collect() : Channel.empty()
+    ch_rrna                   = val_rrna                      ? Channel.fromPath(val_rrna, checkIfExists: true).map{ it -> [ [id:'rRNA'], it ] }.collect()                 : Channel.empty()
+    ch_trna                   = val_trna                      ? Channel.fromPath(val_trna, checkIfExists: true).map{ it -> [ [id:'tRNA'], it ] }.collect()                 : Channel.empty()
+    ch_cdna                   = val_cdna                      ? Channel.fromPath(val_cdna, checkIfExists: true).map{ it -> [ [id:'cDNA'], it ] }.collect()                 : Channel.empty()
+    ch_ncrna                  = val_ncrna                     ? Channel.fromPath(val_ncrna, checkIfExists: true).map{ it -> [ [id:'ncRNA'], it ] }.collect()               : Channel.empty()
+    ch_pirna                  = val_pirna                     ? Channel.fromPath(val_pirna, checkIfExists: true).map{ it -> [ [id:'piRNA'], it ] }.collect()               : Channel.empty()
+    ch_other_contamination    = val_other_contamination       ? Channel.fromPath(val_other_contamination, checkIfExists: true).map{ it -> [ [id:'other'], it ] }.collect() : Channel.empty()
 
     // even if bowtie index is specified, there still needs to be a fasta.
     // without fasta, no genome analysis.
@@ -90,24 +90,24 @@ workflow PREPARE_GENOME {
         }
         ch_reference_mature  = params.mirgenedb_mature  ? Channel.fromPath(params.mirgenedb_mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : { exit 1, "Mature miRNA fasta file not found via --mirgenedb_mature: ${params.mirgenedb_mature}" }
         ch_reference_hairpin = params.mirgenedb_hairpin ? Channel.fromPath(params.mirgenedb_hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : { exit 1, "Hairpin miRNA fasta file not found via --mirgenedb_hairpin: ${params.mirgenedb_hairpin}" }
-        ch_mirna_gtf         = params.mirgenedb_gff     ? Channel.fromPath(params.mirgenedb_gff, checkIfExists: true).collect()                                           : { exit 1, "MirGeneDB gff file not found via --mirgenedb_gff: ${params.mirgenedb_gff}"}
+        ch_mirna_gtf         = params.mirgenedb_gff     ? Channel.fromPath(params.mirgenedb_gff, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()     : { exit 1, "MirGeneDB gff file not found via --mirgenedb_gff: ${params.mirgenedb_gff}"}
     }
 
     emit:
     fasta                 = ch_fasta               // channel: [ val(meta), path(fasta) ]
     has_fasta             = bool_has_fasta         // boolean
-    bowtie_index          = ch_bowtie_index        // channel: [genome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt]
+    bowtie_index          = ch_bowtie_index        // channel: [ val(meta), [ path(directory_index) ] ]
     versions              = ch_versions            // channel: [ versions.yml ]
     mirtrace_species      = ch_mirtrace_species    // channel: [ val(string) ]
     has_mirtrace_species  = bool_mirtrace_species  // boolean
     reference_mature      = ch_reference_mature    // channel: [ val(meta), path(fasta) ]
     reference_hairpin     = ch_reference_hairpin   // channel: [ val(meta), path(fasta) ]
-    mirna_gtf             = ch_mirna_gtf           // channel: [ path(GTF) ]
-    rrna                  = ch_rrna                // channel: [ path(fasta) ]
-    trna                  = ch_trna                // channel: [ path(fasta) ]
-    cdna                  = ch_cdna                // channel: [ path(fasta) ]
-    ncrna                 = ch_ncrna               // channel: [ path(fasta) ]
-    pirna                 = ch_pirna               // channel: [ path(fasta) ]
-    other_contamination   = ch_other_contamination // channel: [ path(fasta) ]
-    mirna_adapters        = ch_mirna_adapters      // channel: [ path(fasta) ]
+    mirna_gtf             = ch_mirna_gtf           // channel: [ val(meta), path(gtf) ]
+    rrna                  = ch_rrna                // channel: [ val(meta), path(fasta) ]
+    trna                  = ch_trna                // channel: [ val(meta), path(fasta) ]
+    cdna                  = ch_cdna                // channel: [ val(meta), path(fasta) ]
+    ncrna                 = ch_ncrna               // channel: [ val(meta), path(fasta) ]
+    pirna                 = ch_pirna               // channel: [ val(meta), path(fasta) ]
+    other_contamination   = ch_other_contamination // channel: [ val(meta), path(fasta) ]
+    mirna_adapters        = ch_mirna_adapters      // channel: [ val(meta), path(fasta) ]
 }
