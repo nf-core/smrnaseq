@@ -27,7 +27,7 @@ workflow PREPARE_GENOME {
 
     // Parameter channel handling
     ch_fasta                  = val_fasta                     ? Channel.fromPath(val_fasta, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()           : Channel.empty()
-    ch_bowtie_index           = val_bowtie_index              ? Channel.fromPath(val_bowtie_index, checkIfExists: true).map{ it -> [ [id:'bowtie_index'], it ] }.collect() : Channel.empty()
+    ch_bowtie_index           = val_bowtie_index              ? Channel.fromPath(val_bowtie_index, checkIfExists: true).map{ it -> [ [], it ] }.collect()                  : Channel.empty()
 
     bool_mirtrace_species     = val_mirtrace_species          ? true : false
     bool_has_fasta            = val_fasta                     ? true : false
@@ -55,7 +55,7 @@ workflow PREPARE_GENOME {
                 ch_bowtie_index = UNTAR_BOWTIE_INDEX.out.files
                 ch_versions  = ch_versions.mix(UNTAR_BOWTIE_INDEX.out.versions)
             } else {
-                ch_bowtie_index = Channel.fromPath("${val_bowtie_index}**ebwt", checkIfExists: true).map{it -> [ [id:'bowtie_index'], it ] }.collect()
+                ch_bowtie_index = Channel.fromPath("${val_bowtie_index}**ebwt", checkIfExists: true).map{it -> [ [id:it.baseName], it ] }.collect()
                     .ifEmpty{ error "Bowtie1 index directory not found: ${val_bowtie_index}" }
                     .filter { it != null }
             }
@@ -96,7 +96,7 @@ workflow PREPARE_GENOME {
     emit:
     fasta                 = ch_fasta               // channel: [ val(meta), path(fasta) ]
     has_fasta             = bool_has_fasta         // boolean
-    bowtie_index          = ch_bowtie_index        // channel: [ val(meta), [ path(genome.1.ebwt), path(genome.2.ebwt), path(genome.3.ebwt), path(genome.4.ebwt), path(genome.rev.1.ebwt), path(genome.rev.2.ebwt) ] ]
+    bowtie_index          = ch_bowtie_index        // channel: [ val(meta), [ path(directory_index) ] ]
     versions              = ch_versions            // channel: [ versions.yml ]
     mirtrace_species      = ch_mirtrace_species    // channel: [ val(string) ]
     has_mirtrace_species  = bool_mirtrace_species  // boolean

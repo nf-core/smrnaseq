@@ -8,7 +8,7 @@ workflow FASTQ_FIND_MIRNA_MIRDEEP2 {
     take:
     ch_reads                     // channel: [ val(meta),  fastq  ]
     ch_genome_fasta              // channel: [ val(meta),  genome_fasta  ]
-    ch_bowtie_index              // channel: [ val(meta), [ path(genome.1.ebwt), path(genome.2.ebwt), path(genome.3.ebwt), path(genome.4.ebwt), path(genome.rev.1.ebwt), path(genome.rev.2.ebwt) ] ]
+    ch_bowtie_index              // channel: [ val(meta),  index  ]
     ch_mirna_mature_hairpin      // channel: [ val(meta),  mature_mirna, hairpin_mirna ]
 
     main:
