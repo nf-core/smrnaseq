@@ -1,8 +1,7 @@
 channels:
   - conda-forge
   - bioconda
-
 dependencies:
-  - bioconda::grep=3.4
+  - conda-forge::grep=3.11
   - conda-forge::sed=4.8
   - conda-forge::tar=1.34
