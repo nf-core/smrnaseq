@@ -51,9 +51,9 @@ workflow NFCORE_SMRNASEQ {
     ch_mirtrace_species    // channel: [ val(string) ]
     ch_reference_mature    // channel: [ val(meta), path(fasta) ]
     ch_reference_hairpin   // channel: [ val(meta), path(fasta) ]
-    ch_mirna_gtf           // channel: [ path(GTF) ]
+    ch_mirna_gtf           // channel: [ val(meta), path(gtf) ]
     ch_fasta               // channel: [ val(meta), path(fasta) ]
-    ch_bowtie_index        // channel: [ val(meta), path(index) ]
+    ch_bowtie_index        // channel: [ val(meta), [ path(genome.1.ebwt), path(genome.2.ebwt), path(genome.3.ebwt), path(genome.4.ebwt), path(genome.rev.1.ebwt), path(genome.rev.2.ebwt) ] ]
     ch_rrna                // channel: [ val(meta), path(fasta) ]
     ch_trna                // channel: [ val(meta), path(fasta) ]
     ch_cdna                // channel: [ val(meta), path(fasta) ]
@@ -62,6 +62,8 @@ workflow NFCORE_SMRNASEQ {
     ch_other_contamination // channel: [ val(meta), path(fasta) ]
     ch_versions            // channel: [ path(versions.yml) ]
     ch_samplesheet         // channel: sample fastqs parsed from --input
+    ch_three_prime_adapter // channel: [ val(string) ]
+    ch_phred_offset        // channel: [ val(string) ]
 
     main:
     //
@@ -145,8 +147,6 @@ workflow NFCORE_SMRNASEQ {
     //
     // MODULE: mirtrace QC
     //
-    ch_three_prime_adapter = Channel.value(params.three_prime_adapter)
-    ch_phred_offset        = Channel.value(params.phred_offset)
 
     ch_mirtrace_config = ch_reads_for_mirna
         .transpose()

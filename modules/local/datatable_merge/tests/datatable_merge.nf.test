@@ -1,11 +1,11 @@
 nextflow_process {
 
-    name "Test Process TABLE_MERGE"
-    script "../datatable_merge.nf"
-    process "TABLE_MERGE"
+    name "Test Process DATATABLE_MERGE"
+    script "../main.nf"
+    process "DATATABLE_MERGE"
     tag "modules"
     tag "modules_local"
-    tag "table_merge"
+    tag "datatable_merge"
 
     test("Contains hsa-miR-365b-3p, hsa-miR-7-5p, hsa-miR-103a-3p") {
 

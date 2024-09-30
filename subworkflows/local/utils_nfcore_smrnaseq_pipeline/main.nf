@@ -38,11 +38,15 @@ workflow PIPELINE_INITIALISATION {
     nextflow_cli_args          //   array: List of positional nextflow CLI args
     outdir                     //  string: The output directory where the results will be saved
     input                      //  string: Path to input samplesheet
+    val_three_prime_adapter    //  string: Sequencing adapter sequence to use for trimming
+    val_phred_offset           //  string: The PHRED quality offset to be used for any input fastq files
 
     main:
 
     //Channel definitions
-    ch_versions       = Channel.empty()
+    ch_versions            = Channel.empty()
+    ch_three_prime_adapter = Channel.value(val_three_prime_adapter)
+    ch_phred_offset        = Channel.value(val_phred_offset)
 
     //
     // Print version and exit if required and dump pipeline parameters to JSON file
@@ -102,8 +106,10 @@ workflow PIPELINE_INITIALISATION {
         }
 
     emit:
-    samplesheet    = ch_samplesheet    // channel: sample fastqs parsed from --input
-    versions       = ch_versions       // channel: [ versions.yml ]
+    samplesheet         = ch_samplesheet         // channel: sample fastqs parsed from --input
+    versions            = ch_versions            // channel: [ versions.yml ]
+    three_prime_adapter = ch_three_prime_adapter // channel: [ val(string) ]
+    phred_offset        = ch_phred_offset        // channel: [ val(string) ]
 }
 
 /*

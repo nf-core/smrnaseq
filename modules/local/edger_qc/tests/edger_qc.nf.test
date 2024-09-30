@@ -1,7 +1,7 @@
 nextflow_process {
 
     name "Test Process EDGER_QC"
-    script "../edger_qc.nf"
+    script "../main.nf"
     process "EDGER_QC"
 
     test("Should not produce MDS plot") {

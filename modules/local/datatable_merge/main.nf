@@ -1,4 +1,4 @@
-process TABLE_MERGE {
+process DATATABLE_MERGE {
     label 'process_medium'
 
     conda 'conda-forge::r-data.table=1.12.2'
