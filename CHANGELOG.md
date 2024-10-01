@@ -41,7 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#443]](https://github.com/nf-core/smrnaseq/pull/443) - Migrate [mirna and genome_quant bowtie to nf-core](https://github.com/nf-core/smrnaseq/issues/436) - Replace local processes with `BOWTIE_ALIGN`.
 - [[#447]](https://github.com/nf-core/smrnaseq/pull/447) - Fix [Minor fixes and general pipeline cleanup](https://github.com/nf-core/smrnaseq/issues/400) - Update variable and processes names, update channel comments, remove unused modules and params.
 - [[#448]](https://github.com/nf-core/smrnaseq/pull/448) - Migrate local mirdeep to [nf-core mirdeep2 modules and subworkflow](https://github.com/nf-core/smrnaseq/issues/443) and generate [test profile for mirdeep2](https://github.com/nf-core/smrnaseq/issues/399).
-- [[#449]](https://github.com/nf-core/smrnaseq/pull/449) - Fix [Fix ch_bowtie_index channel structure](https://github.com/nf-core/smrnaseq/issues/451) and replace untarfiles with untar [replace untarfiles with untar](https://github.com/nf-core/smrnaseq/issues/449).
+- [[#452]](https://github.com/nf-core/smrnaseq/pull/452) - Fix [Fix ch_bowtie_index channel structure](https://github.com/nf-core/smrnaseq/issues/451) and replace untarfiles with untar [replace untarfiles with untar](https://github.com/nf-core/smrnaseq/issues/449).
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
