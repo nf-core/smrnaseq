@@ -1,9 +1,9 @@
-name: untarfiles
+name: untar
 description: Extract files.
 keywords:
   - untar
   - uncompress
-  - files
+  - extract
 tools:
   - untar:
       description: |
@@ -22,16 +22,16 @@ input:
         description: File to be untar
         pattern: "*.{tar}.{gz}"
 output:
-  - files:
+  - untar:
       - meta:
           type: map
           description: |
             Groovy Map containing sample information
             e.g. [ id:'test', single_end:false ]
-      - ${prefix}/**:
-          type: string
-          description: A list containing references to individual archive files
-          pattern: "*/**"
+      - $prefix:
+          type: directory
+          description: Directory containing contents of archive
+          pattern: "*/"
   - versions:
       - versions.yml:
           type: file
@@ -42,10 +42,8 @@ authors:
   - "@drpatelh"
   - "@matthdsm"
   - "@jfy133"
-  - "@pinin4fjords"
 maintainers:
   - "@joseespinosa"
   - "@drpatelh"
   - "@matthdsm"
   - "@jfy133"
-  - "@pinin4fjords"

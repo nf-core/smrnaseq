@@ -7,7 +7,7 @@ include { BOWTIE_ALIGN as BOWTIE_MAP_GENOME } from '../../modules/nf-core/bowtie
 
 workflow GENOME_QUANT {
     take:
-    ch_bowtie_index // channel: [ val(meta), [ path(directory_index) ] ]
+    ch_bowtie_index // channel: [ val(meta), path(directory_index) ]
     ch_fasta        // channel: [ val(meta), path(fasta) ]
     ch_reads        // channel: [ val(meta), [ reads ] ]
 

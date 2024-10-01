@@ -3,9 +3,36 @@
 //
 
 // nf-core modules
-include { UNTARFILES    as UNTAR_BOWTIE_INDEX } from '../../../modules/nf-core/untarfiles'
+include { UNTAR         as UNTAR_BOWTIE_INDEX } from '../../../modules/nf-core/untar'
 include { BOWTIE_BUILD  as INDEX_GENOME       } from '../../../modules/nf-core/bowtie/build/main'
 include { BIOAWK        as CLEAN_FASTA        } from '../../../modules/nf-core/bioawk/main'
+
+/*
+========================================================================================
+    FUNCTIONS
+========================================================================================
+*/
+//
+// Extract prefix from bowtie index files
+//
+def extractFirstIndexPrefix(files_path) {
+    def files = files_path.listFiles()
+    if (files == null || files.length == 0) {
+        throw new Exception("The provided bowtie_index path doesn't contain any files.")
+    }
+    def index_prefix = ''
+    for (file_path in files) {
+        def file_name = file_path.getName()
+        if (file_name.endsWith(".1.ebwt") && !file_name.endsWith(".rev.1.ebwt")) {
+            index_prefix = file_name.substring(0, file_name.lastIndexOf(".1.ebwt"))
+            break
+        }
+    }
+    if (index_prefix == '') {
+        throw new Exception("Unable to extract the prefix from the Bowtie index files. No file with the '.1.ebwt' extension was found. Please ensure that the correct files are in the specified path.")
+    }
+    return index_prefix
+}
 
 
 workflow PREPARE_GENOME {
@@ -26,8 +53,8 @@ workflow PREPARE_GENOME {
     ch_versions = Channel.empty()
 
     // Parameter channel handling
-    ch_fasta                  = val_fasta                     ? Channel.fromPath(val_fasta, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()           : Channel.empty()
-    ch_bowtie_index           = val_bowtie_index              ? Channel.fromPath(val_bowtie_index, checkIfExists: true).map{ it -> [ [], it ] }.collect()                  : Channel.empty()
+    ch_fasta                  = val_fasta                     ? Channel.fromPath(val_fasta, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : Channel.empty()
+    ch_bowtie_index           = val_bowtie_index              ? Channel.fromPath(val_bowtie_index, checkIfExists: true).map{ it -> [ [id:""], it ] }.collect()    : Channel.empty()
 
     bool_mirtrace_species     = val_mirtrace_species          ? true : false
     bool_has_fasta            = val_fasta                     ? true : false
@@ -52,13 +79,20 @@ workflow PREPARE_GENOME {
         if(val_bowtie_index) {
             if (val_bowtie_index.endsWith(".tar.gz")) {
                 UNTAR_BOWTIE_INDEX ( ch_bowtie_index )
-                ch_bowtie_index = UNTAR_BOWTIE_INDEX.out.files
+                ch_bowtie_index = UNTAR_BOWTIE_INDEX.out.untar
+                    .map{ meta, index_dir ->
+                        def index_prefix = extractFirstIndexPrefix(index_dir)
+                        [[id:index_prefix], index_dir]
+                    }
                 ch_versions  = ch_versions.mix(UNTAR_BOWTIE_INDEX.out.versions)
             } else {
-                ch_bowtie_index = Channel.fromPath("${val_bowtie_index}**ebwt", checkIfExists: true).map{it -> [ [id:it.baseName], it ] }.collect()
-                    .ifEmpty{ error "Bowtie1 index directory not found: ${val_bowtie_index}" }
-                    .filter { it != null }
+                ch_bowtie_index = Channel.fromPath(val_bowtie_index, checkIfExists: true)
+                    .map{it ->
+                        def index_prefix = extractFirstIndexPrefix(it)
+                        [[id:index_prefix], it]
+                    }
             }
+
         } else {
             // Clean fasta (replace non-ATCGs with Ns, remove whitespaces from headers)
             CLEAN_FASTA ( ch_fasta )
@@ -96,7 +130,7 @@ workflow PREPARE_GENOME {
     emit:
     fasta                 = ch_fasta               // channel: [ val(meta), path(fasta) ]
     has_fasta             = bool_has_fasta         // boolean
-    bowtie_index          = ch_bowtie_index        // channel: [ val(meta), [ path(directory_index) ] ]
+    bowtie_index          = ch_bowtie_index        // channel: [ val(meta), path(directory_index) ]
     versions              = ch_versions            // channel: [ versions.yml ]
     mirtrace_species      = ch_mirtrace_species    // channel: [ val(string) ]
     has_mirtrace_species  = bool_mirtrace_species  // boolean
