@@ -80,7 +80,7 @@ workflow PREPARE_GENOME {
             if (val_bowtie_index.endsWith(".tar.gz")) {
                 UNTAR_BOWTIE_INDEX ( ch_bowtie_index )
                 ch_bowtie_index = UNTAR_BOWTIE_INDEX.out.untar
-                    .map{ meta, index_dir -> 
+                    .map{ meta, index_dir ->
                         def index_prefix = extractFirstIndexPrefix(index_dir)
                         [[id:index_prefix], index_dir]
                     }
