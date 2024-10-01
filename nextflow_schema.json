@@ -41,13 +41,6 @@
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
                 },
-                "protocol": {
-                    "type": "string",
-                    "description": "Indicates the experimental protocol used for sample preparation, used by miRTrace",
-                    "default": "custom",
-                    "fa_icon": "fas fa-atom",
-                    "enum": ["custom", "illumina", "nextflex", "qiaseq", "cats"]
-                },
                 "save_intermediates": {
                     "type": "boolean",
                     "description": "Save all intermediate files (e.g. fastq, bams) to output directory",
