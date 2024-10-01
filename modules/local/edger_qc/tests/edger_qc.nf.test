@@ -20,8 +20,15 @@ nextflow_process {
         }
 
         then {
-            assert process.success
-            assert snapshot(process.out).match()
+            assertAll(
+            { assert process.success },
+            { assert snapshot(
+                // Snapshot only the stable files (.txt, .csv) and exclude PDFs
+                process.out.edger_files.get(0).findAll { !it.endsWith('pdf')},
+                process.out.versions
+                )
+                .match() }
+        )
         }
 
     }
@@ -49,10 +56,18 @@ nextflow_process {
         }
 
         then {
-            assert process.success
-            assert snapshot(process.out).match()
+            assertAll(
+            { assert process.success },
+            { assert snapshot(
+                // Snapshot only the stable files (.txt, .csv) and exclude PDFs
+                process.out.edger_files.get(0).findAll { !it.endsWith('pdf')},
+                process.out.versions,
+                // Check MDS plot exists
+                file(process.out.edger_files[0].find { file(it).name == "hairpin_edgeR_MDS_plot.pdf" }).exists()
+                )
+                .match() }
+        )
         }
-
     }
 
 }
