@@ -114,6 +114,7 @@ workflow MIRNA_QUANT {
         .map{it -> return [[id:"TSVs"], it]}
 
     CSVTK_JOIN ( ch_tsvs )
+    ch_versions = ch_versions.mix(CSVTK_JOIN.out.versions)
 
     DATATABLE_MERGE ( CSVTK_JOIN.out.csv )
     ch_versions = ch_versions.mix(DATATABLE_MERGE.out.versions)
