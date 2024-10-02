@@ -10,10 +10,10 @@
 
 This option indicates the experimental protocol used for the sample preparation. Currently supporting:
 
-- 'illumina': adapter (`TGGAATTCTCGGGTGCCAAGG`)
-- 'nextflex': adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`4`), three_prime_clip_r1 (`4`)
-- 'qiaseq': adapter (`AACTGTAGGCACCATCAAT`)
-- 'cats': adapter (`GATCGGAAGAGCACACGTCTG`), clip_r1(`3)
+- 'illumina': three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`0`), three_prime_clip_r1 (`0`)
+- 'nextflex': three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`4`), three_prime_clip_r1 (`4`)
+- 'qiaseq': three_prime_adapter (`AACTGTAGGCACCATCAAT`), clip_r1 (`0`), three_prime_clip_r1 (`0`)
+- 'cats': three_prime_adapter (`AAAAAAAA`), clip_r1(`3`), three_prime_clip_r1 (`0`)
 
 This option is not chosen as a parameter but as an additional profile that sets the corresponding `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` parameters accordingly. You can choose to either use any of the provided profiles by running the pipeline with e.g. `illumina` to set the defaults as described above in a more convenient way.
 
