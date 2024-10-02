@@ -19,7 +19,7 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 73 },
+                { assert workflow.trace.succeeded().size() == 74 },
 
                 { assert snapshot(
                     path("$outputDir/mirna_quant/bam/mature/SRX8195118_SRR11631014_mature.sorted.stats"),

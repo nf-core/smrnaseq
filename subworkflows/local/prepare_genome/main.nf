@@ -74,6 +74,11 @@ workflow PREPARE_GENOME {
     // even if bowtie index is specified, there still needs to be a fasta.
     // without fasta, no genome analysis.
     if(val_fasta) {
+        // Clean fasta (replace non-ATCGs with Ns, remove whitespaces from headers)
+        CLEAN_FASTA ( ch_fasta )
+        ch_versions      = ch_versions.mix(CLEAN_FASTA.out.versions)
+        ch_fasta         = CLEAN_FASTA.out.output
+
         //Prepare bowtie index, unless specified
         //This needs to be done here as the index is used by GENOME_QUANT
         if(val_bowtie_index) {
@@ -94,16 +99,12 @@ workflow PREPARE_GENOME {
             }
 
         } else {
-            // Clean fasta (replace non-ATCGs with Ns, remove whitespaces from headers)
-            CLEAN_FASTA ( ch_fasta )
-            ch_versions      = ch_versions.mix(CLEAN_FASTA.out.versions)
 
             // Index FASTA with nf-core Bowtie1
             INDEX_GENOME ( CLEAN_FASTA.out.output )
             ch_versions      = ch_versions.mix(INDEX_GENOME.out.versions)
 
             // Set channels: clean fasta and its index
-            ch_fasta         = CLEAN_FASTA.out.output
             ch_bowtie_index  = INDEX_GENOME.out.index.collect()
         }
     }

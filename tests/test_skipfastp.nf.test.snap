@@ -30,14 +30,14 @@
             "Clone1_N3_mature_hairpin_genome.sorted.idxstats:md5,2620288b88bba1ea3315414016c083a1",
             "Clone1_N1_mature_hairpin_genome.sorted.idxstats:md5,e0e4a95f5c21a926f7894cf1fbe3110b",
             "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,62208acf0c7418d590b41318d7e17d67",
-            "Clone1_N3_mature_hairpin_genome.sorted.stats:md5,471571deab69bf7a6f4cb679035398d2",
-            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,cce099859e44a7e0adf1c304fdb14f4f"
+            "Clone1_N3_mature_hairpin_genome.sorted.stats:md5,1c03f98d16d2e418692d3227c8be2803",
+            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,e5aee4c4e099d5f4e82bd22f58309e2c"
         ],
         "meta": {
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-19T15:26:42.738485563"
+        "timestamp": "2024-10-01T20:19:25.61285999"
     },
     "software_versions": {
         "content": [
@@ -47,7 +47,7 @@
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-30T16:13:51.93255"
+        "timestamp": "2024-10-01T20:19:25.507173099"
     },
     "mirna_quant_bam": {
         "content": [
@@ -140,6 +140,6 @@
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-20T18:29:58.277371938"
+        "timestamp": "2024-10-01T20:19:25.557700049"
     }
 }

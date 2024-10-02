@@ -40,7 +40,7 @@
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-30T15:53:12.532061"
+        "timestamp": "2024-10-01T20:06:04.830119436"
     },
     "mirna_quant_bam": {
         "content": [
@@ -64,10 +64,10 @@
             true
         ],
         "meta": {
-            "nf-test": "0.8.4",
+            "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-04T19:24:40.511510374"
+        "timestamp": "2024-10-01T20:06:04.974546479"
     },
     "mirna_quant_edger_qc": {
         "content": [
@@ -89,10 +89,10 @@
             true
         ],
         "meta": {
-            "nf-test": "0.8.4",
+            "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-04T19:24:40.56322797"
+        "timestamp": "2024-10-01T20:06:05.025175321"
     },
     "contaminant_filter_filter": {
         "content": [
@@ -101,10 +101,10 @@
             true
         ],
         "meta": {
-            "nf-test": "0.8.4",
+            "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-04T19:24:40.458015808"
+        "timestamp": "2024-10-01T20:06:04.920520728"
     },
     "mirna_quant_mirtop": {
         "content": [
@@ -115,6 +115,6 @@
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-20T18:06:26.655506797"
+        "timestamp": "2024-10-01T20:06:05.070939602"
     }
 }
