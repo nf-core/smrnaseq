@@ -121,13 +121,13 @@ MultiQC reports the number of reads that were removed by each of the contaminant
   - `mirna_quant/bam/{hairpin,mature,seqcluster}/.*bam`: The aligned BAM file results against hairpin, mature or seqcluster.
   - `mirna_quant/bam/{hairpin,mature,seqcluster}/.*unmapped.fastq.gz`: Unmapped reads for hairpin, mature or seqcluster.
 
-  If `--save_intermediates` is specified, these files will be placed in this directory.
+If `--save_intermediates` is specified, these files will be placed in this directory.
 
 ## SAMtools
 
 [SAMtools](http://samtools.sourceforge.net/) is used for sorting and indexing the output BAM files from Bowtie. In addition, the numbers of features are counted with the `idxstats` option.
 
-**Output directory: `results/genome_quant/bam`** and `results/mirna_quant/bam`
+\*\*Output directory: `results/{genome_quant,mirna_quant}/bam`
 
 These files will be saved in this directory if `--save_intermediates` is specified. In any case, these stats will always be available in the MultiQC report.
 
