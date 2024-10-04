@@ -51,7 +51,7 @@ You can find numerous talks on the nf-core events page from various topics inclu
    4. ncRNA filtration
    5. piRNA filtration
    6. Others filtration
-5. UMI barcode deduplication ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools))
+5. UMI barcode deduplication ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools)) <!-- TODO, isn't this done on the UMI step above? -->
 6. miRNA quantification
    - EdgeR
      1. Reads alignment against miRBase mature miRNA ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
@@ -108,7 +108,7 @@ Now, you can run the pipeline using:
 
 ```bash
 nextflow run nf-core/smrnaseq \
-   -profile <docker/singularity/.../institute>,illumina \
+   -profile <docker/singularity/.../institute>,<protocol> \
   --input samplesheet.csv \
   --genome 'GRCh37' \
   --mirtrace_species 'hsa' \
@@ -116,7 +116,7 @@ nextflow run nf-core/smrnaseq \
 ```
 
 > [!IMPORTANT]
-> Remember to add a protocol as an additional profile (such as `illumina`, `nexttflex`, `qiaseq` or `custom`) when running with your own data. Default is `custom`. See [usage documentation](https://nf-co.re/smrnaseq/usage) for more details about these profiles.
+> Remember to add a protocol as an additional profile (such as `illumina`, `nexttflex`, `qiaseq` or `cats`) when running with your own data. If no protocol is indicated via -profile, the pipeline will likely fail. Alternatively, if needed to run a custom protocol, parameters must be set manually, and auto-detect feature is available. See [usage documentation](https://nf-co.re/smrnaseq/usage) for more details about these profiles.
 
 > [!WARNING]
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_;
