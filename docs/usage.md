@@ -49,8 +49,9 @@ If MirGeneDB should be used instead it needs to be specified using `--mirgenedb`
 
 - `fasta`: the reference genome FASTA file
 - `bowtie_index`: points to the folder containing the `bowtie` indices for the genome reference specified by `fasta`.
-  > [!NOTE]
-  > if the FASTA file in `fasta` is not the same file used to generate the `bowtie` indices, then the pipeline will fail.
+
+> [!NOTE]
+> if the FASTA file in `fasta` is not the same file used to generate the `bowtie` indices, then the pipeline will fail.
 
 ### Contamination filtering
 

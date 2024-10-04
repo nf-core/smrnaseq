@@ -194,9 +194,8 @@ The files for each sample can also be visualized into a single plot in the Multi
 
 ![MultiQC - FastQC adapter content plot](images/mqc_fastqc_adapter.png)
 
-:::note
-The FastQC plots displayed in the MultiQC report shows _untrimmed_ reads. They may contain adapter sequence and potentially regions with low quality.
-:::
+> [!NOTE]
+> The FastQC plots displayed in the MultiQC report shows _untrimmed_ reads. They may contain adapter sequence and potentially regions with low quality.
 
 ### MultiQC
 
