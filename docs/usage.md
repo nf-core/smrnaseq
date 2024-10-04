@@ -48,7 +48,9 @@ If MirGeneDB should be used instead it needs to be specified using `--mirgenedb`
 ### Genome
 
 - `fasta`: the reference genome FASTA file
-- `bowtie_index`: points to the folder containing the `bowtie` indices for the genome reference specified by `fasta`. **Note:** if the FASTA file in `fasta` is not the same file used to generate the `bowtie` indices, then the pipeline will fail.
+- `bowtie_index`: points to the folder containing the `bowtie` indices for the genome reference specified by `fasta`.
+  > [!NOTE]
+  > if the FASTA file in `fasta` is not the same file used to generate the `bowtie` indices, then the pipeline will fail.
 
 ### Contamination filtering
 
@@ -77,7 +79,7 @@ The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire r
 --with_umi --umitools_extract_method regex --umitools_bc_pattern = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
 ```
 
-> [!NOTE]  
+> [!NOTE]
 > If your UMI read structure differs, you'll need to specify custom `umitools_bc_pattern` patterns. Ensure that the pattern is set so that only the insert sequence of the RNA molecule remains after extraction. For details, refer to the UMI handling manual or the documentation of the kit you're using for the expected read structure.
 
 ## Samplesheet input
@@ -104,7 +106,9 @@ CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz
 ### Full samplesheet
 
 The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet must have at least 2 columns (`sample` and `fastq1`). A third column can be added if the sample is paired-end (`fastq2`).
-**Note**: Most of the tools used can't accommodate paired end reads, so whenever paired-end samples are used as inputs, the R1 and R2 reads are concatenated into a single fastq file by the pipeline.
+
+> [!NOTE]
+> Most of the tools used can't accommodate paired end reads, so whenever paired-end samples are used as inputs, the R1 and R2 reads are concatenated into a single fastq file by the pipeline.
 
 A final samplesheet file consisting of single-end data and may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
 
@@ -150,7 +154,7 @@ If you wish to repeatedly use the same parameters for multiple runs, rather than
 
 Pipeline settings can be provided in a `yaml` or `json` file via `-params-file <file>`.
 
-> [!WARNING] 
+> [!WARNING]
 > Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories), or module arguments (args).
 
 The above pipeline run specified with a params file in yaml format:
