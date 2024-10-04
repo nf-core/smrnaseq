@@ -6,7 +6,7 @@
 
 This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
 
-The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level results directory.
+The directories listed below will be created in the results directory after the pipeline has finished. All paths are relative to the top-level `/results` directory.
 
 ## Pipeline overview
 
@@ -61,13 +61,13 @@ To facilitate processing of input data which has the UMI barcode already embedde
 
 ## FastP
 
-[FastP](https://github.com/OpenGene/fastp) is used for removal of adapter contamination and trimming of low quality regions.
+[FastP](https://github.com/OpenGene/fastp) is used for removal of adapter contamination and trimming of low-quality regions.
 
 MultiQC reports the percentage of bases removed by FastP in the _General Statistics_ table, along some further information on the results.
 
 **Output directory: `results/fastp`**
 
-Contains FastQ files with quality and adapter trimmed reads for each sample, along with a log file describing the trimming.
+Contains FastQ files with quality and adapter-trimmed reads for each sample, along with a log file describing the trimming.
 
 - `sample_fastp.json` - JSON report file with information on parameters and trimming metrics
 - `sample_fastp.html` - HTML report with some visualizations of trimming metrics
@@ -102,7 +102,7 @@ MultiQC reports the number of reads that were removed by each of the contaminant
 - `sample_mature_unmapped.fq.gz`: Unmapped reads against mature miRNAs _This file will be used as input for the alignment against miRNA precursors (hairpins)_
 - `sample_mature_hairpin.bam`: The aligned BAM file of alignment against miRNA precursors (hairpins) that didn't map to the mature
 - `sample_mature_hairpin_unmapped.fq.gz`: Unmapped reads against miRNA precursors (hairpins)
-- `sample_mature_hairpin_genome.bam`: The aligned BAM file of alignment against that didn't map to the precursor.
+- `sample_mature_hairpin_genome.bam`: The aligned BAM file of reads that didn't map to the precursor.
 
 If `--save_intermediates` is specified, these files will be placed in this directory.
 
@@ -112,6 +112,8 @@ If `--save_intermediates` is specified, these files will be placed in this direc
 
 **Output directory: `results/samtools/samtools_stats`**
 
+These files will be saved in this directory if `--save_intermediates` is specified. In any case, these stats will always be available in the MultiQC report.
+
 - `stats|idxstats|flagstat`: BAM stats for each of the files listed above.
 
 ![samtools](images/samtools_alignment_plot.png)
@@ -120,7 +122,7 @@ If `--save_intermediates` is specified, these files will be placed in this direc
 
 [edgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html) is an R package used for differential expression analysis of RNA-seq expression profiles.
 
-**Output directory: `results/edgeR`**
+**Output directory: `results/mirna_quant/edger_qc`**
 
 - `[mature/hairpin]_normalized_CPM.txt` TMM normalized counts of reads aligned to mature miRNAs/miRNA precursors (hairpins)
 - `[mature/hairpin]_edgeR_MDS_plot.pdf` Multidimensional scaling plot of all samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
@@ -138,10 +140,10 @@ If `--save_intermediates` is specified, these files will be placed in this direc
 
 [mirtop](https://github.com/miRTop/mirtop) is used to parse the BAM files from `bowtie` alignment, and produce a [mirgff3](https://github.com/miRTop/mirGFF3) file with information about miRNAs and isomirs.
 
-**Output directory: `results/mirtop`**
+**Output directory: `results/mirna_quant/mirtop`**
 
 - `gff/{sample.id}.gff`: [mirgff3](https://github.com/miRTop/mirGFF3) file
-- `joined_samples_mirtop.tsv`: tabular file of the previous file for easy integration with downstream analysis.
+- `joined_samples_mirtop.tsv`: a tabular version of the previous file for easy integration with downstream analysis.
 - `export/{sample.id}_mirtop_rawData.tsv`: File compatible with [isomiRs](http://lpantano.github.io/isomiRs/reference/IsomirDataSeqFromMirtop.html) Bioconductor package to perform isomiRs analysis.
 - `mirna.tsv`: tabular file with miRNA counts after summarizing unique isomiRs for each miRNA
 
@@ -157,7 +159,7 @@ If `--save_intermediates` is specified, these files will be placed in this direc
 
 ## miRTrace
 
-[miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts). By default, the pipeline sets the PHRED-offset to the most common +33, so if you need to adjust this, use the `params.phred_offset` option to include this accordingly for your FASTQ files.
+[miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts). By default, the pipeline sets the PHRED offset to the most common value of +33, so if you need to adjust this, use the `params.phred_offset` option to include this accordingly for your FASTQ files.
 
 **Output directory: `results/mirtrace/${sample.id}`**
 
@@ -167,7 +169,7 @@ If `--save_intermediates` is specified, these files will be placed in this direc
 - `qc_passed_reads.all.collapsed` FASTA file per sample with sequence reads that passed QC in miRTrace
 - `qc_passed_reads.rnatype_unknown.collapsed` FASTA file per sample with unknown reads in the RNA type analysis
 
-Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/manual.pdf) for detailed specifications about output files. Here is an example of the RNA types plot that you will see:
+The files for each sample can also be visualized into a single plot in the MultiQC report. Refer to the [tool manual](https://github.com/friedlanderlab/mirtrace/blob/master/release-bundle-includes/manual.pdf) for detailed specifications about output files. Here is an example of the RNA types plot that you will see:
 
 ![mirtrace](images/mirtrace_plot.png)
 
@@ -204,7 +206,7 @@ Results generated by MultiQC collate pipeline QC from supported tools e.g. FastQ
 
 - `pipeline_info/`
   - Reports generated by Nextflow: `execution_report.html`, `execution_timeline.html`, `execution_trace.txt` and `pipeline_dag.dot`/`pipeline_dag.svg`.
-  - Reports generated by the pipeline: `pipeline_report.html`, `pipeline_report.txt` and `software_versions.yml`. The `pipeline_report*` files will only be present if the `--email` / `--email_on_fail` parameter's are used when running the pipeline.
+  - Reports generated by the pipeline: `pipeline_report.html`, `pipeline_report.txt` and `software_versions.yml`. The `pipeline_report*` files will only be present if the `--email` / `--email_on_fail` parameters are used when running the pipeline.
   - Reformatted samplesheet files used as input to the pipeline: `samplesheet.valid.csv`.
   - Parameters used by the pipeline run: `params.json`.
 
