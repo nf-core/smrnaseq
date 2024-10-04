@@ -44,6 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#452]](https://github.com/nf-core/smrnaseq/pull/452) - Fix [Fix ch_bowtie_index channel structure](https://github.com/nf-core/smrnaseq/issues/451) and replace untarfiles with untar [replace untarfiles with untar](https://github.com/nf-core/smrnaseq/issues/449).
 - [[#457]](https://github.com/nf-core/smrnaseq/pull/457) - QC all input [fasta files and clean them](https://github.com/nf-core/smrnaseq/issues/455).
 - [[#459]](https://github.com/nf-core/smrnaseq/pull/459) - Update modules and subworkflows [and fix linting](https://github.com/nf-core/smrnaseq/issues/458).
+- [[#462]](https://github.com/nf-core/smrnaseq/pull/462) - Remove automatic wrapping of fasta files by `seqkit replace`. Minor documentation updates.
 
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
