@@ -77,7 +77,8 @@ The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire r
 --with_umi --umitools_extract_method regex --umitools_bc_pattern = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
 ```
 
-> **Note**: If your UMI read structure differs, you'll need to specify custom `umitools_bc_pattern` patterns. Ensure that the pattern is set so that only the insert sequence of the RNA molecule remains after extraction. For details, refer to the UMI handling manual or the documentation of the kit you're using for the expected read structure.
+> [!NOTE]  
+> If your UMI read structure differs, you'll need to specify custom `umitools_bc_pattern` patterns. Ensure that the pattern is set so that only the insert sequence of the RNA molecule remains after extraction. For details, refer to the UMI handling manual or the documentation of the kit you're using for the expected read structure.
 
 ## Samplesheet input
 
@@ -102,7 +103,7 @@ CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz
 
 ### Full samplesheet
 
-The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet must have at least 2 columns (sample and fastq1). A third column can be added if the sample is paired-end (fastq2).
+The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet must have at least 2 columns (`sample` and `fastq1`). A third column can be added if the sample is paired-end (`fastq2`).
 **Note**: Most of the tools used can't accommodate paired end reads, so whenever paired-end samples are used as inputs, the R1 and R2 reads are concatenated into a single fastq file by the pipeline.
 
 A final samplesheet file consisting of single-end data and may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
@@ -149,7 +150,8 @@ If you wish to repeatedly use the same parameters for multiple runs, rather than
 
 Pipeline settings can be provided in a `yaml` or `json` file via `-params-file <file>`.
 
-:warning: Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories), or module arguments (args).
+> [!WARNING] 
+> Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories), or module arguments (args).
 
 The above pipeline run specified with a params file in yaml format:
 
@@ -197,12 +199,12 @@ The `bin` directory contains some scripts used by the pipeline which may also be
 
 To further assist in reproducbility, you can use share and re-use [parameter files](#running-the-pipeline) to repeat pipeline runs with the same settings without having to write out a command with every single parameter.
 
-> **Tip**
-> If you wish to share such profile (such as upload as supplementary material for academic publications), make sure to NOT include cluster specific paths to files, nor institutional specific profiles.
+> [!TIP]
+> If you wish to share such a profile (such as uploading it as supplementary material for academic publications), make sure not to include cluster-specific paths to files, nor institution-specific profiles.
 
 ## Core Nextflow arguments
 
-> **Note**
+> [!NOTE]
 > These options are part of Nextflow and use a _single_ hyphen (pipeline parameters use a double-hyphen).
 
 ### `-profile`
@@ -211,7 +213,7 @@ Use this parameter to choose a configuration profile. Profiles can give configur
 
 Several generic profiles are bundled with the pipeline which instruct the pipeline to use software packaged using different methods (Docker, Singularity, Podman, Shifter, Charliecloud, Apptainer, Conda) - see below.
 
-> **Info**
+> [!TIP]
 > We highly recommend the use of Docker or Singularity containers for full pipeline reproducibility, however when this is not possible, Conda is also supported.
 
 The pipeline also dynamically loads configurations from [https://github.com/nf-core/configs](https://github.com/nf-core/configs) when it runs, making multiple config profiles for various institutional clusters available at run time. For more information and to see if your system is available in these configs please see the [nf-core/configs documentation](https://github.com/nf-core/configs#documentation).
