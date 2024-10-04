@@ -75,6 +75,7 @@ workflow PREPARE_GENOME {
     // without fasta, no genome analysis.
     if(val_fasta) {
         // Clean fasta (replace non-ATCGs with Ns, remove whitespaces from headers)
+        // Note: CLEAN_FASTA runs even when a bowtie_index is provided, as cleaning doesn't affect it, making regeneration unnecessary.
         CLEAN_FASTA ( ch_fasta )
         ch_versions      = ch_versions.mix(CLEAN_FASTA.out.versions)
         ch_fasta         = CLEAN_FASTA.out.output
