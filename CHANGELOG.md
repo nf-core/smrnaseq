@@ -46,6 +46,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#459]](https://github.com/nf-core/smrnaseq/pull/459) - Update modules and subworkflows [and fix linting](https://github.com/nf-core/smrnaseq/issues/458).
 - [[#462]](https://github.com/nf-core/smrnaseq/pull/462) - Remove automatic wrapping of fasta files by `seqkit replace`. Minor documentation updates.
 
+### Software dependencies
+
+| Dependency | Old version | New version |
+| ---------- | ----------- | ----------- |
+| `bioawk`   | -           | 1.0         |
+| `bowtie`   | 1.3.1       | 1.3.0       |
+| `bowtie2`  | 2.4.5       | 2.5.2       |
+| `csvtk`    | -           | 0.30        |
+| `gawk`     | -           | 5.3.0       |
+| `mirtop`   | 0.4.25      | 0.4.28      |
+| `multiqc`  | 1.21        | 1.25.1      |
+| `samtools` | 1.19.2      | 1.21        |
+| `seqkit`   | 2.6.1       | 2.8.1       |
+
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
 - [[#328]](https://github.com/nf-core/smrnaseq/pull/328) - Fix [casting issue](https://github.com/nf-core/smrnaseq/issues/327) in mirtrace module
