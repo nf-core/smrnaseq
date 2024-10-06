@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#457]](https://github.com/nf-core/smrnaseq/pull/457) - QC all input [fasta files and clean them](https://github.com/nf-core/smrnaseq/issues/455).
 - [[#459]](https://github.com/nf-core/smrnaseq/pull/459) - Update modules and subworkflows [and fix linting](https://github.com/nf-core/smrnaseq/issues/458).
 - [[#462]](https://github.com/nf-core/smrnaseq/pull/462) - Remove automatic wrapping of fasta files by `seqkit replace`. Minor documentation updates.
+- [[#465]](https://github.com/nf-core/smrnaseq/issues/465) - Added proper licences and authorship information to scripts in `bin` folder
 
 ### Software dependencies
 
