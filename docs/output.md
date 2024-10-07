@@ -111,7 +111,7 @@ MultiQC reports the number of reads that were removed by each of the contaminant
 **Output directory: `results/`**
 
 - `bowtie_index/`
-  - `mirna_hairpin/bowtie`: mairpin.fa bowtie index files.
+  - `mirna_hairpin/bowtie`: hairpin.fa bowtie index files.
   - `mirna_mature/bowtie`: mature.fa bowtie index files.
 - `genome_quant/`
   - `genome_quant/bam/.*bam`: The aligned BAM file results.
