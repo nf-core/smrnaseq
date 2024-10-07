@@ -109,7 +109,7 @@ CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz
 The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet must have at least 2 columns (`sample` and `fastq1`). A third column can be added if the sample is paired-end (`fastq2`).
 
 > [!NOTE]
-> Most of the tools used can't accommodate paired end reads, so whenever paired-end samples are used as inputs, the R1 and R2 reads are concatenated into a single fastq file by the pipeline.
+> Most of the tools used can't accommodate paired end reads, so whenever paired-end samples are used as inputs, only the R1 files are used by the pipeline.
 
 A final samplesheet file consisting of single-end data and may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
 
