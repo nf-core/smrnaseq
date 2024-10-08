@@ -11,6 +11,7 @@ on:
       - master
   release:
     types: [published]
+  workflow_dispatch:
 
 env:
   NXF_ANSI_LOG: false
@@ -34,7 +35,8 @@ jobs:
       matrix:
         shard: [1, 2, 3, 4]
         NXF_VER:
-          - "23.10.4"
+          - "24.04.2"
+          - "latest-everything"
         profile: ["docker"]
     env:
       SHARDS: "4"
