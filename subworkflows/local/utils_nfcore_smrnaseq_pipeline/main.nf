@@ -220,23 +220,22 @@ def toolCitationText() {
     // Uncomment function in methodsDescriptionText to render in MultiQC report
     def citation_text = [
             "Tools used in the workflow included:",
-            "FastQC (Andrews 2010),",
-            "MultiQC (Ewels et al. 2016),",
+            !params.skip_fastqc          ? "FastQC (Andrews 2010)," : "",
+            !params.skip_multiqc         ? "MultiQC (Ewels et al. 2016)," : "",
+            !params.skip_fastp           ? "fastp (Chen et al. 2018)," : "",
+            !params.skip_mirdeep         ? "MiRDeep2 (Friedländer et al. 2012)," : "",
+            params.filter_contamination  ? "Contamination filtering tools: BLAT (Kent 2002), Bowtie2 (Langmead and Salzberg 2012)," : "",
+            params.mirtrace_species      ? "miRTrace (Kang et al. 2018)," : "",
             "UMI-tools (Smith et al. 2017),",
-            "fastp (Chen et al. 2018),",
-            "miRTrace (Kang et al. 2018),",
             "Bowtie (Langmead et al. 2009),",
-            "Bowtie2 (Langmead and Salzberg 2012),",
             "SAMtools (Li et al. 2009),",
             "EdgeR (Robinson et al. 2010),",
             "Mirtop (Desvignes et al. 2019),",
-            "MiRDeep2 (Friedländer et al. 2012),",
             "SeqKit (Shen et al. 2016),",
             "UMICollapse (Liu 2020),",
-            "BLAT (Kent 2002)",
             "Seqcluster (Pantano et al. 2011)",
             "."
-        ].join(' ').trim()
+    ].join(' ').trim()
 
     return citation_text
 }
