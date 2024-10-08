@@ -43,7 +43,7 @@
                 },
                 "save_intermediates": {
                     "type": "boolean",
-                    "description": "Save all intermediate files (e.g. fastq, bams) to output directory",
+                    "description": "Save all intermediate files (e.g. fastq, bams) of all steps of the pipeline  to output directory",
                     "fa_icon": "fas fa-save"
                 }
             }
