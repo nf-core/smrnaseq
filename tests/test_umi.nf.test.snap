@@ -30,37 +30,37 @@
             "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.flagstat:md5,977e88cbe62027285df73e1f7f9cd9bc",
             "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.idxstats:md5,cc0413bf90252c3b3af8926fd64bc873",
             "SRX8195118_SRR11631014_mature_hairpin_genome.sorted.idxstats:md5,a4874de294706a7ead30258944ff2dad",
-            "SRX8195118_SRR11631014_mature_hairpin_genome.sorted.stats:md5,6beddbebbd48d4ffc01e059c73a5a330",
-            "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.stats:md5,cc5ef7cbd5a29794170ac6cff59dfd76"
+            "SRX8195118_SRR11631014_mature_hairpin_genome.sorted.stats:md5,f1ff3ed8478070d92f068c10bc2c1222",
+            "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.stats:md5,a058de81d9a8055bc40e345ae2ed660c"
         ],
         "meta": {
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-10-01T20:24:14.961610878"
+        "timestamp": "2024-10-08T23:34:54.845245469"
     },
     "software_versions": {
         "content": [
-            "{BOWTIE_MAP_GENOME={bowtie=1.3.0, samtools=1.16.1}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.0, samtools=1.16.1}, BOWTIE_MAP_MATURE={bowtie=1.3.0, samtools=1.16.1}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.0, samtools=1.16.1}, CSVTK_JOIN={csvtk=0.30.0}, DATATABLE_MERGE={r-base=3.6.2}, FASTP={fastp=0.23.4}, FASTP_LENGTH_FILTER={fastp=0.23.4}, FASTQC_RAW={fastqc=0.12.1}, FASTQC_TRIM={fastqc=0.12.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_HAIRPIN={bowtie=1.3.0}, INDEX_MATURE={bowtie=1.3.0}, MIRTOP_COUNTS={mirtop=0.4.28}, MIRTOP_EXPORT={mirtop=0.4.28}, MIRTOP_GFF={mirtop=0.4.28}, MIRTOP_STATS={mirtop=0.4.28}, MIRTRACE_QC={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.21}, SAMTOOLS_IDXSTATS={samtools=1.21}, SAMTOOLS_INDEX={samtools=1.21}, SAMTOOLS_SORT={samtools=1.21}, SAMTOOLS_STATS={samtools=1.21}, SEQCLUSTER_COLLAPSE={seqcluster=1.2.9}, UMICOLLAPSE_FASTQ={umicollapse=1.0.0-1}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
+            "{BOWTIE_MAP_GENOME={bowtie=1.3.0, samtools=1.16.1}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.0, samtools=1.16.1}, BOWTIE_MAP_MATURE={bowtie=1.3.0, samtools=1.16.1}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.0, samtools=1.16.1}, CSVTK_JOIN={csvtk=0.30.0}, DATATABLE_MERGE={r-base=3.6.2}, FASTP={fastp=0.23.4}, FASTP_LENGTH_FILTER={fastp=0.23.4}, FASTQC_RAW={fastqc=0.12.1}, FASTQC_TRIM={fastqc=0.12.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_HAIRPIN={bowtie=1.3.0}, INDEX_MATURE={bowtie=1.3.0}, MIRTOP_COUNTS={mirtop=0.4.28}, MIRTOP_EXPORT={mirtop=0.4.28}, MIRTOP_GFF={mirtop=0.4.28}, MIRTOP_STATS={mirtop=0.4.28}, MIRTRACE_QC={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.21}, SAMTOOLS_IDXSTATS={samtools=1.21}, SAMTOOLS_INDEX={samtools=1.21}, SAMTOOLS_SORT={samtools=1.21}, SAMTOOLS_STATS={samtools=1.21}, SEQCLUSTER_COLLAPSE={seqcluster=1.2.9}, UMICOLLAPSE_FASTQ={umicollapse=1.0.0-1}, Workflow={nf-core/smrnaseq=v2.4.0}}"
         ],
         "meta": {
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-10-02T13:51:36.160803304"
+        "timestamp": "2024-10-08T23:34:54.715037951"
     },
     "mirna_quant_bam": {
         "content": [
-            "SRX8195118_SRR11631014_mature.sorted.stats:md5,a49f7118b3cba5e304cf018089cefc8e",
+            "SRX8195118_SRR11631014_mature.sorted.stats:md5,d2e3a471dc1948dd546015623e4347f9",
             "SRX8195118_SRR11631014_mature.sorted.flagstat:md5,57c6d477394d367ebae59f7267b430a5",
             "SRX8195118_SRR11631014_mature.sorted.idxstats:md5,8b9cf0f1647b938f058b80522df24667",
-            "SRX8195117_SRR11631013_mature.sorted.stats:md5,6847689129964daf73e845cd5ee086db",
+            "SRX8195117_SRR11631013_mature.sorted.stats:md5,e489a85f4bf467724d7841d7e843a224",
             "SRX8195117_SRR11631013_mature.sorted.flagstat:md5,171387fb18ba9868e28ca03d24a7daca",
             "SRX8195117_SRR11631013_mature.sorted.idxstats:md5,fb6c4000f82a66654b4f2a40570649b5",
             "SRX8195117_SRR11631013_mature_hairpin.sorted.idxstats:md5,4e7c1c98804febf6210cee5e3941709e",
             "SRX8195117_SRR11631013_mature_hairpin.sorted.flagstat:md5,b86bd14dc687a26ba5a84d1015f4b70a",
-            "SRX8195117_SRR11631013_mature_hairpin.sorted.stats:md5,c7d9fb0a872991e46fecdd941085ed9e",
-            "SRX8195118_SRR11631014_mature_hairpin.sorted.stats:md5,168c0b770fc77bf9a7f85085aceff75a",
+            "SRX8195117_SRR11631013_mature_hairpin.sorted.stats:md5,b5d4e6934c5c07ace5ad9a7a4eeade08",
+            "SRX8195118_SRR11631014_mature_hairpin.sorted.stats:md5,990e41b7818b98083463b3bcd9862283",
             "SRX8195118_SRR11631014_mature_hairpin.sorted.idxstats:md5,f4485713620f31d97a5006acdf6d8a5d",
             "SRX8195118_SRR11631014_mature_hairpin.sorted.flagstat:md5,e0c44533bc7813d552de4864d997c916"
         ],
@@ -68,7 +68,7 @@
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-19T15:35:36.685710047"
+        "timestamp": "2024-10-08T23:34:54.777375775"
     },
     "mirna_quant_edger_qc": {
         "content": [
