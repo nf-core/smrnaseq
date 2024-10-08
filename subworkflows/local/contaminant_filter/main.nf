@@ -66,7 +66,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(INDEX_RRNA.out.versions)
 
         // Add meta.contaminant to input reads channel
-        ch_reads_for_mirna = ch_reads_for_mirna.map{meta, fastq -> return [[id:meta.id, contaminant: "rRNA", single_end:meta.single_end], fastq]}
+        ch_reads_for_mirna = ch_reads_for_mirna.map{meta, fastq -> return [[id: meta.id, contaminant: "rRNA", single_end: meta.single_end], fastq]}
 
         // Map which reads are rRNAs
         BOWTIE2_ALIGN_RRNA(ch_reads_for_mirna, INDEX_RRNA.out.index.first(), [[],[]], true, false)
