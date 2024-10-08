@@ -51,7 +51,7 @@ You can find numerous talks on the nf-core events page from various topics inclu
    4. ncRNA filtration
    5. piRNA filtration
    6. Others filtration
-5. UMI barcode deduplication ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools)) <!-- TODO, isn't this done on the UMI step above? -->
+5. UMI barcode deduplication ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools))
 6. miRNA quantification
    - EdgeR
      1. Reads alignment against miRBase mature miRNA ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
@@ -82,7 +82,7 @@ You can test the pipeline as follows:
 
 ```bash
 nextflow run nf-core/smrnaseq \
-   -profile test \
+   -profile test,docker \
   --outdir <OUTDIR>
 ```
 
