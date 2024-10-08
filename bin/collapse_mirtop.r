@@ -1,6 +1,6 @@
 #!/usr/bin/env Rscript
 
-# Written by Lorena Pantano and released under the MIT license.
+# Written by Lorena Pantano and released under the MIT license. See LICENSE for details.
 
 library(data.table)
 # Command line arguments
