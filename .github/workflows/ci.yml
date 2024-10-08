@@ -68,7 +68,7 @@ jobs:
               --ci \
               --shard ${{ matrix.shard }}/${{ env.SHARDS }} \
               --changed-since HEAD^ \
-              --profile "+${{ matrix.profile }}" \
+              --profile "+${{ matrix.profile }},ci" \
               --filter pipeline \
               --junitxml=test.xml
 
