@@ -11,6 +11,7 @@ on:
       - master
   release:
     types: [published]
+  workflow_dispatch:
 
 env:
   NXF_ANSI_LOG: false
