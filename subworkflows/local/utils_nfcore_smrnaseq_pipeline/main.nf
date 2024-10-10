@@ -163,6 +163,40 @@ workflow PIPELINE_COMPLETION {
 //
 def validateInputParameters() {
     genomeExistsError()
+
+    if (!params.mirgenedb && !params.mirtrace_species) {
+            error("Reference species for miRTrace is not defined via the --mirtrace_species parameter.")
+    }
+
+    if (!params.mirgenedb) {
+        // Validate mature miRNA fasta file
+        if (!params.mature) {
+            error("Mature miRNA fasta file not found. Please specify using the '--mature' parameter.")
+        }
+        // Validate hairpin miRNA fasta file
+        if (!params.hairpin) {
+            error("Hairpin miRNA fasta file not found. Please specify using the '--hairpin' parameter.")
+        }
+    } else {
+        // Validate MirGeneDB species
+        if (!params.mirgenedb_species) {
+            error("You specified to be using MirGeneDB, but the MirGeneDB species is not set. Please specify using the '--mirgenedb_species' parameter.")
+        }
+        // Validate MirGeneDB mature miRNA fasta file
+        if (!params.mirgenedb_mature) {
+            error("You specified to be using MirGeneDB, but the mature miRNA fasta file is not found. Please provide the file using the '--mirgenedb_mature' parameter.")
+        }
+        // Validate MirGeneDB hairpin miRNA fasta file
+        if (!params.mirgenedb_hairpin) {
+            error("You specified to be using MirGeneDB, but the hairpin miRNA fasta file is not found. Please provide the file using the '--mirgenedb_hairpin' parameter.")
+        }
+        // Validate MirGeneDB GFF file
+        if (!params.mirgenedb_gff) {
+            error("You specified to be using MirGeneDB, but the GFF file is not found. Please provide the file using the '--mirgenedb_gff' parameter.")
+        }
+    }
+
+
 }
 
 // Validate channels from input samplesheet
