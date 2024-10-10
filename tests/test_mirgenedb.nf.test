@@ -1,0 +1,131 @@
+
+nextflow_pipeline {
+
+    name "Test Workflow main.nf - test_mirgenedb"
+    script "main.nf"
+    profile "test_mirgenedb"
+    tag "mirgenedb"
+    tag "pipeline"
+
+    test("test_mirgenedb") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
+                { assert workflow.trace.succeeded().size() == 90 },
+                { assert workflow.trace.failed().size() == 1 },
+
+                { assert snapshot(
+                    path("$outputDir/mirna_quant/bam/mature/Clone1_N1_mature.sorted.flagstat").exists(),
+                    path("$outputDir/mirna_quant/bam/mature/Clone1_N1_mature.sorted.stats").exists(),
+                    path("$outputDir/mirna_quant/bam/mature/Clone9_N1_mature.sorted.flagstat"),
+                    path("$outputDir/mirna_quant/bam/mature/Clone9_N1_mature.sorted.idxstats"),
+                    path("$outputDir/mirna_quant/bam/mature/Control_N1_mature.sorted.flagstat"),
+                    path("$outputDir/mirna_quant/bam/mature/Control_N1_mature.sorted.stats"),
+                    path("$outputDir/mirna_quant/bam/mature/Clone9_N1_mature.sorted.stats"),
+                    path("$outputDir/mirna_quant/bam/mature/Control_N1_mature.sorted.idxstats"),
+                    path("$outputDir/mirna_quant/bam/mature/Clone1_N1_mature.sorted.idxstats").exists(),
+                    path("$outputDir/mirna_quant/bam/hairpin/Control_N1_mature_hairpin.sorted.idxstats"),
+                    path("$outputDir/mirna_quant/bam/hairpin/Control_N1_mature_hairpin.sorted.flagstat"),
+                    path("$outputDir/mirna_quant/bam/hairpin/Clone9_N1_mature_hairpin.sorted.idxstats"),
+                    path("$outputDir/mirna_quant/bam/hairpin/Clone9_N1_mature_hairpin.sorted.stats"),
+                    path("$outputDir/mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.idxstats").exists(),
+                    path("$outputDir/mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.flagstat").exists(),
+                    path("$outputDir/mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.stats").exists(),
+                    path("$outputDir/mirna_quant/bam/hairpin/Control_N1_mature_hairpin.sorted.stats"),
+                    path("$outputDir/mirna_quant/bam/hairpin/Clone9_N1_mature_hairpin.sorted.flagstat")
+                ).match("mirna_quant_bam") },
+
+                { assert snapshot(
+                    path("$outputDir/mirna_quant/edger_qc/hairpin_edgeR_MDS_distance_matrix.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/hairpin_counts.csv").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/hairpin_edgeR_MDS_plot_coordinates.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/hairpin_log2CPM_sample_distances.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/hairpin_logtpm.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/hairpin_normalized_CPM.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/hairpin_logtpm.csv").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/mature_counts.csv").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/mature_edgeR_MDS_distance_matrix.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/hairpin_unmapped_read_counts.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/mature_edgeR_MDS_plot_coordinates.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/mature_log2CPM_sample_distances.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/mature_logtpm.csv").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/mature_logtpm.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/mature_normalized_CPM.txt").exists(),
+                    path("$outputDir/mirna_quant/edger_qc/mature_unmapped_read_counts.txt").exists()
+                ).match("mirna_quant_edger_qc") },
+
+                { assert snapshot(
+                    path("$outputDir/genome_quant/bam/Clone9_N1_mature_hairpin_genome.sorted.stats"),
+                    path("$outputDir/genome_quant/bam/Clone9_N1_mature_hairpin_genome.sorted.idxstats"),
+                    path("$outputDir/genome_quant/bam/Clone1_N1_mature_hairpin_genome.sorted.stats"),
+                    path("$outputDir/genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.stats"),
+                    path("$outputDir/genome_quant/bam/Clone1_N1_mature_hairpin_genome.sorted.flagstat"),
+                    path("$outputDir/genome_quant/bam/Clone9_N1_mature_hairpin_genome.sorted.flagstat"),
+                    path("$outputDir/genome_quant/bam/Clone1_N1_mature_hairpin_genome.sorted.idxstats"),
+                    path("$outputDir/genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.idxstats"),
+                    path("$outputDir/genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.flagstat")
+                ).match("genome_quant_bam") },
+
+                { assert snapshot(
+                    path("$outputDir/mirdeep2/result_Clone1_N1.csv").exists(),
+                    path("$outputDir/mirdeep2/result_Control_N1.csv").exists(),
+                    path("$outputDir/mirdeep2/result_Control_N1.bed").exists(),
+                    path("$outputDir/mirdeep2/result_Control_N1.bed").exists(),
+                    path("$outputDir/mirdeep2/result_Control_N1.html").exists(),
+                    path("$outputDir/mirdeep2/result_Control_N1.html").exists()
+                ).match("mirdeep2") },
+
+                { assert snapshot(
+                    path("$outputDir/multiqc/multiqc_report.html").exists()
+                ).match("multiqc") },
+
+                { assert snapshot(
+                    path("$outputDir/multiqc/multiqc_data/fastqc-status-check-heatmap.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastp_filtered_reads_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc_overrepresented_sequences_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc-1_top_overrepresented_sequences_table.txt").exists(),
+                    path("$outputDir/multiqc/multiqc_data/fastqc-1_sequence_counts_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc-1_per_sequence_gc_content_plot_Percentages.txt"),
+                    path("$outputDir/multiqc/multiqc_data/multiqc_citations.txt"),
+                    path("$outputDir/multiqc/multiqc_data/samtools-stats-dp.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc_sequence_length_distribution_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastp-seq-content-n-plot_Read_1_Before_filtering.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc-1_sequence_duplication_levels_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc-1_per_base_sequence_quality_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/multiqc_general_stats.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc-1_per_base_n_content_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc_per_base_n_content_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastp-seq-quality-plot_Read_1_After_filtering.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc_per_sequence_quality_scores_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc-1_per_sequence_quality_scores_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc_top_overrepresented_sequences_table.txt").exists(),
+                    path("$outputDir/multiqc/multiqc_data/fastqc-1_overrepresented_sequences_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc-1-status-check-heatmap.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc_sequence_counts_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastp-seq-quality-plot_Read_1_Before_filtering.txt"),
+                    path("$outputDir/multiqc/multiqc_data/samtools_alignment_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc_per_base_sequence_quality_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastp-seq-content-n-plot_Read_1_After_filtering.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc_adapter_content_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc_sequence_duplication_levels_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot_Percentages.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc-1_per_sequence_gc_content_plot_Counts.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc-1_adapter_content_plot.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_1_Before_filtering.txt"),
+                    path("$outputDir/multiqc/multiqc_data/fastqc_per_sequence_gc_content_plot_Counts.txt"),
+                    path("$outputDir/multiqc/multiqc_data/multiqc_sources.txt").exists(),
+                    path("$outputDir/multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_1_After_filtering.txt")
+                ).match("multiqc_multiqc_data")}
+            )
+        }
+    }
+
+}

@@ -1,0 +1,120 @@
+{
+    "mirtrace": {
+        "content": [
+            true,
+            "mirtrace-stats-contamination_detailed.tsv:md5,141f6f46a4f9fcfac91303c125a2fc75",
+            "mirtrace-stats-contamination_basic.tsv:md5,34005177b3038da76236b5d8fb468825",
+            "mirtrace-stats-length.tsv:md5,7d835805aca881496e65f6f96aa60d7d",
+            "mirtrace-stats-mirna-complexity.tsv:md5,3605fb37445fe2773d6b606a2171fbf8",
+            "mirtrace-stats-phred.tsv:md5,0f84ab70c67a94bab6820cf97c63d10f",
+            "mirtrace-stats-qcstatus.tsv:md5,aeeebcd9a4305a57d0f13fb2e3dec4cb",
+            "mirtrace-stats-rnatype.tsv:md5,406fdb7bde295573d4d92b57a1c59767",
+            true,
+            "mirtrace-stats-contamination_detailed.tsv:md5,c1af2894292fcd3242fe27a4adcaef49",
+            "mirtrace-stats-contamination_basic.tsv:md5,307eceb1b067f014aaad9e09263cebfc",
+            "mirtrace-stats-length.tsv:md5,4bca762e07f887e245d3757834ecbf4c",
+            "mirtrace-stats-mirna-complexity.tsv:md5,854e5d79c69685dd72922cc7d2135564",
+            "mirtrace-stats-phred.tsv:md5,1e74ce76a5247ce6bce716de7f0d9377",
+            "mirtrace-stats-qcstatus.tsv:md5,319be3a39d281282fb139baed4c7cbbb",
+            "mirtrace-stats-rnatype.tsv:md5,d0323854e2950c8ff7454227ff22dfd1",
+            true,
+            "mirtrace-stats-contamination_detailed.tsv:md5,329c0800ed9e59553e74e121b927047a",
+            "mirtrace-stats-contamination_basic.tsv:md5,651b466f7a6c8f4abff9f9ec44be06fd",
+            "mirtrace-stats-length.tsv:md5,ac1d2301e09318eff98336459de0b2ca",
+            "mirtrace-stats-mirna-complexity.tsv:md5,27e7eb5cdb0c5fe3b80217383f1f0570",
+            "mirtrace-stats-phred.tsv:md5,2b34bed301cb94ff1d24e08a503b92ee",
+            "mirtrace-stats-qcstatus.tsv:md5,212b57cf93930422c2a0119dc5959b1d",
+            "mirtrace-stats-rnatype.tsv:md5,eb2d397090cd2c511590ee53470033a5"
+        ],
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "24.04.4"
+        },
+        "timestamp": "2024-09-11T15:16:30.896336965"
+    },
+    "software_versions": {
+        "content": [
+            "{BLAT_CDNA={blat=36}, BLAT_NCRNA={blat=36}, BOWTIE2_ALIGN_CDNA={bowtie2=2.5.2, samtools=1.18, pigz=2.6}, BOWTIE2_ALIGN_NCRNA={bowtie2=2.5.2, samtools=1.18, pigz=2.6}, BOWTIE2_ALIGN_TRNA={bowtie2=2.5.2, samtools=1.18, pigz=2.6}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.0, samtools=1.16.1}, BOWTIE_MAP_MATURE={bowtie=1.3.0, samtools=1.16.1}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.0, samtools=1.16.1}, CAT_FASTQ={cat=8.3}, CSVTK_JOIN={csvtk=0.30.0}, DATATABLE_MERGE={r-base=3.6.2}, FASTP={fastp=0.23.4}, FILTER_STATS={BusyBox=1.32.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, GAWK_CDNA={gawk=5.3.0}, GAWK_NCRNA={gawk=5.3.0}, INDEX_CDNA={bowtie2=2.5.2}, INDEX_HAIRPIN={bowtie=1.3.0}, INDEX_MATURE={bowtie=1.3.0}, INDEX_NCRNA={bowtie2=2.5.2}, INDEX_TRNA={bowtie2=2.5.2}, MIRTOP_COUNTS={mirtop=0.4.28}, MIRTOP_EXPORT={mirtop=0.4.28}, MIRTOP_GFF={mirtop=0.4.28}, MIRTOP_STATS={mirtop=0.4.28}, MIRTRACE_QC={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, SAMTOOLS_FLAGSTAT={samtools=1.21}, SAMTOOLS_IDXSTATS={samtools=1.21}, SAMTOOLS_INDEX={samtools=1.21}, SAMTOOLS_SORT={samtools=1.21}, SAMTOOLS_STATS={samtools=1.21}, SEQCLUSTER_COLLAPSE={seqcluster=1.2.9}, SEQKIT_GREP_CDNA={seqkit=2.8.0}, SEQKIT_GREP_NCRNA={seqkit=2.8.0}, STATS_GAWK_CDNA={gawk=5.3.0}, STATS_GAWK_NCRNA={gawk=5.3.0}, STATS_GAWK_TRNA={gawk=5.3.0}, Workflow={nf-core/smrnaseq=v2.3.2dev}}"
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "24.04.4"
+        },
+        "timestamp": "2024-10-02T13:29:37.770610046"
+    },
+    "mirna_quant_bam": {
+        "content": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "24.04.4"
+        },
+        "timestamp": "2024-10-01T20:06:04.974546479"
+    },
+    "mirna_quant_edger_qc": {
+        "content": [
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "24.04.4"
+        },
+        "timestamp": "2024-10-01T20:06:05.025175321"
+    },
+    "contaminant_filter_filter": {
+        "content": [
+            true,
+            true,
+            true
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "24.04.4"
+        },
+        "timestamp": "2024-10-01T20:06:04.920520728"
+    },
+    "mirna_quant_mirtop": {
+        "content": [
+            true,
+            true
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "24.04.4"
+        },
+        "timestamp": "2024-10-01T20:06:05.070939602"
+    }
+}

@@ -288,6 +288,7 @@ def completionEmail(summary_params, email, email_on_fail, plaintext_email, outdi
             summary << summary_params[group]
         }
 
+
     def misc_fields = [:]
     misc_fields['Date Started']              = workflow.start
     misc_fields['Date Completed']            = workflow.complete
@@ -352,6 +353,7 @@ def completionEmail(summary_params, email, email_on_fail, plaintext_email, outdi
         try {
             if (plaintext_email) {
 new org.codehaus.groovy.GroovyException('Send plaintext e-mail, not HTML')            }
+
             // Try to send HTML e-mail using sendmail
             def sendmail_tf = new File(workflow.launchDir.toString(), ".sendmail_tmp.html")
             sendmail_tf.withWriter { w -> w << sendmail_html }
@@ -370,12 +372,14 @@ new org.codehaus.groovy.GroovyException('Send plaintext e-mail, not HTML')      
     def output_hf = new File(workflow.launchDir.toString(), ".pipeline_report.html")
     output_hf.withWriter { w -> w << email_html }
     nextflow.extension.FilesEx.copyTo(output_hf.toPath(), "${outdir}/pipeline_info/pipeline_report.html")
+
     output_hf.delete()
 
     // Write summary e-mail TXT to a file
     def output_tf = new File(workflow.launchDir.toString(), ".pipeline_report.txt")
     output_tf.withWriter { w -> w << email_txt }
     nextflow.extension.FilesEx.copyTo(output_tf.toPath(), "${outdir}/pipeline_info/pipeline_report.txt")
+
     output_tf.delete()
 }
 
@@ -408,6 +412,7 @@ def imNotification(summary_params, hook_url) {
         .each { group ->
             summary << summary_params[group]
         }
+
 
     def misc_fields = [:]
     misc_fields['start']          = workflow.start
