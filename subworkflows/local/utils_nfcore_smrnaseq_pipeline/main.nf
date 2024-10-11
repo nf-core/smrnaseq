@@ -111,7 +111,7 @@ workflow PIPELINE_INITIALISATION {
     three_prime_adapter = ch_three_prime_adapter // channel: [ val(string) ]
     phred_offset        = ch_phred_offset        // channel: [ val(string) ]
 }
-
+}
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
