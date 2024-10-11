@@ -202,9 +202,11 @@
                         "installed_by": ["subworkflows"]
                     },
                     "utils_nfschema_plugin": {
-                        "branch": "master",
-                        "git_sha": "bbd5a41f4535a8defafe6080e00ea74c45f4f96c",
-                        "installed_by": ["subworkflows"]
+                        "utils_nfschema_plugin": {
+                            "branch": "master",
+                            "git_sha": "bbd5a41f4535a8defafe6080e00ea74c45f4f96c",
+                            "installed_by": ["subworkflows"]
+                        }
                     }
                 }
             }
