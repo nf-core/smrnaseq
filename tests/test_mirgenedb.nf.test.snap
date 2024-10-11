@@ -1,10 +1,10 @@
 {
     "genome_quant_bam": {
         "content": [
-            "Clone9_N1_mature_hairpin_genome.sorted.stats:md5,201486e8c88b0dbb639776f9dacefe66",
+            "Clone9_N1_mature_hairpin_genome.sorted.stats:md5,6b1d2b924593096358494dda37b46770",
             "Clone9_N1_mature_hairpin_genome.sorted.idxstats:md5,aa37c5da7c2b4505ce58c3a21f97121c",
-            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,5679af445f4628e0f4137f339319c950",
-            "Control_N1_mature_hairpin_genome.sorted.stats:md5,4da4f877f06083f616a0d76edd04ea22",
+            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,3c5f51cd7136eed5e97847ad7b857d23",
+            "Control_N1_mature_hairpin_genome.sorted.stats:md5,a7f2dd17a34c8f0b669a774404247394",
             "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,5bb521c495f1c450835299b1eb88dc84",
             "Clone9_N1_mature_hairpin_genome.sorted.flagstat:md5,6a8ad3be2ca0fa924fd32a04293d4ce4",
             "Clone1_N1_mature_hairpin_genome.sorted.idxstats:md5,d92f9eae7657418858e6d2b69436f74f",
@@ -15,7 +15,7 @@
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-20T13:36:32.067039888"
+        "timestamp": "2024-10-08T23:23:13.57712901"
     },
     "software_versions": {
         "content": [
@@ -25,7 +25,7 @@
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-10-01T20:13:41.274631809"
+        "timestamp": "2024-10-08T23:23:13.407922799"
     },
     "mirna_quant_bam": {
         "content": [
@@ -34,25 +34,25 @@
             "Clone9_N1_mature.sorted.flagstat:md5,adf40ba27907b6ef726d6c5923a731b9",
             "Clone9_N1_mature.sorted.idxstats:md5,8302f401476f5c8fee3333e1c742c05e",
             "Control_N1_mature.sorted.flagstat:md5,f8df7690d20014518f47dc2fe39debec",
-            "Control_N1_mature.sorted.stats:md5,35a03b446785dbf240d755ea9edac0f6",
-            "Clone9_N1_mature.sorted.stats:md5,d2cb555133269b4503e4eb490dd81b3e",
+            "Control_N1_mature.sorted.stats:md5,3c952d69ed81186976ede053c847e109",
+            "Clone9_N1_mature.sorted.stats:md5,873e4f40e377cc445ace1ac48354729d",
             "Control_N1_mature.sorted.idxstats:md5,b7a382b1d0f5cba6cb94b3b5a6b18f84",
             true,
             "Control_N1_mature_hairpin.sorted.idxstats:md5,79dc5e82ff88e7379c893549224cd87f",
             "Control_N1_mature_hairpin.sorted.flagstat:md5,1dc7b98f0014a99a20de7c09a6b95340",
             "Clone9_N1_mature_hairpin.sorted.idxstats:md5,f3ed5bf23f73d41c42d3da0bf30f89ea",
-            "Clone9_N1_mature_hairpin.sorted.stats:md5,9fda01757030fe96a60171965117b2e4",
+            "Clone9_N1_mature_hairpin.sorted.stats:md5,c306ef4c5b1e23a3d032b532cf916fc1",
             true,
             true,
             true,
-            "Control_N1_mature_hairpin.sorted.stats:md5,a96b6d37b444f52c66a3dac9d7de0f36",
+            "Control_N1_mature_hairpin.sorted.stats:md5,3e82fa30bfafcab2e8fb2f247e591959",
             "Clone9_N1_mature_hairpin.sorted.flagstat:md5,678f4f9e98c3e1fcc5af54e8dd06fbbc"
         ],
         "meta": {
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-19T15:14:06.231457002"
+        "timestamp": "2024-10-08T23:23:13.503940378"
     },
     "mirdeep2": {
         "content": [

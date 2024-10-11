@@ -30,14 +30,14 @@
             "Clone1_N3_mature_hairpin_genome.sorted.idxstats:md5,2620288b88bba1ea3315414016c083a1",
             "Clone1_N1_mature_hairpin_genome.sorted.idxstats:md5,e0e4a95f5c21a926f7894cf1fbe3110b",
             "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,62208acf0c7418d590b41318d7e17d67",
-            "Clone1_N3_mature_hairpin_genome.sorted.stats:md5,1c03f98d16d2e418692d3227c8be2803",
-            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,e5aee4c4e099d5f4e82bd22f58309e2c"
+            "Clone1_N3_mature_hairpin_genome.sorted.stats:md5,c9d4d7a91bdafdb45592574cd942a7ba",
+            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,3309ee9de501160337af8c73d46ec682"
         ],
         "meta": {
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-10-01T20:19:25.61285999"
+        "timestamp": "2024-10-08T23:28:49.376604167"
     },
     "software_versions": {
         "content": [
@@ -47,17 +47,17 @@
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-10-02T13:45:55.267854723"
+        "timestamp": "2024-10-08T23:28:49.241105443"
     },
     "mirna_quant_bam": {
         "content": [
             "Clone1_N3_mature_hairpin.sorted.flagstat:md5,1630edf055b591303d7c68d013745938",
             true,
-            "Clone1_N3_mature_hairpin.sorted.stats:md5,b41149b9cb862c46d60ef21498f29e40",
+            "Clone1_N3_mature_hairpin.sorted.stats:md5,488f860e7aed290a4707dbe9b07899b6",
             true,
             "Clone1_N3_mature_hairpin.sorted.idxstats:md5,b44fb26f6be2accc7d52bc38efff69f4",
             true,
-            "Clone1_N3_mature.sorted.stats:md5,b1e54f83ae8a387a2071eda43ef3f9cb",
+            "Clone1_N3_mature.sorted.stats:md5,5263c781ef5db00ba664745ed595841f",
             true,
             true,
             true,
@@ -68,7 +68,7 @@
             "nf-test": "0.9.0",
             "nextflow": "24.04.4"
         },
-        "timestamp": "2024-09-19T15:26:42.634182624"
+        "timestamp": "2024-10-08T23:28:49.30034837"
     },
     "mirna_quant_edger_qc": {
         "content": [

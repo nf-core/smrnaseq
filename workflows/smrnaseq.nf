@@ -3,7 +3,6 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-
 // nf-core modules
 include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                           } from '../modules/nf-core/fastqc/main'
@@ -15,15 +14,16 @@ include { UMITOOLS_EXTRACT                 } from '../modules/nf-core/umitools/e
 include { MIRTRACE_QC                      } from '../modules/nf-core/mirtrace/qc/main'
 // nf-core subworkflows
 include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
+include { FASTQ_FIND_MIRNA_MIRDEEP2        } from '../subworkflows/nf-core/fastq_find_mirna_mirdeep2/main'
 include { paramsSummaryMultiqc             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { FASTQ_FIND_MIRNA_MIRDEEP2        } from '../subworkflows/nf-core/fastq_find_mirna_mirdeep2/main'
 // local subworkflows
 include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/main'
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant'
 include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant'
+include { methodsDescriptionText           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 // plugins
-include { paramsSummaryMap                 } from 'plugin/nf-validation'
+include { paramsSummaryMap                 } from 'plugin/nf-schema'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -66,6 +66,7 @@ workflow NFCORE_SMRNASEQ {
     ch_phred_offset        // channel: [ val(string) ]
 
     main:
+    ch_multiqc_files = Channel.empty()
     //
     // Create separate channels for samples that have single/multiple FastQ files to merge
     //
@@ -244,12 +245,13 @@ workflow NFCORE_SMRNASEQ {
     softwareVersionsToYAML(ch_versions)
         .collectFile(
             storeDir: "${params.outdir}/pipeline_info",
-            name: 'nf_core_pipeline_software_mqc_versions.yml',
+            name: 'nf_core_'  + 'pipeline_software_' +  'mqc_'  + 'versions.yml',
             sort: true,
             newLine: true
         ).set { ch_collated_versions }
         // .collectFile(storeDir: "${params.outdir}/pipeline_info", name: 'nf_core_smrnaseq_software_mqc_versions.yml', sort: true, newLine: true)
         // .set {ch_collated_versions}
+
 
     //
     // MODULE: MultiQC
