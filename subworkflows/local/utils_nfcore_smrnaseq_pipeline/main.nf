@@ -200,8 +200,6 @@ def validateInputParameters() {
             error("You specified to be using MirGeneDB, but the GFF file is not found. Please provide the file using the '--mirgenedb_gff' parameter.")
         }
     }
-
-
 }
 
 // Validate channels from input samplesheet
@@ -339,3 +337,4 @@ def methodsDescriptionText(mqc_methods_yaml) {
 
     return description_html.toString()
 }
+
