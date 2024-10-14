@@ -88,7 +88,7 @@ workflow CONTAMINANT_FILTER {
         rrna_reads = BOWTIE2_ALIGN_RRNA.out.fastq
     }
 
-    rrna_reads.set { trna_reads }
+    trna_reads = rrna_reads
 
     if (params.trna) {
         // Index DB and filter $rrna_reads emit: $trna_reads
@@ -118,7 +118,7 @@ workflow CONTAMINANT_FILTER {
         trna_reads = BOWTIE2_ALIGN_TRNA.out.fastq
     }
 
-    trna_reads.set { cdna_reads }
+    cdna_reads = trna_reads
 
     // Define how to filter significant BLAT hits
     ch_program = Channel.value('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
@@ -168,7 +168,7 @@ workflow CONTAMINANT_FILTER {
         cdna_reads = BOWTIE2_ALIGN_CDNA.out.fastq
     }
 
-    cdna_reads.set { ncrna_reads }
+    ncrna_reads = cdna_reads
 
     if (params.ncrna) {
         // Search which hairpin miRNAs are present in the ncRNA data
@@ -215,7 +215,7 @@ workflow CONTAMINANT_FILTER {
         ncrna_reads = BOWTIE2_ALIGN_NCRNA.out.fastq
     }
 
-    ncrna_reads.set { pirna_reads }
+    pirna_reads = ncrna_reads
 
     if (params.pirna) {
         // Search which hairpin miRNAs are present in the piRNA data
@@ -262,7 +262,7 @@ workflow CONTAMINANT_FILTER {
         pirna_reads = BOWTIE2_ALIGN_PIRNA.out.fastq
     }
 
-    pirna_reads.set { other_cont_reads }
+    other_cont_reads = pirna_reads
 
     if (params.other_contamination) {
         // Search which hairpin miRNAs are present in the other data

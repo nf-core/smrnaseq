@@ -19,7 +19,9 @@ include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipelin
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     SUBWORKFLOW TO INITIALISE PIPELINE
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -69,6 +71,7 @@ workflow PIPELINE_INITIALISATION {
     UTILS_NFCORE_PIPELINE (
         nextflow_cli_args
     )
+
     //
     // Custom validation for pipeline parameters
     //
@@ -91,7 +94,7 @@ workflow PIPELINE_INITIALISATION {
         .groupTuple()
         .map { samplesheet ->
             validateInputSamplesheet(samplesheet)
-        }
+            }
         .map {
             meta, fastqs ->
                 return [ meta, fastqs.flatten() ]
@@ -106,7 +109,9 @@ workflow PIPELINE_INITIALISATION {
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     SUBWORKFLOW FOR PIPELINE COMPLETION
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
@@ -153,7 +158,9 @@ workflow PIPELINE_COMPLETION {
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     FUNCTIONS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 //
@@ -161,6 +168,38 @@ workflow PIPELINE_COMPLETION {
 //
 def validateInputParameters() {
     genomeExistsError()
+
+    if (!params.mirgenedb && !params.mirtrace_species) {
+            error("Reference species for miRTrace is not defined via the --mirtrace_species parameter.")
+    }
+
+    if (!params.mirgenedb) {
+        // Validate mature miRNA fasta file
+        if (!params.mature) {
+            error("Mature miRNA fasta file not found. Please specify using the '--mature' parameter.")
+        }
+        // Validate hairpin miRNA fasta file
+        if (!params.hairpin) {
+            error("Hairpin miRNA fasta file not found. Please specify using the '--hairpin' parameter.")
+        }
+    } else {
+        // Validate MirGeneDB species
+        if (!params.mirgenedb_species) {
+            error("You specified to be using MirGeneDB, but the MirGeneDB species is not set. Please specify using the '--mirgenedb_species' parameter.")
+        }
+        // Validate MirGeneDB mature miRNA fasta file
+        if (!params.mirgenedb_mature) {
+            error("You specified to be using MirGeneDB, but the mature miRNA fasta file is not found. Please provide the file using the '--mirgenedb_mature' parameter.")
+        }
+        // Validate MirGeneDB hairpin miRNA fasta file
+        if (!params.mirgenedb_hairpin) {
+            error("You specified to be using MirGeneDB, but the hairpin miRNA fasta file is not found. Please provide the file using the '--mirgenedb_hairpin' parameter.")
+        }
+        // Validate MirGeneDB GFF file
+        if (!params.mirgenedb_gff) {
+            error("You specified to be using MirGeneDB, but the GFF file is not found. Please provide the file using the '--mirgenedb_gff' parameter.")
+        }
+    }
 }
 
 // Validate channels from input samplesheet
@@ -217,23 +256,22 @@ def toolCitationText() {
     // Uncomment function in methodsDescriptionText to render in MultiQC report
     def citation_text = [
             "Tools used in the workflow included:",
-            "FastQC (Andrews 2010),",
-            "MultiQC (Ewels et al. 2016),",
+            !params.skip_fastqc          ? "FastQC (Andrews 2010)," : "",
+            !params.skip_multiqc         ? "MultiQC (Ewels et al. 2016)," : "",
+            !params.skip_fastp           ? "fastp (Chen et al. 2018)," : "",
+            !params.skip_mirdeep         ? "MiRDeep2 (Friedländer et al. 2012)," : "",
+            params.filter_contamination  ? "Contamination filtering tools: BLAT (Kent 2002), Bowtie2 (Langmead and Salzberg 2012)," : "",
+            params.mirtrace_species      ? "miRTrace (Kang et al. 2018)," : "",
             "UMI-tools (Smith et al. 2017),",
-            "fastp (Chen et al. 2018),",
-            "miRTrace (Kang et al. 2018),",
             "Bowtie (Langmead et al. 2009),",
-            "Bowtie2 (Langmead and Salzberg 2012),",
             "SAMtools (Li et al. 2009),",
             "EdgeR (Robinson et al. 2010),",
             "Mirtop (Desvignes et al. 2019),",
-            "MiRDeep2 (Friedländer et al. 2012),",
             "SeqKit (Shen et al. 2016),",
             "UMICollapse (Liu 2020),",
-            "BLAT (Kent 2002)",
             "Seqcluster (Pantano et al. 2011)",
             "."
-        ].join(' ').trim()
+    ].join(' ').trim()
 
     return citation_text
 }

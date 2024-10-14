@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # Originally written by Phil Ewels and Chuan Wang and released under the MIT license.
-# Contributions by Alexander Peltzer, Anabella Trigila, James Fellows Yates, Sarah Djebali, Kevin Menden, Konrad Stawinski and Lorena Pantano also released under the MIT license.
+# Contributions by Alexander Peltzer, Anabella Trigila, James Fellows Yates, Sarah Djebali, Kevin Menden, Konrad Stawinski and Lorena Pantano also released under the MIT license. See LICENSE https://github.com/nf-core/smrnaseq/blob/master/LICENSE for details.
 
 # Command line arguments
 args = commandArgs(trailingOnly=TRUE)
