@@ -10,38 +10,48 @@
 
 This option indicates the experimental protocol used for the sample preparation. Currently supporting:
 
-- 'illumina': adapter (`TGGAATTCTCGGGTGCCAAGG`)
-- 'nextflex': adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`4`), three_prime_clip_r1 (`4`)
-- 'qiaseq': adapter (`AACTGTAGGCACCATCAAT`)
-- 'cats': adapter (`GATCGGAAGAGCACACGTCTG`), clip_r1(`3)
-- 'custom' (where the user can indicate the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` manually)
+- 'illumina': three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`0`), three_prime_clip_r1 (`0`)
+- 'nextflex': three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`4`), three_prime_clip_r1 (`4`)
+- 'qiaseq': three_prime_adapter (`AACTGTAGGCACCATCAAT`), clip_r1 (`0`), three_prime_clip_r1 (`0`)
+- 'cats': three_prime_adapter (`AAAAAAAA`), clip_r1(`3`), three_prime_clip_r1 (`0`)
+
+This option is not chosen as a parameter but as an additional profile that sets the corresponding `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` parameters accordingly. You can choose to either use any of the provided profiles by running the pipeline with e.g. `illumina` to set the defaults as described above in a more convenient way.
+
+```bash
+-profile your_other_profiles,illumina
+```
+
+In case you have a custom protocol, please supply the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` manually.
 
 The parameter `--three_prime_adapter` is set to the Illumina TruSeq single index adapter sequence `AGATCGGAAGAGCACACGTCTGAACTCCAGTCA`. This is also to ensure, that the auto-detect functionality of `FASTP` is disabled. Please make sure to adapt this adapter sequence accordingly for your run.
 
-:warning: At least the `custom` protocol has to be specified, otherwise the pipeline won't run. In case you specify the `custom` protocol, ensure that the parameters above are set accordingly or the defaults will be applied. If you want to auto-detect the adapters using `fastp`, please set `--three_prime_adapter` to `auto-detect`.
+:warning: If you do not choose a profile that sets the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` options, the pipeline won't run. If you want to auto-detect the adapters using `fastp`, please set `--three_prime_adapter` to `auto-detect`.
 
 ### `mirtrace_species` or `mirgenedb_species`
 
-It should point to the 3-letter species name used by [miRBase](https://www.mirbase.org/help/genome_summary.shtml) or [MirGeneDB](https://www.mirgenedb.org/browse). Note the difference in case for the two databases.
+It should point to the 3-letter species name used by [miRBase](https://www.mirbase.org/browse) or [MirGeneDB](https://www.mirgenedb.org/browse). Note the difference in case for the two databases.
 
 ### miRNA related files
 
 Different parameters can be set for the two supported databases. By default `miRBase` will be used with the parameters below.
 
 - `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRbase: `https://mirbase.org/download/CURRENT/genomes/${params.mirtrace_species}.gff3`
-- `mature`: points to the FASTA file of mature miRNA sequences. `https://mirbase.org/download/mature.fa`
-- `hairpin`: points to the FASTA file of precursor miRNA sequences. `https://mirbase.org/download/hairpin.fa`
+- `mature`: points to the FASTA file of mature miRNA sequences. Default: `https://mirbase.org/download/mature.fa`
+- `hairpin`: points to the FASTA file of precursor miRNA sequences. Default: `https://mirbase.org/download/hairpin.fa`
 
 If MirGeneDB should be used instead it needs to be specified using `--mirgenedb` and use the parameters below.
 
-- `mirgenedb_gff`: The data can not be downloaded automatically (URLs are created with short term tokens in it), thus the user needs to supply the gff file for either his species, or all species downloaded from `https://mirgenedb.org/download`. The total set will automatically be subsetted to the species specified with `--mirgenedb_species`.
-- `mirgenedb_mature`: points to the FASTA file of mature miRNA sequences. Download from `https://mirgenedb.org/download`.
-- `mirgenedb_hairpin`: points to the FASTA file of precursor miRNA sequences. Download from `https://mirgenedb.org/download`. Note that MirGeneDB does not have a dedicated `hairpin` file, but the `Precursor sequences` are to be used.
+- `mirgenedb_gff`: The GFF file cannot be downloaded automatically due to the presence of short-term tokens in the URLs. Therefore, the user must manually provide the GFF file, either for their species of interest or for all species, by downloading it from [MirGeneDB](https://mirgenedb.org/download). The provided dataset will be automatically filtered based on the species specified with the `--mirgenedb_species` parameter.
+- `mirgenedb_mature`: This parameter should point to the FASTA file containing mature miRNA sequences. The file can be manually downloaded from [MirGeneDB](https://mirgenedb.org/download).
+- `mirgenedb_hairpin`: This parameter should point to the FASTA file containing precursor miRNA sequences. Note that MirGeneDB does not offer a dedicated hairpin file, but the precursor sequences can be downloaded from [MirGeneDB](https://mirgenedb.org/download) and used instead.
 
 ### Genome
 
 - `fasta`: the reference genome FASTA file
-- `bt_indices`: points to the folder containing the `bowtie2` indices for the genome reference specified by `fasta`. **Note:** if the FASTA file in `fasta` is not the same file used to generate the `bowtie2` indices, then the pipeline will fail.
+- `bowtie_index`: points to the folder containing the `bowtie` indices for the genome reference specified by `fasta`.
+
+> [!NOTE]
+> if the FASTA file in `fasta` is not the same file used to generate the `bowtie` indices, then the pipeline will fail.
 
 ### Contamination filtering
 
@@ -56,6 +66,12 @@ Contamination filtering of the sequencing reads is optional and can be invoked u
 - `pirna`: Used to supply a FASTA file containing piRNA contamination sequence. e.g. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 - `other_contamination`: Used to supply an additional filtering set. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 
+## mirDeep2
+
+If the software encounters an error with exit status 255, it will be ignored, and the pipeline will continue to complete. In such cases, the pipeline will log a note that includes the path to the work directory where the issue occurred. You can inspect this work directory to examine your input data and troubleshoot the issue.
+
+Error 255 is typically related to the core algorithm of miRDeep generating empty output files. This often happens when the reads being processed do not correspond to putative mature miRNA sequences, or if the provided precursors do not meet the criteria for valid miRNA precursors, both of which may stem from the input reads used. A common cause of this error is running the pipeline with a small subset of the input reads.
+
 ### UMI handling
 
 The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire read sequence after 3'adapter removal. Followed by Umitools-extract to extract the miRNA adapter and UMI. This can be achieved by using the parameters for UMI handling as follows (in this case for QIAseq miRNA Library Kit):
@@ -64,9 +80,8 @@ The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire r
 --with_umi --umitools_extract_method regex --umitools_bc_pattern = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
 ```
 
-:::note
-You will have to specify custom umitools_bc_pattern patterns if your UMI read structure is different. Please check the required capability in your UMI handling manual. It should be set in a way, that only the insert sequence of the RNA molecule is left after extraction. Please refer to the manual of the used kit for the expected read structure.
-:::
+> [!NOTE]
+> If your UMI read structure differs, you'll need to specify custom `umitools_bc_pattern` patterns. Ensure that the pattern is set so that only the insert sequence of the RNA molecule remains after extraction. For details, refer to the UMI handling manual or the documentation of the kit you're using for the expected read structure.
 
 ## Samplesheet input
 
@@ -91,9 +106,12 @@ CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz
 
 ### Full samplesheet
 
-The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet can have as many columns as you desire. However, there is a strict requirement for the first 3 columns to match those defined in the table below.
+The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet must have at least 2 columns (`sample` and `fastq1`). A third column can be added if the sample is paired-end (`fastq2`).
 
-A final samplesheet file consisting of both single- and paired-end data may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
+> [!NOTE]
+> Most of the tools used can't accommodate paired end reads, so whenever paired-end samples are used as inputs, only the R1 files are used by the pipeline.
+
+A final samplesheet file consisting of single-end data and may look something like the one below. This is for 6 samples, where `TREATMENT_REP3` has been sequenced twice.
 
 ```console
 sample,fastq_1
@@ -106,10 +124,11 @@ TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz
 TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz
 ```
 
-| Column    | Description                                                                                                                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). |
-| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             |
+| Column    | Description                                                                                                                                                                            | Requirement |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). | Mandatory   |
+| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             | Mandatory   |
+| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             | Optional    |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
@@ -136,9 +155,8 @@ If you wish to repeatedly use the same parameters for multiple runs, rather than
 
 Pipeline settings can be provided in a `yaml` or `json` file via `-params-file <file>`.
 
-:::warning
-Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories), or module arguments (args).
-:::
+> [!WARNING]
+> Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories), or module arguments (args).
 
 The above pipeline run specified with a params file in yaml format:
 
@@ -146,9 +164,9 @@ The above pipeline run specified with a params file in yaml format:
 nextflow run nf-core/smrnaseq -profile docker -params-file params.yaml
 ```
 
-with `params.yaml` containing:
+with:
 
-```yaml
+```yaml title="params.yaml"
 input: './samplesheet.csv'
 outdir: './results/'
 genome: 'GRCh37'
@@ -156,6 +174,10 @@ genome: 'GRCh37'
 ```
 
 You can also generate such `YAML`/`JSON` files via [nf-core/launch](https://nf-co.re/launch).
+
+## Optional parameters
+
+If `--save_intermediates` is specified, the intermediate files generated in the pipeline will be saved in the output directory.
 
 ### Updating the pipeline
 
@@ -182,15 +204,13 @@ The `bin` directory contains some scripts used by the pipeline which may also be
 
 To further assist in reproducbility, you can use share and re-use [parameter files](#running-the-pipeline) to repeat pipeline runs with the same settings without having to write out a command with every single parameter.
 
-:::tip
-If you wish to share such profile (such as upload as supplementary material for academic publications), make sure to NOT include cluster specific paths to files, nor institutional specific profiles.
-:::
+> [!TIP]
+> If you wish to share such a profile (such as uploading it as supplementary material for academic publications), make sure not to include cluster-specific paths to files, nor institution-specific profiles.
 
 ## Core Nextflow arguments
 
-:::note
-These options are part of Nextflow and use a _single_ hyphen (pipeline parameters use a double-hyphen).
-:::
+> [!NOTE]
+> These options are part of Nextflow and use a _single_ hyphen (pipeline parameters use a double-hyphen).
 
 ### `-profile`
 
@@ -198,9 +218,8 @@ Use this parameter to choose a configuration profile. Profiles can give configur
 
 Several generic profiles are bundled with the pipeline which instruct the pipeline to use software packaged using different methods (Docker, Singularity, Podman, Shifter, Charliecloud, Apptainer, Conda) - see below.
 
-:::info
-We highly recommend the use of Docker or Singularity containers for full pipeline reproducibility, however when this is not possible, Conda is also supported.
-:::
+> [!TIP]
+> We highly recommend the use of Docker or Singularity containers for full pipeline reproducibility, however when this is not possible, Conda is also supported.
 
 The pipeline also dynamically loads configurations from [https://github.com/nf-core/configs](https://github.com/nf-core/configs) when it runs, making multiple config profiles for various institutional clusters available at run time. For more information and to see if your system is available in these configs please see the [nf-core/configs documentation](https://github.com/nf-core/configs#documentation).
 
@@ -224,6 +243,8 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
   - A generic configuration profile to be used with [Charliecloud](https://hpc.github.io/charliecloud/)
 - `apptainer`
   - A generic configuration profile to be used with [Apptainer](https://apptainer.org/)
+- `wave`
+  - A generic configuration profile to enable [Wave](https://seqera.io/wave/) containers. Use together with one of the above (requires Nextflow ` 24.03.0-edge` or later).
 - `conda`
   - A generic configuration profile to be used with [Conda](https://conda.io/docs/). Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter, Charliecloud, or Apptainer.
 
@@ -264,14 +285,6 @@ In most cases, you will only need to create a custom config once. However, if mu
 See the main [Nextflow documentation](https://www.nextflow.io/docs/latest/config.html) for more information about creating your own configuration files.
 
 If you have any questions or issues please send us a message on [Slack](https://nf-co.re/join/slack) on the [`#configs` channel](https://nfcore.slack.com/channels/configs).
-
-## Azure Resource Requests
-
-To be used with the `azurebatch` profile by specifying the `-profile azurebatch`.
-We recommend providing a compute `params.vm_type` of `Standard_D16_v3` VMs by default but these options can be changed if required.
-
-Note that the choice of VM size depends on your quota and the overall workload during the analysis.
-For a thorough list, please refer the [Azure Sizes for virtual machines in Azure](https://docs.microsoft.com/en-us/azure/virtual-machines/sizes).
 
 ## Running in the background
 

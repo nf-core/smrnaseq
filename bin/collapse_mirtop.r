@@ -1,4 +1,7 @@
 #!/usr/bin/env Rscript
+
+# Written by Lorena Pantano and released under the MIT license. See LICENSE https://github.com/nf-core/smrnaseq/blob/master/LICENSE for details.
+
 library(data.table)
 # Command line arguments
 args = commandArgs(trailingOnly=TRUE)

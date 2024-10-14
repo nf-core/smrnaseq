@@ -1,5 +1,8 @@
 #!/usr/bin/env Rscript
 
+# Originally written by Phil Ewels and Chuan Wang and released under the MIT license.
+# Contributions by Alexander Peltzer, Anabella Trigila, James Fellows Yates, Sarah Djebali, Kevin Menden, Konrad Stawinski and Lorena Pantano also released under the MIT license. See LICENSE https://github.com/nf-core/smrnaseq/blob/master/LICENSE for details.
+
 # Command line arguments
 args = commandArgs(trailingOnly=TRUE)
 
@@ -79,7 +82,7 @@ for (i in 1:2) {
     }
 
     # Make MDS plot (only perform with 3 or more samples)
-    if (length(filelist[[1]]) > 2){
+    if (ncol(dataNorm$counts) > 2){
         pdf(paste(header,"_edgeR_MDS_plot.pdf",sep=""))
         MDSdata <- plotMDS(dataNorm)
         dev.off()
@@ -111,6 +114,8 @@ for (i in 1:2) {
 
         # Write clustered distance values to file
         write.table(hmap$carpet, paste(header,"_log2CPM_sample_distances.txt",sep=""), quote=FALSE, sep="\t")
+    } else {
+    warning("Not enough samples to create an MDS plot. At least 3 samples are required.")
     }
 }
 

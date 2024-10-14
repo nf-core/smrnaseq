@@ -6,4 +6,6 @@ results/
 testing/
 testing*
 *.pyc
+null/
 execution_trace*
+.nf-test*

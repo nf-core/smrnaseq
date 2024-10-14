@@ -3,6 +3,64 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## v2.4.0 - 2024-10-14 - Navy Iron Boxer
+
+- [[#349]](https://github.com/nf-core/smrnaseq/pull/349) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347) - change conda-base to conda-forge channel.
+- [[#350]](https://github.com/nf-core/smrnaseq/pull/350) - Fix [MIRTOP_QUANT conda issue](https://github.com/nf-core/smrnaseq/issues/347) - set python version to 3.7 to fix pysam issue.
+- [[#361]](https://github.com/nf-core/smrnaseq/pull/361) - Fix [[#332]](https://github.com/nf-core/smrnaseq/issues/332) - Fix documentation to use only single-end.
+- [[#364]](https://github.com/nf-core/smrnaseq/pull/364) - Fix [Protocol inheritance issue](https://github.com/nf-core/smrnaseq/issues/351) - fixing protocol inheritance from subworkflow with move to config profile(s) for different protocols.
+- [[#372]](https://github.com/nf-core/smrnaseq/pull/372) - Fix [Plain test profile](https://github.com/nf-core/smrnaseq/issues/371) - Updated default protocol value to "custom".
+- [[#374]](https://github.com/nf-core/smrnaseq/pull/374) - Fix [default tests](https://github.com/nf-core/smrnaseq/issues/375) so that they do not require additional profiles in CI. Change GitHub CI fail-fast strategy to false.
+- [[#375]](https://github.com/nf-core/smrnaseq/pull/375) - Test [technical repeats](https://github.com/nf-core/smrnaseq/issues/212) - Test merging of technical repeats.
+- [[#377]](https://github.com/nf-core/smrnaseq/pull/377) - Fix [Linting](https://github.com/nf-core/smrnaseq/issues/369) - Fixed linting warnings and updated modules & subworkflows.
+- [[#378]](https://github.com/nf-core/smrnaseq/pull/378) - Fix [`--mirtrace_species` bug](<(https://github.com/nf-core/smrnaseq/issues/348)>) - Make `MIRTRACE` process conditional. Add mirgenedb test.
+- [[#380]](https://github.com/nf-core/smrnaseq/pull/380) - Fix [edgeR_mirBase.R](https://github.com/nf-core/smrnaseq/issues/187) - Fix checking number of samples which causes error in plotMDS. Add nf-tests for local modules using custom R scripts.
+- [[#381]](https://github.com/nf-core/smrnaseq/pull/381) - Update [Convert tests to nf-tests](https://github.com/nf-core/smrnaseq/issues/379) - CI tests to nf-tests.
+- [[#382]](https://github.com/nf-core/smrnaseq/pull/382) - Add [collapse_mirtop.R](https://github.com/nf-core/smrnaseq/issues/174) - Add nf-tests for local modules using custom R scripts.
+- [[#383]](https://github.com/nf-core/smrnaseq/pull/383) - Fix [parameter `--skip_fastp` throws an error](https://github.com/nf-core/smrnaseq/issues/263) - Fix parameter --skip_fastp.
+- [[#384]](https://github.com/nf-core/smrnaseq/pull/384) - Fix [filter status bug fix](https://github.com/nf-core/smrnaseq/issues/360) - Fix filter stats module and add filter contaminants test profile.
+- [[#386]](https://github.com/nf-core/smrnaseq/pull/386) - Fix [Nextflex trimming support](https://github.com/nf-core/smrnaseq/issues/365) - Fix Nextflex trimming support.
+- [[#387]](https://github.com/nf-core/smrnaseq/pull/387) - Add [contaminant filter failure because the Docker image for BLAT cannot be pulled](https://github.com/nf-core/smrnaseq/issues/354) - Add nf-test to local module `blat_mirna` and fixes . Adds a small test profile to test contaminant filter results.
+- [[#388]](https://github.com/nf-core/smrnaseq/pull/388) - Fix [igenomes fix](https://github.com/nf-core/smrnaseq/issues/360) - Fix workflow scripts so that they can use igenome parameters.
+- [[#391]](https://github.com/nf-core/smrnaseq/pull/391) - Fix [error because of large chromosomes](https://github.com/nf-core/smrnaseq/issues/132) - Change `.bai` index for `.csi` index in `samtools_index` to fix .
+- [[#392]](https://github.com/nf-core/smrnaseq/pull/392) - Update [Reduce tests](https://github.com/nf-core/smrnaseq/issues/389) - Combine and optimize tests, and reduce samplesheets sizes.
+- [[#397]](https://github.com/nf-core/smrnaseq/pull/397) - Fix [contaminant filter failure because of the Docker image for BLAT](https://github.com/nf-core/smrnaseq/issues/354) - Improvements to contaminant filter subworkflow and replacement for nf-core modules.
+- [[#398]](https://github.com/nf-core/smrnaseq/pull/398) - Update [Input channels](https://github.com/nf-core/smrnaseq/issues/390) - Updated channel and params handling through workflows.
+- [[#405]](https://github.com/nf-core/smrnaseq/pull/405) - Fix [Umicollapse algo wrong set](https://github.com/nf-core/smrnaseq/issues/404) - Fix potential bug in Umicollapse (not effective as we do not allow PE data in smrnaseq - but for consistency)
+- [[#420]](https://github.com/nf-core/smrnaseq/pull/420) - Fix [mirTrace produces an error in test nextflex](https://github.com/nf-core/smrnaseq/issues/419) - Allow config mode to be used in mirtrace/qc
+- [[#425]](https://github.com/nf-core/smrnaseq/pull/425) - Raise [minimum required NXF version for pipeline](https://github.com/nf-core/smrnaseq/issues/424) - usage of `arity` in some modules now requires this
+- [[#426]](https://github.com/nf-core/smrnaseq/pull/426) - Add [nf-core mirtop](https://github.com/nf-core/smrnaseq/issues/426) - replace local for nf-core `mirtop`
+- [[#427]](https://github.com/nf-core/smrnaseq/pull/427) - Add [nf-core pigz uncompress](https://github.com/nf-core/smrnaseq/issues/422) - replace local `mirdeep_pigz`
+- [[#429]](https://github.com/nf-core/smrnaseq/pull/429) - Make [saving of intermediate files optional](https://github.com/nf-core/smrnaseq/issues/424) - Allows user to choose whether to save intermediate files or not. Replaces several params that referred to the same such as `params.save_aligned` and `params.save_aligned_mirna_quant`.
+- [[#430]](https://github.com/nf-core/smrnaseq/pull/430) - Emit a [warning if paired-end end data is used](https://github.com/nf-core/smrnaseq/issues/423) - pipeline handles SE data
+- [[#432]](https://github.com/nf-core/smrnaseq/pull/432) - Update [MultiQC and all modules to latest version](https://github.com/nf-core/smrnaseq/issues/428) - Include UMIcollapse module in MultiQC.
+- [[#435]](https://github.com/nf-core/smrnaseq/pull/435) - Replace local instances of bowtie for nf-core [`bowtie2`](https://github.com/nf-core/smrnaseq/issues/434) and [`bowtie1`](https://github.com/nf-core/smrnaseq/issues/433) - Additionally adds a `bioawk` module that cleans fasta files.
+- [[#438]](https://github.com/nf-core/smrnaseq/pull/438) - Update [Mirtop to latest version](https://github.com/nf-core/smrnaseq/issues/437) - Process samples separately and join results with `CSVTK_JOIN`.
+- [[#439]](https://github.com/nf-core/smrnaseq/pull/439) - Fix [Fix paired end samples processing](https://github.com/nf-core/smrnaseq/issues/415) - Fix paired end sample handling and add test profile.
+- [[#441]](https://github.com/nf-core/smrnaseq/pull/441) - Migrate [local contaminant bowtie to nf-core](https://github.com/nf-core/smrnaseq/issues/436) - Replace local processes with `BOWTIE2_ALIGN`.
+- [[#443]](https://github.com/nf-core/smrnaseq/pull/443) - Migrate [mirna and genome_quant bowtie to nf-core](https://github.com/nf-core/smrnaseq/issues/436) - Replace local processes with `BOWTIE_ALIGN`.
+- [[#447]](https://github.com/nf-core/smrnaseq/pull/447) - Fix [Minor fixes and general pipeline cleanup](https://github.com/nf-core/smrnaseq/issues/400) - Update variable and processes names, update channel comments, remove unused modules and params.
+- [[#448]](https://github.com/nf-core/smrnaseq/pull/448) - Migrate local mirdeep to [nf-core mirdeep2 modules and subworkflow](https://github.com/nf-core/smrnaseq/issues/443) and generate [test profile for mirdeep2](https://github.com/nf-core/smrnaseq/issues/399).
+- [[#452]](https://github.com/nf-core/smrnaseq/pull/452) - Fix [Fix ch_bowtie_index channel structure](https://github.com/nf-core/smrnaseq/issues/451) and replace untarfiles with untar [replace untarfiles with untar](https://github.com/nf-core/smrnaseq/issues/449).
+- [[#457]](https://github.com/nf-core/smrnaseq/pull/457) - QC all input [fasta files and clean them](https://github.com/nf-core/smrnaseq/issues/455).
+- [[#459]](https://github.com/nf-core/smrnaseq/pull/459) - Update modules and subworkflows [and fix linting](https://github.com/nf-core/smrnaseq/issues/458).
+- [[#462]](https://github.com/nf-core/smrnaseq/pull/462) - Remove automatic wrapping of fasta files by `seqkit replace`. Minor documentation updates.
+- [[#464]](https://github.com/nf-core/smrnaseq/pull/464) - Added [proper licences and authorship information to scripts in `bin` folder](https://github.com/nf-core/smrnaseq/issues/465)
+
+### Software dependencies
+
+| Dependency | Old version | New version |
+| ---------- | ----------- | ----------- |
+| `bioawk`   | -           | 1.0         |
+| `bowtie`   | 1.3.1       | 1.3.0       |
+| `bowtie2`  | 2.4.5       | 2.5.2       |
+| `csvtk`    | -           | 0.30        |
+| `gawk`     | -           | 5.3.0       |
+| `mirtop`   | 0.4.25      | 0.4.28      |
+| `multiqc`  | 1.21        | 1.25.1      |
+| `samtools` | 1.19.2      | 1.21        |
+| `seqkit`   | 2.6.1       | 2.8.1       |
+
 ## v2.3.1 - 2024-04-18 - Gray Zinc Dalmation Patch
 
 - [[#328]](https://github.com/nf-core/smrnaseq/pull/328) - Fix [casting issue](https://github.com/nf-core/smrnaseq/issues/327) in mirtrace module

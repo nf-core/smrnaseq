@@ -1,5 +1,19 @@
-repository_type: pipeline
+bump_version: null
 lint:
   nextflow_config:
     - config_defaults:
         - params.fastp_known_mirna_adapters
+nf_core_version: 3.0.2
+org_path: null
+repository_type: pipeline
+template:
+  author: "P. Ewels, C. Wang, R. Hammar\xE9n, L. Pantano, A. Peltzer"
+  description: Small RNA-Seq Best Practice Analysis Pipeline.
+  force: false
+  is_nfcore: true
+  name: smrnaseq
+  org: nf-core
+  outdir: .
+  skip_features: null
+  version: 2.4.0
+update: null
