@@ -62,6 +62,17 @@ workflow PREPARE_GENOME {
     ch_mirtrace_species       = val_mirtrace_species          ? Channel.value(val_mirtrace_species) : Channel.empty()
     mirna_gtf_from_species    = val_mirtrace_species          ? (val_mirtrace_species == 'hsa' ? "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${val_mirtrace_species}.gff3") : false
     ch_mirna_gtf              = val_mirna_gtf                 ? Channel.fromPath(val_mirna_gtf, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : ( mirna_gtf_from_species ? Channel.fromPath(mirna_gtf_from_species, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() :  Channel.empty() )
+
+    // Add species of the gtf in the meta
+    ch_mirna_gtf = ch_mirna_gtf
+        .combine(ch_mirtrace_species.ifEmpty('unknown'))
+        .map { meta, gtf, species ->
+            def new_meta = meta + [species: species]
+            [new_meta, gtf]
+        }
+
+    ch_mirna_gtf.dump(tag:"ch_mirna_gtf_mirtrace")
+
     ch_mirna_adapters         = params.with_umi               ? [] : Channel.fromPath(val_fastp_known_mirna_adapters, checkIfExists: true).collect()
 
     ch_rrna                   = val_rrna                      ? Channel.fromPath(val_rrna, checkIfExists: true).map{ it -> [ [id:'rRNA'], it ] }.collect()                 : Channel.empty()
@@ -127,6 +138,20 @@ workflow PREPARE_GENOME {
         ch_reference_mature  = params.mirgenedb_mature  ? Channel.fromPath(params.mirgenedb_mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : { exit 1, "Mature miRNA fasta file not found via --mirgenedb_mature: ${params.mirgenedb_mature}" }
         ch_reference_hairpin = params.mirgenedb_hairpin ? Channel.fromPath(params.mirgenedb_hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : { exit 1, "Hairpin miRNA fasta file not found via --mirgenedb_hairpin: ${params.mirgenedb_hairpin}" }
         ch_mirna_gtf         = params.mirgenedb_gff     ? Channel.fromPath(params.mirgenedb_gff, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()     : { exit 1, "MirGeneDB gff file not found via --mirgenedb_gff: ${params.mirgenedb_gff}"}
+
+    // Create a channel for mirgenedb_species
+    ch_mirgenedb_species = Channel.value(params.mirgenedb_species)
+
+    // Add species of the gtf
+    ch_mirna_gtf = ch_mirna_gtf
+        .combine(ch_mirgenedb_species)
+        .map { meta, gtf, species ->
+            def new_meta = meta + [species: species]
+            [new_meta, gtf]
+        }
+
+    ch_mirna_gtf.dump(tag:"ch_mirna_gtf_mirgenedb")
+
     }
 
     emit:

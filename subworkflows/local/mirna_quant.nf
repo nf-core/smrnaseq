@@ -35,6 +35,7 @@ workflow MIRNA_QUANT {
     main:
     ch_versions = Channel.empty()
     ch_parse_species_input = params.mirgenedb ? Channel.value(params.mirgenedb_species) : ch_mirtrace_species
+    ch_parse_species_input.dump(tag:"ch_parse_species_input")
 
     PARSE_MATURE ( ch_reference_mature, ch_parse_species_input )
     ch_mirna_parsed = PARSE_MATURE.out.parsed_fasta
@@ -96,10 +97,15 @@ workflow MIRNA_QUANT {
 
     // nf-core/mirtop
 
-    ch_mirna_gtf_species = ch_mirna_gtf.map{ meta,gtf -> gtf }
-            .combine(ch_mirtrace_species)
-            .map{ gtf, species -> [ [id:species.toString()], gtf, species ] }
-            .collect()
+    // ch_mirna_gtf_species = ch_mirna_gtf.map{ meta,gtf -> gtf }
+    //         .combine(ch_mirtrace_species)
+    //         .map{ gtf, species -> [ [id:species.toString()], gtf, species ] }
+    //         .collect()
+
+    ch_mirna_gtf_species = ch_mirna_gtf.map{ meta, gtf-> [ meta, gtf, meta.species ] }
+    ch_mirna_gtf_species.dump(tag:"ch_mirna_gtf_species")
+    BOWTIE_MAP_SEQCLUSTER.out.bam.dump(tag:"BOWTIE_MAP_SEQCLUSTER.out.bam")
+    FORMAT_HAIRPIN.out.formatted_fasta.dump(tag:"FORMAT_HAIRPIN.out.formatted_fasta")
 
     BAM_STATS_MIRNA_MIRTOP(BOWTIE_MAP_SEQCLUSTER.out.bam, FORMAT_HAIRPIN.out.formatted_fasta, ch_mirna_gtf_species )
 
