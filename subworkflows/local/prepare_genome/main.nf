@@ -67,7 +67,7 @@ workflow PREPARE_GENOME {
     ch_mirna_gtf = ch_mirna_gtf
         .combine(ch_mirtrace_species.ifEmpty('unknown'))
         .map { meta, gtf, species ->
-            def new_meta = meta + [species: species]
+            def new_meta = meta.clone() + [species: species]
             [new_meta, gtf]
         }
 
@@ -137,16 +137,19 @@ workflow PREPARE_GENOME {
         ch_reference_hairpin = params.mirgenedb_hairpin ? Channel.fromPath(params.mirgenedb_hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : { exit 1, "Specify a mirgenedb Hairpin miRNA fasta file via '--mirgenedb_hairpin'" }
         ch_mirna_gtf         = params.mirgenedb_gff     ? Channel.fromPath(params.mirgenedb_gff, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()     : { exit 1, "Specify a MirGeneDB gff file via '--mirgenedb_gff'"}
 
-    // Create a channel for mirgenedb_species
-    ch_mirgenedb_species = Channel.value(params.mirgenedb_species)
+        // Create a channel for mirgenedb_species
+        ch_mirgenedb_species = Channel.value(params.mirgenedb_species)
 
-    // Add species of the gtf
-    ch_mirna_gtf = ch_mirna_gtf
-        .combine(ch_mirgenedb_species)
-        .map { meta, gtf, species ->
-            def new_meta = meta + [species: species]
-            [new_meta, gtf]
-        }
+        // Add species of the gtf
+        // When mirgenedb workflow is not indicated, species defaults to val_mirtrace_species.
+        // If mirgenedb workflow parameters are indicated, the params.mirgenedb_species is used instead.
+        // If both mirgenedb workflow parameters and mirtrace_species (or mirna_gtf) are provided, params.mirgenedb_species is used as species value
+        ch_mirna_gtf = ch_mirna_gtf
+            .combine(ch_mirgenedb_species)
+            .map { meta, gtf, species ->
+                def new_meta = meta.clone() + [species: species]
+                [new_meta, gtf]
+            }
     }
 
     emit:

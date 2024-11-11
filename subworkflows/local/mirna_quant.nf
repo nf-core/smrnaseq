@@ -94,7 +94,7 @@ workflow MIRNA_QUANT {
 
     ch_mirtop_logs = Channel.empty()
 
-    ch_mirna_gtf_species = ch_mirna_gtf.map{ meta, gtf-> [ meta, gtf, meta.species ] }
+    ch_mirna_gtf_species = ch_mirna_gtf.map{ meta, gtf-> [ meta, gtf, meta.species ] }.collect()
 
     BAM_STATS_MIRNA_MIRTOP(BOWTIE_MAP_SEQCLUSTER.out.bam, FORMAT_HAIRPIN.out.formatted_fasta, ch_mirna_gtf_species )
 
