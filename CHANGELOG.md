@@ -46,6 +46,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#459]](https://github.com/nf-core/smrnaseq/pull/459) - Update modules and subworkflows [and fix linting](https://github.com/nf-core/smrnaseq/issues/458).
 - [[#462]](https://github.com/nf-core/smrnaseq/pull/462) - Remove automatic wrapping of fasta files by `seqkit replace`. Minor documentation updates.
 - [[#464]](https://github.com/nf-core/smrnaseq/pull/464) - Added [proper licences and authorship information to scripts in `bin` folder](https://github.com/nf-core/smrnaseq/issues/465)
+- [[#477]](https://github.com/nf-core/smrnaseq/issues/480) - Fix [MIRTOP_STATS IndexError](https://github.com/nf-core/smrnaseq/issues/477) - Fix mirtop process execution when mirgenedb is used.
 
 ### Software dependencies
 
