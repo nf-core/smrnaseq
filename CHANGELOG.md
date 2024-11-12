@@ -5,7 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Dev vTBD - TBD - TBD
 
-- [[#477]](https://github.com/nf-core/smrnaseq/issues/481) - Fix [MIRTOP_STATS IndexError](https://github.com/nf-core/smrnaseq/issues/477) - Fix mirtop process execution when mirgenedb is used.
+- [[#481]](https://github.com/nf-core/smrnaseq/pull/481) - Fix [MIRTOP_STATS IndexError](https://github.com/nf-core/smrnaseq/issues/477) - Fix mirtop process execution when mirgenedb is used.
+- [[#482]](https://github.com/nf-core/smrnaseq/issues/482) - Update documentation regarding MirgeneDB input files.
 
 ## v2.4.0 - 2024-10-14 - Navy Iron Boxer
 
