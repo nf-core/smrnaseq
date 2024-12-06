@@ -1,6 +1,6 @@
 process PIVOT_WIDER {
     tag"$meta.id"
-    label 'process_single'
+    label 'process_high'
 
     conda "${moduleDir}/environment.yml"
     container "community.wave.seqera.io/library/r-optparse_r-tidyverse_r-vroom:3cbb224fea84a0e1"
