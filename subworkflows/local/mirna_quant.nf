@@ -24,6 +24,9 @@ include { EDGER_QC               } from '../../modules/local/edger_qc/main'
 include { BAM_STATS_MIRNA_MIRTOP } from '../../subworkflows/nf-core/bam_stats_mirna_mirtop/main'
 include { CSVTK_JOIN             } from '../../modules/nf-core/csvtk/join/main'
 
+include { PIVOT_LONGER           } from '../../modules/local/pivot/longer/main'
+include { PIVOT_WIDER            } from '../../modules/local/pivot/wider/main'
+
 workflow MIRNA_QUANT {
     take:
     ch_reference_mature  // channel: [ val(meta), fasta file]
@@ -105,10 +108,20 @@ workflow MIRNA_QUANT {
         .collect{it[1]}
         .map{it -> return [[id:"TSVs"], it]}
 
-    CSVTK_JOIN ( ch_tsvs )
-    ch_versions = ch_versions.mix(CSVTK_JOIN.out.versions)
+    PIVOT_LONGER( BAM_STATS_MIRNA_MIRTOP.out.counts )
+    ch_versions = ch_versions.mix(PIVOT_LONGER.out.versions)
 
-    DATATABLE_MERGE ( CSVTK_JOIN.out.csv )
+    ch_long_files = PIVOT_LONGER.out.csv
+        .map { meta, file -> file }
+        .collect()
+        .map { files ->
+            return [[id: "pivoted_files"], files]
+        }
+
+    PIVOT_WIDER( ch_long_files )
+    ch_versions = ch_versions.mix(PIVOT_WIDER.out.versions)
+
+    DATATABLE_MERGE ( PIVOT_WIDER.out.csv )
     ch_versions = ch_versions.mix(DATATABLE_MERGE.out.versions)
 
     ch_reads_genome = BOWTIE_MAP_HAIRPIN.out.fastq
