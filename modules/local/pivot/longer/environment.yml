@@ -1,0 +1,5 @@
+channels:
+  - conda-forge
+dependencies:
+  - conda-forge::r-optparse
+  - conda-forge::r-tidyverse
