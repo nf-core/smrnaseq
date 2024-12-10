@@ -19,7 +19,7 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 104 },
+                { assert workflow.trace.succeeded().size() == 107 },
                 { assert workflow.trace.failed().size() == 1 },
 
                 { assert snapshot(
