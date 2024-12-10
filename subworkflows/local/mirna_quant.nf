@@ -115,7 +115,7 @@ workflow MIRNA_QUANT {
         .map { meta, file -> file }
         .collect()
         .map { files ->
-            return [[id: "pivoted_files"], files]
+            return [[id: "Long_Files"], files]
         }
 
     PIVOT_WIDER( ch_long_files )
