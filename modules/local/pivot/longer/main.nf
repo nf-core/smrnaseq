@@ -21,8 +21,8 @@ process PIVOT_LONGER {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
-        tidyr: \$(Rscript -e "library(limma); cat(as.character(packageVersion('tidyr')))")
-        optparse: \$(Rscript -e "library(edgeR); cat(as.character(packageVersion('optparse')))")
+        tidyr: \$(Rscript -e "library(tidyr); cat(as.character(packageVersion('tidyr')))")
+        optparse: \$(Rscript -e "library(optparse); cat(as.character(packageVersion('optparse')))")
     END_VERSIONS
     """
 

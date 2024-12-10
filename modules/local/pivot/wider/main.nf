@@ -9,8 +9,8 @@ process PIVOT_WIDER {
     tuple val(meta), path(csvs)
 
     output:
-    tuple val(meta), path("*joined_samples_mirtop.csv") , emit: csv
-    path "versions.yml"                         , emit: versions
+    tuple val(meta), path("*joined_samples_mirtop.tsv") , emit: csv
+    path "versions.yml"                                 , emit: versions
 
     script:
     """
@@ -25,10 +25,10 @@ process PIVOT_WIDER {
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
-        tidyr: \$(Rscript -e "library(limma); cat(as.character(packageVersion('tidyr')))")
-        dplyr: \$(Rscript -e "library(limma); cat(as.character(packageVersion('dplyr')))")
-        optparse: \$(Rscript -e "library(edgeR); cat(as.character(packageVersion('optparse')))")
-        vroom: \$(Rscript -e "library(edgeR); cat(as.character(packageVersion('vroom')))")
+        tidyr: \$(Rscript -e "library(tidyr); cat(as.character(packageVersion('tidyr')))")
+        dplyr: \$(Rscript -e "library(dplyr); cat(as.character(packageVersion('dplyr')))")
+        optparse: \$(Rscript -e "library(optparse); cat(as.character(packageVersion('optparse')))")
+        vroom: \$(Rscript -e "library(vroom); cat(as.character(packageVersion('vroom')))")
     END_VERSIONS
     """
 
