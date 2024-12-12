@@ -40,8 +40,63 @@
                     "type": "string",
                     "description": "MultiQC report title. Printed as page header, used for filename if not otherwise specified.",
                     "fa_icon": "fas fa-file-signature"
+                },
+                "save_intermediates": {
+                    "type": "boolean",
+                    "description": "Save all intermediate files (e.g. fastq, bams) of all steps of the pipeline  to output directory",
+                    "fa_icon": "fas fa-save"
                 }
             }
+        },
+        "umi_options": {
+            "title": "UMI options",
+            "type": "object",
+            "description": "Options for processing reads with unique molecular identifiers",
+            "default": "",
+            "properties": {
+                "with_umi": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-barcode",
+                    "description": "Enable UMI-based read deduplication."
+                },
+                "umitools_extract_method": {
+                    "type": "string",
+                    "default": "string",
+                    "fa_icon": "fas fa-barcode",
+                    "description": "UMI pattern to use. Can be either 'string' (default) or 'regex'.",
+                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).\n"
+                },
+                "umitools_method": {
+                    "type": "string",
+                    "default": "dir",
+                    "description": "UMI grouping method",
+                    "fa_icon": "fas fa-layer-group",
+                    "help_text": "Available options are dir, cc, adj"
+                },
+                "skip_umi_extract_before_dedup": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-compress-alt",
+                    "description": "Skip the UMI extraction from the reads before deduplication. Please note, if this parameter is set to false, the reads will be deduplicated solely on insert sequence. UMIs might be extracted after deduplication depending on the set umitools_bc_pattern nevertheless if with_umi is set to True.",
+                    "default": true
+                },
+                "umitools_bc_pattern": {
+                    "type": "string",
+                    "fa_icon": "fas fa-barcode",
+                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).",
+                    "description": "The UMI barcode pattern to use e.g. 'NNNNNN' indicates that the first 6 nucleotides of the read are from the UMI."
+                },
+                "umi_discard_read": {
+                    "type": "integer",
+                    "fa_icon": "fas fa-barcode",
+                    "description": "After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively."
+                },
+                "save_umi_intermeds": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-save",
+                    "description": "If this option is specified, intermediate FastQ and BAM files produced by UMI-tools are also saved in the results directory."
+                }
+            },
+            "fa_icon": "fas fa-barcode"
         },
         "reference_genome_options": {
             "title": "Reference genome options",
@@ -55,6 +110,22 @@
                     "fa_icon": "fas fa-book",
                     "help_text": "If using a reference genome configured in the pipeline using iGenomes, use this parameter to give the ID for the reference. This is then used to build the full paths for all required reference genome files e.g. `--genome GRCh38`. \n\nSee the [nf-core website docs](https://nf-co.re/usage/reference_genomes) for more details."
                 },
+                "mirgenedb": {
+                    "type": "boolean",
+                    "description": "Boolean whether MirGeneDB should be used instead of miRBase",
+                    "help_text": "This allows you to use MirGeneDB instead of miRBase as the database. \n Note that you will need to set the additional flags `--mirgenedb_species`, `--mirgenedb_gff`, `--mirgenedb_mature` and `--mirgenedb_hairpin`"
+                },
+                "mirtrace_species": {
+                    "type": "string",
+                    "description": "Species for miRTrace.",
+                    "help_text": "This is automatically set when using `--genome`. Example values: `hsa`, `mmu`...\n Note that mirTrace relies on miRBase for its species reference. See available references [here](https://www.mirbase.org/help/genome_summary.shtml).",
+                    "fa_icon": "fas fa-journal-whills"
+                },
+                "mirgenedb_species": {
+                    "type": "string",
+                    "description": "Species of MirGeneDB.",
+                    "help_text": "This replaces the value of `--mirtrace_species` if `--mirgenedb` is used. \n Note the difference in case for species names used in MirGeneDB and miRBase. See https://www.mirgenedb.org/browse for more information."
+                },
                 "fasta": {
                     "type": "string",
                     "format": "file-path",
@@ -65,20 +136,208 @@
                     "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
                     "fa_icon": "far fa-file-code"
                 },
-                "igenomes_ignore": {
+                "mirna_gtf": {
+                    "type": "string",
+                    "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
+                    "help_text": "miRBase `.gff3` file, typically downloaded from [`https://mirbase.org/download/CURRENT/genomes/`](https://mirbase.org/download/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
+                    "fa_icon": "fas fa-address-book"
+                },
+                "mirgenedb_gff": {
+                    "type": "string",
+                    "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
+                    "help_text": "MirGeneDB `.gff3` file, typically downloaded from [`https://mirgenedb.org/download`]. This replaces the value of --mirna_gff if --mirgenedb is used."
+                },
+                "mature": {
+                    "type": "string",
+                    "description": "Path to FASTA file with mature miRNAs.",
+                    "fa_icon": "fas fa-wheelchair",
+                    "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
+                    "default": "https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/mature.fa"
+                },
+                "mirgenedb_mature": {
+                    "type": "string",
+                    "description": "Path to FASTA file with MirGeneDB mature miRNAs.",
+                    "help_text": "This file needs to be downloaded from [`https://mirgenedb.org/download`]. Can be given either as a plain text `.fa` file or a compressed `.gz` file."
+                },
+                "hairpin": {
+                    "type": "string",
+                    "description": "Path to FASTA file with miRNAs precursors.",
+                    "fa_icon": "fab fa-cuttlefish",
+                    "help_text": "Typically this will be the `mature.fa` file from miRBase. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\n\nDefaults to the current miRBase release URL, from which the file will be downloaded.",
+                    "default": "https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hairpin.fa"
+                },
+                "mirgenedb_hairpin": {
+                    "type": "string",
+                    "description": "Path to FASTA file with miRNAs precursors.",
+                    "help_text": "This file needs to be downloaded from [`https://mirgenedb.org/download`]. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\nNote that MirGeneDB does not have a dedicated hairpin file. The equivalent is the `Precursor sequences`."
+                },
+                "bowtie_index": {
+                    "type": "string",
+                    "description": "Path to a Bowtie 1 index directory",
+                    "fa_icon": "fas fa-book",
+                    "help_text": "Point to the directory created by Bowtie 1 when indexing. Bowtie 1 indices consist of six files:\n\n```bash\ngenome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt\n```\n"
+                },
+                "save_reference": {
                     "type": "boolean",
-                    "description": "Do not load the iGenomes reference config.",
-                    "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`."
+                    "description": "Save generated reference genome files to results.",
+                    "help_text": "Saving generated references means that you can use them for future pipeline runs, reducing processing times.",
+                    "fa_icon": "fas fa-save"
                 },
                 "igenomes_base": {
                     "type": "string",
                     "format": "directory-path",
-                    "description": "The base path to the igenomes reference files",
+                    "description": "Directory / URL base for iGenomes references.",
+                    "default": "s3://ngi-igenomes/igenomes/",
+                    "fa_icon": "fas fa-cloud-download-alt"
+                },
+                "igenomes_ignore": {
+                    "type": "boolean",
+                    "description": "Do not load the iGenomes reference config.",
                     "fa_icon": "fas fa-ban",
-                    "hidden": true,
-                    "default": "s3://ngi-igenomes/igenomes/"
+                    "help_text": "Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`.",
+                    "hidden": true
+                }
+            }
+        },
+        "trimming_options": {
+            "title": "Trimming options",
+            "type": "object",
+            "description": "Options for trimming reads and primers.",
+            "fa_icon": "fas fa-cut",
+            "properties": {
+                "clip_r1": {
+                    "type": "integer",
+                    "fa_icon": "fas fa-cut",
+                    "description": "The number of basepairs to remove from the 5' end of read 1."
+                },
+                "three_prime_clip_r1": {
+                    "type": "integer",
+                    "fa_icon": "fas fa-cut",
+                    "description": "The number of basepairs to remove from the 3' end of read 1 AFTER adapter/quality trimming has been performed."
+                },
+                "three_prime_adapter": {
+                    "type": "string",
+                    "fa_icon": "fas fa-text-width",
+                    "description": "Sequencing adapter sequence to use for trimming.",
+                    "default": "AGATCGGAAGAGCACACGTCTGAACTCCAGTCA"
+                },
+                "trim_fastq": {
+                    "type": "boolean",
+                    "default": true,
+                    "fa_icon": "fas fa-hand-scissors",
+                    "description": "Trim FastQ files"
+                },
+                "fastp_min_length": {
+                    "type": "integer",
+                    "default": 17,
+                    "description": "Minimum filter length for raw reads.",
+                    "fa_icon": "fas fa-ruler-horizontal"
+                },
+                "fastp_max_length": {
+                    "type": "integer",
+                    "default": 100,
+                    "description": "Maximum filter length for raw reads.",
+                    "fa_icon": "fas fa-ruler-horizontal"
+                },
+                "save_trimmed_fail": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-cloud-download-alt",
+                    "description": "Save reads failing trimming"
+                },
+                "fastp_known_mirna_adapters": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "mimetype": "text/plain",
+                    "default": "${projectDir}/assets/known_adapters.fa",
+                    "description": "Fasta with known miRNA adapter sequences for adapter trimming",
+                    "fa_icon": "far fa-question-circle"
+                },
+                "min_trimmed_reads": {
+                    "type": "integer",
+                    "default": 10,
+                    "fa_icon": "far fa-window-minimize",
+                    "description": "Minimum number of reads required in input file to use it"
+                },
+                "save_merged": {
+                    "type": "boolean",
+                    "description": "Save merged reads.",
+                    "default": false
+                },
+                "phred_offset": {
+                    "type": "integer",
+                    "default": 33,
+                    "description": "The PHRED quality offset to be used for any input fastq files. Default is 33, standard Illumina 1.8+ format."
+                }
+            }
+        },
+        "contamination_filtering": {
+            "title": "Contamination filter options",
+            "type": "object",
+            "description": "Options to remove contamination from the reads.",
+            "fa_icon": "fas fa-cut",
+            "properties": {
+                "filter_contamination": {
+                    "type": "boolean",
+                    "description": "Enables the contamination filtering."
+                },
+                "rrna": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to the rRNA fasta file to be used as contamination database."
+                },
+                "trna": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to the tRNA fasta file to be used as contamination database."
+                },
+                "cdna": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to the cDNA fasta file to be used as contamination database."
+                },
+                "ncrna": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to the ncRNA fasta file to be used as contamination database."
+                },
+                "pirna": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to the piRNA fasta file to be used as contamination database."
+                },
+                "other_contamination": {
+                    "type": "string",
+                    "format": "file-path",
+                    "description": "Path to an additional fasta file to be used as contamination database."
+                }
+            }
+        },
+        "skipping_pipeline_steps": {
+            "title": "Skipping pipeline steps",
+            "type": "object",
+            "description": "Switches to skip specific pipeline steps, if desired.",
+            "fa_icon": "fas fa-fast-forward",
+            "properties": {
+                "skip_fastqc": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip FastQC"
+                },
+                "skip_mirdeep": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip miRDeep"
+                },
+                "skip_multiqc": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip MultiQC"
+                },
+                "skip_fastp": {
+                    "type": "boolean",
+                    "description": "Skip FastP",
+                    "fa_icon": "fas fa-forward"
                 }
             }
         },
@@ -233,7 +492,19 @@
             "$ref": "#/$defs/input_output_options"
         },
         {
+            "$ref": "#/$defs/umi_options"
+        },
+        {
             "$ref": "#/$defs/reference_genome_options"
+        },
+        {
+            "$ref": "#/$defs/trimming_options"
+        },
+        {
+            "$ref": "#/$defs/contamination_filtering"
+        },
+        {
+            "$ref": "#/$defs/skipping_pipeline_steps"
         },
         {
             "$ref": "#/$defs/institutional_config_options"
