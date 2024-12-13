@@ -19,7 +19,7 @@ nextflow_pipeline {
             assertAll(
                 { assert workflow.success },
                 { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 64 },
+                { assert workflow.trace.succeeded().size() == 66 },
 
                 { assert snapshot(
                     path("$outputDir/mirna_quant/mirtop/joined_samples_mirtop.tsv").exists(),

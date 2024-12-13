@@ -3,9 +3,12 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## Dev vTBD - TBD - TBD
 
-- Fix [[#488]](https://github.com/nf-core/smrnaseq/issues/488) - Fix runtime error that can occur when params.genome is set.
+- [[#481]](https://github.com/nf-core/smrnaseq/pull/481) - Fix [MIRTOP_STATS IndexError](https://github.com/nf-core/smrnaseq/issues/477) - Fix mirtop process execution when mirgenedb is used.
+- [[#482]](https://github.com/nf-core/smrnaseq/pull/482) - Update documentation regarding MirgeneDB input files.
+- [[#486]](https://github.com/nf-core/smrnaseq/pull/486) - Replace `CSVTK_JOIN` to improve processing in large amount of files.
+- [[#493]](https://github.com/nf-core/smrnaseq/pull/493) - Fix [[#488]](https://github.com/nf-core/smrnaseq/issues/488) - Fix runtime error that can occur when params.genome is set.
 
 ## v2.4.0 - 2024-10-14 - Navy Iron Boxer
 

@@ -45,6 +45,10 @@ If MirGeneDB should be used instead it needs to be specified using `--mirgenedb`
 - `mirgenedb_mature`: This parameter should point to the FASTA file containing mature miRNA sequences. The file can be manually downloaded from [MirGeneDB](https://mirgenedb.org/download).
 - `mirgenedb_hairpin`: This parameter should point to the FASTA file containing precursor miRNA sequences. Note that MirGeneDB does not offer a dedicated hairpin file, but the precursor sequences can be downloaded from [MirGeneDB](https://mirgenedb.org/download) and used instead.
 
+See examples in: [the test-datasets repository of nf-core](https://github.com/nf-core/test-datasets/tree/smrnaseq/MirGeneDB).
+
+> [!NOTE] > `mirtop` is hard-coded to use the `pre` sequences, which originate from the hairpin FASTA, rather than the `pri` sequences, which come from the mature FASTA. Users must provide `pre` files from the start to ensure consistency between the FASTA and GFF files, as the coordinates in the GFF file are referenced to `pre` sequences. This also ensures that names in the BAM file will match those in the GFF.
+
 ### Genome
 
 - `fasta`: the reference genome FASTA file
