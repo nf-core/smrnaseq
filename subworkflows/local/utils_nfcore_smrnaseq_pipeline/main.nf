@@ -169,10 +169,6 @@ workflow PIPELINE_COMPLETION {
 def validateInputParameters() {
     genomeExistsError()
 
-    if (!params.mirgenedb && !params.mirtrace_species) {
-            error("Reference species for miRTrace is not defined via the `--mirtrace_species` parameter.")
-    }
-
     if (!params.mirgenedb) {
         // Validate mature miRNA fasta file
         if (!params.mature) {
