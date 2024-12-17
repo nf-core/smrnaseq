@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#481]](https://github.com/nf-core/smrnaseq/pull/481) - Fix [MIRTOP_STATS IndexError](https://github.com/nf-core/smrnaseq/issues/477) - Fix mirtop process execution when mirgenedb is used.
 - [[#482]](https://github.com/nf-core/smrnaseq/pull/482) - Update documentation regarding MirgeneDB input files.
 - [[#486]](https://github.com/nf-core/smrnaseq/pull/486) - Replace `CSVTK_JOIN` to improve processing in large amount of files.
+- [[#494]](https://github.com/nf-core/smrnaseq/pull/494) - Update [help text](https://github.com/nf-core/smrnaseq/issues/491) for `--fasta` parameter
 
 ## v2.4.0 - 2024-10-14 - Navy Iron Boxer
 
