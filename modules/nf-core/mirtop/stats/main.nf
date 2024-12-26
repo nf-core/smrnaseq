@@ -4,7 +4,9 @@ process MIRTOP_STATS {
     label 'process_single'
 
     conda "${moduleDir}/environment.yml"
-    container "community.wave.seqera.io/library/mirtop_pybedtools_pysam_samtools_pruned:60b8208f3dbb2910"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/28/28ece5ab35c2432bf6f360682f58d4245aec76a0cbab3879478f44d248df0205/data' :
+        'community.wave.seqera.io/library/pybedtools_pysam_samtools_biopython_pruned:8e04862200c8021c'}"
 
     input:
     tuple val(meta), path(mirtop_gff)
