@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#486]](https://github.com/nf-core/smrnaseq/pull/486) - Replace `CSVTK_JOIN` to improve processing in large amount of files.
 - [[#493]](https://github.com/nf-core/smrnaseq/pull/493) - Fix [[#488]](https://github.com/nf-core/smrnaseq/issues/488) - Fix runtime error that can occur when params.genome is set.
 - [[#494]](https://github.com/nf-core/smrnaseq/pull/494) - Update [help text](https://github.com/nf-core/smrnaseq/issues/491) for `--fasta` parameter.
-- [[#494]](https://github.com/nf-core/smrnaseq/pull/496) - Fix [bowtie_index channel](https://github.com/nf-core/smrnaseq/issues/496) when in dir format.
+- [[#498]](https://github.com/nf-core/smrnaseq/pull/498) - Fix [bowtie_index channel](https://github.com/nf-core/smrnaseq/issues/496) when in dir format.
 
 ## v2.4.0 - 2024-10-14 - Navy Iron Boxer
 
