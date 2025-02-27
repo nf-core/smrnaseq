@@ -12,7 +12,7 @@
                     },
                     "blat": {
                         "branch": "master",
-                        "git_sha": "666652151335353eef2fcd58880bcef5bc2928e1",
+                        "git_sha": "f1139432f654e4bd1ebd674861039ddb16150e9d",
                         "installed_by": ["modules"]
                     },
                     "bowtie/align": {
