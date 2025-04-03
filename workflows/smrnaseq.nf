@@ -125,7 +125,7 @@ workflow NFCORE_SMRNASEQ {
     // This involves running on the sequencing adapter trimmed remnants of the entire reads
     // consisting of sequence + common sequence "miRNA adapter" + UMI
     // once collapsing happened, we will use umitools extract to get rid of the common miRNA sequence + the UMI to have only plain collapsed reads without any other clutter
-    if (params.with_umi) {
+    if (params.with_umi && params.skip_umi_extract_before_dedup) {
         ch_fastq = Channel.value('fastq')
         ch_input_for_collapse = ch_reads_for_mirna.map{ meta, reads -> [meta, reads, []]} //Needs to be done to add a []
         UMICOLLAPSE_FASTQ(ch_input_for_collapse, ch_fastq)
@@ -296,7 +296,7 @@ workflow NFCORE_SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_zip.collect{it[1]}.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_json.collect{it[1]}.ifEmpty([]))
-        if(params.with_umi) {
+        if(params.with_umi && params.skip_umi_extract_before_dedup) {
             ch_multiqc_files = ch_multiqc_files.mix(UMICOLLAPSE_FASTQ.out.log.collect{it[1]}.ifEmpty([]))
         }
         ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
