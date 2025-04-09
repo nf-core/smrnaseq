@@ -9,3 +9,4 @@ testing*
 null/
 execution_trace*
 .nf-test*
+tmp*
