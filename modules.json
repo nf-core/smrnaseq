@@ -73,22 +73,26 @@
                     "mirtop/counts": {
                         "branch": "master",
                         "git_sha": "196062335bb9ec979075bf2212f64a369b927b0d",
-                        "installed_by": ["bam_stats_mirna_mirtop"]
+                        "installed_by": ["bam_stats_mirna_mirtop"],
+                        "patch": "modules/nf-core/mirtop/counts/mirtop-counts.diff"
                     },
                     "mirtop/export": {
                         "branch": "master",
                         "git_sha": "196062335bb9ec979075bf2212f64a369b927b0d",
-                        "installed_by": ["bam_stats_mirna_mirtop"]
+                        "installed_by": ["bam_stats_mirna_mirtop"],
+                        "patch": "modules/nf-core/mirtop/export/mirtop-export.diff"
                     },
                     "mirtop/gff": {
                         "branch": "master",
                         "git_sha": "196062335bb9ec979075bf2212f64a369b927b0d",
-                        "installed_by": ["bam_stats_mirna_mirtop"]
+                        "installed_by": ["bam_stats_mirna_mirtop"],
+                        "patch": "modules/nf-core/mirtop/gff/mirtop-gff.diff"
                     },
                     "mirtop/stats": {
                         "branch": "master",
                         "git_sha": "196062335bb9ec979075bf2212f64a369b927b0d",
-                        "installed_by": ["bam_stats_mirna_mirtop"]
+                        "installed_by": ["bam_stats_mirna_mirtop"],
+                        "patch": "modules/nf-core/mirtop/stats/mirtop-stats.diff"
                     },
                     "mirtrace/qc": {
                         "branch": "master",
