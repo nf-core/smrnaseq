@@ -1,0 +1,31 @@
+Changes in component 'nf-core/mirtop/stats'
+Changes in 'mirtop/stats/environment.yml':
+--- modules/nf-core/mirtop/stats/environment.yml
++++ modules/nf-core/mirtop/stats/environment.yml
+@@ -4,7 +4,7 @@
+   - conda-forge
+   - bioconda
+ dependencies:
+-  - "bioconda::mirtop=0.4.28"
++  - "bioconda::mirtop=0.4.30"
+   - "bioconda::samtools=1.21"
+   - "conda-forge::python=3.11"
+   - "conda-forge::biopython=1.83"
+
+'modules/nf-core/mirtop/stats/meta.yml' is unchanged
+Changes in 'mirtop/stats/main.nf':
+--- modules/nf-core/mirtop/stats/main.nf
++++ modules/nf-core/mirtop/stats/main.nf
+@@ -4,7 +4,7 @@
+     label 'process_single'
+ 
+     conda "${moduleDir}/environment.yml"
+-    container "community.wave.seqera.io/library/mirtop_pybedtools_pysam_samtools_pruned:60b8208f3dbb2910"
++    container "community.wave.seqera.io/library/mirtop_pybedtools_pysam_samtools:b9705c2683e775b8"
+ 
+     input:
+     tuple val(meta), path(mirtop_gff)
+
+'modules/nf-core/mirtop/stats/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/mirtop/stats/tests/main.nf.test' is unchanged
+************************************************************
