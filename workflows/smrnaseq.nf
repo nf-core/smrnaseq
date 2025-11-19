@@ -83,6 +83,7 @@ workflow NFCORE_SMRNASEQ {
     //
     CAT_FASTQ (
         ch_fastq.multiple
+
     )
     ch_cat_fastq = CAT_FASTQ.out.reads.mix(ch_fastq.single)
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first())
@@ -95,6 +96,7 @@ workflow NFCORE_SMRNASEQ {
     }
 
     FASTQ_FASTQC_UMITOOLS_FASTP (
+
         ch_cat_fastq,
         params.skip_fastqc,
         params.with_umi,
@@ -148,6 +150,7 @@ workflow NFCORE_SMRNASEQ {
     //
     // MODULE: mirtrace QC
     //
+
 
     ch_mirtrace_config = ch_reads_for_mirna
         .transpose()
