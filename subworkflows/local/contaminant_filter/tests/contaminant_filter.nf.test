@@ -1,7 +1,7 @@
 nextflow_workflow {
 
     name "Test Workflow CONTAMINANT_FILTER"
-    script "../contaminant_filter.nf"
+    script "../main.nf"
     config "./nextflow.config"
     workflow "CONTAMINANT_FILTER"
     tag "subworkflows"
