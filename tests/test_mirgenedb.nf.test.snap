@@ -1,10 +1,10 @@
 {
     "genome_quant_bam": {
         "content": [
-            "Clone9_N1_mature_hairpin_genome.sorted.stats:md5,757e373dfa6309bd5b1f2f7c7b8e63a1",
+            "Clone9_N1_mature_hairpin_genome.sorted.stats:md5,e81a1ccd658e49ae3e30a26f6d7ffa07",
             "Clone9_N1_mature_hairpin_genome.sorted.idxstats:md5,8442f0f892abec766eb448b83311f46e",
-            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,74084b32a2ba82690f1e3f2558e13f08",
-            "Control_N1_mature_hairpin_genome.sorted.stats:md5,38f87564922a6bd9b4e14573857fed66",
+            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,951f3a5e3177dcba8aa264d8d5f6fa65",
+            "Control_N1_mature_hairpin_genome.sorted.stats:md5,d7d5f8f404858a052dc03b9b6f769248",
             "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,6971caaa71c465e63e844460f0a7d023",
             "Clone9_N1_mature_hairpin_genome.sorted.flagstat:md5,82126b512243a091f7ddc94fa9dafb1d",
             "Clone1_N1_mature_hairpin_genome.sorted.idxstats:md5,a2c5c718ff07f4bddcd216798b7c405a",
@@ -15,7 +15,7 @@
             "nf-test": "0.9.0",
             "nextflow": "24.10.2"
         },
-        "timestamp": "2025-11-19T23:17:00.089665141"
+        "timestamp": "2025-11-20T19:21:50.46786682"
     },
     "software_versions": {
         "content": [
@@ -34,25 +34,25 @@
             "Clone9_N1_mature.sorted.flagstat:md5,adf40ba27907b6ef726d6c5923a731b9",
             "Clone9_N1_mature.sorted.idxstats:md5,8302f401476f5c8fee3333e1c742c05e",
             "Control_N1_mature.sorted.flagstat:md5,f8df7690d20014518f47dc2fe39debec",
-            "Control_N1_mature.sorted.stats:md5,35a03b446785dbf240d755ea9edac0f6",
-            "Clone9_N1_mature.sorted.stats:md5,d2cb555133269b4503e4eb490dd81b3e",
+            "Control_N1_mature.sorted.stats:md5,3c952d69ed81186976ede053c847e109",
+            "Clone9_N1_mature.sorted.stats:md5,873e4f40e377cc445ace1ac48354729d",
             "Control_N1_mature.sorted.idxstats:md5,b7a382b1d0f5cba6cb94b3b5a6b18f84",
             true,
             "Control_N1_mature_hairpin.sorted.idxstats:md5,25305882d997c5801388c5c881518296",
             "Control_N1_mature_hairpin.sorted.flagstat:md5,569a6748d38176a240c351ba8b30eca8",
             "Clone9_N1_mature_hairpin.sorted.idxstats:md5,265696d182c70f57bd7be26971def403",
-            "Clone9_N1_mature_hairpin.sorted.stats:md5,66af31a70748be77700019a457d086ea",
+            "Clone9_N1_mature_hairpin.sorted.stats:md5,30266af34f3df2b8d807a1e620921ee6",
             true,
             true,
             true,
-            "Control_N1_mature_hairpin.sorted.stats:md5,97356448894c9c341e12170e802bb927",
+            "Control_N1_mature_hairpin.sorted.stats:md5,3bf3fdb23ef91c933887c71ad603999a",
             "Clone9_N1_mature_hairpin.sorted.flagstat:md5,5729505d4df901b0c0cd93ab330526b5"
         ],
         "meta": {
             "nf-test": "0.9.0",
             "nextflow": "24.10.2"
         },
-        "timestamp": "2025-11-19T23:16:59.988989151"
+        "timestamp": "2025-11-20T19:21:50.314067311"
     },
     "mirdeep2": {
         "content": [
