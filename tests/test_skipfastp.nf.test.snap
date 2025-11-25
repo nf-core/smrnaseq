@@ -97,7 +97,7 @@
             "multiqc_citations.txt:md5,f46d2983044658a4a89bdec5ba20fda3",
             "samtools-stats-dp.txt:md5,d1854b0ed73a4c9ae62a3a625c19d4b2",
             "fastqc_sequence_length_distribution_plot.txt:md5,ff2def0eab8321d4ed590b483641f43b",
-            "multiqc_general_stats.txt:md5,3f5a47801a45a1b62bb519bea4896ab4",
+            "multiqc_general_stats.txt:md5,914778e76bd1453c625860cb3634d33b",
             "fastqc_per_base_n_content_plot.txt:md5,c345fe5430e3a17ad1dbcc14e7595f50",
             "fastqc_per_sequence_quality_scores_plot.txt:md5,edf4d21e2928d37d94bb33a25e1d92a6",
             "mirtrace_qc_plot.txt:md5,49c178fc849a1aa44781ddc67c85927c",
@@ -117,9 +117,9 @@
         ],
         "meta": {
             "nf-test": "0.9.0",
-            "nextflow": "24.04.4"
+            "nextflow": "24.10.2"
         },
-        "timestamp": "2024-09-20T16:48:44.52005314"
+        "timestamp": "2025-11-21T20:31:44.384868438"
     },
     "multiqc": {
         "content": [

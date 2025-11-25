@@ -97,7 +97,7 @@
     "multiqc_multiqc_data": {
         "content": [
             "fastqc-status-check-heatmap.txt:md5,949e6825a7ecc751aa9ba515de7dbd02",
-            "fastp_filtered_reads_plot.txt:md5,bf3be3a2f4b50b4de0ede0ba46336da3",
+            "fastp_filtered_reads_plot.txt:md5,2998eb8729ed8c68d45957d8d466b630",
             "fastqc-1_overrepresented_sequences_plot.txt:md5,11b85c61ea97ca62a9e7c34fae9e575c",
             true,
             "fastqc-1_sequence_counts_plot.txt:md5,0ab7661061d5e13c5493b60502921f78",
@@ -109,7 +109,7 @@
             "fastp-seq-content-n-plot_Read_1_Before_filtering.txt:md5,bd72bc8bfc907c6aab72f315917ab280",
             "fastqc-1_sequence_duplication_levels_plot.txt:md5,a53f959bf59ad69d3bcbc53e8fe609b3",
             "fastqc-1_per_base_sequence_quality_plot.txt:md5,2f85a658bcb8261328449f1642688086",
-            "multiqc_general_stats.txt:md5,9bc4353b1ae9588391be745fd069c871",
+            "multiqc_general_stats.txt:md5,63ddd0f1131ae0d5613cb8f6ba3739b7",
             "fastqc-1_per_base_n_content_plot.txt:md5,e3b4bb3ed98e87f2d8acb0c009485ecd",
             "fastqc-1_per_base_n_content_plot.txt:md5,e3b4bb3ed98e87f2d8acb0c009485ecd",
             "fastp-seq-quality-plot_Read_1_After_filtering.txt:md5,2956382a3f2e855a4dce8e8246a57add",
@@ -138,8 +138,8 @@
         ],
         "meta": {
             "nf-test": "0.9.0",
-            "nextflow": "24.04.4"
+            "nextflow": "24.10.2"
         },
-        "timestamp": "2024-09-20T17:11:24.369706104"
+        "timestamp": "2025-11-21T19:55:35.858711583"
     }
 }
