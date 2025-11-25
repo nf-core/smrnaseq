@@ -3,7 +3,7 @@ nextflow_pipeline {
 
     name "Test Workflow main.nf - test_contamination_tech_reps"
     script "main.nf"
-    profile "test_contamination_tech_reps"
+    profile "test_contamination_tech_reps,ci"
     tag "test_contamination_tech_reps"
     tag "contamination"
     tag "pipeline"
@@ -18,9 +18,13 @@ nextflow_pipeline {
 
         then {
             assertAll(
-                { assert workflow.success },
-                { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 103 },
+                { assert workflow.success},
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_smrnaseq_software_mqc_versions.yml")
+                ).match() },
 
                 { assert snapshot(
                     path("$outputDir/contaminant_filter/filter/Clone1_N1_trimmed.contamination_mqc.yaml").exists(), //TODO see if we can make these deterministic or why they are non-deterministic

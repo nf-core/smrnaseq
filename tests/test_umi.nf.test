@@ -3,7 +3,7 @@ nextflow_pipeline {
 
     name "Test Workflow main.nf - test_umi"
     script "main.nf"
-    profile "test_umi"
+    profile "test_umi,ci"
     tag "umi"
     tag "pipeline"
 
@@ -17,9 +17,13 @@ nextflow_pipeline {
 
         then {
             assertAll(
-                { assert workflow.success },
-                { assert snapshot(UTILS.removeNextflowVersion("$outputDir")).match("software_versions") },
-                { assert workflow.trace.succeeded().size() == 76 },
+                { assert workflow.success},
+                { assert snapshot(
+                    // Number of successful tasks
+                    workflow.trace.succeeded().size(),
+                    // pipeline versions.yml file for multiqc from which Nextflow version is removed because we test pipelines on multiple Nextflow versions
+                    removeNextflowVersion("$outputDir/pipeline_info/nf_core_smrnaseq_software_mqc_versions.yml")
+                ).match() },
 
                 { assert snapshot(
                     path("$outputDir/mirna_quant/bam/mature/SRX8195118_SRR11631014_mature.sorted.stats"),
