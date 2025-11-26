@@ -26,4 +26,3 @@ long_data <- data %>%
     )
 
 vroom_write(long_data, opt$output, delim = ",")
-

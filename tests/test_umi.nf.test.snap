@@ -39,16 +39,6 @@
         },
         "timestamp": "2025-11-20T20:18:20.309895819"
     },
-    "software_versions": {
-        "content": [
-            "{BOWTIE_MAP_GENOME={bowtie=1.3.0, samtools=1.16.1}, BOWTIE_MAP_HAIRPIN={bowtie=1.3.0, samtools=1.16.1}, BOWTIE_MAP_MATURE={bowtie=1.3.0, samtools=1.16.1}, BOWTIE_MAP_SEQCLUSTER={bowtie=1.3.0, samtools=1.16.1}, DATATABLE_MERGE={r-base=3.6.2}, FASTP={fastp=0.23.4}, FASTP_LENGTH_FILTER={fastp=0.23.4}, FASTQC_RAW={fastqc=0.12.1}, FASTQC_TRIM={fastqc=0.12.1}, FORMAT_HAIRPIN={fastx_toolkit=0.0.14}, FORMAT_MATURE={fastx_toolkit=0.0.14}, INDEX_HAIRPIN={bowtie=1.3.0}, INDEX_MATURE={bowtie=1.3.0}, MIRTOP_COUNTS={mirtop=0.4.30}, MIRTOP_EXPORT={mirtop=0.4.30}, MIRTOP_GFF={mirtop=0.4.30}, MIRTOP_STATS={mirtop=0.4.30}, MIRTRACE_QC={mirtrace=1.0.1}, PARSE_HAIRPIN={seqkit=2.6.1}, PARSE_MATURE={seqkit=2.6.1}, PIVOT_LONGER={r-base=4.4.2, tidyr=1.3.1, optparse=1.7.5}, PIVOT_WIDER={r-base=4.4.2, tidyr=1.3.1, dplyr=1.1.4, optparse=1.7.5, vroom=1.6.5}, SAMTOOLS_FLAGSTAT={samtools=1.21}, SAMTOOLS_IDXSTATS={samtools=1.21}, SAMTOOLS_INDEX={samtools=1.21}, SAMTOOLS_SORT={samtools=1.21}, SAMTOOLS_STATS={samtools=1.21}, SEQCLUSTER_COLLAPSE={seqcluster=1.2.9}, UMICOLLAPSE_FASTQ={umicollapse=1.0.0-1}, Workflow={nf-core/smrnaseq=v2.4.0}}"
-        ],
-        "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "24.10.2"
-        },
-        "timestamp": "2025-11-19T23:35:45.776697201"
-    },
     "mirna_quant_bam": {
         "content": [
             "SRX8195118_SRR11631014_mature.sorted.stats:md5,d2e3a471dc1948dd546015623e4347f9",
@@ -92,7 +82,7 @@
     "multiqc_multiqc_data": {
         "content": [
             "fastqc-status-check-heatmap.txt:md5,c1509fdd74b21a718fe099de64514995",
-            "fastp_filtered_reads_plot.txt:md5,54caeafa94c6ec8de2e5fda261aee04a",
+            "fastp_filtered_reads_plot.txt:md5,2a9cbf12175d43180f83b251f99d2159",
             true,
             "fastqc-1_sequence_counts_plot.txt:md5,036a1ca02aa27567988d53bcefce1959",
             "mirtrace_complexity_plot.txt:md5,5a860a872f793250b8c4482d031176a8",
@@ -103,7 +93,7 @@
             "fastp-seq-content-n-plot_Read_1_Before_filtering.txt:md5,dfdb23f41359b8a6b84d6626a0474d02",
             "fastqc-1_sequence_duplication_levels_plot.txt:md5,b5ae95ecd73055798ed70947dda3747c",
             "fastqc-1_per_base_sequence_quality_plot.txt:md5,89adfa92b1cde0ad4e401b430bbc68ce",
-            "multiqc_general_stats.txt:md5,ec1bbecb2844d95f6282b893b6709a06",
+            "multiqc_general_stats.txt:md5,ab05f15c2dc14e1bd9c1ef9fce1cd779",
             "fastqc-1_per_base_n_content_plot.txt:md5,db081d3aa63007e5a78113f0fc26f27d",
             "fastqc_per_base_n_content_plot.txt:md5,5b5b8cee3162d092c0bcddffbd000f34",
             "fastp-seq-quality-plot_Read_1_After_filtering.txt:md5,66a47c7ce00ede2053f8e6eb20ec3417",
@@ -135,9 +125,9 @@
         ],
         "meta": {
             "nf-test": "0.9.0",
-            "nextflow": "24.04.4"
+            "nextflow": "24.10.2"
         },
-        "timestamp": "2024-09-20T16:55:26.694937898"
+        "timestamp": "2025-11-21T21:24:57.179300053"
     },
     "multiqc": {
         "content": [
@@ -159,5 +149,117 @@
             "nextflow": "24.04.4"
         },
         "timestamp": "2024-09-20T19:12:28.290360163"
+    },
+    "test_umi": {
+        "content": [
+            76,
+            {
+                "BOWTIE_MAP_GENOME": {
+                    "bowtie": "1.3.0",
+                    "samtools": "1.16.1"
+                },
+                "BOWTIE_MAP_HAIRPIN": {
+                    "bowtie": "1.3.0",
+                    "samtools": "1.16.1"
+                },
+                "BOWTIE_MAP_MATURE": {
+                    "bowtie": "1.3.0",
+                    "samtools": "1.16.1"
+                },
+                "BOWTIE_MAP_SEQCLUSTER": {
+                    "bowtie": "1.3.0",
+                    "samtools": "1.16.1"
+                },
+                "DATATABLE_MERGE": {
+                    "r-base": "3.6.2"
+                },
+                "FASTP": {
+                    "fastp": "0.23.4"
+                },
+                "FASTP_LENGTH_FILTER": {
+                    "fastp": "0.23.4"
+                },
+                "FASTQC_RAW": {
+                    "fastqc": "0.12.1"
+                },
+                "FASTQC_TRIM": {
+                    "fastqc": "0.12.1"
+                },
+                "FORMAT_HAIRPIN": {
+                    "fastx_toolkit": "0.0.14"
+                },
+                "FORMAT_MATURE": {
+                    "fastx_toolkit": "0.0.14"
+                },
+                "INDEX_HAIRPIN": {
+                    "bowtie": "1.3.0"
+                },
+                "INDEX_MATURE": {
+                    "bowtie": "1.3.0"
+                },
+                "MIRTOP_COUNTS": {
+                    "mirtop": "0.4.30"
+                },
+                "MIRTOP_EXPORT": {
+                    "mirtop": "0.4.30"
+                },
+                "MIRTOP_GFF": {
+                    "mirtop": "0.4.30"
+                },
+                "MIRTOP_STATS": {
+                    "mirtop": "0.4.30"
+                },
+                "MIRTRACE_QC": {
+                    "mirtrace": "1.0.1"
+                },
+                "PARSE_HAIRPIN": {
+                    "seqkit": "2.6.1"
+                },
+                "PARSE_MATURE": {
+                    "seqkit": "2.6.1"
+                },
+                "PIVOT_LONGER": {
+                    "r-base": "4.4.2",
+                    "tidyr": "1.3.1",
+                    "optparse": "1.7.5"
+                },
+                "PIVOT_WIDER": {
+                    "r-base": "4.4.2",
+                    "tidyr": "1.3.1",
+                    "dplyr": "1.1.4",
+                    "optparse": "1.7.5",
+                    "vroom": "1.6.5"
+                },
+                "SAMTOOLS_FLAGSTAT": {
+                    "samtools": 1.21
+                },
+                "SAMTOOLS_IDXSTATS": {
+                    "samtools": 1.21
+                },
+                "SAMTOOLS_INDEX": {
+                    "samtools": 1.21
+                },
+                "SAMTOOLS_SORT": {
+                    "samtools": 1.21
+                },
+                "SAMTOOLS_STATS": {
+                    "samtools": 1.21
+                },
+                "SEQCLUSTER_COLLAPSE": {
+                    "seqcluster": "1.2.9"
+                },
+                "UMICOLLAPSE_FASTQ": {
+                    "umicollapse": "1.0.0-1"
+                },
+                "Workflow": {
+                    "nf-core/smrnaseq": "v2.4.0"
+                }
+            }
+        ],
+        "meta": {
+            "nf-test": "0.9.2",
+            "nextflow": "24.10.2"
+        },
+        "timestamp": "2025-11-25T22:18:43.994543061"
     }
 }
