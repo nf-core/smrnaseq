@@ -1,0 +1,57 @@
+{
+    "Should not produce MDS plot": {
+        "content": [
+            [
+                "hairpin_counts.csv:md5,9a2c4c71862349eee5071cf08a81df52",
+                "hairpin_logtpm.csv:md5,590516d1c7447023933f055446d34552",
+                "hairpin_logtpm.txt:md5,5cbb1258c290d958910db677490596c0",
+                "hairpin_normalized_CPM.txt:md5,2f6685750d4c0aa1dc8150276f8a5a2d",
+                "hairpin_unmapped_read_counts.txt:md5,b3ca3b9f01dbdab1bdbd989769121794",
+                "mature_counts.csv:md5,17b953ef2fb4e58d83acc263f68755fd",
+                "mature_logtpm.csv:md5,b4654e4ec264243156b1ceab73503017",
+                "mature_logtpm.txt:md5,9cba6dd8336de7fe79be641285e92a73",
+                "mature_normalized_CPM.txt:md5,43db2854ec00e6afca25883b64ad67bd",
+                "mature_unmapped_read_counts.txt:md5,0e129ffe42aa32f96250a5071d3a7649"
+            ],
+            [
+                "versions.yml:md5,2e5b1dd3ed5befd1d4c9812a3fcb768a"
+            ]
+        ],
+        "meta": {
+            "nf-test": "0.8.4",
+            "nextflow": "24.04.4"
+        },
+        "timestamp": "2024-09-30T19:57:28.863043452"
+    },
+    "Should produce MDS plot": {
+        "content": [
+            [
+                "hairpin_counts.csv:md5,4b0fa0e52a7b8b40bdc5930378430136",
+                "hairpin_edgeR_MDS_distance_matrix.txt:md5,f0eb20be2b7bae7775ef65e03139f5a9",
+                "hairpin_edgeR_MDS_plot_coordinates.txt:md5,4d86b9a7a42f7b44ed7e56abc4db8649",
+                "hairpin_log2CPM_sample_distances.txt:md5,20592bfa42e23827dfac02eab1e033ff",
+                "hairpin_logtpm.csv:md5,35a5449d3468995e8010907105922898",
+                "hairpin_logtpm.txt:md5,1de707003b6ed2c38372670d69eaf5fb",
+                "hairpin_normalized_CPM.txt:md5,d42e8eb89175107c5dfbfb2c7da98d37",
+                "hairpin_unmapped_read_counts.txt:md5,c587147fb1a5b6681c17eff2d4859022",
+                "mature_counts.csv:md5,f961a9d6749dbf0c84dfb8976e0b6516",
+                "mature_edgeR_MDS_distance_matrix.txt:md5,bfbf327feedbc2e7bbbd57020ae0594c",
+                "mature_edgeR_MDS_plot_coordinates.txt:md5,b329d9712be8e70b92a4dd2f4aed5390",
+                "mature_log2CPM_sample_distances.txt:md5,b4ed17084de4711e7fd4a12d221d65ec",
+                "mature_logtpm.csv:md5,850a8ed0e4559d338578f81dc849acf5",
+                "mature_logtpm.txt:md5,9087155e2f4bc7f85ced8ab8c02c77e6",
+                "mature_normalized_CPM.txt:md5,3bc348a1248f9597dfc9e8e465c3c8a8",
+                "mature_unmapped_read_counts.txt:md5,138cf290420edbf9721b9db861204c9c"
+            ],
+            [
+                "versions.yml:md5,2e5b1dd3ed5befd1d4c9812a3fcb768a"
+            ],
+            true
+        ],
+        "meta": {
+            "nf-test": "0.9.0",
+            "nextflow": "24.10.2"
+        },
+        "timestamp": "2025-11-24T04:42:47.54205205"
+    }
+}

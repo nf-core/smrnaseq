@@ -121,7 +121,11 @@
         },
         {
             "@id": "main.nf",
-            "@type": ["File", "SoftwareSourceCode", "ComputationalWorkflow"],
+            "@type": [
+                "File",
+                "SoftwareSourceCode",
+                "ComputationalWorkflow"
+            ],
             "creator": [
                 {
                     "@id": "https://orcid.org/0000-0002-3859-3249"
@@ -130,17 +134,31 @@
             "dateCreated": "",
             "dateModified": "2025-11-27T14:08:30Z",
             "dct:conformsTo": "https://bioschemas.org/profiles/ComputationalWorkflow/1.0-RELEASE/",
-            "keywords": ["nf-core", "nextflow", "small-rna", "smrna-seq"],
-            "license": ["MIT"],
-            "name": ["nf-core/smrnaseq"],
+            "keywords": [
+                "nf-core",
+                "nextflow",
+                "small-rna",
+                "smrna-seq"
+            ],
+            "license": [
+                "MIT"
+            ],
+            "name": [
+                "nf-core/smrnaseq"
+            ],
             "programmingLanguage": {
                 "@id": "https://w3id.org/workflowhub/workflow-ro-crate#nextflow"
             },
             "sdPublisher": {
                 "@id": "https://nf-co.re/"
             },
-            "url": ["https://github.com/nf-core/smrnaseq", "https://nf-co.re/smrnaseq/2.4.0/"],
-            "version": ["2.4.0"]
+            "url": [
+                "https://github.com/nf-core/smrnaseq",
+                "https://nf-co.re/smrnaseq/2.4.0/"
+            ],
+            "version": [
+                "2.4.0"
+            ]
         },
         {
             "@id": "https://w3id.org/workflowhub/workflow-ro-crate#nextflow",

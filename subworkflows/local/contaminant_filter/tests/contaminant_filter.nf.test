@@ -1,0 +1,99 @@
+nextflow_workflow {
+
+    name "Test Workflow CONTAMINANT_FILTER"
+    script "../main.nf"
+    config "./nextflow.config"
+    workflow "CONTAMINANT_FILTER"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/contaminant_filter"
+    tag "contaminant_filter"
+
+    test("Should remove other contaminants") {
+
+        when {
+            params {
+                outdir              = "${outputDir}"
+                other_contamination = true
+            }
+            workflow {
+                """
+                input[0] =  channel.of([['id':'hairpin'], file("https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hairpin.fa", checkIfExists: true)])
+                input[1] =  []
+                input[2] =  []
+                input[3] =  []
+                input[4] =  []
+                input[5] =  []
+                input[6] =  channel.of([['id':'other'], file("https://huggingface.co/datasets/nf-core/smrnaseq/resolve/main/GRCh37/Homo_sapiens.GRCh37.ncrna.fa", checkIfExists: true)])
+                input[7] =  channel.of([['id':'Clone1_N1', 'single_end':true], file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/contaminant_filter/small_Clone1_N1.tRNA.filter.unmapped.contaminant.fastq", checkIfExists: true)])
+                """
+            }
+        }
+
+        then {
+            assert workflow.success
+            assert path(workflow.out.filtered_reads.get(0).get(1)).linesGzip.contains("@M07660:69:000000000-KDJ4R:1:1102:18200:10888 1:N:0:ACAGTG")
+            assert workflow.out.filtered_reads
+        }
+
+    }
+
+    test("Should remove tRNA contaminants") {
+
+        when {
+            params {
+                outdir = "${outputDir}"
+                trna   = true
+            }
+            workflow {
+                """
+                input[0] =  channel.of([['id':'hairpin'], file("https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hairpin.fa", checkIfExists: true)])
+                input[1] =  []
+                input[2] =  channel.of([[id:'tRNA'], file("https://huggingface.co/datasets/nf-core/smrnaseq/resolve/main/GRCh37/hg19-tRNAs.fa", checkIfExists: true)])
+                input[3] =  []
+                input[4] =  []
+                input[5] =  []
+                input[6] =  []
+                input[7] =  channel.of([['id':'Clone1_N1', 'single_end':true], file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/contaminant_filter/small_Clone1_N1.tRNA.filter.unmapped.contaminant.fastq", checkIfExists: true)])
+                """
+            }
+        }
+
+        then {
+            assert workflow.success
+            assert path(workflow.out.filtered_reads.get(0).get(1)).linesGzip.contains("@M07660:69:000000000-KDJ4R:1:1102:18200:10888 1:N:0:ACAGTG")
+            assert workflow.out.filtered_reads
+        }
+
+    }
+
+    test("Should remove ncRNA contaminants") {
+
+        when {
+            params {
+                outdir = "${outputDir}"
+                ncrna  = true
+            }
+            workflow {
+                """
+                input[0] =  channel.of([['id':'hairpin'], file("https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hairpin.fa", checkIfExists: true)])
+                input[1] =  []
+                input[2] =  []
+                input[3] =  []
+                input[4] =  channel.of([[id:'ncRNA'], file("https://huggingface.co/datasets/nf-core/smrnaseq/resolve/main/GRCh37/Homo_sapiens.GRCh37.ncrna.fa")])
+                input[5] =  []
+                input[6] =  []
+                input[7] =  channel.of([['id':'Clone1_N1', 'single_end':true], file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/contaminant_filter/small_Clone1_N1.tRNA.filter.unmapped.contaminant.fastq", checkIfExists: true)])
+                """
+            }
+        }
+
+        then {
+            assert workflow.success
+            assert path(workflow.out.filtered_reads.get(0).get(1)).linesGzip.contains("@M07660:69:000000000-KDJ4R:1:1102:18200:10888 1:N:0:ACAGTG")
+            assert workflow.out.filtered_reads
+        }
+
+    }
+
+}
