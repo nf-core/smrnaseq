@@ -121,7 +121,7 @@ workflow PREPARE_GENOME {
 
     //Config checks
     // Check optional parameters
-    if (!params.mirgenedb && !val_mirtrace_species) {
+    if (!params.mirgenedb && !val_mirtrace_species && !(params.help || params.help_full)) {
             exit 1, "Reference species for miRTrace is not defined via the --mirtrace_species parameter."
         }
 
