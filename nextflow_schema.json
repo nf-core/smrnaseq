@@ -261,8 +261,7 @@
                 },
                 "save_merged": {
                     "type": "boolean",
-                    "description": "Save merged reads.",
-                    "default": false
+                    "description": "Save merged reads."
                 },
                 "phred_offset": {
                     "type": "integer",
