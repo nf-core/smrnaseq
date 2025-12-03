@@ -36,8 +36,8 @@ workflow MIRNA_QUANT {
     ch_mirtrace_species  // channel: [ val(string) ]
 
     main:
-    ch_versions = Channel.empty()
-    ch_parse_species_input = params.mirgenedb ? Channel.value(params.mirgenedb_species) : ch_mirtrace_species
+    ch_versions = channel.empty()
+    ch_parse_species_input = params.mirgenedb ? channel.value(params.mirgenedb_species) : ch_mirtrace_species
 
     PARSE_MATURE ( ch_reference_mature, ch_parse_species_input )
     ch_mirna_parsed = PARSE_MATURE.out.parsed_fasta
@@ -95,7 +95,7 @@ workflow MIRNA_QUANT {
     BOWTIE_MAP_SEQCLUSTER ( ch_reads_collapsed, hairpin_bowtie, true )
     ch_versions = ch_versions.mix(BOWTIE_MAP_SEQCLUSTER.out.versions)
 
-    ch_mirtop_logs = Channel.empty()
+    ch_mirtop_logs = channel.empty()
 
     ch_mirna_gtf_species = ch_mirna_gtf.map{ meta, gtf-> [ meta, gtf, meta.species ] }.collect()
 

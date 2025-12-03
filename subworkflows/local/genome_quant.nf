@@ -12,7 +12,7 @@ workflow GENOME_QUANT {
     ch_reads        // channel: [ val(meta), [ reads ] ]
 
     main:
-    ch_versions = Channel.empty()
+    ch_versions = channel.empty()
 
     BOWTIE_MAP_GENOME ( ch_reads, ch_bowtie_index, true )
     ch_versions = ch_versions.mix(BOWTIE_MAP_GENOME.out.versions)

@@ -54,9 +54,9 @@ workflow CONTAMINANT_FILTER {
 
     main:
 
-    ch_versions     = Channel.empty()
-    ch_filter_stats = Channel.empty()
-    ch_mqc_results  = Channel.empty()
+    ch_versions     = channel.empty()
+    ch_filter_stats = channel.empty()
+    ch_mqc_results  = channel.empty()
 
     ch_reads_for_mirna.set { rrna_reads }
 
@@ -121,7 +121,7 @@ workflow CONTAMINANT_FILTER {
     cdna_reads = trna_reads
 
     // Define how to filter significant BLAT hits
-    ch_program = Channel.value('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
+    ch_program = channel.value('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
 
     if (params.cdna) {
         // Search which hairpin miRNAs are present in the cDNA data

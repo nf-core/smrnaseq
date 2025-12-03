@@ -2,7 +2,7 @@ lint:
   nextflow_config:
     - config_defaults:
         - params.fastp_known_mirna_adapters
-nf_core_version: 3.3.1
+nf_core_version: 3.5.1
 repository_type: pipeline
 template:
   author: "P. Ewels, C. Wang, R. Hammar\xE9n, L. Pantano, A. Peltzer"
