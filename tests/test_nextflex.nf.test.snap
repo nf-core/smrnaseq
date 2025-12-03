@@ -189,7 +189,7 @@
     "multiqc_multiqc_data": {
         "content": [
             "fastqc-status-check-heatmap.txt:md5,949e6825a7ecc751aa9ba515de7dbd02",
-            "fastp_filtered_reads_plot.txt:md5,2998eb8729ed8c68d45957d8d466b630",
+            "fastp_filtered_reads_plot.txt:md5,a1464e3de666ec5ee13115314f6104c7",
             "fastqc-1_overrepresented_sequences_plot.txt:md5,11b85c61ea97ca62a9e7c34fae9e575c",
             true,
             "fastqc-1_sequence_counts_plot.txt:md5,0ab7661061d5e13c5493b60502921f78",
@@ -201,7 +201,7 @@
             "fastp-seq-content-n-plot_Read_1_Before_filtering.txt:md5,bd72bc8bfc907c6aab72f315917ab280",
             "fastqc-1_sequence_duplication_levels_plot.txt:md5,a53f959bf59ad69d3bcbc53e8fe609b3",
             "fastqc-1_per_base_sequence_quality_plot.txt:md5,2f85a658bcb8261328449f1642688086",
-            "multiqc_general_stats.txt:md5,63ddd0f1131ae0d5613cb8f6ba3739b7",
+            "multiqc_general_stats.txt:md5,1b57816bf7bd438566adf05d0ea44892",
             "fastqc-1_per_base_n_content_plot.txt:md5,e3b4bb3ed98e87f2d8acb0c009485ecd",
             "fastqc-1_per_base_n_content_plot.txt:md5,e3b4bb3ed98e87f2d8acb0c009485ecd",
             "fastp-seq-quality-plot_Read_1_After_filtering.txt:md5,2956382a3f2e855a4dce8e8246a57add",
@@ -209,7 +209,6 @@
             "mirtrace_qc_plot.txt:md5,394ac045f75e2300302b7e3c2418cbbc",
             "fastqc-1_per_sequence_quality_scores_plot.txt:md5,28ed13d328e755aa06a0f13f87c336eb",
             "mirtrace_length_plot.txt:md5,18717f7f295b4d03524e91fd32c2956e",
-            true,
             "fastqc-1-status-check-heatmap.txt:md5,66af5433ebb61bc68905f8219d7419ab",
             "fastqc_sequence_counts_plot.txt:md5,c92bc7da83662b8a6b49d5cdbab3dc42",
             "mirtrace_rna_categories_plot.txt:md5,d9f621ebb387d289357004d21c9eb209",
@@ -229,9 +228,9 @@
             "fastp-seq-content-gc-plot_Read_1_After_filtering.txt:md5,ed44d5035150f69bdeb7855c80271c21"
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "24.10.2"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2025-11-21T19:55:35.858711583"
+        "timestamp": "2025-12-03T15:08:31.688768354"
     }
 }

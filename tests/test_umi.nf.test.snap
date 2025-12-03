@@ -82,8 +82,7 @@
     "multiqc_multiqc_data": {
         "content": [
             "fastqc-status-check-heatmap.txt:md5,c1509fdd74b21a718fe099de64514995",
-            "fastp_filtered_reads_plot.txt:md5,2a9cbf12175d43180f83b251f99d2159",
-            true,
+            "fastp_filtered_reads_plot.txt:md5,c2b625a4f53761bc0842454e066aa00a",
             "fastqc-1_sequence_counts_plot.txt:md5,036a1ca02aa27567988d53bcefce1959",
             "mirtrace_complexity_plot.txt:md5,5a860a872f793250b8c4482d031176a8",
             "fastqc-1_per_sequence_gc_content_plot_Percentages.txt:md5,351f949c0abf4fb7587f3f5d9a28d461",
@@ -93,7 +92,7 @@
             "fastp-seq-content-n-plot_Read_1_Before_filtering.txt:md5,dfdb23f41359b8a6b84d6626a0474d02",
             "fastqc-1_sequence_duplication_levels_plot.txt:md5,b5ae95ecd73055798ed70947dda3747c",
             "fastqc-1_per_base_sequence_quality_plot.txt:md5,89adfa92b1cde0ad4e401b430bbc68ce",
-            "multiqc_general_stats.txt:md5,ab05f15c2dc14e1bd9c1ef9fce1cd779",
+            "multiqc_general_stats.txt:md5,0881b424fb0b5d83337d5abfb88b9609",
             "fastqc-1_per_base_n_content_plot.txt:md5,db081d3aa63007e5a78113f0fc26f27d",
             "fastqc_per_base_n_content_plot.txt:md5,5b5b8cee3162d092c0bcddffbd000f34",
             "fastp-seq-quality-plot_Read_1_After_filtering.txt:md5,66a47c7ce00ede2053f8e6eb20ec3417",
@@ -101,7 +100,6 @@
             "mirtrace_qc_plot.txt:md5,98a104b1e65164016ae4081b8815f33e",
             "fastqc-1_per_sequence_quality_scores_plot.txt:md5,4108da6fe352558a652ee2b17d609e07",
             "mirtrace_length_plot.txt:md5,440a84ce9bbdb89b736e4e2446382665",
-            true,
             "fastqc-1-status-check-heatmap.txt:md5,cb2ea844834808ae4c95c6440269cf2e",
             "fastqc_sequence_counts_plot.txt:md5,78f80dbdcc711e490c779a998f94b69a",
             "mirtrace_rna_categories_plot.txt:md5,57039a101b0062b1849dadf994df3a88",
@@ -124,10 +122,10 @@
             "fastp-seq-content-gc-plot_Read_1_After_filtering.txt:md5,d673e3b18c40c5af1edccffba386d678"
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "24.10.2"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2025-11-21T21:24:57.179300053"
+        "timestamp": "2025-12-03T14:50:32.220775298"
     },
     "multiqc": {
         "content": [

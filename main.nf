@@ -47,7 +47,6 @@ params.other_contamination = getGenomeAttribute('other_contamination') //not in 
 workflow {
 
     main:
-    ch_versions = Channel.empty()
 
     //
     // SUBWORKFLOW : Prepare reference genome files
@@ -77,7 +76,10 @@ workflow {
         params.outdir,
         params.input,
         params.three_prime_adapter,
-        params.phred_offset
+        params.phred_offset,
+        params.help,
+        params.help_full,
+        params.show_hidden
     )
 
     //
@@ -99,7 +101,6 @@ workflow {
         PREPARE_GENOME.out.ncrna,
         PREPARE_GENOME.out.pirna,
         PREPARE_GENOME.out.other_contamination,
-        ch_versions,
         PIPELINE_INITIALISATION.out.samplesheet,
         PIPELINE_INITIALISATION.out.three_prime_adapter,
         PIPELINE_INITIALISATION.out.phred_offset

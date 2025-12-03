@@ -83,18 +83,14 @@
         "content": [
             "fastqc-status-check-heatmap.txt:md5,a16737b9ae7b9b70b0ef7e462101a729",
             "fastqc_overrepresented_sequences_plot.txt:md5,3c1ffe7d55bbf2815e6bc427a2d27a2c",
-            "mirtrace_complexity_plot.txt:md5,e27fb1e870985b3fe76744c027ce1c40",
-            "multiqc_citations.txt:md5,f46d2983044658a4a89bdec5ba20fda3",
+            "multiqc_citations.txt:md5,3fff312b9bd89379c41f913934a05adc",
             "samtools-stats-dp.txt:md5,d1854b0ed73a4c9ae62a3a625c19d4b2",
             "fastqc_sequence_length_distribution_plot.txt:md5,ff2def0eab8321d4ed590b483641f43b",
             "multiqc_general_stats.txt:md5,914778e76bd1453c625860cb3634d33b",
             "fastqc_per_base_n_content_plot.txt:md5,c345fe5430e3a17ad1dbcc14e7595f50",
             "fastqc_per_sequence_quality_scores_plot.txt:md5,edf4d21e2928d37d94bb33a25e1d92a6",
-            "mirtrace_qc_plot.txt:md5,49c178fc849a1aa44781ddc67c85927c",
-            "mirtrace_length_plot.txt:md5,7023ffcd95379998adbd65204b9998ee",
             true,
             "fastqc_sequence_counts_plot.txt:md5,a8680d3b059401e71c7c0fe2404f5933",
-            "mirtrace_rna_categories_plot.txt:md5,606174b789bdb9841f8e99206d147bb9",
             "samtools_alignment_plot.txt:md5,2778636ce5b6c9432b67014382fc35af",
             "fastqc_per_base_sequence_quality_plot.txt:md5,60f539c88c503680c0b2603749494948",
             "mirtop_read_count_plot.txt:md5,420dda9dbd3348b5c685e888dbe2a85a",
@@ -106,10 +102,10 @@
             true
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "24.10.2"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2025-11-21T20:31:44.384868438"
+        "timestamp": "2025-12-03T05:08:50.916007241"
     },
     "test_skipfastp": {
         "content": [
