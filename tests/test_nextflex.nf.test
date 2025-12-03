@@ -116,7 +116,6 @@ nextflow_pipeline {
                     path("$outputDir/multiqc/multiqc_data/mirtrace_qc_plot.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastqc-1_per_sequence_quality_scores_plot.txt"),
                     path("$outputDir/multiqc/multiqc_data/mirtrace_length_plot.txt"),
-                    path("$outputDir/multiqc/multiqc_data/fastqc_top_overrepresented_sequences_table.txt").exists(),
                     path("$outputDir/multiqc/multiqc_data/fastqc-1-status-check-heatmap.txt"),
                     path("$outputDir/multiqc/multiqc_data/fastqc_sequence_counts_plot.txt"),
                     path("$outputDir/multiqc/multiqc_data/mirtrace_rna_categories_plot.txt"),
