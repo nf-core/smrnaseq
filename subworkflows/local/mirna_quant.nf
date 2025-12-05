@@ -47,7 +47,7 @@ workflow MIRNA_QUANT {
     ch_versions = ch_versions.mix(FORMAT_MATURE.out.versions)
 
     INDEX_MATURE ( FORMAT_MATURE.out.formatted_fasta )
-    ch_mature_bowtie = INDEX_MATURE.out.index.first()
+    ch_mature_bowtie = INDEX_MATURE.out.index
     ch_versions = ch_versions.mix(INDEX_MATURE.out.versions)
 
     ch_reads_mirna = ch_reads_for_mirna
@@ -70,7 +70,7 @@ workflow MIRNA_QUANT {
     ch_versions = ch_versions.mix(FORMAT_HAIRPIN.out.versions)
 
     INDEX_HAIRPIN ( FORMAT_HAIRPIN.out.formatted_fasta )
-    hairpin_bowtie = INDEX_HAIRPIN.out.index.first()
+    hairpin_bowtie = INDEX_HAIRPIN.out.index
     ch_versions = ch_versions.mix(INDEX_HAIRPIN.out.versions)
 
     BOWTIE_MAP_HAIRPIN ( ch_reads_hairpin, hairpin_bowtie, true )
