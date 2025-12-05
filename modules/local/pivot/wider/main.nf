@@ -32,4 +32,17 @@ process PIVOT_WIDER {
     END_VERSIONS
     """
 
+    stub:
+    """
+    touch "joined_samples_mirtop.tsv"
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
+        tidyr: \$(Rscript -e "library(tidyr); cat(as.character(packageVersion('tidyr')))")
+        dplyr: \$(Rscript -e "library(dplyr); cat(as.character(packageVersion('dplyr')))")
+        optparse: \$(Rscript -e "library(optparse); cat(as.character(packageVersion('optparse')))")
+        vroom: \$(Rscript -e "library(vroom); cat(as.character(packageVersion('vroom')))")
+    END_VERSIONS
+    """
 }
