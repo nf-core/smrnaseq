@@ -212,7 +212,7 @@ workflow NFCORE_SMRNASEQ {
     genome_stats = channel.empty()
     if (has_fasta){
         GENOME_QUANT (
-            ch_bowtie_index.first(),
+            ch_bowtie_index,
             ch_fasta,
             MIRNA_QUANT.out.unmapped
         )
@@ -233,7 +233,7 @@ workflow NFCORE_SMRNASEQ {
                 FASTQ_FIND_MIRNA_MIRDEEP2 (
                         ch_reads_for_mirna,
                         ch_fasta,
-                        ch_bowtie_index.first(),
+                        ch_bowtie_index,
                         ch_mature_hairpin,
                 )
         ch_versions = ch_versions.mix(FASTQ_FIND_MIRNA_MIRDEEP2.out.versions)
