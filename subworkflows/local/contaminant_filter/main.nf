@@ -149,7 +149,7 @@ workflow CONTAMINANT_FILTER {
         trna_reads = trna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "cDNA", single_end:meta.single_end], fastq]}
 
         // Map which reads are cDNA
-        BOWTIE2_ALIGN_CDNA(trna_reads, INDEX_CDNA.out.index, [[],[]], true, false)
+        BOWTIE2_ALIGN_CDNA(trna_reads, INDEX_CDNA.out.index.first(), [[],[]], true, false)
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_CDNA.out.versions)
 
         // Obtain how many hits were contaminants
@@ -195,7 +195,7 @@ workflow CONTAMINANT_FILTER {
         cdna_reads = cdna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "ncRNA", single_end:meta.single_end], fastq]}
 
         // Map which reads are ncRNA
-        BOWTIE2_ALIGN_NCRNA(cdna_reads, INDEX_NCRNA.out.index, [[],[]], true, false)
+        BOWTIE2_ALIGN_NCRNA(cdna_reads, INDEX_NCRNA.out.index.first(), [[],[]], true, false)
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_NCRNA.out.versions)
 
         // Obtain how many hits were contaminants
@@ -241,7 +241,7 @@ workflow CONTAMINANT_FILTER {
         ncrna_reads = ncrna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "piRNA", single_end:meta.single_end], fastq]}
 
         // Map which reads are piRNA
-        BOWTIE2_ALIGN_PIRNA(ncrna_reads, INDEX_PIRNA.out.index, [[],[]], true, false)
+        BOWTIE2_ALIGN_PIRNA(ncrna_reads, INDEX_PIRNA.out.index.first(), [[],[]], true, false)
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_PIRNA.out.versions)
 
         // Obtain how many hits were contaminants
@@ -284,7 +284,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(INDEX_OTHER.out.versions)
 
         // Map which reads are other
-        BOWTIE2_ALIGN_OTHER(pirna_reads, INDEX_OTHER.out.index, [[],[]], true, false)
+        BOWTIE2_ALIGN_OTHER(pirna_reads, INDEX_OTHER.out.index.first(), [[],[]], true, false)
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_OTHER.out.versions)
 
         // Obtain how many hits were contaminants
