@@ -3,29 +3,29 @@
 //
 
 include {   PARSE_FASTA_MIRNA  as PARSE_MATURE
-            PARSE_FASTA_MIRNA  as PARSE_HAIRPIN      } from '../../modules/local/parse_fasta_mirna'
+            PARSE_FASTA_MIRNA  as PARSE_HAIRPIN      } from '../../../modules/local/parse_fasta_mirna/main'
 
 include {   FORMAT_FASTA_MIRNA  as FORMAT_MATURE
-            FORMAT_FASTA_MIRNA  as FORMAT_HAIRPIN    } from '../../modules/local/format_fasta_mirna'
+            FORMAT_FASTA_MIRNA  as FORMAT_HAIRPIN    } from '../../../modules/local/format_fasta_mirna/main'
 
-include { BOWTIE_BUILD  as INDEX_MATURE     } from '../../modules/nf-core/bowtie/build/main'
-include { BOWTIE_BUILD  as INDEX_HAIRPIN    } from '../../modules/nf-core/bowtie/build/main'
+include { BOWTIE_BUILD  as INDEX_MATURE     } from '../../../modules/nf-core/bowtie/build/main'
+include { BOWTIE_BUILD  as INDEX_HAIRPIN    } from '../../../modules/nf-core/bowtie/build/main'
 
 include {   BOWTIE_ALIGN  as BOWTIE_MAP_MATURE
             BOWTIE_ALIGN  as BOWTIE_MAP_HAIRPIN
-            BOWTIE_ALIGN  as BOWTIE_MAP_SEQCLUSTER } from '../../modules/nf-core/bowtie/align/main'
+            BOWTIE_ALIGN  as BOWTIE_MAP_SEQCLUSTER } from '../../../modules/nf-core/bowtie/align/main'
 
 include {   BAM_SORT_STATS_SAMTOOLS as BAM_STATS_MATURE
-            BAM_SORT_STATS_SAMTOOLS as BAM_STATS_HAIRPIN   } from '../nf-core/bam_sort_stats_samtools'
+            BAM_SORT_STATS_SAMTOOLS as BAM_STATS_HAIRPIN   } from '../../nf-core/bam_sort_stats_samtools'
 
-include { SEQCLUSTER_COLLAPSE    } from '../../modules/nf-core/seqcluster/collapse/main'
-include { DATATABLE_MERGE        } from '../../modules/local/datatable_merge/main'
-include { EDGER_QC               } from '../../modules/local/edger_qc/main'
-include { BAM_STATS_MIRNA_MIRTOP } from '../../subworkflows/nf-core/bam_stats_mirna_mirtop/main'
-include { CSVTK_JOIN             } from '../../modules/nf-core/csvtk/join/main'
+include { SEQCLUSTER_COLLAPSE    } from '../../../modules/nf-core/seqcluster/collapse/main'
+include { DATATABLE_MERGE        } from '../../../modules/local/datatable_merge/main'
+include { EDGER_QC               } from '../../../modules/local/edger_qc/main'
+include { BAM_STATS_MIRNA_MIRTOP } from '../../../subworkflows/nf-core/bam_stats_mirna_mirtop/main'
+include { CSVTK_JOIN             } from '../../../modules/nf-core/csvtk/join/main'
 
-include { PIVOT_LONGER           } from '../../modules/local/pivot/longer/main'
-include { PIVOT_WIDER            } from '../../modules/local/pivot/wider/main'
+include { PIVOT_LONGER           } from '../../../modules/local/pivot/longer/main'
+include { PIVOT_WIDER            } from '../../../modules/local/pivot/wider/main'
 
 workflow MIRNA_QUANT {
     take:

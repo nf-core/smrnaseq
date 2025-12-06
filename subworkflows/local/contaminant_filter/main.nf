@@ -39,7 +39,7 @@ include { GAWK as STATS_GAWK_PIRNA               } from '../../../modules/nf-cor
 include { GAWK as STATS_GAWK_OTHER               } from '../../../modules/nf-core/gawk/main'
 
 
-include { FILTER_STATS } from '../../../modules/local/filter_stats'
+include { FILTER_STATS } from '../../../modules/local/filter_stats/main'
 
 workflow CONTAMINANT_FILTER {
     take:
