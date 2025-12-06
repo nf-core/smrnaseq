@@ -2,8 +2,8 @@
 // Quantify mirna with bowtie and mirtop
 //
 
-include { BAM_SORT_STATS_SAMTOOLS           } from '../nf-core/bam_sort_stats_samtools'
-include { BOWTIE_ALIGN as BOWTIE_MAP_GENOME } from '../../modules/nf-core/bowtie/align/main'
+include { BAM_SORT_STATS_SAMTOOLS           } from '../../nf-core/bam_sort_stats_samtools'
+include { BOWTIE_ALIGN as BOWTIE_MAP_GENOME } from '../../../modules/nf-core/bowtie/align/main'
 
 workflow GENOME_QUANT {
     take:
