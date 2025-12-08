@@ -19,8 +19,8 @@ include { paramsSummaryMultiqc             } from '../subworkflows/nf-core/utils
 include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 // local subworkflows
 include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/main'
-include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant'
-include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant'
+include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant/main'
+include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant/main'
 include { methodsDescriptionText           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 // plugins
 include { paramsSummaryMap                 } from 'plugin/nf-schema'
@@ -212,7 +212,7 @@ workflow NFCORE_SMRNASEQ {
     genome_stats = channel.empty()
     if (has_fasta){
         GENOME_QUANT (
-            ch_bowtie_index.first(),
+            ch_bowtie_index,
             ch_fasta,
             MIRNA_QUANT.out.unmapped
         )
@@ -233,7 +233,7 @@ workflow NFCORE_SMRNASEQ {
                 FASTQ_FIND_MIRNA_MIRDEEP2 (
                         ch_reads_for_mirna,
                         ch_fasta,
-                        ch_bowtie_index.first(),
+                        ch_bowtie_index,
                         ch_mature_hairpin,
                 )
         ch_versions = ch_versions.mix(FASTQ_FIND_MIRNA_MIRDEEP2.out.versions)

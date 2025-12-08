@@ -5,13 +5,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Dev vTBD - TBD - TBD
 
-- [[#507]](https://github.com/nf-core/smrnaseq/pull/507) Fix mirgeneDB error in mirtop when the GFF used don't contain this keyword. Fix [slack comments](https://nfcore.slack.com/archives/CL66GAJBF/p1744225727593939?thread_ts=1737474621.740539&cid=CL66GAJBF).
 - [[#481]](https://github.com/nf-core/smrnaseq/pull/481) - Fix [MIRTOP_STATS IndexError](https://github.com/nf-core/smrnaseq/issues/477) - Fix mirtop process execution when mirgenedb is used.
 - [[#482]](https://github.com/nf-core/smrnaseq/pull/482) - Update documentation regarding MirgeneDB input files.
 - [[#486]](https://github.com/nf-core/smrnaseq/pull/486) - Replace `CSVTK_JOIN` to improve processing in large amount of files.
 - [[#493]](https://github.com/nf-core/smrnaseq/pull/493) - Fix [[#488]](https://github.com/nf-core/smrnaseq/issues/488) - Fix runtime error that can occur when params.genome is set.
 - [[#494]](https://github.com/nf-core/smrnaseq/pull/494) - Update [help text](https://github.com/nf-core/smrnaseq/issues/491) for `--fasta` parameter.
 - [[#498]](https://github.com/nf-core/smrnaseq/pull/498) - Fix [bowtie_index channel](https://github.com/nf-core/smrnaseq/issues/496) when in dir format.
+- [[#507]](https://github.com/nf-core/smrnaseq/pull/507) Fix mirgeneDB error in mirtop when the GFF used don't contain this keyword. Fix [slack comments](https://nfcore.slack.com/archives/CL66GAJBF/p1744225727593939?thread_ts=1737474621.740539&cid=CL66GAJBF).
+- [[#515]](https://github.com/nf-core/smrnaseq/pull/515) Template update for nf-core/tools v3.3.1
+- [[#518]](https://github.com/nf-core/smrnaseq/pull/518) Template update for nf-core/tools v3.5.1
+- [[#520]](https://github.com/nf-core/smrnaseq/pull/520) Updated JSON schemas.
 
 ## v2.4.0 - 2024-10-14 - Navy Iron Boxer
 

@@ -39,7 +39,7 @@ include { GAWK as STATS_GAWK_PIRNA               } from '../../../modules/nf-cor
 include { GAWK as STATS_GAWK_OTHER               } from '../../../modules/nf-core/gawk/main'
 
 
-include { FILTER_STATS } from '../../../modules/local/filter_stats'
+include { FILTER_STATS } from '../../../modules/local/filter_stats/main'
 
 workflow CONTAMINANT_FILTER {
     take:
@@ -69,7 +69,7 @@ workflow CONTAMINANT_FILTER {
         ch_reads_for_mirna = ch_reads_for_mirna.map{meta, fastq -> return [[id: meta.id, contaminant: "rRNA", single_end: meta.single_end], fastq]}
 
         // Map which reads are rRNAs
-        BOWTIE2_ALIGN_RRNA(ch_reads_for_mirna, INDEX_RRNA.out.index.first(), [[],[]], true, false)
+        BOWTIE2_ALIGN_RRNA(ch_reads_for_mirna, INDEX_RRNA.out.index, [[],[]], true, false)
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_RRNA.out.versions)
 
         // Obtain how many hits were contaminants
@@ -81,8 +81,7 @@ workflow CONTAMINANT_FILTER {
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
                 .mix(STATS_GAWK_RRNA.out.output
-                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]}
-                        .ifEmpty(null))
+                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]})
 
         // Assign clean reads to new channel
         rrna_reads = BOWTIE2_ALIGN_RRNA.out.fastq
@@ -99,7 +98,7 @@ workflow CONTAMINANT_FILTER {
         rrna_reads = rrna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "tRNA", single_end:meta.single_end], fastq]}
 
         // Map which reads are tRNAs
-        BOWTIE2_ALIGN_TRNA(rrna_reads, INDEX_TRNA.out.index.first(), [[],[]], true, false)
+        BOWTIE2_ALIGN_TRNA(rrna_reads, INDEX_TRNA.out.index, [[],[]], true, false)
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_TRNA.out.versions)
 
         // Obtain how many hits were contaminants
@@ -111,8 +110,7 @@ workflow CONTAMINANT_FILTER {
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
                 .mix(STATS_GAWK_TRNA.out.output
-                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]}
-                        .ifEmpty(null))
+                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]})
 
         // Assign clean reads to new channel
         trna_reads = BOWTIE2_ALIGN_TRNA.out.fastq
@@ -161,8 +159,7 @@ workflow CONTAMINANT_FILTER {
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
                 .mix(STATS_GAWK_CDNA.out.output
-                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]}
-                        .ifEmpty(null))
+                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]})
 
         // Assign clean reads to new channel
         cdna_reads = BOWTIE2_ALIGN_CDNA.out.fastq
@@ -208,8 +205,7 @@ workflow CONTAMINANT_FILTER {
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
                 .mix(STATS_GAWK_NCRNA.out.output
-                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]}
-                        .ifEmpty(null))
+                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]})
 
         // Assign clean reads to new channel
         ncrna_reads = BOWTIE2_ALIGN_NCRNA.out.fastq
@@ -255,8 +251,7 @@ workflow CONTAMINANT_FILTER {
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
                 .mix(STATS_GAWK_PIRNA.out.output
-                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]}
-                        .ifEmpty(null))
+                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]})
 
         // Assign clean reads to new channel
         pirna_reads = BOWTIE2_ALIGN_PIRNA.out.fastq
@@ -299,8 +294,7 @@ workflow CONTAMINANT_FILTER {
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
                 .mix(STATS_GAWK_OTHER.out.output
-                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]}
-                        .ifEmpty(null))
+                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]})
 
         // Assign clean reads to new channel
         other_cont_reads = BOWTIE2_ALIGN_OTHER.out.fastq
