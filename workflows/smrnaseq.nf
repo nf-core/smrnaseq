@@ -85,7 +85,7 @@ workflow NFCORE_SMRNASEQ {
     CAT_FASTQ (
         ch_fastq.multiple
     )
-    ch_cat_fastq = CAT_FASTQ.out.reads.mix(ch_fastq.single)
+    ch_cat_fastq = CAT_FASTQ.out.reads.mix(ch_fastq.single).combine(ch_mirna_adapters)
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first())
 
     //
@@ -102,7 +102,6 @@ workflow NFCORE_SMRNASEQ {
         params.skip_umi_extract_before_dedup,
         params.umi_discard_read,
         params.skip_fastp,
-        ch_mirna_adapters,
         params.save_trimmed_fail,
         params.save_merged,
         params.min_trimmed_reads

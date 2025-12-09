@@ -11,8 +11,8 @@ process BIOAWK {
     tuple val(meta), path(input)
 
     output:
-    tuple val(meta), path("*.fasta"), emit: output
-    path "versions.yml"             , emit: versions
+    tuple val(meta), path(prefix), emit: output
+    path "versions.yml"          , emit: versions
 
     when:
     task.ext.when == null || task.ext.when
@@ -26,7 +26,7 @@ process BIOAWK {
     bioawk \\
         $args \\
         $input \\
-        > ${prefix}.fasta
+        > ${prefix}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

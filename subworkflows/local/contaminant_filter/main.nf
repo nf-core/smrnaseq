@@ -75,7 +75,7 @@ workflow CONTAMINANT_FILTER {
         // Obtain how many hits were contaminants
         ch_bowtie = BOWTIE2_ALIGN_RRNA.out.log
 
-        STATS_GAWK_RRNA(ch_bowtie, [])
+        STATS_GAWK_RRNA(ch_bowtie, [], false)
         ch_versions = ch_versions.mix(STATS_GAWK_RRNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
@@ -104,7 +104,7 @@ workflow CONTAMINANT_FILTER {
         // Obtain how many hits were contaminants
         ch_bowtie = BOWTIE2_ALIGN_TRNA.out.log
 
-        STATS_GAWK_TRNA(ch_bowtie, [])
+        STATS_GAWK_TRNA(ch_bowtie, [], false)
         ch_versions = ch_versions.mix(STATS_GAWK_TRNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
@@ -127,7 +127,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BLAT_CDNA.out.versions)
 
         // Extract the significant hits
-        GAWK_CDNA(BLAT_CDNA.out.psl, ch_program)
+        GAWK_CDNA(BLAT_CDNA.out.psl, ch_program, false)
         ch_versions = ch_versions.mix(GAWK_CDNA.out.versions)
 
         // Get only unique elements of the list
@@ -153,7 +153,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_CDNA.out.versions)
 
         // Obtain how many hits were contaminants
-        STATS_GAWK_CDNA(BOWTIE2_ALIGN_CDNA.out.log, [])
+        STATS_GAWK_CDNA(BOWTIE2_ALIGN_CDNA.out.log, [], false)
         ch_versions = ch_versions.mix(STATS_GAWK_CDNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
@@ -173,7 +173,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BLAT_NCRNA.out.versions)
 
         // Extract the significant hits
-        GAWK_NCRNA(BLAT_NCRNA.out.psl, ch_program)
+        GAWK_NCRNA(BLAT_NCRNA.out.psl, ch_program, false)
         ch_versions = ch_versions.mix(GAWK_NCRNA.out.versions)
 
         // Get only unique elements of the list
@@ -199,7 +199,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_NCRNA.out.versions)
 
         // Obtain how many hits were contaminants
-        STATS_GAWK_NCRNA(BOWTIE2_ALIGN_NCRNA.out.log, [])
+        STATS_GAWK_NCRNA(BOWTIE2_ALIGN_NCRNA.out.log, [], false)
         ch_versions = ch_versions.mix(STATS_GAWK_NCRNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
@@ -219,7 +219,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BLAT_PIRNA.out.versions)
 
         // Extract the significant hits
-        GAWK_PIRNA(BLAT_PIRNA.out.psl, ch_program)
+        GAWK_PIRNA(BLAT_PIRNA.out.psl, ch_program, false)
         ch_versions = ch_versions.mix(GAWK_PIRNA.out.versions)
 
         // Get only unique elements of the list
@@ -245,7 +245,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_PIRNA.out.versions)
 
         // Obtain how many hits were contaminants
-        STATS_GAWK_PIRNA(BOWTIE2_ALIGN_PIRNA.out.log, [])
+        STATS_GAWK_PIRNA(BOWTIE2_ALIGN_PIRNA.out.log, [], false)
         ch_versions = ch_versions.mix(STATS_GAWK_PIRNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
@@ -265,7 +265,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BLAT_OTHER.out.versions)
 
         // Extract the significant hits
-        GAWK_OTHER(BLAT_OTHER.out.psl, ch_program)
+        GAWK_OTHER(BLAT_OTHER.out.psl, ch_program, false)
         ch_versions = ch_versions.mix(GAWK_OTHER.out.versions)
 
         // Get only unique elements of the list
@@ -288,7 +288,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_OTHER.out.versions)
 
         // Obtain how many hits were contaminants
-        STATS_GAWK_OTHER(BOWTIE2_ALIGN_OTHER.out.log, [])
+        STATS_GAWK_OTHER(BOWTIE2_ALIGN_OTHER.out.log, [], false)
         ch_versions = ch_versions.mix(STATS_GAWK_OTHER.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
