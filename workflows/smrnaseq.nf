@@ -85,7 +85,7 @@ workflow NFCORE_SMRNASEQ {
     CAT_FASTQ (
         ch_fastq.multiple
     )
-    ch_cat_fastq = CAT_FASTQ.out.reads.mix(ch_fastq.single).combine(ch_mirna_adapters)
+    ch_cat_fastq = CAT_FASTQ.out.reads.mix(ch_fastq.single)
     ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first())
 
     //
@@ -93,6 +93,12 @@ workflow NFCORE_SMRNASEQ {
     //
     if ( params.skip_fastp && params.skip_fastqc ) {
         exit 1, "At least one of skip_fastp or skip_fastqc must be false"
+    }
+
+    if (params.with_umi) {
+        ch_cat_fastq = ch_cat_fastq.map { meta, reads -> [meta, reads, []] }
+    } else {
+        ch_cat_fastq = ch_cat_fastq.combine(ch_mirna_adapters)
     }
 
     FASTQ_FASTQC_UMITOOLS_FASTP (
@@ -112,8 +118,7 @@ workflow NFCORE_SMRNASEQ {
     // Trim 3' end nucleotides after adapter is removed, otherwise they are not really trimmed
     if (params.three_prime_clip_r1){
         FASTP3(
-            ch_reads_for_mirna,
-            [],
+            ch_reads_for_mirna.map { meta, reads -> [meta, reads, []] },
             false,
             false,
             false
@@ -134,8 +139,7 @@ workflow NFCORE_SMRNASEQ {
 
         // Filter out sequences smaller than params.fastp_min_length
         FASTP_LENGTH_FILTER (
-            UMITOOLS_EXTRACT.out.reads,
-            ch_mirna_adapters,
+            UMITOOLS_EXTRACT.out.reads.map {meta, reads -> [meta, reads, []] },
             false,
             params.save_trimmed_fail,
             params.save_merged
