@@ -22,7 +22,6 @@ include { SEQCLUSTER_COLLAPSE    } from '../../../modules/nf-core/seqcluster/col
 include { DATATABLE_MERGE        } from '../../../modules/local/datatable_merge/main'
 include { EDGER_QC               } from '../../../modules/local/edger_qc/main'
 include { BAM_STATS_MIRNA_MIRTOP } from '../../../subworkflows/nf-core/bam_stats_mirna_mirtop/main'
-include { CSVTK_JOIN             } from '../../../modules/nf-core/csvtk/join/main'
 
 include { PIVOT_LONGER           } from '../../../modules/local/pivot/longer/main'
 include { PIVOT_WIDER            } from '../../../modules/local/pivot/wider/main'
