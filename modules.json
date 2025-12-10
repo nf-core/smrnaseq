@@ -98,9 +98,8 @@
                     },
                     "multiqc": {
                         "branch": "master",
-                        "git_sha": "5cb9a8694da0a0e550921636bb60bc8c56445fd7",
-                        "installed_by": ["modules"],
-                        "patch": "modules/nf-core/multiqc/multiqc.diff"
+                        "git_sha": "9656d955b700a8707c4a67821ab056f8c1095675",
+                        "installed_by": ["modules"]
                     },
                     "samtools/flagstat": {
                         "branch": "master",
