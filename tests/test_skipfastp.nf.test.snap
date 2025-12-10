@@ -30,24 +30,24 @@
             "Clone1_N3_mature_hairpin_genome.sorted.idxstats:md5,2620288b88bba1ea3315414016c083a1",
             "Clone1_N1_mature_hairpin_genome.sorted.idxstats:md5,e0e4a95f5c21a926f7894cf1fbe3110b",
             "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,62208acf0c7418d590b41318d7e17d67",
-            "Clone1_N3_mature_hairpin_genome.sorted.stats:md5,c9d4d7a91bdafdb45592574cd942a7ba",
-            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,3309ee9de501160337af8c73d46ec682"
+            "Clone1_N3_mature_hairpin_genome.sorted.stats:md5,9a65436ca3202f3093de80df77d07c8d",
+            "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,bb71e62166f099939b1c4434faea73f5"
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "24.10.2"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2025-11-20T20:01:37.389220273"
+        "timestamp": "2025-12-10T01:15:17.531048356"
     },
     "mirna_quant_bam": {
         "content": [
             "Clone1_N3_mature_hairpin.sorted.flagstat:md5,1630edf055b591303d7c68d013745938",
             true,
-            "Clone1_N3_mature_hairpin.sorted.stats:md5,488f860e7aed290a4707dbe9b07899b6",
+            "Clone1_N3_mature_hairpin.sorted.stats:md5,8d01a90bc1eac638d93bcb5617d0bc4a",
             true,
             "Clone1_N3_mature_hairpin.sorted.idxstats:md5,b44fb26f6be2accc7d52bc38efff69f4",
             true,
-            "Clone1_N3_mature.sorted.stats:md5,5263c781ef5db00ba664745ed595841f",
+            "Clone1_N3_mature.sorted.stats:md5,848f7bbe9965b97fad7c45d11cc5056e",
             true,
             true,
             true,
@@ -55,10 +55,10 @@
             "Clone1_N3_mature.sorted.flagstat:md5,9e287eb7ac83624b262864d0255217fd"
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "24.10.2"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2025-11-20T20:01:37.298106568"
+        "timestamp": "2025-12-10T01:15:17.410395518"
     },
     "mirna_quant_edger_qc": {
         "content": [
@@ -112,20 +112,20 @@
             66,
             {
                 "BOWTIE_MAP_GENOME": {
-                    "bowtie": "1.3.0",
-                    "samtools": "1.16.1"
+                    "bowtie": "1.3.1",
+                    "samtools": 1.21
                 },
                 "BOWTIE_MAP_HAIRPIN": {
-                    "bowtie": "1.3.0",
-                    "samtools": "1.16.1"
+                    "bowtie": "1.3.1",
+                    "samtools": 1.21
                 },
                 "BOWTIE_MAP_MATURE": {
-                    "bowtie": "1.3.0",
-                    "samtools": "1.16.1"
+                    "bowtie": "1.3.1",
+                    "samtools": 1.21
                 },
                 "BOWTIE_MAP_SEQCLUSTER": {
-                    "bowtie": "1.3.0",
-                    "samtools": "1.16.1"
+                    "bowtie": "1.3.1",
+                    "samtools": 1.21
                 },
                 "DATATABLE_MERGE": {
                     "r-base": "3.6.2"
@@ -140,10 +140,10 @@
                     "fastx_toolkit": "0.0.14"
                 },
                 "INDEX_HAIRPIN": {
-                    "bowtie": "1.3.0"
+                    "bowtie": "1.3.1"
                 },
                 "INDEX_MATURE": {
-                    "bowtie": "1.3.0"
+                    "bowtie": "1.3.1"
                 },
                 "MIRTOP_COUNTS": {
                     "mirtop": "0.4.30"
@@ -179,19 +179,19 @@
                     "vroom": "1.6.5"
                 },
                 "SAMTOOLS_FLAGSTAT": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SAMTOOLS_IDXSTATS": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SAMTOOLS_INDEX": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SAMTOOLS_SORT": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SAMTOOLS_STATS": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SEQCLUSTER_COLLAPSE": {
                     "seqcluster": "1.2.9"
@@ -202,10 +202,10 @@
             }
         ],
         "meta": {
-            "nf-test": "0.9.2",
-            "nextflow": "24.10.2"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2025-11-25T19:35:03.785319055"
+        "timestamp": "2025-12-10T01:15:17.294880568"
     },
     "multiqc": {
         "content": [

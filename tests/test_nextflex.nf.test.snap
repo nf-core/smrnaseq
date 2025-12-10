@@ -3,83 +3,83 @@
         "content": [
             true,
             "mirtrace-stats-contamination_basic.tsv:md5,a299193a1453a3abe1e5a0522af4ba96",
-            "mirtrace-stats-mirna-complexity.tsv:md5,9c932b03070aa4b13162f01ad9f5066f",
-            "mirtrace-stats-phred.tsv:md5,b1903783618346f63f267bdeec7ce2ea",
-            "mirtrace-stats-length.tsv:md5,5b185869894275973fa47e4ae16c8a20",
+            "mirtrace-stats-mirna-complexity.tsv:md5,a1ec39777087ab6aaf4affbbe4f921b8",
+            "mirtrace-stats-phred.tsv:md5,13fed5d3b3d3e59eb97dcd9e479576a5",
+            "mirtrace-stats-length.tsv:md5,293fd2ddbd382ec964fec80c388bb527",
             "mirtrace-stats-contamination_detailed.tsv:md5,fbb92d8e56263aeb00b7bcf8a802306e",
-            "mirtrace-stats-qcstatus.tsv:md5,d16ecd87584893661a02b88490368406",
-            "mirtrace-stats-rnatype.tsv:md5,ff383255e7f6cbb632e3055dc8857e2a",
+            "mirtrace-stats-qcstatus.tsv:md5,095efee52992e9823077bbb4ca92211c",
+            "mirtrace-stats-rnatype.tsv:md5,dd1c0f47d078094ffeb152c1afdd26f6",
             true,
             "mirtrace-stats-contamination_basic.tsv:md5,cf2a6799f2b7a1d8b6bfe89139f24b17",
-            "mirtrace-stats-mirna-complexity.tsv:md5,0410685fb0146f074e6b3731fbd61383",
-            "mirtrace-stats-phred.tsv:md5,e5266158a2ba50edde8de8c959f2ab9b",
-            "mirtrace-stats-length.tsv:md5,d260924b340ccc8559e97f769420c2b8",
+            "mirtrace-stats-mirna-complexity.tsv:md5,0d944af57016d71e09ad1a5455f73ed8",
+            "mirtrace-stats-phred.tsv:md5,685e24b65bba88bffca88fd1bd5e777d",
+            "mirtrace-stats-length.tsv:md5,08a6ed1ec7835bb289ae252841735db3",
             "mirtrace-stats-contamination_detailed.tsv:md5,b043078ea1db631f8f5c767f86366c60",
-            "mirtrace-stats-qcstatus.tsv:md5,21b85f590394539be7417c25cc8ffc0a",
-            "mirtrace-stats-rnatype.tsv:md5,1a3e5156f9ebc9845988dad6932b0bdc",
+            "mirtrace-stats-qcstatus.tsv:md5,98518a0eae7831c3f98048c13b119e73",
+            "mirtrace-stats-rnatype.tsv:md5,8eebd9ee0651106ba412421a25e4c645",
             true,
             "mirtrace-stats-contamination_basic.tsv:md5,2536bebcaeaa1dc0334e5484968f67ad",
-            "mirtrace-stats-mirna-complexity.tsv:md5,408118e08e297e6ffea9692228ae61be",
-            "mirtrace-stats-phred.tsv:md5,74b89cafe342aa184203c533090ab6b3",
-            "mirtrace-stats-length.tsv:md5,febc7969e6eeb988675f719756e58000",
+            "mirtrace-stats-mirna-complexity.tsv:md5,f62facdb755ec8fd715a3d45ab1ffe67",
+            "mirtrace-stats-phred.tsv:md5,7139539e7000cf63c9d1fec8d0a60fef",
+            "mirtrace-stats-length.tsv:md5,3f74ba76b2499a0f9417933f1f1c21b5",
             "mirtrace-stats-contamination_detailed.tsv:md5,a62fcf38cc7e7e754ed69457efc2f9f3",
-            "mirtrace-stats-qcstatus.tsv:md5,d4ab1e47d6a32ddeb502bf4001b4d446",
-            "mirtrace-stats-rnatype.tsv:md5,4450d9e0c9804b332c4ac79973d8fbfc"
+            "mirtrace-stats-qcstatus.tsv:md5,1610e53939db3362b1a304e49460b938",
+            "mirtrace-stats-rnatype.tsv:md5,fff6603fdbc18c49970435168c7c822d"
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2024-09-11T13:45:08.273052652"
+        "timestamp": "2025-12-10T04:12:25.595299038"
     },
     "mirna_quant_bam": {
         "content": [
-            "sample2_mature.sorted.idxstats:md5,9688f02beeebf9a590dc81e49415ede9",
-            "sample1_mature.sorted.flagstat:md5,7d61ae305e545c7a66ef8d23a0c8be25",
-            "sample2_mature.sorted.stats:md5,1a2146975784f51e98f4208f4562a4e6",
-            "sample3_mature.sorted.stats:md5,d1c48aac54b7b741e1108d97e9231232",
-            "sample3_mature.sorted.flagstat:md5,1aae00444143bce06cb0f8cf31deb8e4",
-            "sample3_mature.sorted.idxstats:md5,9688f02beeebf9a590dc81e49415ede9",
-            "sample1_mature.sorted.stats:md5,80f9a8fe5d498265223e95d9dd04a89a",
-            "sample2_mature.sorted.flagstat:md5,1aae00444143bce06cb0f8cf31deb8e4",
-            "sample1_mature.sorted.idxstats:md5,6db0cfab41307285fe5c89dfe95b5d46",
-            "sample3_mature_hairpin.sorted.stats:md5,e725f70ac1e4e4007714b19e588cbc46",
-            "sample2_mature_hairpin.sorted.flagstat:md5,4e201dd868164d0c53142888dd6ca238",
-            "sample1_mature_hairpin.sorted.flagstat:md5,7ed3ab444077ddf6c334845e9c4ce75e",
-            "sample1_mature_hairpin.sorted.idxstats:md5,7b7d142caee6cccbb6d83c8e6568a951",
-            "sample3_mature_hairpin.sorted.flagstat:md5,4e201dd868164d0c53142888dd6ca238",
-            "sample2_mature_hairpin.sorted.stats:md5,f5e8be4ea1e9f85c5dc15d3f8cdbae47",
-            "sample1_mature_hairpin.sorted.stats:md5,052c1f774377058033a165f05d2fcbec",
-            "sample3_mature_hairpin.sorted.idxstats:md5,8927231d0ea3100fb75a96b4e5317321",
-            "sample2_mature_hairpin.sorted.idxstats:md5,8927231d0ea3100fb75a96b4e5317321"
+            "sample2_mature.sorted.idxstats:md5,a8a621a9652b077cbe11520f6e6f8e3b",
+            "sample1_mature.sorted.flagstat:md5,0f84dc2a54b7a3bd1dbaf73f771b9494",
+            "sample2_mature.sorted.stats:md5,0467efbefb3bf457f1b2fe85473eea61",
+            "sample3_mature.sorted.stats:md5,ee0de0ba9141371196d9745619719f5d",
+            "sample3_mature.sorted.flagstat:md5,6ee3697338446fad0473ce882adaaa6d",
+            "sample3_mature.sorted.idxstats:md5,a8a621a9652b077cbe11520f6e6f8e3b",
+            "sample1_mature.sorted.stats:md5,5d6d14161808965793ef9f1af2c0512a",
+            "sample2_mature.sorted.flagstat:md5,6ee3697338446fad0473ce882adaaa6d",
+            "sample1_mature.sorted.idxstats:md5,06c8d55180d8744276b71a5235fa8595",
+            "sample3_mature_hairpin.sorted.stats:md5,3bcd16b7e1763c5dfc0a12694162cd82",
+            "sample2_mature_hairpin.sorted.flagstat:md5,b2b177d1cd992e8789ddc4f7b8275bb2",
+            "sample1_mature_hairpin.sorted.flagstat:md5,ceae46b5150c4b1e8db554f917a0e9c0",
+            "sample1_mature_hairpin.sorted.idxstats:md5,db54c203e1565ccf894873337832597e",
+            "sample3_mature_hairpin.sorted.flagstat:md5,b2b177d1cd992e8789ddc4f7b8275bb2",
+            "sample2_mature_hairpin.sorted.stats:md5,6d4f360cd883388cfda20725a5d4d4a2",
+            "sample1_mature_hairpin.sorted.stats:md5,c45ab5e03fcf2e275aa0193208339a0d",
+            "sample3_mature_hairpin.sorted.idxstats:md5,f45bb8e50c59e6a0326ae3b3a372e2f7",
+            "sample2_mature_hairpin.sorted.idxstats:md5,f45bb8e50c59e6a0326ae3b3a372e2f7"
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "24.10.2"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2025-11-20T19:44:47.569380626"
+        "timestamp": "2025-12-10T04:12:25.427674212"
     },
     "test_nextflex": {
         "content": [
             82,
             {
                 "BOWTIE_MAP_HAIRPIN": {
-                    "bowtie": "1.3.0",
-                    "samtools": "1.16.1"
+                    "bowtie": "1.3.1",
+                    "samtools": 1.21
                 },
                 "BOWTIE_MAP_MATURE": {
-                    "bowtie": "1.3.0",
-                    "samtools": "1.16.1"
+                    "bowtie": "1.3.1",
+                    "samtools": 1.21
                 },
                 "BOWTIE_MAP_SEQCLUSTER": {
-                    "bowtie": "1.3.0",
-                    "samtools": "1.16.1"
+                    "bowtie": "1.3.1",
+                    "samtools": 1.21
                 },
                 "DATATABLE_MERGE": {
                     "r-base": "3.6.2"
                 },
                 "FASTP": {
-                    "fastp": "0.23.4"
+                    "fastp": "1.0.1"
                 },
                 "FASTQC_RAW": {
                     "fastqc": "0.12.1"
@@ -94,10 +94,10 @@
                     "fastx_toolkit": "0.0.14"
                 },
                 "INDEX_HAIRPIN": {
-                    "bowtie": "1.3.0"
+                    "bowtie": "1.3.1"
                 },
                 "INDEX_MATURE": {
-                    "bowtie": "1.3.0"
+                    "bowtie": "1.3.1"
                 },
                 "MIRTOP_COUNTS": {
                     "mirtop": "0.4.30"
@@ -133,19 +133,19 @@
                     "vroom": "1.6.5"
                 },
                 "SAMTOOLS_FLAGSTAT": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SAMTOOLS_IDXSTATS": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SAMTOOLS_INDEX": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SAMTOOLS_SORT": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SAMTOOLS_STATS": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SEQCLUSTER_COLLAPSE": {
                     "seqcluster": "1.2.9"
@@ -156,10 +156,10 @@
             }
         ],
         "meta": {
-            "nf-test": "0.9.2",
-            "nextflow": "24.10.2"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2025-11-25T22:07:49.090185952"
+        "timestamp": "2025-12-10T04:12:25.221977954"
     },
     "mirna_quant_edger_qc": {
         "content": [
@@ -189,48 +189,48 @@
     "multiqc_multiqc_data": {
         "content": [
             "fastqc-status-check-heatmap.txt:md5,949e6825a7ecc751aa9ba515de7dbd02",
-            "fastp_filtered_reads_plot.txt:md5,a1464e3de666ec5ee13115314f6104c7",
-            "fastqc-1_overrepresented_sequences_plot.txt:md5,11b85c61ea97ca62a9e7c34fae9e575c",
+            "fastp_filtered_reads_plot.txt:md5,6094835f030bba45f551e18d3605aa5c",
+            "fastqc-1_overrepresented_sequences_plot.txt:md5,885dc944126e0878ed16b995fd8543d1",
             true,
-            "fastqc-1_sequence_counts_plot.txt:md5,0ab7661061d5e13c5493b60502921f78",
-            "mirtrace_complexity_plot.txt:md5,127cdbec37b2ce57f6994a20796224d1",
-            "fastqc-1_per_sequence_gc_content_plot_Percentages.txt:md5,3f7fd27d4553da6a88f4f15dd4b6413b",
+            "fastqc-1_sequence_counts_plot.txt:md5,55ef17b6e2f18ddefc758194c8144f77",
+            "mirtrace_complexity_plot.txt:md5,9ff775a00d039ae197150b963d9d9e68",
+            "fastqc-1_per_sequence_gc_content_plot_Percentages.txt:md5,8a77845d3ad0bb1398ecf989ed271dbe",
             "multiqc_citations.txt:md5,3adbccd17a42d0d5d97ee7ebb476f433",
-            "samtools-stats-dp.txt:md5,1fa31e11ef6c82185d5c9dc2f40d61b2",
-            "fastqc_sequence_length_distribution_plot.txt:md5,130a5569ba830f7e7abb971d1c8da537",
+            "samtools-stats-dp.txt:md5,c5169c16c3d16d29405eb62824eaa14b",
+            "fastqc_sequence_length_distribution_plot.txt:md5,c43ba85adcb43a18057f7eb17a60bfb5",
             "fastp-seq-content-n-plot_Read_1_Before_filtering.txt:md5,bd72bc8bfc907c6aab72f315917ab280",
-            "fastqc-1_sequence_duplication_levels_plot.txt:md5,a53f959bf59ad69d3bcbc53e8fe609b3",
+            "fastqc-1_sequence_duplication_levels_plot.txt:md5,ebb29a4d498f51ee48e4dcbd99a4e61f",
             "fastqc-1_per_base_sequence_quality_plot.txt:md5,2f85a658bcb8261328449f1642688086",
-            "multiqc_general_stats.txt:md5,1b57816bf7bd438566adf05d0ea44892",
-            "fastqc-1_per_base_n_content_plot.txt:md5,e3b4bb3ed98e87f2d8acb0c009485ecd",
-            "fastqc-1_per_base_n_content_plot.txt:md5,e3b4bb3ed98e87f2d8acb0c009485ecd",
+            "multiqc_general_stats.txt:md5,ea37f90abae280543c479aa5f9969364",
+            "fastqc-1_per_base_n_content_plot.txt:md5,ff16108f476a2627030b4d8726e89a1a",
+            "fastqc-1_per_base_n_content_plot.txt:md5,ff16108f476a2627030b4d8726e89a1a",
             "fastp-seq-quality-plot_Read_1_After_filtering.txt:md5,2956382a3f2e855a4dce8e8246a57add",
-            "fastqc-1_per_sequence_quality_scores_plot.txt:md5,28ed13d328e755aa06a0f13f87c336eb",
-            "mirtrace_qc_plot.txt:md5,394ac045f75e2300302b7e3c2418cbbc",
-            "fastqc-1_per_sequence_quality_scores_plot.txt:md5,28ed13d328e755aa06a0f13f87c336eb",
-            "mirtrace_length_plot.txt:md5,18717f7f295b4d03524e91fd32c2956e",
+            "fastqc-1_per_sequence_quality_scores_plot.txt:md5,168ec230deab98733f534ff049b34570",
+            "mirtrace_qc_plot.txt:md5,0a6b6d56226eddb5c0917bd93e249df0",
+            "fastqc-1_per_sequence_quality_scores_plot.txt:md5,168ec230deab98733f534ff049b34570",
+            "mirtrace_length_plot.txt:md5,382c353959c29be90c619ef492136399",
             "fastqc-1-status-check-heatmap.txt:md5,66af5433ebb61bc68905f8219d7419ab",
             "fastqc_sequence_counts_plot.txt:md5,c92bc7da83662b8a6b49d5cdbab3dc42",
-            "mirtrace_rna_categories_plot.txt:md5,d9f621ebb387d289357004d21c9eb209",
+            "mirtrace_rna_categories_plot.txt:md5,099920f6d263cabdb580d0f7cd7b63e3",
             "fastp-seq-quality-plot_Read_1_Before_filtering.txt:md5,e5ea2bfd87e957a18fae5239137d6499",
-            "samtools_alignment_plot.txt:md5,625da9c9da2fe432bee7a5bfca9cf550",
+            "samtools_alignment_plot.txt:md5,99b94d2eb81c78739e172a5094de4c93",
             "fastqc_per_base_sequence_quality_plot.txt:md5,1208509fcaff06edcddc377c907dfdaf",
-            "fastp-seq-content-n-plot_Read_1_After_filtering.txt:md5,dd53a16aebc689109fc8065d08d8a6c7",
+            "fastp-seq-content-n-plot_Read_1_After_filtering.txt:md5,3c6477b8e9b08c41906a8b9abaf029a8",
             "mirtrace_contamination_check_plot.txt:md5,8fd040b7771963863937f0eb31a265f1",
             "fastqc_adapter_content_plot.txt:md5,8aa2cbcf256bbb89c4a1d1fd18019c9b",
             "fastqc_sequence_duplication_levels_plot.txt:md5,97a930f423f2cd365c2262b0a185f68a",
             "fastqc_per_sequence_gc_content_plot_Percentages.txt:md5,5857a8a1980816cf70b34b7b318e1482",
-            "fastqc-1_per_sequence_gc_content_plot_Counts.txt:md5,d3ecffd88ebbdac463e297a2b98c8b3d",
-            "fastqc-1_adapter_content_plot.txt:md5,245d96a402988141cbe68b60a42db535",
+            "fastqc-1_per_sequence_gc_content_plot_Counts.txt:md5,91e15c020153e6f555164054c18b7a5a",
+            "fastqc-1_adapter_content_plot.txt:md5,bb2eca6d2a146511240f1f305988e3b9",
             "fastp-seq-content-gc-plot_Read_1_Before_filtering.txt:md5,9033ad6887da19d96fb9e2504d8de0a5",
             "fastqc_per_sequence_gc_content_plot_Counts.txt:md5,fbe1f23a76ed70b2568d553fc42adef2",
             true,
-            "fastp-seq-content-gc-plot_Read_1_After_filtering.txt:md5,ed44d5035150f69bdeb7855c80271c21"
+            "fastp-seq-content-gc-plot_Read_1_After_filtering.txt:md5,082881547e66a05e000299445d67594d"
         ],
         "meta": {
             "nf-test": "0.9.3",
             "nextflow": "25.04.6"
         },
-        "timestamp": "2025-12-03T15:08:31.688768354"
+        "timestamp": "2025-12-10T04:12:25.833815164"
     }
 }
