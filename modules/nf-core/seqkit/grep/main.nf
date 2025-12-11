@@ -5,15 +5,15 @@ process SEQKIT_GREP {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/seqkit:2.8.1--h9ee0642_0':
-        'biocontainers/seqkit:2.8.1--h9ee0642_0' }"
+        'https://depot.galaxyproject.org/singularity/seqkit:2.9.0--h9ee0642_0':
+        'biocontainers/seqkit:2.9.0--h9ee0642_0' }"
 
     input:
     tuple val(meta), path(sequence)
     path pattern
 
     output:
-    tuple val(meta), path("*.{fa,fq}")  , emit: filter
+    tuple val(meta), path("*.{fa,fq}.gz")  , emit: filter
     path "versions.yml"                    , emit: versions
 
     when:
@@ -33,7 +33,7 @@ process SEQKIT_GREP {
         --threads $task.cpus \\
         ${pattern_file} \\
         ${sequence} \\
-        -o ${prefix}.${suffix} \\
+        -o ${prefix}.${suffix}.gz \\
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

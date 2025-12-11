@@ -4,33 +4,33 @@
             true,
             "mirtrace-stats-contamination_detailed.tsv:md5,141f6f46a4f9fcfac91303c125a2fc75",
             "mirtrace-stats-contamination_basic.tsv:md5,34005177b3038da76236b5d8fb468825",
-            "mirtrace-stats-length.tsv:md5,7d835805aca881496e65f6f96aa60d7d",
-            "mirtrace-stats-mirna-complexity.tsv:md5,3605fb37445fe2773d6b606a2171fbf8",
-            "mirtrace-stats-phred.tsv:md5,0f84ab70c67a94bab6820cf97c63d10f",
-            "mirtrace-stats-qcstatus.tsv:md5,aeeebcd9a4305a57d0f13fb2e3dec4cb",
-            "mirtrace-stats-rnatype.tsv:md5,406fdb7bde295573d4d92b57a1c59767",
+            "mirtrace-stats-length.tsv:md5,2cbf0ea9c681da0a2deba47c4dc75bb2",
+            "mirtrace-stats-mirna-complexity.tsv:md5,4dd00290cb13bf3c755aa05d8eb45aa8",
+            "mirtrace-stats-phred.tsv:md5,6bd880d02106e40824d6566ef3cae7ba",
+            "mirtrace-stats-qcstatus.tsv:md5,9a5f52f6f92185bd9128a54f9f668c9f",
+            "mirtrace-stats-rnatype.tsv:md5,660c56970ca96a6215dc1acd670d4c46",
             true,
             "mirtrace-stats-contamination_detailed.tsv:md5,c1af2894292fcd3242fe27a4adcaef49",
             "mirtrace-stats-contamination_basic.tsv:md5,307eceb1b067f014aaad9e09263cebfc",
-            "mirtrace-stats-length.tsv:md5,4bca762e07f887e245d3757834ecbf4c",
-            "mirtrace-stats-mirna-complexity.tsv:md5,854e5d79c69685dd72922cc7d2135564",
-            "mirtrace-stats-phred.tsv:md5,1e74ce76a5247ce6bce716de7f0d9377",
-            "mirtrace-stats-qcstatus.tsv:md5,319be3a39d281282fb139baed4c7cbbb",
-            "mirtrace-stats-rnatype.tsv:md5,d0323854e2950c8ff7454227ff22dfd1",
+            "mirtrace-stats-length.tsv:md5,1c5e8dac2e8613fab04308119ad5320d",
+            "mirtrace-stats-mirna-complexity.tsv:md5,035c0f00eb3f25326d9c937213243eb2",
+            "mirtrace-stats-phred.tsv:md5,80acda1a4adfed8729d1d8754e29c184",
+            "mirtrace-stats-qcstatus.tsv:md5,f31a85a805d20a9aa8b22e237c546b4d",
+            "mirtrace-stats-rnatype.tsv:md5,0167cfd3ae1d42877a958153f3746560",
             true,
             "mirtrace-stats-contamination_detailed.tsv:md5,329c0800ed9e59553e74e121b927047a",
             "mirtrace-stats-contamination_basic.tsv:md5,651b466f7a6c8f4abff9f9ec44be06fd",
-            "mirtrace-stats-length.tsv:md5,ac1d2301e09318eff98336459de0b2ca",
-            "mirtrace-stats-mirna-complexity.tsv:md5,27e7eb5cdb0c5fe3b80217383f1f0570",
-            "mirtrace-stats-phred.tsv:md5,2b34bed301cb94ff1d24e08a503b92ee",
-            "mirtrace-stats-qcstatus.tsv:md5,212b57cf93930422c2a0119dc5959b1d",
-            "mirtrace-stats-rnatype.tsv:md5,eb2d397090cd2c511590ee53470033a5"
+            "mirtrace-stats-length.tsv:md5,7851e4348e110b2bfd5eaead9902ec64",
+            "mirtrace-stats-mirna-complexity.tsv:md5,d8ce006e5542e8d864851166f00113bd",
+            "mirtrace-stats-phred.tsv:md5,826cd9f71188a83e8cddac11c1038c0c",
+            "mirtrace-stats-qcstatus.tsv:md5,b9e2bcb0d3acc418c87236ec9115a740",
+            "mirtrace-stats-rnatype.tsv:md5,9737c99c8002777ba7fc6d4deeaff23b"
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2024-09-11T15:16:30.896336965"
+        "timestamp": "2025-12-10T01:01:32.847311849"
     },
     "mirna_quant_bam": {
         "content": [
@@ -95,40 +95,40 @@
                     "blat": "39x1"
                 },
                 "BOWTIE2_ALIGN_CDNA": {
-                    "bowtie2": "2.5.2",
-                    "samtools": 1.18,
-                    "pigz": 2.6
+                    "bowtie2": "2.5.4",
+                    "samtools": 1.21,
+                    "pigz": 2.8
                 },
                 "BOWTIE2_ALIGN_NCRNA": {
-                    "bowtie2": "2.5.2",
-                    "samtools": 1.18,
-                    "pigz": 2.6
+                    "bowtie2": "2.5.4",
+                    "samtools": 1.21,
+                    "pigz": 2.8
                 },
                 "BOWTIE2_ALIGN_TRNA": {
-                    "bowtie2": "2.5.2",
-                    "samtools": 1.18,
-                    "pigz": 2.6
+                    "bowtie2": "2.5.4",
+                    "samtools": 1.21,
+                    "pigz": 2.8
                 },
                 "BOWTIE_MAP_HAIRPIN": {
-                    "bowtie": "1.3.0",
-                    "samtools": "1.16.1"
+                    "bowtie": "1.3.1",
+                    "samtools": 1.21
                 },
                 "BOWTIE_MAP_MATURE": {
-                    "bowtie": "1.3.0",
-                    "samtools": "1.16.1"
+                    "bowtie": "1.3.1",
+                    "samtools": 1.21
                 },
                 "BOWTIE_MAP_SEQCLUSTER": {
-                    "bowtie": "1.3.0",
-                    "samtools": "1.16.1"
+                    "bowtie": "1.3.1",
+                    "samtools": 1.21
                 },
                 "CAT_FASTQ": {
-                    "cat": 8.3
+                    "cat": 9.5
                 },
                 "DATATABLE_MERGE": {
                     "r-base": "3.6.2"
                 },
                 "FASTP": {
-                    "fastp": "0.23.4"
+                    "fastp": "1.0.1"
                 },
                 "FILTER_STATS": {
                     "BusyBox": "1.32.1"
@@ -146,19 +146,19 @@
                     "gawk": "5.3.0"
                 },
                 "INDEX_CDNA": {
-                    "bowtie2": "2.5.2"
+                    "bowtie2": "2.5.4"
                 },
                 "INDEX_HAIRPIN": {
-                    "bowtie": "1.3.0"
+                    "bowtie": "1.3.1"
                 },
                 "INDEX_MATURE": {
-                    "bowtie": "1.3.0"
+                    "bowtie": "1.3.1"
                 },
                 "INDEX_NCRNA": {
-                    "bowtie2": "2.5.2"
+                    "bowtie2": "2.5.4"
                 },
                 "INDEX_TRNA": {
-                    "bowtie2": "2.5.2"
+                    "bowtie2": "2.5.4"
                 },
                 "MIRTOP_COUNTS": {
                     "mirtop": "0.4.30"
@@ -194,28 +194,28 @@
                     "vroom": "1.6.5"
                 },
                 "SAMTOOLS_FLAGSTAT": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SAMTOOLS_IDXSTATS": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SAMTOOLS_INDEX": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SAMTOOLS_SORT": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SAMTOOLS_STATS": {
-                    "samtools": 1.21
+                    "samtools": "1.22.1"
                 },
                 "SEQCLUSTER_COLLAPSE": {
                     "seqcluster": "1.2.9"
                 },
                 "SEQKIT_GREP_CDNA": {
-                    "seqkit": "2.8.0"
+                    "seqkit": "2.9.0"
                 },
                 "SEQKIT_GREP_NCRNA": {
-                    "seqkit": "2.8.0"
+                    "seqkit": "2.9.0"
                 },
                 "STATS_GAWK_CDNA": {
                     "gawk": "5.3.0"
@@ -232,10 +232,10 @@
             }
         ],
         "meta": {
-            "nf-test": "0.9.2",
-            "nextflow": "24.10.2"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2025-11-25T20:24:45.343050703"
+        "timestamp": "2025-12-10T01:01:32.663343299"
     },
     "contaminant_filter_filter": {
         "content": [

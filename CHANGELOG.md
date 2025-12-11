@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#515]](https://github.com/nf-core/smrnaseq/pull/515) Template update for nf-core/tools v3.3.1
 - [[#518]](https://github.com/nf-core/smrnaseq/pull/518) Template update for nf-core/tools v3.5.1
 - [[#520]](https://github.com/nf-core/smrnaseq/pull/520) Updated JSON schemas.
+- [[#521]](https://github.com/nf-core/smrnaseq/pull/521) Update nf-core modules and subworkflows.
 
 ## v2.4.0 - 2024-10-14 - Navy Iron Boxer
 
