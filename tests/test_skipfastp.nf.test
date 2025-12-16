@@ -9,8 +9,7 @@ nextflow_pipeline {
 
     def test_scenario = [
         [
-            name: "test_skipfastp",
-            params: []
+            name: "-profile test_skipfastp"
         ]
     ]
 

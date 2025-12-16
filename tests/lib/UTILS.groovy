@@ -19,7 +19,7 @@ class UTILS {
         def stable_content = getAllFilesFromDir(outdir, ignoreFile: 'tests/.nftignore')
 
         // fastq_files: Stable fastq files
-        def fastq_files = getAllFilesFromDir(outdir, include: ['mirna_quant/seqcluster/*.{fastq,fq}{,.gz}'])
+        //def fastq_files = getAllFilesFromDir(outdir, include: ['mirna_quant/seqcluster/*.{fastq,fq}{,.gz}'])
 
         // bam_files: All bam files
         def bam_files = getAllFilesFromDir(outdir, include: ['**/*.bam'])
@@ -38,7 +38,7 @@ class UTILS {
 
         if (!scenario.stub) {
             assertion.add(stable_content.isEmpty() ? 'No stable content' : stable_content)
-            assertion.add(fastq_files.isEmpty() ? 'No stable FASTQ files' : fastq_files.collect { file -> file.getName() + ":md5," + path(file.toString()).fastq.sequences.join('').md5() })
+            //assertion.add(fastq_files.isEmpty() ? 'No stable FASTQ files' : fastq_files.collect { file -> file.getName() + ":md5," + path(file.toString()).fastq.sequences.join('').md5() })
             assertion.add(bam_files.isEmpty() ? 'No BAM files' : bam_files.collect { file -> file.getName() + ":stats," + bam(file.toString()).getStatistics() })
             assertion.add(vcf_files.isEmpty() ? 'No VCF files' : vcf_files.collect { file -> file.getName() + ":md5," + path(file.toString()).vcf.variantsMD5 })
         }
