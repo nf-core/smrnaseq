@@ -9,7 +9,7 @@ nextflow_pipeline {
 
     def test_scenario = [
         [
-            name: "-profile test_mirgened"
+            name: "-profile test_mirgenedb"
         ]
     ]
 
