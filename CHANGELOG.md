@@ -5,10 +5,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.4.1 - 2025-12-19 - Red Zinc Spaniel
 
-- [[#466]](https://github.com/nf-core/smrnaseq/pull/466) - Bump version and release date.
-- [[#469]](https://github.com/nf-core/smrnaseq/pull/469) - Adress issues from review.
-- [[#472]](https://github.com/nf-core/smrnaseq/pull/472) - Template update for nf-core/tools v3.0.1
-- [[#476]](https://github.com/nf-core/smrnaseq/pull/476) - Tiny bugfixes.
 - [[#479]](https://github.com/nf-core/smrnaseq/pull/479) - Fix igenomes_base in nextflow_schema.
 - [[#481]](https://github.com/nf-core/smrnaseq/pull/481) - Fix [MIRTOP_STATS IndexError](https://github.com/nf-core/smrnaseq/issues/477) - Fix mirtop process execution when mirgenedb is used.
 - [[#482]](https://github.com/nf-core/smrnaseq/pull/482) - Update documentation regarding MirgeneDB input files.
