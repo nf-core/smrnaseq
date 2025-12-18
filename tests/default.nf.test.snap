@@ -64,15 +64,15 @@
                     "seqkit": "2.6.1"
                 },
                 "PIVOT_LONGER": {
+                    "optparse": "1.7.5",
                     "r-base": "4.4.2",
-                    "tidyr": "1.3.1",
-                    "optparse": "1.7.5"
+                    "tidyr": "1.3.1"
                 },
                 "PIVOT_WIDER": {
-                    "r-base": "4.4.2",
-                    "tidyr": "1.3.1",
                     "dplyr": "1.1.4",
                     "optparse": "1.7.5",
+                    "r-base": "4.4.2",
+                    "tidyr": "1.3.1",
                     "vroom": "1.6.5"
                 },
                 "SAMTOOLS_FLAGSTAT": {
@@ -541,22 +541,6 @@
                 "Control_N3_mature_hairpin_genome.sorted.flagstat:md5,409b8700bad7ead311184c657d7507c9",
                 "Control_N3_mature_hairpin_genome.sorted.idxstats:md5,addf95ffd01dd67b7cd889f87b5376c4",
                 "Control_N3_mature_hairpin_genome.sorted.stats:md5,4d258a3980a53bccd57bcf24f2087407",
-                "Clone1_N1_mirtop_rawData.tsv:md5,36302566f743d455408f8ca85642fc97",
-                "Clone1_N3_mirtop_rawData.tsv:md5,23465db049fb2420310fb303a6dc5a79",
-                "Clone9_N1_mirtop_rawData.tsv:md5,560c1a09d778260619305fbf8b66fcdc",
-                "Clone9_N2_mirtop_rawData.tsv:md5,57884447b26df8149fdc82a3208563e1",
-                "Clone9_N3_mirtop_rawData.tsv:md5,b31a78884d285cba7a598a4d8939ff85",
-                "Control_N1_mirtop_rawData.tsv:md5,be2e56392cb7ba0d1eddc27a7d75928d",
-                "Control_N2_mirtop_rawData.tsv:md5,b9a8d4deebfb49bf898d04814575e67c",
-                "Control_N3_mirtop_rawData.tsv:md5,b2e80aea4c3d795683b5d8411c5a4f34",
-                "Clone1_N1_mirtop.gff:md5,21abd96456ee1314a5a7bdc0f0beb195",
-                "Clone1_N3_mirtop.gff:md5,9d4c22f502df986e3a077193e0690538",
-                "Clone9_N1_mirtop.gff:md5,a905136482963bcfaeaa1e930dbb9198",
-                "Clone9_N2_mirtop.gff:md5,17dff9471a3efa0790039466d23ece6b",
-                "Clone9_N3_mirtop.gff:md5,5db76c5d2153ea8cc6ecd211b05e2a7f",
-                "Control_N1_mirtop.gff:md5,7b6a9effce24331fc2f347faead15ac0",
-                "Control_N2_mirtop.gff:md5,1f680c42b611affb139b384e97f4eb5a",
-                "Control_N3_mirtop.gff:md5,e23df21d6b44db82331eae9ed8227933",
                 "mirtrace-stats-contamination_basic.tsv:md5,34005177b3038da76236b5d8fb468825",
                 "mirtrace-stats-contamination_detailed.tsv:md5,141f6f46a4f9fcfac91303c125a2fc75",
                 "mirtrace-stats-length.tsv:md5,2cbf0ea9c681da0a2deba47c4dc75bb2",
@@ -646,6 +630,7 @@
                 "fastqc-1_per_sequence_quality_scores_plot.txt:md5,70fb58bb7cc9cb1f233fe8ab9b962e80",
                 "fastqc-1_sequence_counts_plot.txt:md5,4be5a69d331fc98c84296752d44326ed",
                 "fastqc-1_sequence_duplication_levels_plot.txt:md5,cd347a33216c76c05e2b83160b8572cb",
+                "fastqc-1_top_overrepresented_sequences_table.txt:md5,a0f6a70b7acffa16745bd2b58eb2152b",
                 "fastqc-status-check-heatmap.txt:md5,30f55902420433a11971d36956e8576e",
                 "fastqc_adapter_content_plot.txt:md5,86a0f478fd3e690ef5132d08bf4e7625",
                 "fastqc_overrepresented_sequences_plot.txt:md5,c9114495778fc34844065a82254efca5",
@@ -657,6 +642,7 @@
                 "fastqc_sequence_counts_plot.txt:md5,81fa53817d7792203fcf881783106102",
                 "fastqc_sequence_duplication_levels_plot.txt:md5,88b0babe77f623547e8af664791ef2d0",
                 "fastqc_sequence_length_distribution_plot.txt:md5,f1356c87ed134bdde935faf354b7a9a7",
+                "fastqc_top_overrepresented_sequences_table.txt:md5,4eb3d5bf770abb0a399bc5710876407b",
                 "mirtop_mean_read_count_plot.txt:md5,fa4d2c3fe9aac694d2d6d12bf2b844ba",
                 "mirtop_read_count_plot.txt:md5,835d6b70ae9f61a6e3dcbe369611943f",
                 "mirtop_unique_read_count_plot.txt:md5,4fc6b7e4f279b0e79a995279d3576682",
@@ -684,6 +670,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.04.6"
         },
-        "timestamp": "2025-12-10T15:10:25.077616816"
+        "timestamp": "2025-12-16T18:23:20.008558265"
     }
 }

@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#518]](https://github.com/nf-core/smrnaseq/pull/518) Template update for nf-core/tools v3.5.1
 - [[#520]](https://github.com/nf-core/smrnaseq/pull/520) Updated JSON schemas.
 - [[#521]](https://github.com/nf-core/smrnaseq/pull/521) Update nf-core modules and subworkflows.
+- [[#522]](https://github.com/nf-core/smrnaseq/pull/522) Refactor and simplify pipeline test suite.
 
 ## v2.4.0 - 2024-10-14 - Navy Iron Boxer
 
