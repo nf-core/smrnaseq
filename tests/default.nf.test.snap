@@ -94,7 +94,7 @@
                     "seqcluster": "1.2.9"
                 },
                 "Workflow": {
-                    "nf-core/smrnaseq": "v2.4.0"
+                    "nf-core/smrnaseq": "v2.4.1"
                 }
             },
             [
