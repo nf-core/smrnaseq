@@ -1,7 +1,7 @@
 process PARSE_FASTA_MIRNA {
     label 'process_medium'
 
-    conda 'bioconda::seqkit=2.8.2'
+    conda 'bioconda::seqkit=2.6.1'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/seqkit:2.6.1--h9ee0642_0' :
         'biocontainers/seqkit:2.6.1--h9ee0642_0' }"

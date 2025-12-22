@@ -1,7 +1,7 @@
 process DATATABLE_MERGE {
     label 'process_medium'
 
-    conda 'conda-forge::r-data.table=1.12.2'
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
         'https://depot.galaxyproject.org/singularity/r-data.table:1.12.2' :
         'biocontainers/r-data.table:1.12.2' }"
