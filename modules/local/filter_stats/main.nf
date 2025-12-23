@@ -2,10 +2,10 @@ process FILTER_STATS {
     label 'process_medium'
     tag "$meta.id"
 
-    conda 'bowtie2=2.4.5'
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/bowtie2:2.4.5--py39hd2f7db1_2' :
-        'biocontainers/bowtie2:2.4.5--py39hd2f7db1_2' }"
+        'https://depot.galaxyproject.org/singularity/gawk:5.3.0' :
+        'biocontainers/gawk:5.3.0' }"
 
     input:
     tuple val(meta), path(reads), path (stats_files)
@@ -39,7 +39,7 @@ process FILTER_STATS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        BusyBox: \$(busybox | sed -n -E 's/.*v([[:digit:].]+)\\s\\(.*/\\1/p')
+        gawk: \$(awk -Wversion | sed '1!d; s/.*Awk //; s/,.*//')
     END_VERSIONS
     """
 }

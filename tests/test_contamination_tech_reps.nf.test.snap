@@ -46,7 +46,7 @@
                     "fastp": "1.0.1"
                 },
                 "FILTER_STATS": {
-                    "BusyBox": "1.32.1"
+                    "gawk": "5.3.0"
                 },
                 "FORMAT_HAIRPIN": {
                     "fastx_toolkit": "0.0.14"
@@ -426,6 +426,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.04.6"
         },
-        "timestamp": "2025-12-16T22:12:43.115471322"
+        "timestamp": "2025-12-23T00:17:50.317705546"
     }
 }

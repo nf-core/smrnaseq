@@ -3,8 +3,8 @@ process EDGER_QC {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1:f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0' :
-        'biocontainers/mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1:f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0' }"
+        'oras://community.wave.seqera.io/library/bioconductor-edger_bioconductor-limma_r-base_r-data.table_pruned:8f1a97febf73b41c' :
+        'community.wave.seqera.io/library/bioconductor-edger_bioconductor-limma_r-base_r-data.table_pruned:d592e095d0f6a5f0' }"
 
     input:
     path input_files
