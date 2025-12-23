@@ -3,8 +3,8 @@ process DATATABLE_MERGE {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/r-data.table:1.12.2' :
-        'biocontainers/r-data.table:1.12.2' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/bc/bcfd41c6d43be719236b5701a481d72b88fb562731c4afb3b56f43bc40d8ef83/data' :
+        'community.wave.seqera.io/library/r-base_r-data.table:409a65bae991099c' }"
 
     input:
     tuple val(meta), path(mirtop)
