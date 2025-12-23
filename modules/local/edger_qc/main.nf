@@ -3,7 +3,7 @@ process EDGER_QC {
 
     conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'oras://community.wave.seqera.io/library/bioconductor-edger_bioconductor-limma_r-base_r-data.table_pruned:8f1a97febf73b41c' :
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/7b/7b75cd43418d68682b9872aafa0e3ef683cf609af2a70cf33f27a323e2d718c9/data' :
         'community.wave.seqera.io/library/bioconductor-edger_bioconductor-limma_r-base_r-data.table_pruned:d592e095d0f6a5f0' }"
 
     input:
