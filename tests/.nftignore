@@ -27,5 +27,6 @@ mirna_quant/mirtop/export/*_rawData.tsv
 mirna_quant/mirtop/gff/mirtop/*.gff
 mirna_quant/mirtop/joined_samples_mirtop.tsv
 mirtrace/*/*.{html,json}
-umi_dedup/fastq_extracted_umi/*.umi_extract.log
+umi_dedup/bam_deduplicated/*.umi_dedup.sorted.fastq.gz
+umi_dedup/fastq_extracted_umi/*.umi_extract.{fastq.gz,log}
 pipeline_info/*.{html,json,txt,yml}
