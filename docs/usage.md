@@ -87,6 +87,13 @@ The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire r
 > [!NOTE]
 > If your UMI read structure differs, you'll need to specify custom `umitools_bc_pattern` patterns. Ensure that the pattern is set so that only the insert sequence of the RNA molecule remains after extraction. For details, refer to the UMI handling manual or the documentation of the kit you're using for the expected read structure.
 
+> [!WARNING]
+> Some UMI kits (e.g. QIAseq) locate the UMI relative to a kit-specific adapter/anchor sequence (e.g. AACTGTAGGCACCATCAAT). In nf-core/smrnaseq v2.4.1, `fastp` trims the protocol adapter sequence before `umi_tools extract`. If your `umitools_bc_pattern` requires the adapter/anchor sequence, the regex will not match (often resulting in an empty FASTQ and/or “regex does not match” messages).
+>
+> This warning is based on the execution order (`fastp` → `umicollapse` → `umi_tools extract`) and the resulting empty output when the adapter is trimmed before regex-based UMI extraction.
+>
+> In these cases where UMI trimming relies on the adapter sequence for the location of the UMIs, you can disable fastp trimming for the run (e.g. `--skip_fastp`).
+
 ## Samplesheet input
 
 You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 2 columns ("sample" and "fastq_1"), and a header row as shown in the examples below.
