@@ -2,10 +2,10 @@ process FILTER_STATS {
     label 'process_medium'
     tag "$meta.id"
 
-    conda 'bowtie2=2.4.5'
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/bowtie2:2.4.5--py39hd2f7db1_2' :
-        'biocontainers/bowtie2:2.4.5--py39hd2f7db1_2' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/6b/6b244720eef0bd28a41d4f26e33d3800e75d9fc87f080e81d42d5d676b4960dc/data' :
+        'community.wave.seqera.io/library/gawk:5.3.0--180f75ae8b0ce739' }"
 
     input:
     tuple val(meta), path(reads), path (stats_files)
@@ -39,7 +39,9 @@ process FILTER_STATS {
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        BusyBox: \$(busybox | sed -n -E 's/.*v([[:digit:].]+)\\s\\(.*/\\1/p')
+        gawk: \$(awk -Wversion | sed '1!d; s/.*Awk //; s/,.*//')
+        gzip: \$(gzip --version | head -1 | cut -d ' ' -f 2)
+        GNU coreutils: \$(echo \$(cat --version 2>&1) | sed 's/^.*coreutils) //; s/ .*\$//')
     END_VERSIONS
     """
 }

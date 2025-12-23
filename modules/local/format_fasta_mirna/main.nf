@@ -6,8 +6,8 @@ process FORMAT_FASTA_MIRNA {
 
     conda 'bioconda::fastx_toolkit=0.0.14'
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/fastx_toolkit:0.0.14--hdbdd923_11' :
-        'biocontainers/fastx_toolkit:0.0.14--hdbdd923_11' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/1e/1e4dce7124230c2e3aa2782710246b68b7e5606a1fdafd29fe9d4aaffa2190a9/data' :
+        'community.wave.seqera.io/library/fastx_toolkit:0.0.14--2d5a3f28610ed585' }"
 
     input:
     tuple val(meta2), path(fasta)

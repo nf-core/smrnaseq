@@ -14,14 +14,14 @@
                 "mature_unmapped_read_counts.txt:md5,0e129ffe42aa32f96250a5071d3a7649"
             ],
             [
-                "versions.yml:md5,2e5b1dd3ed5befd1d4c9812a3fcb768a"
+                "versions.yml:md5,8b8e7ca3ee46446e0ecec3a0ea3a33aa"
             ]
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2024-09-30T19:57:28.863043452"
+        "timestamp": "2025-12-23T02:30:58.490963416"
     },
     "Should produce MDS plot": {
         "content": [
@@ -44,14 +44,14 @@
                 "mature_unmapped_read_counts.txt:md5,138cf290420edbf9721b9db861204c9c"
             ],
             [
-                "versions.yml:md5,2e5b1dd3ed5befd1d4c9812a3fcb768a"
+                "versions.yml:md5,8b8e7ca3ee46446e0ecec3a0ea3a33aa"
             ],
             true
         ],
         "meta": {
-            "nf-test": "0.9.0",
-            "nextflow": "24.10.2"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2025-11-24T04:42:47.54205205"
+        "timestamp": "2025-12-23T02:31:46.779238243"
     }
 }

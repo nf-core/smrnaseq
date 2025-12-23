@@ -74,11 +74,9 @@ jobs:
         # Exclude conda and singularity on dev
         exclude:
           - isMain: false
-            profile: "conda"
-          - isMain: false
             profile: "singularity"
         NXF_VER:
-          - "25.04.0"
+          - "25.04.2"
           - "latest-everything"
     env:
       NXF_ANSI_LOG: false

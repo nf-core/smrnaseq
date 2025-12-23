@@ -1,10 +1,10 @@
 process EDGER_QC {
     label 'process_medium'
 
-    conda 'bioconda::bioconductor-limma=3.58.1 bioconda::bioconductor-edger=4.0.16 conda-forge::r-data.table=1.14.10 conda-forge::r-gplots=3.1.3 conda-forge::r-statmod=1.5.0'
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1:f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0' :
-        'biocontainers/mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1:f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/7b/7b75cd43418d68682b9872aafa0e3ef683cf609af2a70cf33f27a323e2d718c9/data' :
+        'community.wave.seqera.io/library/bioconductor-edger_bioconductor-limma_r-base_r-data.table_pruned:d592e095d0f6a5f0' }"
 
     input:
     path input_files

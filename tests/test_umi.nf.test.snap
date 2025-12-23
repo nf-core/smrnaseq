@@ -607,10 +607,6 @@
                 "samtools_alignment_plot.txt:md5,8072813ffbde66e72343645cecd051bc",
                 "umicollapse_deduplication_barplot.txt:md5,e245b25bd92d45ec05d572701a1b58ed",
                 "umicollapse_stats_violin.txt:md5,d43e87099866193975a421f3ab23567f",
-                "SRX8195117_SRR11631013.umi_dedup.sorted.fastq.gz:md5,3cfd52502228fa884033ec3c73677a2d",
-                "SRX8195118_SRR11631014.umi_dedup.sorted.fastq.gz:md5,020bccb6fb52b3c184b24ffa34aa7ca2",
-                "SRX8195117_SRR11631013.umi_extract.fastq.gz:md5,5eb532c03db823a914e00b110809c383",
-                "SRX8195118_SRR11631014.umi_extract.fastq.gz:md5,2bdf51a666670064f2dfa8a41cb61e60",
                 "genome.1.ebwt:md5,1bfbf95848b5a2e8a786d0a2c1054bbb",
                 "genome.2.ebwt:md5,8f007efb2d23e46035cc47340c4d981e",
                 "genome.3.ebwt:md5,caf97e67055e1b465e933214d0168e68",
@@ -640,6 +636,6 @@
             "nf-test": "0.9.3",
             "nextflow": "25.04.6"
         },
-        "timestamp": "2025-12-16T14:43:20.06850006"
+        "timestamp": "2025-12-23T15:02:43.382116559"
     }
 }

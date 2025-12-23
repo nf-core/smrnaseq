@@ -3,7 +3,9 @@ process PIVOT_WIDER {
     label 'process_high'
 
     conda "${moduleDir}/environment.yml"
-    container "community.wave.seqera.io/library/r-optparse_r-tidyverse_r-vroom:3cbb224fea84a0e1"
+    container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/f0/f096fe9683b943ce1869bf984e9d240a364bc73ae5647abeae4ff0c3b26ef011/data' :
+        'community.wave.seqera.io/library/r-base_r-dplyr_r-optparse_r-tidyr_r-vroom:c983cf5da1eb6e00' }"
 
     input:
     tuple val(meta), path(csvs)
