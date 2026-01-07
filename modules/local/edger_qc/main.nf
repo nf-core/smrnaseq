@@ -1,10 +1,10 @@
 process EDGER_QC {
     label 'process_medium'
 
-    conda 'bioconda::bioconductor-limma=3.58.1 bioconda::bioconductor-edger=4.0.16 conda-forge::r-data.table=1.14.10 conda-forge::r-gplots=3.1.3 conda-forge::r-statmod=1.5.0'
+    conda "${moduleDir}/environment.yml"
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?
-        'https://depot.galaxyproject.org/singularity/mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1:f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0' :
-        'biocontainers/mulled-v2-419bd7f10b2b902489ac63bbaafc7db76f8e0ae1:f5ff7de321749bc7ae12f7e79a4b581497f4c8ce-0' }"
+        'https://community-cr-prod.seqera.io/docker/registry/v2/blobs/sha256/7b/7b75cd43418d68682b9872aafa0e3ef683cf609af2a70cf33f27a323e2d718c9/data' :
+        'community.wave.seqera.io/library/bioconductor-edger_bioconductor-limma_r-base_r-data.table_pruned:d592e095d0f6a5f0' }"
 
     input:
     path input_files
@@ -32,4 +32,42 @@ process EDGER_QC {
     END_VERSIONS
     """
 
+    stub:
+    """
+    touch "mature_unmapped_read_counts.txt"
+    touch "hairpin_unmapped_read_counts.txt"
+    touch "mature_counts.txt"
+    touch "hairpin_counts.txt"
+    touch "mature_logtpm.txt"
+    touch "hairpin_logtpm.txt"
+    touch "mature_logtpm.csv"
+    touch "hairpin_logtpm.csv"
+    touch "mature_normalized_CPM.txt.csv"
+    touch "hairpin_normalized_CPM.txt.csv"
+    touch "mature_CPM_heatmap.pdf"
+    touch "hairpin_CPM_heatmap.pdf"
+    touch "mature_edgeR_MDS_plot.pdf"
+    touch "hairpin_edgeR_MDS_plot.pdf"
+    touch "mature_edgeR_MDS_distance_matrix.txt"
+    touch "hairpin_edgeR_MDS_distance_matrix.txt"
+    touch "mature_edgeR_MDS_plot_coordinates.txt"
+    touch "hairpin_edgeR_MDS_plot_coordinates.txt"
+    touch "mature_log2CPM_sample_distances_heatmap.pdf"
+    touch "hairpin_log2CPM_sample_distances_heatmap.pdf"
+    touch "mature_log2CPM_sample_distances_dendrogram.pdf"
+    touch "hairpin_log2CPM_sample_distances_dendrogram.pdf"
+    touch "mature_log2CPM_sample_distances.txt"
+    touch "hairpin_log2CPM_sample_distances.txt"
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
+        limma: \$(Rscript -e "library(limma); cat(as.character(packageVersion('limma')))")
+        edgeR: \$(Rscript -e "library(edgeR); cat(as.character(packageVersion('edgeR')))")
+        data.table: \$(Rscript -e "library(data.table); cat(as.character(packageVersion('data.table')))")
+        gplots: \$(Rscript -e "library(gplots); cat(as.character(packageVersion('gplots')))")
+        methods: \$(Rscript -e "library(methods); cat(as.character(packageVersion('methods')))")
+        statmod: \$(Rscript -e "library(statmod); cat(as.character(packageVersion('statmod')))")
+    END_VERSIONS
+    """
 }

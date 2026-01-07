@@ -14,21 +14,21 @@
                 "mature_unmapped_read_counts.txt:md5,0e129ffe42aa32f96250a5071d3a7649"
             ],
             [
-                "versions.yml:md5,2e5b1dd3ed5befd1d4c9812a3fcb768a"
+                "versions.yml:md5,8b8e7ca3ee46446e0ecec3a0ea3a33aa"
             ]
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2024-09-30T19:57:28.863043452"
+        "timestamp": "2025-12-23T02:30:58.490963416"
     },
     "Should produce MDS plot": {
         "content": [
             [
                 "hairpin_counts.csv:md5,4b0fa0e52a7b8b40bdc5930378430136",
                 "hairpin_edgeR_MDS_distance_matrix.txt:md5,f0eb20be2b7bae7775ef65e03139f5a9",
-                "hairpin_edgeR_MDS_plot_coordinates.txt:md5,2f1f865b11c4ee5253f80ebe9a1914ee",
+                "hairpin_edgeR_MDS_plot_coordinates.txt:md5,4d86b9a7a42f7b44ed7e56abc4db8649",
                 "hairpin_log2CPM_sample_distances.txt:md5,20592bfa42e23827dfac02eab1e033ff",
                 "hairpin_logtpm.csv:md5,35a5449d3468995e8010907105922898",
                 "hairpin_logtpm.txt:md5,1de707003b6ed2c38372670d69eaf5fb",
@@ -36,7 +36,7 @@
                 "hairpin_unmapped_read_counts.txt:md5,c587147fb1a5b6681c17eff2d4859022",
                 "mature_counts.csv:md5,f961a9d6749dbf0c84dfb8976e0b6516",
                 "mature_edgeR_MDS_distance_matrix.txt:md5,bfbf327feedbc2e7bbbd57020ae0594c",
-                "mature_edgeR_MDS_plot_coordinates.txt:md5,b89854153c61a348929ea3901a61bd56",
+                "mature_edgeR_MDS_plot_coordinates.txt:md5,b329d9712be8e70b92a4dd2f4aed5390",
                 "mature_log2CPM_sample_distances.txt:md5,b4ed17084de4711e7fd4a12d221d65ec",
                 "mature_logtpm.csv:md5,850a8ed0e4559d338578f81dc849acf5",
                 "mature_logtpm.txt:md5,9087155e2f4bc7f85ced8ab8c02c77e6",
@@ -44,14 +44,14 @@
                 "mature_unmapped_read_counts.txt:md5,138cf290420edbf9721b9db861204c9c"
             ],
             [
-                "versions.yml:md5,2e5b1dd3ed5befd1d4c9812a3fcb768a"
+                "versions.yml:md5,8b8e7ca3ee46446e0ecec3a0ea3a33aa"
             ],
             true
         ],
         "meta": {
-            "nf-test": "0.8.4",
-            "nextflow": "24.04.4"
+            "nf-test": "0.9.3",
+            "nextflow": "25.04.6"
         },
-        "timestamp": "2024-09-30T19:59:15.428541578"
+        "timestamp": "2025-12-23T02:31:46.779238243"
     }
 }

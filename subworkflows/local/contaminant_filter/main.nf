@@ -39,7 +39,7 @@ include { GAWK as STATS_GAWK_PIRNA               } from '../../../modules/nf-cor
 include { GAWK as STATS_GAWK_OTHER               } from '../../../modules/nf-core/gawk/main'
 
 
-include { FILTER_STATS } from '../../../modules/local/filter_stats'
+include { FILTER_STATS } from '../../../modules/local/filter_stats/main'
 
 workflow CONTAMINANT_FILTER {
     take:
@@ -54,9 +54,9 @@ workflow CONTAMINANT_FILTER {
 
     main:
 
-    ch_versions     = Channel.empty()
-    ch_filter_stats = Channel.empty()
-    ch_mqc_results  = Channel.empty()
+    ch_versions     = channel.empty()
+    ch_filter_stats = channel.empty()
+    ch_mqc_results  = channel.empty()
 
     ch_reads_for_mirna.set { rrna_reads }
 
@@ -69,20 +69,19 @@ workflow CONTAMINANT_FILTER {
         ch_reads_for_mirna = ch_reads_for_mirna.map{meta, fastq -> return [[id: meta.id, contaminant: "rRNA", single_end: meta.single_end], fastq]}
 
         // Map which reads are rRNAs
-        BOWTIE2_ALIGN_RRNA(ch_reads_for_mirna, INDEX_RRNA.out.index.first(), [[],[]], true, false)
+        BOWTIE2_ALIGN_RRNA(ch_reads_for_mirna, INDEX_RRNA.out.index, [[],[]], true, false)
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_RRNA.out.versions)
 
         // Obtain how many hits were contaminants
         ch_bowtie = BOWTIE2_ALIGN_RRNA.out.log
 
-        STATS_GAWK_RRNA(ch_bowtie, [])
+        STATS_GAWK_RRNA(ch_bowtie, [], false)
         ch_versions = ch_versions.mix(STATS_GAWK_RRNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
                 .mix(STATS_GAWK_RRNA.out.output
-                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]}
-                        .ifEmpty(null))
+                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]})
 
         // Assign clean reads to new channel
         rrna_reads = BOWTIE2_ALIGN_RRNA.out.fastq
@@ -99,20 +98,19 @@ workflow CONTAMINANT_FILTER {
         rrna_reads = rrna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "tRNA", single_end:meta.single_end], fastq]}
 
         // Map which reads are tRNAs
-        BOWTIE2_ALIGN_TRNA(rrna_reads, INDEX_TRNA.out.index.first(), [[],[]], true, false)
+        BOWTIE2_ALIGN_TRNA(rrna_reads, INDEX_TRNA.out.index, [[],[]], true, false)
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_TRNA.out.versions)
 
         // Obtain how many hits were contaminants
         ch_bowtie = BOWTIE2_ALIGN_TRNA.out.log
 
-        STATS_GAWK_TRNA(ch_bowtie, [])
+        STATS_GAWK_TRNA(ch_bowtie, [], false)
         ch_versions = ch_versions.mix(STATS_GAWK_TRNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
                 .mix(STATS_GAWK_TRNA.out.output
-                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]}
-                        .ifEmpty(null))
+                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]})
 
         // Assign clean reads to new channel
         trna_reads = BOWTIE2_ALIGN_TRNA.out.fastq
@@ -121,7 +119,7 @@ workflow CONTAMINANT_FILTER {
     cdna_reads = trna_reads
 
     // Define how to filter significant BLAT hits
-    ch_program = Channel.value('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
+    ch_program = channel.value('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
 
     if (params.cdna) {
         // Search which hairpin miRNAs are present in the cDNA data
@@ -129,7 +127,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BLAT_CDNA.out.versions)
 
         // Extract the significant hits
-        GAWK_CDNA(BLAT_CDNA.out.psl, ch_program)
+        GAWK_CDNA(BLAT_CDNA.out.psl, ch_program, false)
         ch_versions = ch_versions.mix(GAWK_CDNA.out.versions)
 
         // Get only unique elements of the list
@@ -155,14 +153,13 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_CDNA.out.versions)
 
         // Obtain how many hits were contaminants
-        STATS_GAWK_CDNA(BOWTIE2_ALIGN_CDNA.out.log, [])
+        STATS_GAWK_CDNA(BOWTIE2_ALIGN_CDNA.out.log, [], false)
         ch_versions = ch_versions.mix(STATS_GAWK_CDNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
                 .mix(STATS_GAWK_CDNA.out.output
-                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]}
-                        .ifEmpty(null))
+                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]})
 
         // Assign clean reads to new channel
         cdna_reads = BOWTIE2_ALIGN_CDNA.out.fastq
@@ -176,7 +173,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BLAT_NCRNA.out.versions)
 
         // Extract the significant hits
-        GAWK_NCRNA(BLAT_NCRNA.out.psl, ch_program)
+        GAWK_NCRNA(BLAT_NCRNA.out.psl, ch_program, false)
         ch_versions = ch_versions.mix(GAWK_NCRNA.out.versions)
 
         // Get only unique elements of the list
@@ -202,14 +199,13 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_NCRNA.out.versions)
 
         // Obtain how many hits were contaminants
-        STATS_GAWK_NCRNA(BOWTIE2_ALIGN_NCRNA.out.log, [])
+        STATS_GAWK_NCRNA(BOWTIE2_ALIGN_NCRNA.out.log, [], false)
         ch_versions = ch_versions.mix(STATS_GAWK_NCRNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
                 .mix(STATS_GAWK_NCRNA.out.output
-                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]}
-                        .ifEmpty(null))
+                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]})
 
         // Assign clean reads to new channel
         ncrna_reads = BOWTIE2_ALIGN_NCRNA.out.fastq
@@ -223,7 +219,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BLAT_PIRNA.out.versions)
 
         // Extract the significant hits
-        GAWK_PIRNA(BLAT_PIRNA.out.psl, ch_program)
+        GAWK_PIRNA(BLAT_PIRNA.out.psl, ch_program, false)
         ch_versions = ch_versions.mix(GAWK_PIRNA.out.versions)
 
         // Get only unique elements of the list
@@ -249,14 +245,13 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_PIRNA.out.versions)
 
         // Obtain how many hits were contaminants
-        STATS_GAWK_PIRNA(BOWTIE2_ALIGN_PIRNA.out.log, [])
+        STATS_GAWK_PIRNA(BOWTIE2_ALIGN_PIRNA.out.log, [], false)
         ch_versions = ch_versions.mix(STATS_GAWK_PIRNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
                 .mix(STATS_GAWK_PIRNA.out.output
-                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]}
-                        .ifEmpty(null))
+                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]})
 
         // Assign clean reads to new channel
         pirna_reads = BOWTIE2_ALIGN_PIRNA.out.fastq
@@ -270,7 +265,7 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BLAT_OTHER.out.versions)
 
         // Extract the significant hits
-        GAWK_OTHER(BLAT_OTHER.out.psl, ch_program)
+        GAWK_OTHER(BLAT_OTHER.out.psl, ch_program, false)
         ch_versions = ch_versions.mix(GAWK_OTHER.out.versions)
 
         // Get only unique elements of the list
@@ -293,14 +288,13 @@ workflow CONTAMINANT_FILTER {
         ch_versions = ch_versions.mix(BOWTIE2_ALIGN_OTHER.out.versions)
 
         // Obtain how many hits were contaminants
-        STATS_GAWK_OTHER(BOWTIE2_ALIGN_OTHER.out.log, [])
+        STATS_GAWK_OTHER(BOWTIE2_ALIGN_OTHER.out.log, [], false)
         ch_versions = ch_versions.mix(STATS_GAWK_OTHER.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
                 .mix(STATS_GAWK_OTHER.out.output
-                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]}
-                        .ifEmpty(null))
+                        .map{meta, stats -> return [[id:meta.id, single_end:meta.single_end], stats]})
 
         // Assign clean reads to new channel
         other_cont_reads = BOWTIE2_ALIGN_OTHER.out.fastq
@@ -316,9 +310,10 @@ workflow CONTAMINANT_FILTER {
     // Filter all contaminant stats and create MultiQC file
     FILTER_STATS ( ch_reads_contaminants )
     FILTER_STATS.out.stats.dump(tag:"FILTER_STATS.out.stats")
+    ch_versions = ch_versions.mix(FILTER_STATS.out.versions)
 
     emit:
-    filtered_reads  = other_cont_reads                           // channel: [ val(meta), path(fastq) ]
-    filter_stats    = FILTER_STATS.out.stats                     // channel: [  path(stats) ]
-    versions        = ch_versions.mix(FILTER_STATS.out.versions) // channel: [ versions.yml ]
+    filtered_reads  = other_cont_reads       // channel: [ val(meta), path(fastq) ]
+    filter_stats    = FILTER_STATS.out.stats // channel: [  path(stats) ]
+    versions        = ch_versions            // channel: [ versions.yml ]
 }

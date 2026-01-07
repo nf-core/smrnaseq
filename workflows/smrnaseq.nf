@@ -19,8 +19,8 @@ include { paramsSummaryMultiqc             } from '../subworkflows/nf-core/utils
 include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 // local subworkflows
 include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/main'
-include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant'
-include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant'
+include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant/main'
+include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant/main'
 include { methodsDescriptionText           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 // plugins
 include { paramsSummaryMap                 } from 'plugin/nf-schema'
@@ -31,10 +31,10 @@ include { paramsSummaryMap                 } from 'plugin/nf-schema'
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-ch_multiqc_config                     = Channel.fromPath("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
-ch_multiqc_custom_config              = params.multiqc_config ? Channel.fromPath( params.multiqc_config, checkIfExists: true ) : Channel.empty()
-ch_multiqc_logo                       = params.multiqc_logo   ? Channel.fromPath( params.multiqc_logo, checkIfExists: true ) : Channel.empty()
-ch_fastp_adapters                     = Channel.fromPath(params.fastp_known_mirna_adapters, checkIfExists: true).collect() // collect to consume for all incoming samples to FASTP
+ch_multiqc_config                     = channel.fromPath("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
+ch_multiqc_custom_config              = params.multiqc_config ? channel.fromPath( params.multiqc_config, checkIfExists: true ) : channel.empty()
+ch_multiqc_logo                       = params.multiqc_logo   ? channel.fromPath( params.multiqc_logo, checkIfExists: true ) : channel.empty()
+ch_fastp_adapters                     = channel.fromPath(params.fastp_known_mirna_adapters, checkIfExists: true).collect() // collect to consume for all incoming samples to FASTP
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -60,13 +60,14 @@ workflow NFCORE_SMRNASEQ {
     ch_ncrna               // channel: [ val(meta), path(fasta) ]
     ch_pirna               // channel: [ val(meta), path(fasta) ]
     ch_other_contamination // channel: [ val(meta), path(fasta) ]
-    ch_versions            // channel: [ path(versions.yml) ]
     ch_samplesheet         // channel: sample fastqs parsed from --input
     ch_three_prime_adapter // channel: [ val(string) ]
     ch_phred_offset        // channel: [ val(string) ]
 
     main:
-    ch_multiqc_files = Channel.empty()
+
+    ch_versions = channel.empty()
+    ch_multiqc_files = channel.empty()
     //
     // Create separate channels for samples that have single/multiple FastQ files to merge
     //
@@ -94,6 +95,12 @@ workflow NFCORE_SMRNASEQ {
         exit 1, "At least one of skip_fastp or skip_fastqc must be false"
     }
 
+    if (params.with_umi) {
+        ch_cat_fastq = ch_cat_fastq.map { meta, reads -> [meta, reads, []] }
+    } else {
+        ch_cat_fastq = ch_cat_fastq.combine(ch_mirna_adapters)
+    }
+
     FASTQ_FASTQC_UMITOOLS_FASTP (
         ch_cat_fastq,
         params.skip_fastqc,
@@ -101,7 +108,6 @@ workflow NFCORE_SMRNASEQ {
         params.skip_umi_extract_before_dedup,
         params.umi_discard_read,
         params.skip_fastp,
-        ch_mirna_adapters,
         params.save_trimmed_fail,
         params.save_merged,
         params.min_trimmed_reads
@@ -112,8 +118,7 @@ workflow NFCORE_SMRNASEQ {
     // Trim 3' end nucleotides after adapter is removed, otherwise they are not really trimmed
     if (params.three_prime_clip_r1){
         FASTP3(
-            ch_reads_for_mirna,
-            [],
+            ch_reads_for_mirna.map { meta, reads -> [meta, reads, []] },
             false,
             false,
             false
@@ -126,7 +131,7 @@ workflow NFCORE_SMRNASEQ {
     // consisting of sequence + common sequence "miRNA adapter" + UMI
     // once collapsing happened, we will use umitools extract to get rid of the common miRNA sequence + the UMI to have only plain collapsed reads without any other clutter
     if (params.with_umi) {
-        ch_fastq = Channel.value('fastq')
+        ch_fastq = channel.value('fastq')
         ch_input_for_collapse = ch_reads_for_mirna.map{ meta, reads -> [meta, reads, []]} //Needs to be done to add a []
         UMICOLLAPSE_FASTQ(ch_input_for_collapse, ch_fastq)
         ch_versions = ch_versions.mix(UMICOLLAPSE_FASTQ.out.versions)
@@ -134,8 +139,7 @@ workflow NFCORE_SMRNASEQ {
 
         // Filter out sequences smaller than params.fastp_min_length
         FASTP_LENGTH_FILTER (
-            UMITOOLS_EXTRACT.out.reads,
-            ch_mirna_adapters,
+            UMITOOLS_EXTRACT.out.reads.map {meta, reads -> [meta, reads, []] },
             false,
             params.save_trimmed_fail,
             params.save_merged
@@ -178,7 +182,7 @@ workflow NFCORE_SMRNASEQ {
     //
     // SUBWORKFLOW: remove contaminants from reads
     //
-    contamination_stats = Channel.empty()
+    contamination_stats = channel.empty()
     if (params.filter_contamination){
         CONTAMINANT_FILTER (
             ch_reference_hairpin,
@@ -208,7 +212,7 @@ workflow NFCORE_SMRNASEQ {
     //
     // GENOME
     //
-    genome_stats = Channel.empty()
+    genome_stats = channel.empty()
     if (has_fasta){
         GENOME_QUANT (
             ch_bowtie_index,
@@ -242,45 +246,59 @@ workflow NFCORE_SMRNASEQ {
     //
     // Collate and save software versions
     //
-    softwareVersionsToYAML(ch_versions)
+    def topic_versions = channel.topic("versions")
+        .distinct()
+        .branch { entry ->
+            versions_file: entry instanceof Path
+            versions_tuple: true
+        }
+
+    def topic_versions_string = topic_versions.versions_tuple
+        .map { process, tool, version ->
+            [ process[process.lastIndexOf(':')+1..-1], "  ${tool}: ${version}" ]
+        }
+        .groupTuple(by:0)
+        .map { process, tool_versions ->
+            tool_versions.unique().sort()
+            "${process}:\n${tool_versions.join('\n')}"
+        }
+
+    softwareVersionsToYAML(ch_versions.mix(topic_versions.versions_file))
+        .mix(topic_versions_string)
         .collectFile(
             storeDir: "${params.outdir}/pipeline_info",
-            name: 'nf_core_'  + 'pipeline_software_' +  'mqc_'  + 'versions.yml',
+            name: 'nf_core_'  +  'smrnaseq_software_'  + 'mqc_'  + 'versions.yml',
             sort: true,
             newLine: true
         ).set { ch_collated_versions }
-        // .collectFile(storeDir: "${params.outdir}/pipeline_info", name: 'nf_core_smrnaseq_software_mqc_versions.yml', sort: true, newLine: true)
-        // .set {ch_collated_versions}
 
 
     //
     // MODULE: MultiQC
     //
-    ch_multiqc_report = Channel.empty()
+    ch_multiqc_report = channel.empty()
     if (!params.skip_multiqc) {
-        // summary_params           = paramsSummaryMap(workflow, parameters_schema: "nextflow_schema.json")
-        // ch_workflow_summary = Channel.value(paramsSummaryMultiqc(summary_params))
-
-        ch_multiqc_config        = Channel.fromPath(
+        ch_multiqc_config        = channel.fromPath(
             "$projectDir/assets/multiqc_config.yml", checkIfExists: true)
         ch_multiqc_custom_config = params.multiqc_config ?
-            Channel.fromPath(params.multiqc_config, checkIfExists: true) :
-            Channel.empty()
+            channel.fromPath(params.multiqc_config, checkIfExists: true) :
+            channel.empty()
         ch_multiqc_logo          = params.multiqc_logo ?
-            Channel.fromPath(params.multiqc_logo, checkIfExists: true) :
-            Channel.empty()
+            channel.fromPath(params.multiqc_logo, checkIfExists: true) :
+            channel.empty()
 
         summary_params      = paramsSummaryMap(
             workflow, parameters_schema: "nextflow_schema.json")
-        ch_workflow_summary = Channel.value(paramsSummaryMultiqc(summary_params))
-
+        ch_workflow_summary = channel.value(paramsSummaryMultiqc(summary_params))
+        ch_multiqc_files = ch_multiqc_files.mix(
+            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
         ch_multiqc_custom_methods_description = params.multiqc_methods_description ?
-            Channel.fromPath(params.multiqc_methods_description, checkIfExists: true) :
-            Channel.fromPath("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
-        // ch_methods_description                = Channel.value(
+            file(params.multiqc_methods_description, checkIfExists: true) :
+            file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
+        // ch_methods_description                = channel.value(
         //     methodsDescriptionText(ch_multiqc_custom_methods_description))
 
-        ch_multiqc_files = Channel.empty()
+        ch_multiqc_files = channel.empty()
         ch_multiqc_files = ch_multiqc_files.mix(
             ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
         ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)

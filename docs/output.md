@@ -117,7 +117,6 @@ MultiQC reports the number of reads that were removed by each of the contaminant
   - `genome_quant/bam/.*bam`: The aligned BAM file results.
   - `genome_quant/bam/.*unmapped.fastq.gz`: Unmapped reads results.
 - `mirna_quant/`
-
   - `mirna_quant/bam/{hairpin,mature,seqcluster}/.*bam`: The aligned BAM file results against hairpin, mature or seqcluster.
   - `mirna_quant/bam/{hairpin,mature,seqcluster}/.*unmapped.fastq.gz`: Unmapped reads for hairpin, mature or seqcluster.
 

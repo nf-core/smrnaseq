@@ -52,7 +52,6 @@
             "title": "UMI options",
             "type": "object",
             "description": "Options for processing reads with unique molecular identifiers",
-            "default": "",
             "properties": {
                 "with_umi": {
                     "type": "boolean",
@@ -113,7 +112,8 @@
                 "mirgenedb": {
                     "type": "boolean",
                     "description": "Boolean whether MirGeneDB should be used instead of miRBase",
-                    "help_text": "This allows you to use MirGeneDB instead of miRBase as the database. \n Note that you will need to set the additional flags `--mirgenedb_species`, `--mirgenedb_gff`, `--mirgenedb_mature` and `--mirgenedb_hairpin`"
+                    "help_text": "This allows you to use MirGeneDB instead of miRBase as the database. \n Note that you will need to set the additional flags `--mirgenedb_species`, `--mirgenedb_gff`, `--mirgenedb_mature` and `--mirgenedb_hairpin`",
+                    "fa_icon": "fas fa-database"
                 },
                 "mirtrace_species": {
                     "type": "string",
@@ -124,7 +124,8 @@
                 "mirgenedb_species": {
                     "type": "string",
                     "description": "Species of MirGeneDB.",
-                    "help_text": "This replaces the value of `--mirtrace_species` if `--mirgenedb` is used. \n Note the difference in case for species names used in MirGeneDB and miRBase. See https://www.mirgenedb.org/browse for more information."
+                    "help_text": "This replaces the value of `--mirtrace_species` if `--mirgenedb` is used. \n Note the difference in case for species names used in MirGeneDB and miRBase. See https://www.mirgenedb.org/browse for more information.",
+                    "fa_icon": "fas fa-microscope"
                 },
                 "fasta": {
                     "type": "string",
@@ -133,7 +134,7 @@
                     "mimetype": "text/plain",
                     "pattern": "^\\S+\\.fn?a(sta)?(\\.gz)?$",
                     "description": "Path to FASTA genome file.",
-                    "help_text": "This parameter is *mandatory* if `--genome` is not specified. If you don't have a BWA index available this will be generated for you automatically. Combine with `--save_reference` to save BWA index for future runs.",
+                    "help_text": "FASTA file used for genome quantification and identification of novel miRNAs.  If you don't have a Bowtie1 index available, this will be generated for you automatically. Combine with `--save_reference` to save Bowtie1 index for future runs.",
                     "fa_icon": "far fa-file-code"
                 },
                 "mirna_gtf": {
@@ -145,7 +146,8 @@
                 "mirgenedb_gff": {
                     "type": "string",
                     "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
-                    "help_text": "MirGeneDB `.gff3` file, typically downloaded from [`https://mirgenedb.org/download`]. This replaces the value of --mirna_gff if --mirgenedb is used."
+                    "help_text": "MirGeneDB `.gff3` file, typically downloaded from [`https://mirgenedb.org/download`]. This replaces the value of --mirna_gff if --mirgenedb is used.",
+                    "fa_icon": "fas fa-address-book"
                 },
                 "mature": {
                     "type": "string",
@@ -157,7 +159,8 @@
                 "mirgenedb_mature": {
                     "type": "string",
                     "description": "Path to FASTA file with MirGeneDB mature miRNAs.",
-                    "help_text": "This file needs to be downloaded from [`https://mirgenedb.org/download`]. Can be given either as a plain text `.fa` file or a compressed `.gz` file."
+                    "help_text": "This file needs to be downloaded from [`https://mirgenedb.org/download`]. Can be given either as a plain text `.fa` file or a compressed `.gz` file.",
+                    "fa_icon": "fas fa-file-alt"
                 },
                 "hairpin": {
                     "type": "string",
@@ -169,7 +172,8 @@
                 "mirgenedb_hairpin": {
                     "type": "string",
                     "description": "Path to FASTA file with miRNAs precursors.",
-                    "help_text": "This file needs to be downloaded from [`https://mirgenedb.org/download`]. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\nNote that MirGeneDB does not have a dedicated hairpin file. The equivalent is the `Precursor sequences`."
+                    "help_text": "This file needs to be downloaded from [`https://mirgenedb.org/download`]. Can be given either as a plain text `.fa` file or a compressed `.gz` file.\nNote that MirGeneDB does not have a dedicated hairpin file. The equivalent is the `Precursor sequences`.",
+                    "fa_icon": "fab fa-cuttlefish"
                 },
                 "bowtie_index": {
                     "type": "string",
@@ -182,6 +186,13 @@
                     "description": "Save generated reference genome files to results.",
                     "help_text": "Saving generated references means that you can use them for future pipeline runs, reducing processing times.",
                     "fa_icon": "fas fa-save"
+                },
+                "igenomes_base": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Directory / URL base for iGenomes references.",
+                    "default": "s3://ngi-igenomes/igenomes/",
+                    "fa_icon": "fas fa-cloud-download-alt"
                 },
                 "igenomes_ignore": {
                     "type": "boolean",
@@ -255,12 +266,13 @@
                 "save_merged": {
                     "type": "boolean",
                     "description": "Save merged reads.",
-                    "default": false
+                    "fa_icon": "fas fa-save"
                 },
                 "phred_offset": {
                     "type": "integer",
                     "default": 33,
-                    "description": "The PHRED quality offset to be used for any input fastq files. Default is 33, standard Illumina 1.8+ format."
+                    "description": "The PHRED quality offset to be used for any input fastq files. Default is 33, standard Illumina 1.8+ format.",
+                    "fa_icon": "fas fa-greater-than"
                 }
             }
         },
@@ -272,37 +284,44 @@
             "properties": {
                 "filter_contamination": {
                     "type": "boolean",
-                    "description": "Enables the contamination filtering."
+                    "description": "Enables the contamination filtering.",
+                    "fa_icon": "fas fa-filter"
                 },
                 "rrna": {
                     "type": "string",
                     "format": "file-path",
-                    "description": "Path to the rRNA fasta file to be used as contamination database."
+                    "description": "Path to the rRNA fasta file to be used as contamination database.",
+                    "fa_icon": "fas fa-file-alt"
                 },
                 "trna": {
                     "type": "string",
                     "format": "file-path",
-                    "description": "Path to the tRNA fasta file to be used as contamination database."
+                    "description": "Path to the tRNA fasta file to be used as contamination database.",
+                    "fa_icon": "fas fa-file-alt"
                 },
                 "cdna": {
                     "type": "string",
                     "format": "file-path",
-                    "description": "Path to the cDNA fasta file to be used as contamination database."
+                    "description": "Path to the cDNA fasta file to be used as contamination database.",
+                    "fa_icon": "fas fa-file-alt"
                 },
                 "ncrna": {
                     "type": "string",
                     "format": "file-path",
-                    "description": "Path to the ncRNA fasta file to be used as contamination database."
+                    "description": "Path to the ncRNA fasta file to be used as contamination database.",
+                    "fa_icon": "fas fa-file-alt"
                 },
                 "pirna": {
                     "type": "string",
                     "format": "file-path",
-                    "description": "Path to the piRNA fasta file to be used as contamination database."
+                    "description": "Path to the piRNA fasta file to be used as contamination database.",
+                    "fa_icon": "fas fa-file-alt"
                 },
                 "other_contamination": {
                     "type": "string",
                     "format": "file-path",
-                    "description": "Path to an additional fasta file to be used as contamination database."
+                    "description": "Path to an additional fasta file to be used as contamination database.",
+                    "fa_icon": "fas fa-file-alt"
                 }
             }
         },
@@ -470,6 +489,24 @@
                     "description": "Base URL or local path to location of pipeline test dataset files",
                     "default": "https://raw.githubusercontent.com/nf-core/test-datasets/",
                     "hidden": true
+                },
+                "trace_report_suffix": {
+                    "type": "string",
+                    "fa_icon": "far calendar",
+                    "description": "Suffix to add to the trace report filename. Default is the date and time in the format yyyy-MM-dd_HH-mm-ss.",
+                    "hidden": true
+                },
+                "help": {
+                    "type": ["boolean", "string"],
+                    "description": "Display the help message."
+                },
+                "help_full": {
+                    "type": "boolean",
+                    "description": "Display the full detailed help message."
+                },
+                "show_hidden": {
+                    "type": "boolean",
+                    "description": "Display hidden parameters in the help message (only works when --help or --help_full are provided)."
                 }
             }
         }
@@ -499,11 +536,5 @@
         {
             "$ref": "#/$defs/generic_options"
         }
-    ],
-    "properties": {
-        "igenomes_base": {
-            "type": "string",
-            "default": "s3://ngi-igenomes/igenomes/"
-        }
-    }
+    ]
 }

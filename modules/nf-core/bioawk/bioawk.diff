@@ -1,25 +1,31 @@
-Changes in module 'nf-core/bioawk'
+Changes in component 'nf-core/bioawk'
+'modules/nf-core/bioawk/environment.yml' is unchanged
+'modules/nf-core/bioawk/meta.yml' is unchanged
+Changes in 'bioawk/main.nf':
 --- modules/nf-core/bioawk/main.nf
 +++ modules/nf-core/bioawk/main.nf
-@@ -11,7 +11,7 @@
+@@ -11,8 +11,8 @@
      tuple val(meta), path(input)
  
      output:
 -    tuple val(meta), path("*.gz"), emit: output
-+    tuple val(meta), path("*.fasta"), emit: output
-     path "versions.yml"             , emit: versions
+-    path "versions.yml"             , emit: versions
++    tuple val(meta), path(prefix), emit: output
++    path "versions.yml"          , emit: versions
  
      when:
-@@ -26,9 +26,7 @@
-     bioawk \\
-         $args \\
+     task.ext.when == null || task.ext.when
+@@ -28,8 +28,6 @@
          $input \\
--        > ${prefix}
--
--    gzip ${prefix}
-+        > ${prefix}.fasta
+         > ${prefix}
  
+-    gzip ${prefix}
+-
      cat <<-END_VERSIONS > versions.yml
      "${task.process}":
+         bioawk: $VERSION
 
+'modules/nf-core/bioawk/tests/nextflow.config' is unchanged
+'modules/nf-core/bioawk/tests/main.nf.test' is unchanged
+'modules/nf-core/bioawk/tests/main.nf.test.snap' is unchanged
 ************************************************************
