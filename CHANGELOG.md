@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## v2.4.1 - 2025-12-23 - Red Zinc Spaniel
+## v2.4.1 - 2026-01-08 - Red Zinc Spaniel
 
 - [[#479]](https://github.com/nf-core/smrnaseq/pull/479) - Fix igenomes_base in nextflow_schema.
 - [[#481]](https://github.com/nf-core/smrnaseq/pull/481) - Fix [MIRTOP_STATS IndexError](https://github.com/nf-core/smrnaseq/issues/477) - Fix mirtop process execution when mirgenedb is used.
