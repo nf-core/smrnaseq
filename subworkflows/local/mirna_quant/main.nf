@@ -134,6 +134,8 @@ workflow MIRNA_QUANT {
     hairpin_stats       = BAM_STATS_HAIRPIN.out.stats        // channel: [ val(meta), [ stats ] ]
     mirtop_logs         = ch_mirtop_logs                     // channel: [ val(meta), path(log) ]
     versions            = ch_versions                        // channel: [ versions.yml ]
+    mirtop_counts       = DATATABLE_MERGE.out.mirna_tsv
+    
 }
 
 def add_suffix(row, suffix) {

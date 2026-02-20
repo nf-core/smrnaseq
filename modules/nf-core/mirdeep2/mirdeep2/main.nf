@@ -14,6 +14,7 @@ process MIRDEEP2_MIRDEEP2 {
 
     output:
     tuple val(meta), path("result*.{bed,csv,html}")    , emit: outputs
+    tuple val(meta), path("pdfs*")                     , emit: pdfs
     path "versions.yml"                                , emit: versions
 
     when:
@@ -40,6 +41,7 @@ process MIRDEEP2_MIRDEEP2 {
     mv result_*.bed result_${prefix}.bed
     mv result_*.csv result_${prefix}.csv
     mv result_*.html result_${prefix}.html
+    mv pdfs_* pdfs_${prefix}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
@@ -55,6 +57,7 @@ process MIRDEEP2_MIRDEEP2 {
     touch result_${prefix}.html
     touch result_${prefix}.bed
     touch result_${prefix}.csv
+    mkdir pdfs_${prefix}
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

@@ -17,6 +17,13 @@ include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq
 include { FASTQ_FIND_MIRNA_MIRDEEP2        } from '../subworkflows/nf-core/fastq_find_mirna_mirdeep2/main'
 include { paramsSummaryMultiqc             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+
+// HT modules
+include { DGE_EDGER              } from '../modules/local/dge_edger/main'
+include { MIRNA_TARGETS          } from '../modules/local/mirnas_target/main'
+include { ENRICHMENT             } from '../modules/local/enrichment/main'
+include { MIRNAS_INTEREST        } from '../modules/local/mirnas_interest/main'
+
 // local subworkflows
 include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/main'
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant/main'
@@ -241,6 +248,66 @@ workflow NFCORE_SMRNASEQ {
                 )
         ch_versions = ch_versions.mix(FASTQ_FIND_MIRNA_MIRDEEP2.out.versions)
         }
+    }
+
+    //
+    // DGE
+    //
+    lfc_ch = Channel.of(params.lfc_threshold)
+    fdr_ch = Channel.of(params.fdr_threshold)
+    metadata_ch = params.metadata ? Channel.fromPath(params.metadata, checkIfExists: true) : Channel.empty()
+
+    DGE_EDGER(
+        MIRNA_QUANT.out.mirtop_counts,
+        metadata_ch,
+        params.contrasts,
+        lfc_ch,
+        fdr_ch
+    )
+
+    ch_versions     = ch_versions.mix(DGE_EDGER.out.versions)
+    ch_dge_rdata    = DGE_EDGER.out.rdata
+
+    //
+    // miRNAs targets
+    //
+    org_ch          = Channel.of(params.mirtrace_species)
+    drug_ch         = Channel.of(params.drug)
+    disease_ch      = Channel.of(params.disease)
+    org_ch.combine(drug_ch)
+        .combine(disease_ch)
+        .set { comb_ch }
+
+    MIRNA_TARGETS(
+        ch_dge_rdata,
+        comb_ch
+    )
+    ch_versions = ch_versions.mix(MIRNA_TARGETS.out.versions)
+    ch_targets_rdata = MIRNA_TARGETS.out.rdata
+
+    //
+    // enrichment analysis
+    //
+
+    ENRICHMENT(
+        ch_targets_rdata,
+        params.mirtrace_species
+    )
+
+    ch_versions   = ch_versions.mix(ENRICHMENT.out.versions)
+
+    //
+    // mirnas of interest analysis
+    //
+    if (params.mirnaslist) {
+        mirnaslist_ch = Channel.fromPath(params.mirnaslist, checkIfExists: true)
+        MIRNAS_INTEREST(
+        ch_dge_rdata,
+        mirnaslist_ch,
+        params.mirtrace_species
+    )
+
+    ch_versions      = ch_versions.mix(MIRNAS_INTEREST.out.versions)
     }
 
     //
