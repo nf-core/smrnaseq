@@ -135,7 +135,7 @@ workflow MIRNA_QUANT {
     mirtop_logs         = ch_mirtop_logs                     // channel: [ val(meta), path(log) ]
     versions            = ch_versions                        // channel: [ versions.yml ]
     mirtop_counts       = DATATABLE_MERGE.out.mirna_tsv
-    
+
 }
 
 def add_suffix(row, suffix) {

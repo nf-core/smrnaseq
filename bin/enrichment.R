@@ -1,7 +1,7 @@
 #!/usr/bin/env Rscript
 
 # -------------------------------
-# Written by Karla Ruiz and released under the MIT license. 
+# Written by Karla Ruiz and released under the MIT license.
 # Human Technopole. National Facility for Data Handling and Analysis - IU2 OMICS
 #
 # This script performs the enrichment analysis of the miRNAs' targets from the DGE analysis on miRNA data.
@@ -54,7 +54,7 @@ if (organism %in% c("hsa", "human")) {
     "KEGG_2021_Human" = list(title = "KEGG", suffix = "KEGG"),
     "Reactome_2022" = list(title = "Reactome", suffix = "Reactome")
   )
-  
+
 } else if (organism %in% c("mmu", "mouse")) {
   dbs <- c("Mouse_Gene_Atlas", "WikiPathways_2024_Mouse", "KEGG_2019_Mouse")
   plot_info <- list(
@@ -62,12 +62,12 @@ if (organism %in% c("hsa", "human")) {
     "WikiPathways_2024_Mouse" = list(title = "WikiPathways", suffix = "WikiPathways"),
     "KEGG_2019_Mouse" = list(title = "KEGG", suffix = "KEGG")
   )
-  
+
 } else {
   stop("Invalid organism specified. Please choose either 'human' or 'mouse'.")
 }
 
-#-----ANALYSIS----- 
+#-----ANALYSIS-----
 #Verificar que el input coincida incluyendo los contrastes
 load (rdata_file)
 
@@ -75,7 +75,7 @@ results_enrich_targets <- list()
 for (contrast_name in names(dge_res)) {
   print(paste("Processing contrast:", contrast_name))
   dge_ctr_folder <- paste0("./enrich_", contrast_name)
-  
+
   if (dir.exists(dge_ctr_folder)) {
     #cat("Folder created successfully:", dge_ctr_folder, "\n")
   } else {
@@ -87,23 +87,23 @@ for (contrast_name in names(dge_res)) {
   for (datatype in names(enrichr_input)) {
     input <- enrichr_input[[datatype]]
     enrichment_results <- paste0(dge_ctr_folder, '/', datatype)
-    
+
   if (!dir.exists(enrichment_results)) {
       dir.create(enrichment_results)
   }
-    
+
   # Perform enrichment analysis
   enriched <- enrichr(input$target_symbol, dbs)
   write.xlsx(enriched, file = file.path(enrichment_results, paste0("enrichment_", datatype, ".xlsx")))
-  
+
   #Plot
   for (name in names(plot_info)) {
     if (name %in% names(enriched)) {
-      goplot <- plotEnrich(enriched[[name]], showTerms = 20, numChar = 40, 
+      goplot <- plotEnrich(enriched[[name]], showTerms = 20, numChar = 40,
                            y = "Count", orderBy = "P.value", title = plot_info[[name]]$title)
-      ggsave(file.path(enrichment_results, paste0(plot_info[[name]]$suffix, "_", datatype, ".png")), 
+      ggsave(file.path(enrichment_results, paste0(plot_info[[name]]$suffix, "_", datatype, ".png")),
              goplot, height = 7, width = 7, dpi = 600)
-      
+
       print(paste(name, "plot created"))
     } else {
       warning(paste(name, "not found in the results."))
@@ -113,8 +113,3 @@ for (contrast_name in names(dge_res)) {
 }
 
 save(results_enrich_targets, file = "enrichr.RData")
- 
- 
-
-
- 

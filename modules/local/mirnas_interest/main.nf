@@ -11,15 +11,15 @@ process MIRNAS_INTEREST {
     output:
     path '*.{pdf,png}'            ,     emit: mirnas_interest_plots
     path '*.xlsx'                 ,     emit: mirnas_interest
-    path('versions.yml')          ,     emit: versions                    
-    
+    path('versions.yml')          ,     emit: versions
+
     when:
     task.ext.when == null || task.ext.when
 
     script:
     """
     mirnas_interest.R "${rdata}" "${mirnaslist}" "${mirtrace_species}" > log.out
-    
+
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
         r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
@@ -29,8 +29,8 @@ process MIRNAS_INTEREST {
         RColorBrewer: \$(Rscript -e "library(RColorBrewer); cat(as.character(packageVersion('RColorBrewer')))")
         gplots: \$(Rscript -e "library(gplots); cat(as.character(packageVersion('gplots')))")
     END_VERSIONS
-    """   
-    
+    """
+
     stub:
     """
     mkdir mirnas_interest
@@ -50,5 +50,5 @@ process MIRNAS_INTEREST {
         RColorBrewer: \$(Rscript -e "library(RColorBrewer); cat(as.character(packageVersion('RColorBrewer')))")
         gplots: \$(Rscript -e "library(gplots); cat(as.character(packageVersion('gplots')))")
     END_VERSIONS
-    """ 
+    """
 }

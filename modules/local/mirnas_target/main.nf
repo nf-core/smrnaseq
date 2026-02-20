@@ -5,21 +5,21 @@ process MIRNA_TARGETS {
 
     input:
     path rdata
-    tuple val (mirtrace_species), val (drug), val (disease) 
+    tuple val (mirtrace_species), val (drug), val (disease)
 
     output:
     path 'targets_*'                ,     emit: mirnas_targets
     path 'miRNA_targetDB_info.txt'  ,     emit: db_targets_info
-    path 'miRNAs_targets.RData'     ,     emit: rdata         
+    path 'miRNAs_targets.RData'     ,     emit: rdata
     path('versions.yml')            ,     emit: versions
     path 'log.out'                  ,     emit: logfile
-    
+
     when:
     task.ext.when == null || task.ext.when
 
     script:
     args = task.ext.args ?: ''
-    
+
     """
     mirnas_targets.R $args ${rdata} ${mirtrace_species} ${drug} ${disease} > log.out
 

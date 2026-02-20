@@ -8,12 +8,12 @@ process ENRICHMENT {
     path rdata
     val mirtrace_species
 
-    output: 
+    output:
     path 'enrichment'           ,     emit: enrichr_results
     path 'orgdb_metadata.csv'   ,     emit: orgdb_metadata
     path 'enrichr.RData'        ,     emit: enrichr_RData
     path('versions.yml')        ,     emit: versions
-    
+
     when:
     task.ext.when == null || task.ext.when
 
@@ -33,8 +33,8 @@ process ENRICHMENT {
         ggarchery: \$(Rscript -e "library(ggarchery); cat(as.character(packageVersion('ggarchery')))")
 
     END_VERSIONS
-    """  
-    
+    """
+
     stub:
     """
     mkdir enrichment
@@ -112,5 +112,5 @@ process ENRICHMENT {
         ggarchery: \$(Rscript -e "library(ggarchery); cat(as.character(packageVersion('ggarchery')))")
     END_VERSIONS
     """
-  
+
 }

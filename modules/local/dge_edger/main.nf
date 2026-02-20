@@ -10,12 +10,12 @@ process DGE_EDGER {
     val lfc
     val fdr
 
-    output: 
+    output:
     path "DE_*"             , emit: edger_files
     path("DGE_miRNAs.RData"), emit: rdata
     path("*.{pdf,png}")      , emit: plots
     path('versions.yml')    , emit: versions
-    
+
     when:
     task.ext.when == null || task.ext.when
 
