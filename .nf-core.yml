@@ -2,7 +2,8 @@ lint:
   nextflow_config:
     - config_defaults:
         - params.fastp_known_mirna_adapters
-nf_core_version: 3.5.1
+  nf_test_content: false
+nf_core_version: 4.0.0
 repository_type: pipeline
 template:
   author: "P. Ewels, C. Wang, R. Hammar\xE9n, L. Pantano, A. Peltzer"
@@ -12,4 +13,4 @@ template:
   name: smrnaseq
   org: nf-core
   outdir: .
-  version: 2.4.0
+  version: 2.4.1
