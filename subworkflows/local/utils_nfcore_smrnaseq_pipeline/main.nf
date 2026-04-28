@@ -106,6 +106,11 @@ workflow PIPELINE_INITIALISATION {
     validateInputParameters()
 
     //
+    // Validate the bowtie align arguments provided through params.bowtie_align_args
+    //
+    validateBowtieGenomeArgs()
+
+    //
     // Create channel from input file provided through params.input
     //
 
@@ -248,6 +253,98 @@ def validateInputSamplesheet(input) {
     }
 
     return [ metas[0], fastqs ]
+}
+//
+// Validate the bowtie align arguments provided through params.bowtie_align_args
+//
+def validateBowtieGenomeArgs() {
+    if (!params.bowtie_align_args) return  // empty string is fine
+
+    // Allowlist: flag -> expected value type (null = flag only, 'int' = requires integer)
+    def ALLOWED_GENOME_ARGS = [
+    '-v'           : 'int_0_3',
+    '-n'           : 'int_0_3',
+    '--seedmms'    : 'int_0_3',
+    '-e'           : 'int',
+    '--maqerr'     : 'int',
+    '-l'           : 'int',
+    '--seedlen'    : 'int',
+    '-k'           : 'int',
+    '-m'           : 'int',
+    '--maxbts'     : 'int',
+    '--chunkmbs'   : 'int',
+    '--seed'       : 'int',
+    '--best'       : null,
+    '--strata'     : null,
+    '--nomaqround' : null,
+    '--norc'       : null,
+]
+
+    // Mutually exclusive pairs
+    def MUTEX_PAIRS = [
+        ['-v', '-n'],
+        ['-v', '--seedmms'],
+        ['--strata', '--best'],  // --strata requires --best, so flag if --strata without --best
+    ]
+
+    def tokens = params.bowtie_align_args.trim().split(/\s+/)
+    def i = 0
+    def seen = [] as Set
+
+    while (i < tokens.size()) {
+        def token = tokens[i]
+
+        // Handle --flag=value syntax by splitting on '='
+        def flag  = token
+        def value = null
+        if (token.contains('=')) {
+            def parts = token.split('=', 2)
+            flag  = parts[0]
+            value = parts[1]
+        }
+
+        if (!ALLOWED_GENOME_ARGS.containsKey(flag)) {
+            error "[bowtie_align_args] Argument '${flag}' is not allowed. " +
+                  "Only these flags are permitted: ${ALLOWED_GENOME_ARGS.keySet().sort().join(', ')}"
+        }
+
+        def expectedType = ALLOWED_GENOME_ARGS[flag]
+        seen << flag
+
+        if (expectedType != null) {
+            // Expect a value — either inline (--flag=val) or next token (--flag val)
+            if (value == null) {
+                i++
+                if (i >= tokens.size()) {
+                    error "[bowtie_align_args] Argument '${flag}' requires a value but none was provided."
+                }
+                value = tokens[i]
+            }
+
+            // Validate the value type
+            if (expectedType == 'int' || expectedType == 'int_0_3') {
+                if (!(value =~ /^\d+$/)) {
+                    error "[bowtie_align_args] Argument '${flag}' requires an integer value, got '${value}'."
+                }
+                if (expectedType == 'int_0_3' && !(value.toInteger() in 0..3)) {
+                    error "[bowtie_align_args] Argument '${flag}' must be between 0 and 3, got '${value}'."
+                }
+            }
+        } else if (value != null) {
+            // Flag-only arg was given a value via = syntax
+            error "[bowtie_align_args] Argument '${flag}' does not take a value, got '${value}'."
+        }
+
+        i++
+    }
+
+    // Mutual exclusivity checks
+    if (seen.contains('-v') && (seen.contains('-n') || seen.contains('--seedmms'))) {
+        error "[bowtie_align_args] '-v' and '-n'/'--seedmms' are mutually exclusive."
+    }
+    if (seen.contains('--strata') && !seen.contains('--best')) {
+        error "[bowtie_align_args] '--strata' requires '--best' to also be specified."
+    }
 }
 //
 // Get attribute from genome config file e.g. fasta

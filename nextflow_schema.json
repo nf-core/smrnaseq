@@ -181,6 +181,14 @@
                     "fa_icon": "fas fa-book",
                     "help_text": "Point to the directory created by Bowtie 1 when indexing. Bowtie 1 indices consist of six files:\n\n```bash\ngenome.1.ebwt, genome.2.ebwt, genome.3.ebwt, genome.4.ebwt, genome.rev.1.ebwt, genome.rev.2.ebwt\n```\n"
                 },
+                "bowtie_align_args": {
+                    "type": "string",
+                    "default": "",
+                    "description": "Additional arguments to pass to Bowtie alignment.",
+                    "help_text": "These flags are passed to Bowtie 1 for the genome mapping, e.g. `--bowtie_align_args '-v 1 --best'`. Use with caution as some flags may conflict with pipeline-managed options.",
+                    "fa_icon": "fas fa-terminal",
+                    "hidden": true
+                },
                 "save_reference": {
                     "type": "boolean",
                     "description": "Save generated reference genome files to results.",
