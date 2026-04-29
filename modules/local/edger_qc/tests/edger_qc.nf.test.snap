@@ -17,11 +17,11 @@
                 "versions.yml:md5,8b8e7ca3ee46446e0ecec3a0ea3a33aa"
             ]
         ],
-        "timestamp": "2026-04-29T10:49:00.144316049",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "25.10.4"
-        }
+        },
+        "timestamp": "2026-04-29T10:49:00.144316049"
     },
     "Should produce MDS plot": {
         "content": [
@@ -48,10 +48,10 @@
             ],
             true
         ],
-        "timestamp": "2026-04-29T10:49:13.621933645",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "25.10.4"
-        }
+        },
+        "timestamp": "2026-04-29T10:49:13.621933645"
     }
 }
