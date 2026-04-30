@@ -4,6 +4,5 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - python<=3.13
-  - bioconda::multiqc=1.32
+  - bioconda::multiqc=1.33
   - rich==14.2.0
