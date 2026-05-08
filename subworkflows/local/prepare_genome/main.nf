@@ -92,7 +92,7 @@ workflow PREPARE_GENOME {
         //Prepare bowtie index, unless specified
         //This needs to be done here as the index is used by GENOME_QUANT
         if(val_bowtie_index) {
-            if (val_bowtie_index.endsWith(".tar.gz")) {
+            if (val_bowtie_index.toString().endsWith(".tar.gz")) {
                 UNTAR_BOWTIE_INDEX ( ch_bowtie_index )
                 ch_bowtie_index = UNTAR_BOWTIE_INDEX.out.untar
                     .map{ meta, index_dir ->
