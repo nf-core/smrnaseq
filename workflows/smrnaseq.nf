@@ -302,7 +302,13 @@ workflow NFCORE_SMRNASEQ {
             ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.json.collect { item -> item[1] }.ifEmpty([]))
             ch_mirtrace_tsv_for_multiqc = MIRTRACE_QC.out.tsv
                 .map { _meta, tsv_files ->
-                    tsv_files.findAll { tsv -> tsv.text.readLines().drop(1).any { line -> line.trim() } }
+                    tsv_files.findAll { tsv ->
+                        def lines = tsv.text.readLines().drop(1).findAll { line -> line.trim() }
+                        tsv.name == "mirtrace-stats-contamination_detailed.tsv" ? lines :
+                            tsv.name == "mirtrace-stats-contamination_basic.tsv" ?
+                                lines.any { line -> line.split("\t").drop(1).any { value -> value ==~ /-?\d+/ && value.toInteger() != 0 } } :
+                                true
+                    }
                 }
                 .flatten()
                 .collect()
