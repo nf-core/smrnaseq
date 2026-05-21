@@ -300,7 +300,14 @@ workflow NFCORE_SMRNASEQ {
         if (has_mirtrace_species){
             ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.html.collect { item -> item[1] }.ifEmpty([]))
             ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.json.collect { item -> item[1] }.ifEmpty([]))
-            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.tsv.collect { item -> item[1] }.ifEmpty([]))
+            ch_mirtrace_tsv_for_multiqc = MIRTRACE_QC.out.tsv
+                .map { _meta, tsv_files ->
+                    tsv_files.findAll { tsv -> tsv.text.readLines().drop(1).any { line -> line.trim() } }
+                }
+                .flatten()
+                .collect()
+                .ifEmpty([])
+            ch_multiqc_files = ch_multiqc_files.mix(ch_mirtrace_tsv_for_multiqc)
         }
 
         def ch_multiqc_config_files = params.multiqc_config ?
