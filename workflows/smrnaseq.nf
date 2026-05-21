@@ -27,17 +27,6 @@ include { paramsSummaryMap                 } from 'plugin/nf-schema'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    CONFIG FILES
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-*/
-
-ch_multiqc_config                     = channel.fromPath("$projectDir/assets/multiqc_config.yml", checkIfExists: true)
-ch_multiqc_custom_config              = params.multiqc_config ? channel.fromPath( params.multiqc_config, checkIfExists: true ) : channel.empty()
-ch_multiqc_logo                       = params.multiqc_logo   ? channel.fromPath( params.multiqc_logo, checkIfExists: true ) : channel.empty()
-ch_fastp_adapters                     = channel.fromPath(params.fastp_known_mirna_adapters, checkIfExists: true).collect() // collect to consume for all incoming samples to FASTP
-
-/*
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
@@ -266,7 +255,7 @@ workflow NFCORE_SMRNASEQ {
     def ch_collated_versions = softwareVersionsToYAML(ch_versions.mix(topic_versions.versions_file))
         .mix(topic_versions_string)
         .collectFile(
-            storeDir: "${outdir}/pipeline_info",
+            storeDir: "${params.outdir}/pipeline_info",
             name: 'nf_core_'  +  'smrnaseq_software_'  + 'mqc_'  + 'versions.yml',
             sort: true,
             newLine: true
@@ -277,20 +266,9 @@ workflow NFCORE_SMRNASEQ {
     //
     ch_multiqc_report = channel.empty()
     if (!params.skip_multiqc) {
-        ch_multiqc_config        = channel.fromPath(
-            "$projectDir/assets/multiqc_config.yml", checkIfExists: true)
-        ch_multiqc_custom_config = params.multiqc_config ?
-            channel.fromPath(params.multiqc_config, checkIfExists: true) :
-            channel.empty()
-        ch_multiqc_logo          = params.multiqc_logo ?
-            channel.fromPath(params.multiqc_logo, checkIfExists: true) :
-            channel.empty()
-
         summary_params      = paramsSummaryMap(
             workflow, parameters_schema: "nextflow_schema.json")
         ch_workflow_summary = channel.value(paramsSummaryMultiqc(summary_params))
-        ch_multiqc_files = ch_multiqc_files.mix(
-            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
         ch_multiqc_custom_methods_description = params.multiqc_methods_description ?
             file(params.multiqc_methods_description, checkIfExists: true) :
             file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
@@ -299,42 +277,42 @@ workflow NFCORE_SMRNASEQ {
 
         ch_multiqc_files = channel.empty()
         ch_multiqc_files = ch_multiqc_files.mix(
-            ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+            ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml"))
         ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
         // ch_multiqc_files = ch_multiqc_files.mix(
         //     ch_methods_description.collectFile(
-        //         name: 'methods_description_mqc.yaml',
+        //         name: "methods_description_mqc.yaml",
         //         sort: true
         //     )
         // )
 
-        ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
-        ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip.collect{it[1]}.ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_zip.collect{it[1]}.ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_json.collect{it[1]}.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip.collect { item -> item[1] }.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_zip.collect { item -> item[1] }.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_json.collect { item -> item[1] }.ifEmpty([]))
         if(params.with_umi) {
-            ch_multiqc_files = ch_multiqc_files.mix(UMICOLLAPSE_FASTQ.out.log.collect{it[1]}.ifEmpty([]))
+            ch_multiqc_files = ch_multiqc_files.mix(UMICOLLAPSE_FASTQ.out.log.collect { item -> item[1] }.ifEmpty([]))
         }
         ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect({it[1]}).ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect({it[1]}).ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect({it[1]}).ifEmpty([]))
-        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect({it[1]}).ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect { item -> item[1] }.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect { item -> item[1] }.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect { item -> item[1] }.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect { item -> item[1] }.ifEmpty([]))
         if (has_mirtrace_species){
-            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.html.collect({it[1]}).ifEmpty([]))
-            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.json.collect({it[1]}).ifEmpty([]))
-            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.tsv.collect({it[1]}).ifEmpty([]))
+            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.html.collect { item -> item[1] }.ifEmpty([]))
+            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.json.collect { item -> item[1] }.ifEmpty([]))
+            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.tsv.collect { item -> item[1] }.ifEmpty([]))
         }
 
-        MULTIQC (
-            ch_multiqc_files.collect(),
-            ch_multiqc_config.toList(),
-            ch_multiqc_custom_config.toList(),
-            ch_multiqc_logo.toList(),
-            [],
-            []
-        )
+        def ch_multiqc_config_files = params.multiqc_config ?
+            [ file("$projectDir/assets/multiqc_config.yml", checkIfExists: true), file(params.multiqc_config, checkIfExists: true) ] :
+            [ file("$projectDir/assets/multiqc_config.yml", checkIfExists: true) ]
+        def ch_multiqc_logo_file = params.multiqc_logo ? file(params.multiqc_logo, checkIfExists: true) : []
+        ch_multiqc_input = ch_multiqc_files.collect()
+            .map { multiqc_files ->
+                [ [ id: "multiqc" ], multiqc_files, ch_multiqc_config_files, ch_multiqc_logo_file, [], [] ]
+            }
+
+        MULTIQC ( ch_multiqc_input )
         ch_multiqc_report = MULTIQC.out.report
 
     }

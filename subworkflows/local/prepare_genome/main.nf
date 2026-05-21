@@ -20,18 +20,15 @@ def extractFirstIndexPrefix(files_path) {
     if (files == null || files.length == 0) {
         throw new Exception("The provided bowtie_index path doesn't contain any files.")
     }
-    def index_prefix = ''
-    for (file_path in files) {
+    def index_file = files.find { file_path ->
         def file_name = file_path.getName()
-        if (file_name.endsWith(".1.ebwt") && !file_name.endsWith(".rev.1.ebwt")) {
-            index_prefix = file_name.substring(0, file_name.lastIndexOf(".1.ebwt"))
-            break
-        }
+        file_name.endsWith(".1.ebwt") && !file_name.endsWith(".rev.1.ebwt")
     }
-    if (index_prefix == '') {
+    if (index_file == null) {
         throw new Exception("Unable to extract the prefix from the Bowtie index files. No file with the '.1.ebwt' extension was found. Please ensure that the correct files are in the specified path.")
     }
-    return index_prefix
+    def index_file_name = index_file.getName()
+    return index_file_name.substring(0, index_file_name.lastIndexOf(".1.ebwt"))
 }
 
 
