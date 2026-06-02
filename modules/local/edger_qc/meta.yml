@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "edger/qc"
+description: Generate miRNA count QC reports and plots with edgeR.
+keywords:
+  - qc
+  - mirna
+  - edger
+  - counts
+tools:
+  - "edger":
+      description: "Bioconductor package for differential expression analysis of digital gene expression data."
+      homepage: "https://bioconductor.org/packages/release/bioc/html/edgeR.html"
+      documentation: "https://bioconductor.org/packages/release/bioc/manuals/edgeR/man/edgeR.pdf"
+      doi: "10.1093/bioinformatics/btp616"
+      licence: ["GPL-2.0-or-later"]
+input:
+  - input_files:
+      type: file
+      description: Input count files used to generate edgeR QC outputs.
+      pattern: "*.{txt,tsv,csv}"
+output:
+  - edger_files:
+      type: file
+      description: edgeR QC result files, including count tables, CSV files, and PDF plots.
+      pattern: "*.{txt,pdf,csv}"
+  - versions:
+      type: file
+      description: File containing software versions.
+      pattern: "versions.yml"
+authors:
+  - "@atrigila"
+maintainers:
+  - "@atrigila"

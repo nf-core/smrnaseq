@@ -1,0 +1,36 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "format_fasta_mirna"
+description: Format miRNA FASTA records into single-line sequences for indexing and quantification.
+keywords:
+  - fasta
+  - mirna
+  - format
+tools:
+  - "fastx_toolkit":
+      description: "FASTX-Toolkit is a collection of command line tools for short-read FASTA/FASTQ preprocessing."
+      homepage: "http://hannonlab.cshl.edu/fastx_toolkit/"
+      documentation: "http://hannonlab.cshl.edu/fastx_toolkit/commandline.html"
+      licence: ["AGPL-3.0-or-later"]
+input:
+  - meta2:
+      type: map
+      description: |
+        Groovy Map containing reference information.
+        e.g. [ id:'mature' ]
+  - fasta:
+      type: file
+      description: Input miRNA FASTA file.
+      pattern: "*.{fa,fasta}"
+output:
+  - formatted_fasta:
+      type: file
+      description: Formatted miRNA FASTA file.
+      pattern: "*_idx.fa"
+  - versions:
+      type: file
+      description: File containing software versions.
+      pattern: "versions.yml"
+authors:
+  - "@atrigila"
+maintainers:
+  - "@atrigila"

@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "utils_nfcore_smrnaseq_pipeline"
+description: Pipeline-specific initialisation, parameter validation, samplesheet parsing and completion handling for nf-core/smrnaseq.
+keywords:
+  - utility
+  - pipeline
+  - initialisation
+  - completion
+  - samplesheet
+components:
+  - utils_nfschema_plugin
+  - utils_nfcore_pipeline
+  - utils_nextflow_pipeline
+input:
+  - version:
+      type: boolean
+      description: Display the pipeline version and exit.
+  - validate_params:
+      type: boolean
+      description: Validate parameters against the pipeline schema at runtime.
+  - monochrome_logs:
+      type: boolean
+      description: Disable coloured log output.
+  - nextflow_cli_args:
+      type: list
+      description: List of positional Nextflow CLI arguments.
+  - outdir:
+      type: string
+      description: Output directory where results will be saved.
+  - input:
+      type: string
+      description: Path to the input samplesheet.
+  - val_three_prime_adapter:
+      type: string
+      description: Sequencing adapter sequence to use for trimming.
+  - val_phred_offset:
+      type: string
+      description: PHRED quality offset for input FASTQ files.
+  - help:
+      type: boolean, string
+      description: Display the help message and exit.
+  - help_full:
+      type: boolean
+      description: Show the full help message.
+  - show_hidden:
+      type: boolean
+      description: Show hidden parameters in the help message.
+  - email:
+      type: string
+      description: Email address for pipeline completion notification.
+  - email_on_fail:
+      type: string
+      description: Email address for pipeline failure notification.
+  - plaintext_email:
+      type: boolean
+      description: Send plain-text email instead of HTML.
+  - multiqc_report:
+      type: string
+      description: Path to the MultiQC report used in completion emails.
+output:
+  - samplesheet:
+      type: file
+      description: |
+        Channel containing sample metadata and FASTQ files parsed from the input samplesheet.
+        Structure: [ val(meta), path(fastqs) ]
+      pattern: "*.{fastq,fastq.gz,fq,fq.gz}"
+  - versions:
+      type: file
+      description: |
+        File containing software versions.
+        Structure: [ path(versions.yml) ]
+      pattern: "versions.yml"
+  - three_prime_adapter:
+      type: string
+      description: |
+        Channel containing the three-prime adapter sequence.
+        Structure: [ val(string) ]
+  - phred_offset:
+      type: string
+      description: |
+        Channel containing the PHRED quality offset.
+        Structure: [ val(string) ]
+authors:
+  - "@atrigila"
+maintainers:
+  - "@atrigila"

@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "genome_quant"
+description: Map reads to the reference genome with Bowtie and generate BAM statistics with Samtools.
+keywords:
+  - genome
+  - quantification
+  - bowtie
+  - samtools
+components:
+  - bowtie/align
+  - bam_sort_stats_samtools
+input:
+  - ch_bowtie_index:
+      type: directory
+      description: |
+        Input channel containing the Bowtie genome index directory.
+        Structure: [ val(meta), path(directory_index) ]
+  - ch_fasta:
+      type: file
+      description: |
+        Input channel containing the reference genome FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_reads:
+      type: file
+      description: |
+        Input channel containing reads to map to the genome.
+        Structure: [ val(meta), path(reads) ]
+      pattern: "*.{fastq,fastq.gz,fq,fq.gz}"
+output:
+  - stats:
+      type: file
+      description: |
+        Channel containing Samtools statistics for genome-aligned reads.
+        Structure: [ val(meta), path(stats) ]
+      pattern: "*.{stats}"
+  - versions:
+      type: file
+      description: |
+        File containing software versions.
+        Structure: [ path(versions.yml) ]
+      pattern: "versions.yml"
+authors:
+  - "@atrigila"
+maintainers:
+  - "@atrigila"
