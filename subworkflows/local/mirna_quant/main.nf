@@ -49,12 +49,12 @@ workflow MIRNA_QUANT {
     ch_mature_bowtie = INDEX_MATURE.out.index
 
     ch_reads_mirna = ch_reads_for_mirna
-        .map { add_suffix(it, "mature") }
+        .map { row -> add_suffix(row, "mature") }
 
     BOWTIE_MAP_MATURE ( ch_reads_mirna, ch_mature_bowtie, true )
 
     ch_reads_hairpin = BOWTIE_MAP_MATURE.out.fastq
-        .map { add_suffix(it, "hairpin") }
+        .map { row -> add_suffix(row, "hairpin") }
 
     BAM_STATS_MATURE ( BOWTIE_MAP_MATURE.out.bam, FORMAT_MATURE.out.formatted_fasta )
 
@@ -72,8 +72,8 @@ workflow MIRNA_QUANT {
 
     BAM_STATS_HAIRPIN ( BOWTIE_MAP_HAIRPIN.out.bam, FORMAT_HAIRPIN.out.formatted_fasta )
 
-    ch_edger_input = BAM_STATS_MATURE.out.idxstats.collect{it[1]}
-        .mix(BAM_STATS_HAIRPIN.out.idxstats.collect{it[1]})
+    ch_edger_input = BAM_STATS_MATURE.out.idxstats.collect{ row -> row[1] }
+        .mix(BAM_STATS_HAIRPIN.out.idxstats.collect{ row -> row[1] })
         .flatten()
         .collect()
 
@@ -96,15 +96,11 @@ workflow MIRNA_QUANT {
     ch_mirtop_logs = BAM_STATS_MIRNA_MIRTOP.out.stats_log
     ch_versions = ch_versions.mix(BAM_STATS_MIRNA_MIRTOP.out.versions)
 
-    ch_tsvs = BAM_STATS_MIRNA_MIRTOP.out.counts
-        .collect{it[1]}
-        .map{it -> return [[id:"TSVs"], it]}
-
     PIVOT_LONGER( BAM_STATS_MIRNA_MIRTOP.out.counts )
     ch_versions = ch_versions.mix(PIVOT_LONGER.out.versions)
 
     ch_long_files = PIVOT_LONGER.out.csv
-        .map { meta, file -> file }
+        .map { _meta, file -> file }
         .collect()
         .map { files ->
             return [[id: "Long_Files"], files]
@@ -117,7 +113,7 @@ workflow MIRNA_QUANT {
     ch_versions = ch_versions.mix(DATATABLE_MERGE.out.versions)
 
     ch_reads_genome = BOWTIE_MAP_HAIRPIN.out.fastq
-        .map { add_suffix(it, "genome") }
+        .map { row -> add_suffix(row, "genome") }
 
     emit:
     fasta_mature        = FORMAT_MATURE.out.formatted_fasta  // channel: [ val(meta), path(fasta) ]

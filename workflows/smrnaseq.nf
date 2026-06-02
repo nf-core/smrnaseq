@@ -265,9 +265,6 @@ workflow NFCORE_SMRNASEQ {
         summary_params      = paramsSummaryMap(
             workflow, parameters_schema: "nextflow_schema.json")
         ch_workflow_summary = channel.value(paramsSummaryMultiqc(summary_params))
-        ch_multiqc_custom_methods_description = params.multiqc_methods_description ?
-            file(params.multiqc_methods_description, checkIfExists: true) :
-            file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
         // ch_methods_description                = channel.value(
         //     methodsDescriptionText(ch_multiqc_custom_methods_description))
 

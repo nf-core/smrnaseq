@@ -56,7 +56,6 @@ workflow CONTAMINANT_FILTER {
 
     ch_versions     = channel.empty()
     ch_filter_stats = channel.empty()
-    ch_mqc_results  = channel.empty()
 
     ch_reads_for_mirna.set { rrna_reads }
 
@@ -124,7 +123,7 @@ workflow CONTAMINANT_FILTER {
 
         // Get only unique elements of the list
         ch_pattern = GAWK_CDNA.out.output
-                .map { meta, file -> file.text.readLines() }
+                .map { _meta, file -> file.text.readLines() }
                 .flatten()
                 .unique()
                 .collectFile(name: 'ch_hairpin_cDNA_unique.txt', newLine: true)
@@ -164,7 +163,7 @@ workflow CONTAMINANT_FILTER {
 
         // Get only unique elements of the list
         ch_pattern = GAWK_NCRNA.out.output
-                .map { meta, file -> file.text.readLines() }
+                .map { _meta, file -> file.text.readLines() }
                 .flatten()
                 .unique()
                 .collectFile(name: 'ch_hairpin_ncRNA_unique.txt', newLine: true)
@@ -204,7 +203,7 @@ workflow CONTAMINANT_FILTER {
 
         // Get only unique elements of the list
         ch_pattern = GAWK_PIRNA.out.output
-                .map { meta, file -> file.text.readLines() }
+                .map { _meta, file -> file.text.readLines() }
                 .flatten()
                 .unique()
                 .collectFile(name: 'ch_hairpin_piRNA_unique.txt', newLine: true)
@@ -244,7 +243,7 @@ workflow CONTAMINANT_FILTER {
 
         // Get only unique elements of the list
         ch_pattern = GAWK_OTHER.out.output
-                .map { meta, file -> file.text.readLines() }
+                .map { _meta, file -> file.text.readLines() }
                 .flatten()
                 .unique()
                 .collectFile(name: 'ch_hairpin_other_unique.txt', newLine: true)
