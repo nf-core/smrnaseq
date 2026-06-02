@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
-name: "format_fasta_mirna"
+name: "format/fasta_mirna"
 description: Format miRNA FASTA records into single-line sequences for indexing and quantification.
 keywords:
   - fasta

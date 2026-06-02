@@ -3,6 +3,7 @@ lint:
     - config_defaults:
         - params.fastp_known_mirna_adapters
   nf_test_content: false
+  merge_markers: false
 nf_core_version: 4.0.2
 repository_type: pipeline
 template:

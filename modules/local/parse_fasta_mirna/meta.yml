@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
-name: "parse_fasta_mirna"
+name: "parse/fasta_mirna"
 description: Clean, species-filter, and convert miRNA FASTA references from RNA to DNA alphabet.
 keywords:
   - fasta
