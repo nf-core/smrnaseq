@@ -15,10 +15,8 @@ workflow GENOME_QUANT {
     ch_versions = channel.empty()
 
     BOWTIE_MAP_GENOME ( ch_reads, ch_bowtie_index, true )
-    ch_versions = ch_versions.mix(BOWTIE_MAP_GENOME.out.versions)
 
     BAM_SORT_STATS_SAMTOOLS ( BOWTIE_MAP_GENOME.out.bam,  ch_fasta )
-    ch_versions = ch_versions.mix(BAM_SORT_STATS_SAMTOOLS.out.versions)
 
     emit:
     stats    = BAM_SORT_STATS_SAMTOOLS.out.stats // channel: [ val(meta), [ stats ] ]

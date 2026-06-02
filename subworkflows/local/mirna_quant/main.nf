@@ -47,19 +47,16 @@ workflow MIRNA_QUANT {
 
     INDEX_MATURE ( FORMAT_MATURE.out.formatted_fasta )
     ch_mature_bowtie = INDEX_MATURE.out.index
-    ch_versions = ch_versions.mix(INDEX_MATURE.out.versions)
 
     ch_reads_mirna = ch_reads_for_mirna
         .map { add_suffix(it, "mature") }
 
     BOWTIE_MAP_MATURE ( ch_reads_mirna, ch_mature_bowtie, true )
-    ch_versions = ch_versions.mix(BOWTIE_MAP_MATURE.out.versions)
 
     ch_reads_hairpin = BOWTIE_MAP_MATURE.out.fastq
         .map { add_suffix(it, "hairpin") }
 
     BAM_STATS_MATURE ( BOWTIE_MAP_MATURE.out.bam, FORMAT_MATURE.out.formatted_fasta )
-    ch_versions = ch_versions.mix(BAM_STATS_MATURE.out.versions)
 
     PARSE_HAIRPIN ( ch_reference_hairpin, ch_parse_species_input )
     ch_hairpin_parsed = PARSE_HAIRPIN.out.parsed_fasta
@@ -70,13 +67,10 @@ workflow MIRNA_QUANT {
 
     INDEX_HAIRPIN ( FORMAT_HAIRPIN.out.formatted_fasta )
     hairpin_bowtie = INDEX_HAIRPIN.out.index
-    ch_versions = ch_versions.mix(INDEX_HAIRPIN.out.versions)
 
     BOWTIE_MAP_HAIRPIN ( ch_reads_hairpin, hairpin_bowtie, true )
-    ch_versions = ch_versions.mix(BOWTIE_MAP_HAIRPIN.out.versions)
 
     BAM_STATS_HAIRPIN ( BOWTIE_MAP_HAIRPIN.out.bam, FORMAT_HAIRPIN.out.formatted_fasta )
-    ch_versions = ch_versions.mix(BAM_STATS_HAIRPIN.out.versions)
 
     ch_edger_input = BAM_STATS_MATURE.out.idxstats.collect{it[1]}
         .mix(BAM_STATS_HAIRPIN.out.idxstats.collect{it[1]})
@@ -92,7 +86,6 @@ workflow MIRNA_QUANT {
     ch_reads_collapsed = SEQCLUSTER_COLLAPSE.out.fastq
 
     BOWTIE_MAP_SEQCLUSTER ( ch_reads_collapsed, hairpin_bowtie, true )
-    ch_versions = ch_versions.mix(BOWTIE_MAP_SEQCLUSTER.out.versions)
 
     ch_mirtop_logs = channel.empty()
 

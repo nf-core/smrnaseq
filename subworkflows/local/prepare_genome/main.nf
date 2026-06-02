@@ -82,8 +82,7 @@ workflow PREPARE_GENOME {
     if(val_fasta) {
         // Clean fasta (replace non-ATCGs with Ns, remove whitespaces from headers)
         // Note: CLEAN_FASTA runs even when a bowtie_index is provided, as cleaning doesn't affect it, making regeneration unnecessary.
-        CLEAN_FASTA ( ch_fasta )
-        ch_versions      = ch_versions.mix(CLEAN_FASTA.out.versions)
+        CLEAN_FASTA ( ch_fasta, [], false, 'fa' )
         ch_fasta         = CLEAN_FASTA.out.output
 
         //Prepare bowtie index, unless specified
@@ -96,7 +95,6 @@ workflow PREPARE_GENOME {
                         def index_prefix = extractFirstIndexPrefix(index_dir)
                         [[id:index_prefix], index_dir]
                     }
-                ch_versions  = ch_versions.mix(UNTAR_BOWTIE_INDEX.out.versions)
             } else {
                 ch_bowtie_index = channel.fromPath(val_bowtie_index, checkIfExists: true)
                     .map{it ->
@@ -109,7 +107,6 @@ workflow PREPARE_GENOME {
 
             // Index FASTA with nf-core Bowtie1
             INDEX_GENOME ( CLEAN_FASTA.out.output )
-            ch_versions      = ch_versions.mix(INDEX_GENOME.out.versions)
 
             // Set channels: clean fasta and its index
             ch_bowtie_index  = INDEX_GENOME.out.index.collect()
