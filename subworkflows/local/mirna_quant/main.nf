@@ -44,6 +44,9 @@ workflow MIRNA_QUANT {
 
     FORMAT_MATURE ( ch_mirna_parsed )
     ch_versions = ch_versions.mix(FORMAT_MATURE.out.versions)
+    ch_mature_fasta_fai = FORMAT_MATURE.out.formatted_fasta.map { row ->
+        row.size() == 2 ? [ row[0], row[1], [] ] : row
+    }
 
     INDEX_MATURE ( FORMAT_MATURE.out.formatted_fasta )
     ch_mature_bowtie = INDEX_MATURE.out.index
@@ -56,7 +59,7 @@ workflow MIRNA_QUANT {
     ch_reads_hairpin = BOWTIE_MAP_MATURE.out.fastq
         .map { row -> add_suffix(row, "hairpin") }
 
-    BAM_STATS_MATURE ( BOWTIE_MAP_MATURE.out.bam, FORMAT_MATURE.out.formatted_fasta )
+    BAM_STATS_MATURE ( BOWTIE_MAP_MATURE.out.bam, ch_mature_fasta_fai )
 
     PARSE_HAIRPIN ( ch_reference_hairpin, ch_parse_species_input )
     ch_hairpin_parsed = PARSE_HAIRPIN.out.parsed_fasta
@@ -64,13 +67,16 @@ workflow MIRNA_QUANT {
 
     FORMAT_HAIRPIN ( ch_hairpin_parsed )
     ch_versions = ch_versions.mix(FORMAT_HAIRPIN.out.versions)
+    ch_hairpin_fasta_fai = FORMAT_HAIRPIN.out.formatted_fasta.map { row ->
+        row.size() == 2 ? [ row[0], row[1], [] ] : row
+    }
 
     INDEX_HAIRPIN ( FORMAT_HAIRPIN.out.formatted_fasta )
     hairpin_bowtie = INDEX_HAIRPIN.out.index
 
     BOWTIE_MAP_HAIRPIN ( ch_reads_hairpin, hairpin_bowtie, true )
 
-    BAM_STATS_HAIRPIN ( BOWTIE_MAP_HAIRPIN.out.bam, FORMAT_HAIRPIN.out.formatted_fasta )
+    BAM_STATS_HAIRPIN ( BOWTIE_MAP_HAIRPIN.out.bam, ch_hairpin_fasta_fai )
 
     ch_edger_input = BAM_STATS_MATURE.out.idxstats.collect{ row -> row[1] }
         .mix(BAM_STATS_HAIRPIN.out.idxstats.collect{ row -> row[1] })
