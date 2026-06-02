@@ -181,4 +181,3 @@ nf-core pipelines bump-version --nextflow . <min_nf_version>
 If you update images or graphics, follow the nf-core [style guidelines](https://nf-co.re/docs/community/brand/workflow-schematics).
 
 ## Pipeline specific contribution guidelines
-
