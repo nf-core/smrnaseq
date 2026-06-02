@@ -491,9 +491,9 @@
                 "mirgenedb_hsa_mature.4.ebwt:md5,70977c4174dd54d5715e24cbe148686c",
                 "mirgenedb_hsa_mature.rev.1.ebwt:md5,34feb7692da8d4752343cf327e1f4446",
                 "mirgenedb_hsa_mature.rev.2.ebwt:md5,ea6d4ad4a6fbc394e189ba95c38eaad0",
-                "Clone1_N1.fastp.json:md5,ecc863f4fa66fedc6f55dbe737e334ea",
-                "Clone9_N1.fastp.json:md5,15fa4f5d1b91b03c7d7f29d52daa250b",
-                "Control_N1.fastp.json:md5,dc3b2e7593d80f31a2a4d0f3391f071a",
+                "Clone1_N1.fastp.json:md5,3d6f6bf66b5cb0704578b4716d82b5bd",
+                "Clone9_N1.fastp.json:md5,23fb1a012b3096f89fc989dbb6620494",
+                "Control_N1.fastp.json:md5,60d2cdb58719690aaa9f8bb07955c301",
                 "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,a8b1f90a30f9f39d4f2a4289bceaf2d1",
                 "Clone1_N1_mature_hairpin_genome.sorted.idxstats:md5,102a2777e6cb60500ab144aad81c2e5d",
                 "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,be01338d5a2239b0c9c09245e7d1ea7e",
@@ -558,7 +558,7 @@
                 "fastqc_sequence_length_distribution_plot.txt:md5,6bd21067e3ab28cd33ac107417e72c4c",
                 "fastqc_top_overrepresented_sequences_table.txt:md5,91b745155fb6c1652cdd8222fc96a9cc",
                 "multiqc_citations.txt:md5,57db2426be011862828d18f767d25b57",
-                "multiqc_fastp.txt:md5,4e086c08bad49cbac4d7a6c15eb97fb8",
+                "multiqc_fastp.txt:md5,0bbf2f69a6d67998f8da55dd7a4ff4dd",
                 "multiqc_fastqc.txt:md5,5f3d48b29b7909fd7f0c4da6f8745c08",
                 "multiqc_fastqc_fastqc-1.txt:md5,ca8352d25077b529780f4dfa79f343a6",
                 "multiqc_general_stats.txt:md5,237a839be7fc8425c22e00535d2df321",
@@ -591,7 +591,7 @@
             ],
             "No VCF files"
         ],
-        "timestamp": "2026-06-02T12:49:01.589993268",
+        "timestamp": "2026-06-02T17:09:38.915154423",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.0"

@@ -505,10 +505,10 @@
                 "mature.4.ebwt:md5,78260e9dde22d8f31622c77d71bbb605",
                 "mature.rev.1.ebwt:md5,0520d43b6b75328f3c30254a2d6baa18",
                 "mature.rev.2.ebwt:md5,ab52bc362b4c382cf213a71219e9efee",
-                "SRX8195117_SRR11631013.fastp.json:md5,a26cc9d54d97bbce7e6c8a91781a25bc",
-                "SRX8195118_SRR11631014.fastp.json:md5,f04c1433cde9963835eeac186a66b18c",
-                "SRX8195117_SRR11631013.fastp.json:md5,0882350b6d256a8e1a9540bf9bf73c09",
-                "SRX8195118_SRR11631014.fastp.json:md5,b3ea0ad6251be4ff3d4345c4f83a81a1",
+                "SRX8195117_SRR11631013.fastp.json:md5,58dd94e43078a72d5683bcb65a33ee74",
+                "SRX8195118_SRR11631014.fastp.json:md5,b3b20a1ee4e0b47de9de52fa07eb5e75",
+                "SRX8195117_SRR11631013.fastp.json:md5,9e5d35b1afe756fccf6225442f912a1d",
+                "SRX8195118_SRR11631014.fastp.json:md5,62bd26454a47f69f0d56653c8a0b6590",
                 "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.flagstat:md5,b2d7641adf9b3b32158c4bfb4d68fd5c",
                 "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.idxstats:md5,960214b32881a23baa8c10b2821b764b",
                 "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.stats:md5,562aeba6968e273561fa676ba883a67b",
@@ -581,7 +581,7 @@
                 "mirtrace_qc_plot.txt:md5,4602b041b47522b96b750fd97682bf20",
                 "mirtrace_rna_categories_plot.txt:md5,68d0ab6030b0c103b55de39e0b1d14b7",
                 "multiqc_citations.txt:md5,3f952977c627cf09125cf1f697728ebd",
-                "multiqc_fastp.txt:md5,ab1da477f51dadfa8507c54bdf953db0",
+                "multiqc_fastp.txt:md5,5863f9ada6411730a1177893464917e6",
                 "multiqc_fastqc.txt:md5,94d8a1832b3a4db0c1dcb7388f8c1213",
                 "multiqc_fastqc_fastqc-1.txt:md5,0493da07c03309e75d3248c8fe09ef51",
                 "multiqc_general_stats.txt:md5,850061ebe16066328668e7b14c709c6c",
@@ -620,7 +620,7 @@
             ],
             "No VCF files"
         ],
-        "timestamp": "2026-06-02T13:02:58.275709623",
+        "timestamp": "2026-06-02T17:19:41.007922823",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.0"

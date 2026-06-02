@@ -519,14 +519,14 @@
                 "untar/bowtie_index/genome.rev.2.ebwt"
             ],
             [
-                "Clone1_N1.fastp.json:md5,ecc863f4fa66fedc6f55dbe737e334ea",
-                "Clone1_N3.fastp.json:md5,08a2e18692d372378001ccfc6823fcad",
-                "Clone9_N1.fastp.json:md5,15fa4f5d1b91b03c7d7f29d52daa250b",
-                "Clone9_N2.fastp.json:md5,fbe3d4bf36ac0b497a03b80f92c90b61",
-                "Clone9_N3.fastp.json:md5,6402ce6235812000e7b12deba59f06eb",
-                "Control_N1.fastp.json:md5,dc3b2e7593d80f31a2a4d0f3391f071a",
-                "Control_N2.fastp.json:md5,fa6cd0b9ef7ff3a4b4db5261c7605c5c",
-                "Control_N3.fastp.json:md5,34059024ac71d87e20d6710cff5c4076",
+                "Clone1_N1.fastp.json:md5,3d6f6bf66b5cb0704578b4716d82b5bd",
+                "Clone1_N3.fastp.json:md5,90621ad6cf4a32ec7189503bf8df3e5d",
+                "Clone9_N1.fastp.json:md5,23fb1a012b3096f89fc989dbb6620494",
+                "Clone9_N2.fastp.json:md5,1c74bd50cbc5ef95dd636300219b7dd0",
+                "Clone9_N3.fastp.json:md5,e3565aa93d7a38f28168964c37ac6713",
+                "Control_N1.fastp.json:md5,60d2cdb58719690aaa9f8bb07955c301",
+                "Control_N2.fastp.json:md5,3087113160c8fd4cb11749ef0adbc40e",
+                "Control_N3.fastp.json:md5,2ee90c727c5a542d1beaf72819049bad",
                 "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,dfe7e48a58e63d6b36bb1e97194ccc20",
                 "Clone1_N1_mature_hairpin_genome.sorted.idxstats:md5,f6cd73e274f9d6d9db778287143426ab",
                 "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,16f04590e6ff8dec9efa56561dbc6534",
@@ -658,7 +658,7 @@
                 "mirtrace_qc_plot.txt:md5,2b842fb37e248f0a61f8000faadb1db4",
                 "mirtrace_rna_categories_plot.txt:md5,13abbcb2c9ba466ba6d92f3e21669f0b",
                 "multiqc_citations.txt:md5,c2900ba941a5e78a3f42ef6a1033ace7",
-                "multiqc_fastp.txt:md5,4ebc42bb01f7bf842672dd102a3b902b",
+                "multiqc_fastp.txt:md5,43996244052a72b9c4e2d4b962ad46ab",
                 "multiqc_fastqc.txt:md5,74d277d129db4aab9c98790a96a40557",
                 "multiqc_fastqc_fastqc-1.txt:md5,4c4f6b548ce4f8fdf829a9a086f1ee9f",
                 "multiqc_general_stats.txt:md5,5101d5d8c65f0b95fda9a7382291a940",
@@ -677,7 +677,7 @@
                 "genome.rev.2.ebwt:md5,65f054c598e3e9fdd33cb22c9f8f8ca5"
             ]
         ],
-        "timestamp": "2026-06-02T12:18:12.286022016",
+        "timestamp": "2026-06-02T15:52:50.979518276",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.0"
