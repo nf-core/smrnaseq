@@ -75,7 +75,6 @@ workflow NFCORE_SMRNASEQ {
         ch_fastq.multiple
     )
     ch_cat_fastq = CAT_FASTQ.out.reads.mix(ch_fastq.single)
-    ch_versions = ch_versions.mix(CAT_FASTQ.out.versions.first())
 
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters & dedup UMIs if necessary / desired by the user
@@ -101,7 +100,6 @@ workflow NFCORE_SMRNASEQ {
         params.save_merged,
         params.min_trimmed_reads
     )
-    ch_versions = ch_versions.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.versions)
 
     ch_reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
     // Trim 3' end nucleotides after adapter is removed, otherwise they are not really trimmed
@@ -123,7 +121,6 @@ workflow NFCORE_SMRNASEQ {
         ch_fastq = channel.value('fastq')
         ch_input_for_collapse = ch_reads_for_mirna.map{ meta, reads -> [meta, reads, []]} //Needs to be done to add a []
         UMICOLLAPSE_FASTQ(ch_input_for_collapse, ch_fastq)
-        ch_versions = ch_versions.mix(UMICOLLAPSE_FASTQ.out.versions)
         UMITOOLS_EXTRACT(UMICOLLAPSE_FASTQ.out.fastq)
 
         // Filter out sequences smaller than params.fastp_min_length
@@ -133,7 +130,6 @@ workflow NFCORE_SMRNASEQ {
             params.save_trimmed_fail,
             params.save_merged
         )
-        ch_versions = ch_versions.mix(FASTP_LENGTH_FILTER.out.versions)
 
         ch_reads_for_mirna = FASTP_LENGTH_FILTER.out.reads
     }
