@@ -5,19 +5,26 @@
             {
                 "BOWTIE_MAP_GENOME": {
                     "bowtie": "1.3.1",
+                    "gzip": 1.12,
                     "samtools": 1.21
                 },
                 "BOWTIE_MAP_HAIRPIN": {
                     "bowtie": "1.3.1",
+                    "gzip": 1.12,
                     "samtools": 1.21
                 },
                 "BOWTIE_MAP_MATURE": {
                     "bowtie": "1.3.1",
+                    "gzip": 1.12,
                     "samtools": 1.21
                 },
                 "BOWTIE_MAP_SEQCLUSTER": {
                     "bowtie": "1.3.1",
+                    "gzip": 1.12,
                     "samtools": 1.21
+                },
+                "CLEAN_FASTA": {
+                    "bioawk": 1.0
                 },
                 "DATATABLE_MERGE": {
                     "r-base": "3.6.2"
@@ -71,28 +78,31 @@
                     "vroom": "1.6.5"
                 },
                 "SAMTOOLS_FLAGSTAT": {
-                    "samtools": "1.22.1"
+                    "samtools": "1.23.1"
                 },
                 "SAMTOOLS_IDXSTATS": {
-                    "samtools": "1.22.1"
+                    "samtools": "1.23.1"
                 },
                 "SAMTOOLS_INDEX": {
-                    "samtools": "1.22.1"
+                    "samtools": "1.23.1"
                 },
                 "SAMTOOLS_SORT": {
-                    "samtools": "1.22.1"
+                    "samtools": "1.23.1"
                 },
                 "SAMTOOLS_STATS": {
-                    "samtools": "1.22.1"
+                    "samtools": "1.23.1"
                 },
                 "SEQCLUSTER_COLLAPSE": {
                     "seqcluster": "1.2.9"
+                },
+                "UNTAR_BOWTIE_INDEX": {
+                    "untar": 1.34
                 }
             },
             [
                 "bowtie_index",
                 "bowtie_index/genome",
-                "bowtie_index/genome/genome_clean.fa",
+                "bowtie_index/genome/_clean.fa",
                 "bowtie_index/mirna_hairpin",
                 "bowtie_index/mirna_hairpin/bowtie",
                 "bowtie_index/mirna_hairpin/bowtie/hairpin.1.ebwt",
@@ -250,6 +260,10 @@
                 "multiqc/multiqc_data/fastqc_sequence_length_distribution_plot.txt",
                 "multiqc/multiqc_data/fastqc_top_overrepresented_sequences_table.txt",
                 "multiqc/multiqc_data/llms-full.txt",
+                "multiqc/multiqc_data/mirtrace_complexity_plot.txt",
+                "multiqc/multiqc_data/mirtrace_length_plot.txt",
+                "multiqc/multiqc_data/mirtrace_qc_plot.txt",
+                "multiqc/multiqc_data/mirtrace_rna_categories_plot.txt",
                 "multiqc/multiqc_data/multiqc.log",
                 "multiqc/multiqc_data/multiqc.parquet",
                 "multiqc/multiqc_data/multiqc_citations.txt",
@@ -279,6 +293,12 @@
                 "multiqc/multiqc_plots/pdf/fastqc_sequence_duplication_levels_plot.pdf",
                 "multiqc/multiqc_plots/pdf/fastqc_sequence_length_distribution_plot.pdf",
                 "multiqc/multiqc_plots/pdf/fastqc_top_overrepresented_sequences_table.pdf",
+                "multiqc/multiqc_plots/pdf/mirtrace_complexity_plot.pdf",
+                "multiqc/multiqc_plots/pdf/mirtrace_length_plot.pdf",
+                "multiqc/multiqc_plots/pdf/mirtrace_qc_plot-cnt.pdf",
+                "multiqc/multiqc_plots/pdf/mirtrace_qc_plot-pct.pdf",
+                "multiqc/multiqc_plots/pdf/mirtrace_rna_categories_plot-cnt.pdf",
+                "multiqc/multiqc_plots/pdf/mirtrace_rna_categories_plot-pct.pdf",
                 "multiqc/multiqc_plots/pdf/samtools-stats-dp.pdf",
                 "multiqc/multiqc_plots/pdf/samtools_alignment_plot-cnt.pdf",
                 "multiqc/multiqc_plots/pdf/samtools_alignment_plot-pct.pdf",
@@ -295,6 +315,12 @@
                 "multiqc/multiqc_plots/png/fastqc_sequence_duplication_levels_plot.png",
                 "multiqc/multiqc_plots/png/fastqc_sequence_length_distribution_plot.png",
                 "multiqc/multiqc_plots/png/fastqc_top_overrepresented_sequences_table.png",
+                "multiqc/multiqc_plots/png/mirtrace_complexity_plot.png",
+                "multiqc/multiqc_plots/png/mirtrace_length_plot.png",
+                "multiqc/multiqc_plots/png/mirtrace_qc_plot-cnt.png",
+                "multiqc/multiqc_plots/png/mirtrace_qc_plot-pct.png",
+                "multiqc/multiqc_plots/png/mirtrace_rna_categories_plot-cnt.png",
+                "multiqc/multiqc_plots/png/mirtrace_rna_categories_plot-pct.png",
                 "multiqc/multiqc_plots/png/samtools-stats-dp.png",
                 "multiqc/multiqc_plots/png/samtools_alignment_plot-cnt.png",
                 "multiqc/multiqc_plots/png/samtools_alignment_plot-pct.png",
@@ -311,6 +337,12 @@
                 "multiqc/multiqc_plots/svg/fastqc_sequence_duplication_levels_plot.svg",
                 "multiqc/multiqc_plots/svg/fastqc_sequence_length_distribution_plot.svg",
                 "multiqc/multiqc_plots/svg/fastqc_top_overrepresented_sequences_table.svg",
+                "multiqc/multiqc_plots/svg/mirtrace_complexity_plot.svg",
+                "multiqc/multiqc_plots/svg/mirtrace_length_plot.svg",
+                "multiqc/multiqc_plots/svg/mirtrace_qc_plot-cnt.svg",
+                "multiqc/multiqc_plots/svg/mirtrace_qc_plot-pct.svg",
+                "multiqc/multiqc_plots/svg/mirtrace_rna_categories_plot-cnt.svg",
+                "multiqc/multiqc_plots/svg/mirtrace_rna_categories_plot-pct.svg",
                 "multiqc/multiqc_plots/svg/samtools-stats-dp.svg",
                 "multiqc/multiqc_plots/svg/samtools_alignment_plot-cnt.svg",
                 "multiqc/multiqc_plots/svg/samtools_alignment_plot-pct.svg",
@@ -327,7 +359,7 @@
                 "untar/bowtie_index/genome.rev.2.ebwt"
             ],
             [
-                "genome_clean.fa:md5,1023292bc0ec00ec22d1c7cf909ff86a",
+                "_clean.fa:md5,1023292bc0ec00ec22d1c7cf909ff86a",
                 "hairpin.1.ebwt:md5,40c2c142e094ab5ea531a0564ad62cee",
                 "hairpin.2.ebwt:md5,6d99166d1a8a7a1bbf262e89db218278",
                 "hairpin.3.ebwt:md5,5c60180e2f6fc2e0c399f10b9f9bbee2",
@@ -342,22 +374,22 @@
                 "mature.rev.2.ebwt:md5,ab52bc362b4c382cf213a71219e9efee",
                 "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,62208acf0c7418d590b41318d7e17d67",
                 "Clone1_N1_mature_hairpin_genome.sorted.idxstats:md5,e0e4a95f5c21a926f7894cf1fbe3110b",
-                "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,bb71e62166f099939b1c4434faea73f5",
+                "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,9144bcdc95c3d38ac548b9cac01ebc9d",
                 "Clone1_N3_mature_hairpin_genome.sorted.flagstat:md5,22d4dffd7b6fc1d2ae7827de3fb68ad7",
                 "Clone1_N3_mature_hairpin_genome.sorted.idxstats:md5,2620288b88bba1ea3315414016c083a1",
-                "Clone1_N3_mature_hairpin_genome.sorted.stats:md5,9a65436ca3202f3093de80df77d07c8d",
+                "Clone1_N3_mature_hairpin_genome.sorted.stats:md5,1e25df10c4b1e82a27cf37114f22ee7a",
                 "Clone1_N1_mature_hairpin.sorted.flagstat:md5,883a0e9f52c4c876ef9847daa63ec0de",
                 "Clone1_N1_mature_hairpin.sorted.idxstats:md5,6601b61f1c8a343ba901f328eb2499ed",
-                "Clone1_N1_mature_hairpin.sorted.stats:md5,43685a0e7d9f120ac0e97bc8914a9c1b",
+                "Clone1_N1_mature_hairpin.sorted.stats:md5,06612991bf5a4f1fa5ff6bff6c0dc107",
                 "Clone1_N3_mature_hairpin.sorted.flagstat:md5,1630edf055b591303d7c68d013745938",
                 "Clone1_N3_mature_hairpin.sorted.idxstats:md5,b44fb26f6be2accc7d52bc38efff69f4",
-                "Clone1_N3_mature_hairpin.sorted.stats:md5,8d01a90bc1eac638d93bcb5617d0bc4a",
+                "Clone1_N3_mature_hairpin.sorted.stats:md5,176c6e8c2d43e03530365b60bcc503b2",
                 "Clone1_N1_mature.sorted.flagstat:md5,f8dd1a5032573e17558964260346c6be",
                 "Clone1_N1_mature.sorted.idxstats:md5,4c3722c4eee312a587e3aea26d240696",
-                "Clone1_N1_mature.sorted.stats:md5,dff314e7fbddef4a97606711bda65363",
+                "Clone1_N1_mature.sorted.stats:md5,a3e381084caa833456c4ca48e9a356f6",
                 "Clone1_N3_mature.sorted.flagstat:md5,9e287eb7ac83624b262864d0255217fd",
                 "Clone1_N3_mature.sorted.idxstats:md5,bde0293f0938a8a074ad3ac633d8cb73",
-                "Clone1_N3_mature.sorted.stats:md5,848f7bbe9965b97fad7c45d11cc5056e",
+                "Clone1_N3_mature.sorted.stats:md5,16243b7107d0a4623ba0e1657f392543",
                 "hairpin.fa_igenome.fa:md5,5fb538f60d5288846600dba31010251e",
                 "hairpin.fa_igenome.fa_idx.fa:md5,482b0327b0c1e36748c1ee3d3be9be77",
                 "mature.fa_igenome.fa:md5,ef4cabcbea05adf334ba6891a50c951a",
@@ -391,11 +423,15 @@
                 "fastqc_sequence_duplication_levels_plot.txt:md5,7e7eb4105b8f963bdf68e422e4ebce67",
                 "fastqc_sequence_length_distribution_plot.txt:md5,ff2def0eab8321d4ed590b483641f43b",
                 "fastqc_top_overrepresented_sequences_table.txt:md5,9d9c0abd48b1872e43ba2248c852fa50",
-                "multiqc_citations.txt:md5,ee1baba4adea57b43a9ae59ce7e1dd7f",
+                "mirtrace_complexity_plot.txt:md5,e27fb1e870985b3fe76744c027ce1c40",
+                "mirtrace_length_plot.txt:md5,7023ffcd95379998adbd65204b9998ee",
+                "mirtrace_qc_plot.txt:md5,49c178fc849a1aa44781ddc67c85927c",
+                "mirtrace_rna_categories_plot.txt:md5,606174b789bdb9841f8e99206d147bb9",
+                "multiqc_citations.txt:md5,9003fcb9991fe8399ef2b9b7a006d46c",
                 "multiqc_fastqc.txt:md5,7c9e3a9e67821f5a086bc55fd37e8833",
                 "multiqc_general_stats.txt:md5,bedaad8087d5dd74849e0e39456b3a5f",
                 "multiqc_mirtrace_complexity.txt:md5,a5ed7a31e0f518871634fc3746d91b68",
-                "multiqc_mirtrace_contamination.txt:md5,1f3da7b044e573c5e77565c83d666f81",
+                "multiqc_mirtrace_contamination.txt:md5,d41d8cd98f00b204e9800998ecf8427e",
                 "multiqc_mirtrace_length.txt:md5,47c48e637c3ed63cad4b31ebf42aa2dd",
                 "multiqc_mirtrace_summary.txt:md5,99394511aacdd525e64c43a2113fc161",
                 "multiqc_samtools_stats.txt:md5,086d3b10496eba32b3422b63fdb49555",
@@ -426,10 +462,10 @@
             ],
             "No VCF files"
         ],
+        "timestamp": "2026-06-02T12:57:21.528097538",
         "meta": {
-            "nf-test": "0.9.3",
-            "nextflow": "25.04.6"
-        },
-        "timestamp": "2026-04-29T22:20:05.590127714"
+            "nf-test": "0.9.5",
+            "nextflow": "26.04.0"
+        }
     }
 }

@@ -20,18 +20,15 @@ def extractFirstIndexPrefix(files_path) {
     if (files == null || files.length == 0) {
         throw new Exception("The provided bowtie_index path doesn't contain any files.")
     }
-    def index_prefix = ''
-    for (file_path in files) {
+    def index_file = files.find { file_path ->
         def file_name = file_path.getName()
-        if (file_name.endsWith(".1.ebwt") && !file_name.endsWith(".rev.1.ebwt")) {
-            index_prefix = file_name.substring(0, file_name.lastIndexOf(".1.ebwt"))
-            break
-        }
+        file_name.endsWith(".1.ebwt") && !file_name.endsWith(".rev.1.ebwt")
     }
-    if (index_prefix == '') {
+    if (index_file == null) {
         throw new Exception("Unable to extract the prefix from the Bowtie index files. No file with the '.1.ebwt' extension was found. Please ensure that the correct files are in the specified path.")
     }
-    return index_prefix
+    def index_file_name = index_file.getName()
+    return index_file_name.substring(0, index_file_name.lastIndexOf(".1.ebwt"))
 }
 
 
@@ -85,8 +82,7 @@ workflow PREPARE_GENOME {
     if(val_fasta) {
         // Clean fasta (replace non-ATCGs with Ns, remove whitespaces from headers)
         // Note: CLEAN_FASTA runs even when a bowtie_index is provided, as cleaning doesn't affect it, making regeneration unnecessary.
-        CLEAN_FASTA ( ch_fasta )
-        ch_versions      = ch_versions.mix(CLEAN_FASTA.out.versions)
+        CLEAN_FASTA ( ch_fasta, [], false, 'fa' )
         ch_fasta         = CLEAN_FASTA.out.output
 
         //Prepare bowtie index, unless specified
@@ -95,11 +91,10 @@ workflow PREPARE_GENOME {
             if (val_bowtie_index.toString().endsWith(".tar.gz")) {
                 UNTAR_BOWTIE_INDEX ( ch_bowtie_index )
                 ch_bowtie_index = UNTAR_BOWTIE_INDEX.out.untar
-                    .map{ meta, index_dir ->
+                    .map{ _meta, index_dir ->
                         def index_prefix = extractFirstIndexPrefix(index_dir)
                         [[id:index_prefix], index_dir]
                     }
-                ch_versions  = ch_versions.mix(UNTAR_BOWTIE_INDEX.out.versions)
             } else {
                 ch_bowtie_index = channel.fromPath(val_bowtie_index, checkIfExists: true)
                     .map{it ->
@@ -112,7 +107,6 @@ workflow PREPARE_GENOME {
 
             // Index FASTA with nf-core Bowtie1
             INDEX_GENOME ( CLEAN_FASTA.out.output )
-            ch_versions      = ch_versions.mix(INDEX_GENOME.out.versions)
 
             // Set channels: clean fasta and its index
             ch_bowtie_index  = INDEX_GENOME.out.index.collect()

@@ -56,27 +56,23 @@ workflow CONTAMINANT_FILTER {
 
     ch_versions     = channel.empty()
     ch_filter_stats = channel.empty()
-    ch_mqc_results  = channel.empty()
 
     ch_reads_for_mirna.set { rrna_reads }
 
     if (params.rrna) {
         // Index DB and filter $reads emit: $rrna_reads
         INDEX_RRNA ( ch_rrna )
-        ch_versions = ch_versions.mix(INDEX_RRNA.out.versions)
 
         // Add meta.contaminant to input reads channel
         ch_reads_for_mirna = ch_reads_for_mirna.map{meta, fastq -> return [[id: meta.id, contaminant: "rRNA", single_end: meta.single_end], fastq]}
 
         // Map which reads are rRNAs
         BOWTIE2_ALIGN_RRNA(ch_reads_for_mirna, INDEX_RRNA.out.index, [[],[]], true, false)
-        ch_versions = ch_versions.mix(BOWTIE2_ALIGN_RRNA.out.versions)
 
         // Obtain how many hits were contaminants
         ch_bowtie = BOWTIE2_ALIGN_RRNA.out.log
 
         STATS_GAWK_RRNA(ch_bowtie, [], false)
-        ch_versions = ch_versions.mix(STATS_GAWK_RRNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
@@ -92,20 +88,17 @@ workflow CONTAMINANT_FILTER {
     if (params.trna) {
         // Index DB and filter $rrna_reads emit: $trna_reads
         INDEX_TRNA ( ch_trna )
-        ch_versions = ch_versions.mix(INDEX_TRNA.out.versions)
 
         // Add meta.contaminant to input reads channel
         rrna_reads = rrna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "tRNA", single_end:meta.single_end], fastq]}
 
         // Map which reads are tRNAs
         BOWTIE2_ALIGN_TRNA(rrna_reads, INDEX_TRNA.out.index, [[],[]], true, false)
-        ch_versions = ch_versions.mix(BOWTIE2_ALIGN_TRNA.out.versions)
 
         // Obtain how many hits were contaminants
         ch_bowtie = BOWTIE2_ALIGN_TRNA.out.log
 
         STATS_GAWK_TRNA(ch_bowtie, [], false)
-        ch_versions = ch_versions.mix(STATS_GAWK_TRNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
@@ -124,37 +117,31 @@ workflow CONTAMINANT_FILTER {
     if (params.cdna) {
         // Search which hairpin miRNAs are present in the cDNA data
         BLAT_CDNA(ch_reference_hairpin, ch_cdna)
-        ch_versions = ch_versions.mix(BLAT_CDNA.out.versions)
 
         // Extract the significant hits
         GAWK_CDNA(BLAT_CDNA.out.psl, ch_program, false)
-        ch_versions = ch_versions.mix(GAWK_CDNA.out.versions)
 
         // Get only unique elements of the list
         ch_pattern = GAWK_CDNA.out.output
-                .map { meta, file -> file.text.readLines() }
+                .map { _meta, file -> file.text.readLines() }
                 .flatten()
                 .unique()
                 .collectFile(name: 'ch_hairpin_cDNA_unique.txt', newLine: true)
 
         // Remove the hairpin miRNAs from the cDNA data
         SEQKIT_GREP_CDNA(ch_cdna, ch_pattern)
-        ch_versions = ch_versions.mix(SEQKIT_GREP_CDNA.out.versions)
 
         // Previous original code:
         INDEX_CDNA ( SEQKIT_GREP_CDNA.out.filter )
-        ch_versions = ch_versions.mix(INDEX_CDNA.out.versions)
 
         // Add meta.contaminant to input reads channel
         trna_reads = trna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "cDNA", single_end:meta.single_end], fastq]}
 
         // Map which reads are cDNA
         BOWTIE2_ALIGN_CDNA(trna_reads, INDEX_CDNA.out.index.first(), [[],[]], true, false)
-        ch_versions = ch_versions.mix(BOWTIE2_ALIGN_CDNA.out.versions)
 
         // Obtain how many hits were contaminants
         STATS_GAWK_CDNA(BOWTIE2_ALIGN_CDNA.out.log, [], false)
-        ch_versions = ch_versions.mix(STATS_GAWK_CDNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
@@ -170,37 +157,31 @@ workflow CONTAMINANT_FILTER {
     if (params.ncrna) {
         // Search which hairpin miRNAs are present in the ncRNA data
         BLAT_NCRNA(ch_reference_hairpin, ch_ncrna)
-        ch_versions = ch_versions.mix(BLAT_NCRNA.out.versions)
 
         // Extract the significant hits
         GAWK_NCRNA(BLAT_NCRNA.out.psl, ch_program, false)
-        ch_versions = ch_versions.mix(GAWK_NCRNA.out.versions)
 
         // Get only unique elements of the list
         ch_pattern = GAWK_NCRNA.out.output
-                .map { meta, file -> file.text.readLines() }
+                .map { _meta, file -> file.text.readLines() }
                 .flatten()
                 .unique()
                 .collectFile(name: 'ch_hairpin_ncRNA_unique.txt', newLine: true)
 
         // Remove the hairpin miRNAs from the ncRNA data
         SEQKIT_GREP_NCRNA(ch_ncrna, ch_pattern)
-        ch_versions = ch_versions.mix(SEQKIT_GREP_NCRNA.out.versions)
 
         // Previous original code:
         INDEX_NCRNA ( SEQKIT_GREP_NCRNA.out.filter )
-        ch_versions = ch_versions.mix(INDEX_NCRNA.out.versions)
 
         // Add meta.contaminant to input reads channel
         cdna_reads = cdna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "ncRNA", single_end:meta.single_end], fastq]}
 
         // Map which reads are ncRNA
         BOWTIE2_ALIGN_NCRNA(cdna_reads, INDEX_NCRNA.out.index.first(), [[],[]], true, false)
-        ch_versions = ch_versions.mix(BOWTIE2_ALIGN_NCRNA.out.versions)
 
         // Obtain how many hits were contaminants
         STATS_GAWK_NCRNA(BOWTIE2_ALIGN_NCRNA.out.log, [], false)
-        ch_versions = ch_versions.mix(STATS_GAWK_NCRNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
@@ -216,37 +197,31 @@ workflow CONTAMINANT_FILTER {
     if (params.pirna) {
         // Search which hairpin miRNAs are present in the piRNA data
         BLAT_PIRNA(ch_reference_hairpin, ch_pirna)
-        ch_versions = ch_versions.mix(BLAT_PIRNA.out.versions)
 
         // Extract the significant hits
         GAWK_PIRNA(BLAT_PIRNA.out.psl, ch_program, false)
-        ch_versions = ch_versions.mix(GAWK_PIRNA.out.versions)
 
         // Get only unique elements of the list
         ch_pattern = GAWK_PIRNA.out.output
-                .map { meta, file -> file.text.readLines() }
+                .map { _meta, file -> file.text.readLines() }
                 .flatten()
                 .unique()
                 .collectFile(name: 'ch_hairpin_piRNA_unique.txt', newLine: true)
 
         // Remove the hairpin miRNAs from the piRNA data
         SEQKIT_GREP_PIRNA(ch_pirna, ch_pattern)
-        ch_versions = ch_versions.mix(SEQKIT_GREP_PIRNA.out.versions)
 
         // Previous original code:
         INDEX_PIRNA ( SEQKIT_GREP_PIRNA.out.filter )
-        ch_versions = ch_versions.mix(INDEX_PIRNA.out.versions)
 
         // Add meta.contaminant to input reads channel
         ncrna_reads = ncrna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "piRNA", single_end:meta.single_end], fastq]}
 
         // Map which reads are piRNA
         BOWTIE2_ALIGN_PIRNA(ncrna_reads, INDEX_PIRNA.out.index.first(), [[],[]], true, false)
-        ch_versions = ch_versions.mix(BOWTIE2_ALIGN_PIRNA.out.versions)
 
         // Obtain how many hits were contaminants
         STATS_GAWK_PIRNA(BOWTIE2_ALIGN_PIRNA.out.log, [], false)
-        ch_versions = ch_versions.mix(STATS_GAWK_PIRNA.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
@@ -262,34 +237,28 @@ workflow CONTAMINANT_FILTER {
     if (params.other_contamination) {
         // Search which hairpin miRNAs are present in the other data
         BLAT_OTHER(ch_reference_hairpin, ch_other_contamination)
-        ch_versions = ch_versions.mix(BLAT_OTHER.out.versions)
 
         // Extract the significant hits
         GAWK_OTHER(BLAT_OTHER.out.psl, ch_program, false)
-        ch_versions = ch_versions.mix(GAWK_OTHER.out.versions)
 
         // Get only unique elements of the list
         ch_pattern = GAWK_OTHER.out.output
-                .map { meta, file -> file.text.readLines() }
+                .map { _meta, file -> file.text.readLines() }
                 .flatten()
                 .unique()
                 .collectFile(name: 'ch_hairpin_other_unique.txt', newLine: true)
 
         // Remove the hairpin miRNAs from the other data
         SEQKIT_GREP_OTHER(ch_other_contamination, ch_pattern)
-        ch_versions = ch_versions.mix(SEQKIT_GREP_OTHER.out.versions)
 
         // Previous original code:
         INDEX_OTHER ( SEQKIT_GREP_OTHER.out.filter )
-        ch_versions = ch_versions.mix(INDEX_OTHER.out.versions)
 
         // Map which reads are other
         BOWTIE2_ALIGN_OTHER(pirna_reads, INDEX_OTHER.out.index.first(), [[],[]], true, false)
-        ch_versions = ch_versions.mix(BOWTIE2_ALIGN_OTHER.out.versions)
 
         // Obtain how many hits were contaminants
         STATS_GAWK_OTHER(BOWTIE2_ALIGN_OTHER.out.log, [], false)
-        ch_versions = ch_versions.mix(STATS_GAWK_OTHER.out.versions)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
