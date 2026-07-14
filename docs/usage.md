@@ -92,7 +92,9 @@ The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire r
 >
 > This warning is based on the execution order (`fastp` → `umicollapse` → `umi_tools extract`) and the resulting empty output when the adapter is trimmed before regex-based UMI extraction.
 >
-> In these cases where UMI trimming relies on the adapter sequence for the location of the UMIs, you can disable fastp trimming for the run (e.g. `--skip_fastp`).
+> In these cases where UMI trimming relies on the adapter sequence for the location of the UMIs, you can use
+> `--skip_fastp` to skip the initial adapter-trimming step. This does not disable `fastp` entirely: with `--with_umi`,
+> the pipeline still runs a separate `fastp` length-filtering step after `umi_tools extract`.
 
 ## Samplesheet input
 
