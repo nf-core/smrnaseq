@@ -1,4 +1,4 @@
-# nf-core/smrnaseq: Usage
+﻿# nf-core/smrnaseq: Usage
 
 ## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/smrnaseq/usage](https://nf-co.re/smrnaseq/usage)
 
@@ -22,7 +22,7 @@ This option is not chosen as a parameter but as an additional profile that sets 
 -profile your_other_profiles,illumina
 ```
 
-For NEXTFLEX libraries, use `nextflex` for the NEXTFLEX Small RNA-Seq Kit v3 chemistry and `nextflex_v4` for the v4 chemistry. For v4, the settings follow the [manufacturer's trimming instructions](https://resources.revvity.com/pdfs/Nextflex%20Small%20RNA%20trimming%20instructions.pdf), which specify the 3' adapter and a minimum read length of 16 nt without additional fixed 5' or 3' clipping.
+For NEXTFLEX libraries, use `nextflex` for the NEXTFLEX Small RNA-Seq Kit v3 chemistry and `nextflex_v4` for the v4 chemistry. For v4, the settings follow the [manufacturer's trimming instructions](https://resources.revvity.com/pdfs/man-nextflex-small-rna-trimming-instructions.pdf), which specify the 3' adapter and a minimum read length of 16 nt without additional fixed 5' or 3' clipping.
 
 In case you have a custom protocol, please supply the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` manually and adapt `fastp_min_length` if required by your protocol.
 
