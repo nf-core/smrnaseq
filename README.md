@@ -121,7 +121,7 @@ nextflow run nf-core/smrnaseq \
 ```
 
 > [!IMPORTANT]
-> Remember to add a protocol as an additional profile (such as `illumina`, `nexttflex`, `qiaseq` or `cats`) when running with your own data. If no protocol is indicated via -profile, the pipeline will likely fail. Alternatively, if needed to run a custom protocol, parameters must be set manually, and auto-detect feature is available. See [usage documentation](https://nf-co.re/smrnaseq/usage) for more details about these profiles.
+> Remember to add a protocol as an additional profile (such as `illumina`, `nextflex`, `nextflex_v4`, `qiaseq` or `cats`) when running with your own data. For NEXTFLEX libraries, use `nextflex` for v3 chemistry and `nextflex_v4` for v4 chemistry. If no protocol is indicated via -profile, the pipeline will likely fail. Alternatively, if needed to run a custom protocol, parameters must be set manually, and auto-detect feature is available. See [usage documentation](https://nf-co.re/smrnaseq/usage) for more details about these profiles.
 
 > [!WARNING]
 > Please provide pipeline parameters via the CLI or Nextflow `-params-file` option. Custom config files including those provided by the `-c` Nextflow option can be used to provide any configuration _**except for parameters**_; see [docs](https://nf-co.re/docs/usage/getting_started/configuration#custom-configuration-files).
