@@ -1,0 +1,42 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "parse/fasta_mirna"
+description: Clean, species-filter, and convert miRNA FASTA references from RNA to DNA alphabet.
+keywords:
+  - fasta
+  - mirna
+  - parse
+  - seqkit
+tools:
+  - "seqkit":
+      description: "SeqKit is a cross-platform and ultrafast toolkit for FASTA/Q file manipulation."
+      homepage: "https://bioinf.shenwei.me/seqkit/"
+      documentation: "https://bioinf.shenwei.me/seqkit/usage/"
+      tool_dev_url: "https://github.com/shenwei356/seqkit"
+      doi: "10.1371/journal.pone.0163962"
+      licence: ["MIT"]
+input:
+  - meta2:
+      type: map
+      description: |
+        Groovy Map containing reference information.
+        e.g. [ id:'mature' ]
+  - fasta:
+      type: file
+      description: Input miRNA FASTA file.
+      pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
+  - filter_species:
+      type: string
+      description: miRBase-style species identifier used to filter FASTA records.
+output:
+  - parsed_fasta:
+      type: file
+      description: Parsed and species-filtered miRNA FASTA file.
+      pattern: "*_igenome.fa"
+  - versions:
+      type: file
+      description: File containing software versions.
+      pattern: "versions.yml"
+authors:
+  - "@atrigila"
+maintainers:
+  - "@atrigila"
