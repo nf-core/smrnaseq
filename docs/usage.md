@@ -90,9 +90,9 @@ The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire r
 > [!WARNING]
 > Some UMI kits (e.g. QIAseq) locate the UMI relative to a kit-specific adapter/anchor sequence (e.g. AACTGTAGGCACCATCAAT). In nf-core/smrnaseq v2.4.1, `fastp` trims the protocol adapter sequence before `umi_tools extract`. If your `umitools_bc_pattern` requires the adapter/anchor sequence, the regex will not match (often resulting in an empty FASTQ and/or “regex does not match” messages).
 >
-> This warning is based on the execution order (`fastp` → `umicollapse` → `umi_tools extract`) and the resulting empty output when the adapter is trimmed before regex-based UMI extraction.
+> This warning is based on the execution order and the resulting empty output when the adapter is trimmed before regex-based UMI extraction. In the default UMI handling order, `fastp` adapter trimming runs first, followed by `umicollapse` deduplication and then `umi_tools extract`; a final `fastp` length-only pass runs after UMI extraction to remove short reads.
 >
-> In these cases where UMI trimming relies on the adapter sequence for the location of the UMIs, you can disable fastp trimming for the run (e.g. `--skip_fastp`).
+> In these cases where UMI trimming relies on the adapter sequence for the location of the UMIs, you can prevent `fastp` from adapter-trimming the reads before UMI extraction with `--skip_fastp`. Note that `--skip_fastp` does not disable `fastp` entirely: the length-only `fastp` pass after UMI extraction is still executed (with adapter and quality trimming disabled).
 
 ## Samplesheet input
 
