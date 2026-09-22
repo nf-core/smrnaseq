@@ -1,0 +1,87 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "contaminant_filter"
+description: Filter reads against rRNA, tRNA, cDNA, ncRNA, piRNA and additional contaminant references.
+keywords:
+  - contaminant
+  - filter
+  - bowtie2
+  - mirna
+components:
+  - blat
+  - gawk
+  - seqkit/grep
+  - bowtie2/build
+  - bowtie2/align
+  - filter/stats
+input:
+  - ch_reference_hairpin:
+      type: file
+      description: |
+        Input channel containing the reference hairpin miRNA FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_rrna:
+      type: file
+      description: |
+        Input channel containing the rRNA contaminant FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_trna:
+      type: file
+      description: |
+        Input channel containing the tRNA contaminant FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_cdna:
+      type: file
+      description: |
+        Input channel containing the cDNA contaminant FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_ncrna:
+      type: file
+      description: |
+        Input channel containing the ncRNA contaminant FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_pirna:
+      type: file
+      description: |
+        Input channel containing the piRNA contaminant FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_other_contamination:
+      type: file
+      description: |
+        Input channel containing an additional contaminant FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_reads_for_mirna:
+      type: file
+      description: |
+        Input channel containing reads to filter for downstream miRNA quantification.
+        Structure: [ val(meta), path(reads) ]
+      pattern: "*.{fastq,fastq.gz,fq,fq.gz}"
+output:
+  - filtered_reads:
+      type: file
+      description: |
+        Channel containing reads after contaminant filtering.
+        Structure: [ val(meta), path(fastq) ]
+      pattern: "*.{fastq,fastq.gz,fq,fq.gz}"
+  - filter_stats:
+      type: file
+      description: |
+        Channel containing contaminant filtering statistics.
+        Structure: [ path(stats) ]
+      pattern: "*.{txt,tsv}"
+  - versions:
+      type: file
+      description: |
+        File containing software versions.
+        Structure: [ path(versions.yml) ]
+      pattern: "versions.yml"
+authors:
+  - "@atrigila"
+maintainers:
+  - "@atrigila"

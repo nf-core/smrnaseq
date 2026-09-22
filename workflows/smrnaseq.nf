@@ -3,12 +3,27 @@
     IMPORT MODULES / SUBWORKFLOWS / FUNCTIONS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
-include { FASTQC                 } from '../modules/nf-core/fastqc/main'
-include { MULTIQC                } from '../modules/nf-core/multiqc/main'
-include { paramsSummaryMap       } from 'plugin/nf-schema'
-include { paramsSummaryMultiqc   } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
+// nf-core modules
+include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/main'
+include { FASTQC                           } from '../modules/nf-core/fastqc/main'
+include { FASTP as FASTP_LENGTH_FILTER     } from '../modules/nf-core/fastp'
+include { FASTP as FASTP3                  } from '../modules/nf-core/fastp'
+include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
+include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
+include { UMITOOLS_EXTRACT                 } from '../modules/nf-core/umitools/extract/main'
+include { MIRTRACE_QC                      } from '../modules/nf-core/mirtrace/qc/main'
+// nf-core subworkflows
+include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
+include { FASTQ_FIND_MIRNA_MIRDEEP2        } from '../subworkflows/nf-core/fastq_find_mirna_mirdeep2/main'
+include { paramsSummaryMultiqc             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils_nfcore_pipeline'
+// local subworkflows
+include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/main'
+include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant/main'
+include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant/main'
+include { methodsDescriptionText           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
+// plugins
+include { paramsSummaryMap                 } from 'plugin/nf-schema'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -16,24 +31,202 @@ include { methodsDescriptionText } from '../subworkflows/local/utils_nfcore_smrn
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-workflow SMRNASEQ {
+workflow NFCORE_SMRNASEQ {
 
     take:
-    ch_samplesheet // channel: samplesheet read in from --input
-    multiqc_config
-    multiqc_logo
-    multiqc_methods_description
-    outdir
+    has_fasta              // boolean
+    has_mirtrace_species   // boolean
+    ch_mirna_adapters      // channel: [ val(string) ]
+    ch_mirtrace_species    // channel: [ val(string) ]
+    ch_reference_mature    // channel: [ val(meta), path(fasta) ]
+    ch_reference_hairpin   // channel: [ val(meta), path(fasta) ]
+    ch_mirna_gtf           // channel: [ val(meta), path(gtf) ]
+    ch_fasta               // channel: [ val(meta), path(fasta) ]
+    ch_bowtie_index        // channel: [ val(meta), [ path(directory_index) ] ]
+    ch_rrna                // channel: [ val(meta), path(fasta) ]
+    ch_trna                // channel: [ val(meta), path(fasta) ]
+    ch_cdna                // channel: [ val(meta), path(fasta) ]
+    ch_ncrna               // channel: [ val(meta), path(fasta) ]
+    ch_pirna               // channel: [ val(meta), path(fasta) ]
+    ch_other_contamination // channel: [ val(meta), path(fasta) ]
+    ch_samplesheet         // channel: sample fastqs parsed from --input
+    ch_three_prime_adapter // channel: [ val(string) ]
+    ch_phred_offset        // channel: [ val(string) ]
 
     main:
 
     def ch_versions = channel.empty()
     def ch_multiqc_files = channel.empty()
     //
-    // MODULE: Run FastQC
+    // Create separate channels for samples that have single/multiple FastQ files to merge
     //
-    FASTQC(ch_samplesheet)
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.map{ _meta, file -> file })
+    ch_fastq = ch_samplesheet
+        .branch {
+            meta, fastqs ->
+                single  : fastqs.size() == 1
+                    return [ meta, fastqs.flatten() ]
+                multiple: fastqs.size() > 1
+                    return [ meta, fastqs.flatten() ]
+        }
+    //
+    // MODULE: Concatenate FastQ files from same sample if required
+    //
+    CAT_FASTQ (
+        ch_fastq.multiple
+    )
+    ch_cat_fastq = CAT_FASTQ.out.reads.mix(ch_fastq.single)
+
+    //
+    // SUBWORKFLOW: Read QC, extract UMI and trim adapters & dedup UMIs if necessary / desired by the user
+    //
+    if ( params.skip_fastp && params.skip_fastqc ) {
+        exit 1, "At least one of skip_fastp or skip_fastqc must be false"
+    }
+
+    if (params.with_umi) {
+        ch_cat_fastq = ch_cat_fastq.map { meta, reads -> [meta, reads, []] }
+    } else {
+        ch_cat_fastq = ch_cat_fastq.combine(ch_mirna_adapters)
+    }
+
+    FASTQ_FASTQC_UMITOOLS_FASTP (
+        ch_cat_fastq,
+        params.skip_fastqc,
+        params.with_umi,
+        params.skip_umi_extract_before_dedup,
+        params.umi_discard_read,
+        params.skip_fastp,
+        params.save_trimmed_fail,
+        params.save_merged,
+        params.min_trimmed_reads
+    )
+
+    ch_reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
+    // Trim 3' end nucleotides after adapter is removed, otherwise they are not really trimmed
+    if (params.three_prime_clip_r1){
+        FASTP3(
+            ch_reads_for_mirna.map { meta, reads -> [meta, reads, []] },
+            false,
+            false,
+            false
+        )
+        ch_reads_for_mirna  = FASTP3.out.reads
+    }
+
+    // UMI Dedup for fastq input
+    // This involves running on the sequencing adapter trimmed remnants of the entire reads
+    // consisting of sequence + common sequence "miRNA adapter" + UMI
+    // once collapsing happened, we will use umitools extract to get rid of the common miRNA sequence + the UMI to have only plain collapsed reads without any other clutter
+    if (params.with_umi) {
+        ch_fastq = channel.value('fastq')
+        ch_input_for_collapse = ch_reads_for_mirna.map{ meta, reads -> [meta, reads, []]} //Needs to be done to add a []
+        UMICOLLAPSE_FASTQ(ch_input_for_collapse, ch_fastq)
+        UMITOOLS_EXTRACT(UMICOLLAPSE_FASTQ.out.fastq)
+
+        // Filter out sequences smaller than params.fastp_min_length
+        FASTP_LENGTH_FILTER (
+            UMITOOLS_EXTRACT.out.reads.map {meta, reads -> [meta, reads, []] },
+            false,
+            params.save_trimmed_fail,
+            params.save_merged
+        )
+
+        ch_reads_for_mirna = FASTP_LENGTH_FILTER.out.reads
+    }
+
+    //
+    // MODULE: mirtrace QC
+    //
+
+    ch_mirtrace_config = ch_reads_for_mirna
+        .transpose()
+        .combine(ch_three_prime_adapter)
+        .combine(ch_phred_offset)
+        .collectFile { meta, reads, adapter, phred ->
+        def config_filename = "${meta.id}.data"
+        [ config_filename, "./${reads.getFileName().toString()},${meta.id},${adapter},${phred}\n" ]
+        }
+        .map { config_file ->
+        def base_name = config_file.getBaseName()
+        [ ['id':base_name], config_file ]
+    }
+
+    ch_mirtrace_qc_inputs = ch_reads_for_mirna
+            .map{meta, reads -> [[id: meta.id], reads]}
+            .join(ch_mirtrace_config)
+
+    if (has_mirtrace_species){
+
+        MIRTRACE_QC(ch_mirtrace_qc_inputs, ch_mirtrace_species)
+        ch_versions = ch_versions.mix(MIRTRACE_QC.out.versions)
+
+    } else {
+        log.warn "The parameter --mirtrace_species is absent. MIRTRACE quantification skipped."
+    }
+
+    //
+    // SUBWORKFLOW: remove contaminants from reads
+    //
+    contamination_stats = channel.empty()
+    if (params.filter_contamination){
+        CONTAMINANT_FILTER (
+            ch_reference_hairpin,
+            ch_rrna,
+            ch_trna,
+            ch_cdna,
+            ch_ncrna,
+            ch_pirna,
+            ch_other_contamination,
+            ch_reads_for_mirna
+        )
+        contamination_stats = CONTAMINANT_FILTER.out.filter_stats
+        ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
+        ch_reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
+    }
+
+    //MIRNA_QUANT process should still run even if mirtrace_species is null, when mirgendb is true
+    MIRNA_QUANT (
+        ch_reference_mature,
+        ch_reference_hairpin,
+        ch_mirna_gtf,
+        ch_reads_for_mirna,
+        ch_mirtrace_species
+    )
+    ch_versions = ch_versions.mix(MIRNA_QUANT.out.versions)
+
+    //
+    // GENOME
+    //
+    genome_stats = channel.empty()
+    if (has_fasta){
+        GENOME_QUANT (
+            ch_bowtie_index,
+            ch_fasta,
+            MIRNA_QUANT.out.unmapped
+        )
+        genome_stats = GENOME_QUANT.out.stats
+        ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
+
+        ch_hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
+        ch_mature_clean  = MIRNA_QUANT.out.fasta_mature.map { it -> it[1] }
+
+        ch_mature_hairpin = ch_mature_clean
+                .combine(ch_hairpin_clean)
+                .map { mature, hairpin ->
+                    [[id: 'mature_hairpin'], mature, hairpin, []]
+                }
+                .first()
+
+        if (!params.skip_mirdeep) {
+                FASTQ_FIND_MIRNA_MIRDEEP2 (
+                        ch_reads_for_mirna,
+                        ch_fasta,
+                        ch_bowtie_index,
+                        ch_mature_hairpin,
+                )
+        ch_versions = ch_versions.mix(FASTQ_FIND_MIRNA_MIRDEEP2.out.versions)
+        }
+    }
 
     //
     // Collate and save software versions
@@ -58,7 +251,7 @@ workflow SMRNASEQ {
     def ch_collated_versions = softwareVersionsToYAML(ch_versions.mix(topic_versions.versions_file))
         .mix(topic_versions_string)
         .collectFile(
-            storeDir: "${outdir}/pipeline_info",
+            storeDir: "${params.outdir}/pipeline_info",
             name: 'nf_core_'  +  'smrnaseq_software_'  + 'mqc_'  + 'versions.yml',
             sort: true,
             newLine: true
@@ -67,33 +260,73 @@ workflow SMRNASEQ {
     //
     // MODULE: MultiQC
     //
-    ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
-    def ch_summary_params = paramsSummaryMap(workflow, parameters_schema: "nextflow_schema.json")
-    def ch_workflow_summary = channel.value(paramsSummaryMultiqc(ch_summary_params))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-    def ch_multiqc_custom_methods_description = multiqc_methods_description
-        ? file(multiqc_methods_description, checkIfExists: true)
-        : file("${projectDir}/assets/methods_description_template.yml", checkIfExists: true)
-    def ch_methods_description = channel.value(methodsDescriptionText(ch_multiqc_custom_methods_description))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_methods_description.collectFile(name: 'methods_description_mqc.yaml', sort: true))
-    MULTIQC(
-        ch_multiqc_files.flatten().collect().map { files ->
-            [
-                [id: 'smrnaseq'],
-                files,
-                multiqc_config
-                    ? file(multiqc_config, checkIfExists: true)
-                    : file("${projectDir}/assets/multiqc_config.yml", checkIfExists: true),
-                multiqc_logo ? file(multiqc_logo, checkIfExists: true) : [],
-                [],
-                [],
-            ]
-        }
-    )
-    emit:multiqc_report = MULTIQC.out.report.map { _meta, report -> [report] }.toList() // channel: /path/to/multiqc_report.html
-    versions       = ch_versions                 // channel: [ path(versions.yml) ]
-}
+    ch_multiqc_report = channel.empty()
+    if (!params.skip_multiqc) {
+        summary_params      = paramsSummaryMap(
+            workflow, parameters_schema: "nextflow_schema.json")
+        ch_workflow_summary = channel.value(paramsSummaryMultiqc(summary_params))
+        // ch_methods_description                = channel.value(
+        //     methodsDescriptionText(ch_multiqc_custom_methods_description))
 
+        ch_multiqc_files = channel.empty()
+        ch_multiqc_files = ch_multiqc_files.mix(
+            ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml"))
+        ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
+        // ch_multiqc_files = ch_multiqc_files.mix(
+        //     ch_methods_description.collectFile(
+        //         name: "methods_description_mqc.yaml",
+        //         sort: true
+        //     )
+        // )
+
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip.collect { item -> item[1] }.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_zip.collect { item -> item[1] }.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_json.collect { item -> item[1] }.ifEmpty([]))
+        if(params.with_umi) {
+            ch_multiqc_files = ch_multiqc_files.mix(UMICOLLAPSE_FASTQ.out.log.collect { item -> item[1] }.ifEmpty([]))
+        }
+        ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(genome_stats.collect { item -> item[1] }.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mature_stats.collect { item -> item[1] }.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.hairpin_stats.collect { item -> item[1] }.ifEmpty([]))
+        ch_multiqc_files = ch_multiqc_files.mix(MIRNA_QUANT.out.mirtop_logs.collect { item -> item[1] }.ifEmpty([]))
+        if (has_mirtrace_species){
+            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.html.collect { item -> item[1] }.ifEmpty([]))
+            ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.json.collect { item -> item[1] }.ifEmpty([]))
+            ch_mirtrace_tsv_for_multiqc = MIRTRACE_QC.out.tsv
+                .map { _meta, tsv_files ->
+                    tsv_files.findAll { tsv ->
+                        def lines = tsv.text.readLines().drop(1).findAll { line -> line.trim() }
+                        tsv.name == "mirtrace-stats-contamination_detailed.tsv" ? lines :
+                            tsv.name == "mirtrace-stats-contamination_basic.tsv" ?
+                                lines.any { line -> line.split("\t").drop(1).any { value -> value ==~ /-?\d+/ && value.toInteger() != 0 } } :
+                                true
+                    }
+                }
+                .flatten()
+                .collect()
+                .ifEmpty([])
+            ch_multiqc_files = ch_multiqc_files.mix(ch_mirtrace_tsv_for_multiqc)
+        }
+
+        def ch_multiqc_config_files = params.multiqc_config ?
+            [ file("$projectDir/assets/multiqc_config.yml", checkIfExists: true), file(params.multiqc_config, checkIfExists: true) ] :
+            [ file("$projectDir/assets/multiqc_config.yml", checkIfExists: true) ]
+        def ch_multiqc_logo_file = params.multiqc_logo ? file(params.multiqc_logo, checkIfExists: true) : []
+        ch_multiqc_input = ch_multiqc_files.collect()
+            .map { multiqc_files ->
+                [ [ id: "multiqc" ], multiqc_files, ch_multiqc_config_files, ch_multiqc_logo_file, [], [] ]
+            }
+
+        MULTIQC ( ch_multiqc_input )
+        ch_multiqc_report = MULTIQC.out.report
+
+    }
+
+    emit:
+    multiqc_report = ch_multiqc_report // channel: /path/to/multiqc_report.html
+    versions       = ch_versions       // channel: [ path(versions.yml) ]
+}
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     THE END
