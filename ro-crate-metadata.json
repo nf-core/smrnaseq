@@ -361,67 +361,7 @@
             "url": "https://nf-co.re/"
         },
         {
-            "@id": "https://orcid.org/0000-0002-6550-3384",
-            "@type": "Person",
-            "email": "konrad@konsta.com.pl",
-            "name": "Konrad Stawiski"
-        },
-        {
-            "@id": "https://orcid.org/0000-0003-3220-0253",
-            "@type": "Person",
-            "email": "paolo.ditommaso@gmail.com",
-            "name": "Paolo Di Tommaso"
-        },
-        {
-            "@id": "#andres.fernandez_benevento.ext@boehringer-ingelheim.com",
-            "@type": "Person",
-            "email": "andres.fernandez_benevento.ext@boehringer-ingelheim.com",
-            "name": "zxBIB Fernandez_Benevento"
-        },
-        {
-            "@id": "https://orcid.org/0000-0003-2493-6543",
-            "@type": "Person",
-            "email": "sarahqd@gmail.com",
-            "name": "Sarah Djebali Quelen"
-        },
-        {
-            "@id": "#danielsson.erik.0@gmail.com",
-            "@type": "Person",
-            "email": "danielsson.erik.0@gmail.com",
-            "name": "Erik Danielsson"
-        },
-        {
-            "@id": "#chuan.wang@scilifelab.se",
-            "@type": "Person",
-            "email": "chuan.wang@scilifelab.se",
-            "name": "Chuan Wang"
-        },
-        {
-            "@id": "https://orcid.org/0000-0002-3859-3249",
-            "@type": "Person",
-            "email": "lorena.pantano@gmail.com",
-            "name": "Lorena Pantano"
-        },
-        {
-            "@id": "#phil.ewels@scilifelab.se",
-            "@type": "Person",
-            "email": "phil.ewels@scilifelab.se",
-            "name": "Phil Ewels"
-        },
-        {
-            "@id": "https://orcid.org/0000-0001-9017-591X",
-            "@type": "Person",
-            "email": "rickard.hammaren@scilifelab.se",
-            "name": "Rickard Hammar\u00e9n"
-        },
-        {
-            "@id": "#schcolni@inhccews03.eu.boehringer.com",
-            "@type": "Person",
-            "email": "schcolni@inhccews03.eu.boehringer.com",
-            "name": "zxBIB Schcolnicov"
-        },
-        {
-            "@id": "https://orcid.org/0000-0002-6503-2180",
+            "@id": "#7b913e8e-0816-4240-952e-48b3b8a2b9bf",
             "@type": "Person",
             "email": "apeltzer@users.noreply.github.com",
             "name": "Alexander Peltzer"
@@ -439,13 +379,13 @@
             "name": "lluc cab\u00fas"
         },
         {
-            "@id": "https://orcid.org/0000-0002-5228-985X",
+            "@id": "#a503e722-33fd-487f-9716-7660d544d811",
             "@type": "Person",
             "email": "kevin.menden@t-online.de",
             "name": "Kevin Menden"
         },
         {
-            "@id": "#drpatelh@users.noreply.github.com",
+            "@id": "#9caad318-efc0-4039-90a3-00fb7ef123c9",
             "@type": "Person",
             "email": "drpatelh@users.noreply.github.com",
             "name": "Harshil Patel"
