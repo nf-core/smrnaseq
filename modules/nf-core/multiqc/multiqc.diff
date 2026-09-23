@@ -1,0 +1,19 @@
+Changes in component 'nf-core/multiqc'
+Changes in 'multiqc/environment.yml':
+--- modules/nf-core/multiqc/environment.yml
++++ modules/nf-core/multiqc/environment.yml
+@@ -5,3 +5,4 @@
+   - bioconda
+ dependencies:
+   - bioconda::multiqc=1.35
++  - conda-forge::plotly=6.6.0 
+
+'modules/nf-core/multiqc/main.nf' is unchanged
+'modules/nf-core/multiqc/meta.yml' is unchanged
+'modules/nf-core/multiqc/.conda-lock/linux_amd64-bd-c17fb751507e9dfc_1.txt' is unchanged
+'modules/nf-core/multiqc/.conda-lock/linux_arm64-bd-5c84a5000a226ab5_1.txt' is unchanged
+'modules/nf-core/multiqc/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/multiqc/tests/custom_prefix.config' is unchanged
+'modules/nf-core/multiqc/tests/main.nf.test' is unchanged
+'modules/nf-core/multiqc/tests/nextflow.config' is unchanged
+************************************************************
