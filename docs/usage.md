@@ -81,20 +81,18 @@ Error 255 is typically related to the core algorithm of miRDeep generating empty
 The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire read sequence after 3'adapter removal. Followed by Umitools-extract to extract the miRNA adapter and UMI. This can be achieved by using the parameters for UMI handling as follows (in this case for QIAseq miRNA Library Kit):
 
 ```bash
---with_umi --umitools_extract_method regex --umitools_bc_pattern = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
+--with_umi --umitools_extract_method regex --umitools_bc_pattern '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
 ```
 
 > [!NOTE]
 > If your UMI read structure differs, you'll need to specify custom `umitools_bc_pattern` patterns. Ensure that the pattern is set so that only the insert sequence of the RNA molecule remains after extraction. For details, refer to the UMI handling manual or the documentation of the kit you're using for the expected read structure.
 
 > [!WARNING]
-> Some UMI kits (e.g. QIAseq) locate the UMI relative to a kit-specific adapter/anchor sequence (e.g. AACTGTAGGCACCATCAAT). In nf-core/smrnaseq v2.4.1, `fastp` trims the protocol adapter sequence before `umi_tools extract`. If your `umitools_bc_pattern` requires the adapter/anchor sequence, the regex will not match (often resulting in an empty FASTQ and/or “regex does not match” messages).
+> Some UMI kits (e.g. QIAseq) locate the UMI relative to a kit-specific adapter/anchor sequence (e.g. AACTGTAGGCACCATCAAT). From nf-core/smrnaseq v2.4.1, `fastp` trims the protocol adapter sequence before `umi_tools extract`. If your `umitools_bc_pattern` requires the adapter/anchor sequence, the regex will not match (often resulting in an empty FASTQ and/or “regex does not match” messages).
 >
-> This warning is based on the execution order (`fastp` → `umicollapse` → `umi_tools extract`) and the resulting empty output when the adapter is trimmed before regex-based UMI extraction.
+> This warning is based on the execution order and the resulting empty output when the adapter is trimmed before regex-based UMI extraction. In the default UMI handling order, `fastp` adapter trimming runs first, followed by `umicollapse` deduplication and then `umi_tools extract`; a final `fastp` length-only pass runs after UMI extraction to remove short reads.
 >
-> In these cases where UMI trimming relies on the adapter sequence for the location of the UMIs, you can use
-> `--skip_fastp` to skip the initial adapter-trimming step. This does not disable `fastp` entirely: with `--with_umi`,
-> the pipeline still runs a separate `fastp` length-filtering step after `umi_tools extract`.
+> In these cases where UMI trimming relies on the adapter sequence for the location of the UMIs, you can prevent `fastp` from initial adapter-trimming the reads before UMI extraction with `--skip_fastp`. Note that `--skip_fastp` does not disable `fastp` entirely: the length-only `fastp` pass after UMI extraction is still executed (with adapter and quality trimming disabled). When using with `--with_umi`, the pipeline still runs a separate `fastp` length-filtering step after `umi_tools extract`.
 
 ## Samplesheet input
 
@@ -287,9 +285,37 @@ To use a different container from the default container or conda environment spe
 
 ### Custom Tool Arguments
 
-A pipeline might not always support every possible argument or option of a particular tool used in pipeline. Fortunately, nf-core pipelines provide some freedom to users to insert additional parameters that the pipeline does not include by default.
+A pipeline might not expose every command-line option of every tool as a pipeline parameter. For supported nf-core modules, you can pass extra tool options with the `ext.args` process directive in a Nextflow config file. This is useful, for example, when you want to change Bowtie's mismatch settings or add an option to a SAMtools command. These are module arguments, so put them in a custom config passed with `-c`; pipeline parameters belong in the CLI or a `-params-file` (see [running the pipeline](#running-the-pipeline)).
 
-To learn how to provide additional arguments to a particular tool of the pipeline, please see the [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) section of the nf-core website.
+For this pipeline, the alignment module is named `BOWTIE_ALIGN`. It runs both Bowtie and `samtools view`: set `ext.args` for Bowtie options and `ext.args2` for `samtools view` options. For the separate sorting step, use `ext.args` on `SAMTOOLS_SORT`.
+
+For example, create `tool_args.config`:
+
+```nextflow
+process {
+    withName: BOWTIE_ALIGN {
+        ext.args  = '-n 0'       // Bowtie: allow zero mismatches in the seed
+        ext.args2 = '--no-PG'    // samtools view: example additional option
+    }
+
+    withName: SAMTOOLS_SORT {
+        ext.args = '--no-PG'     // samtools sort: example additional option
+    }
+}
+```
+
+Then include it in your usual run command:
+
+```bash
+nextflow run nf-core/smrnaseq \
+    -profile docker \
+    -c tool_args.config \
+    --input samplesheet.csv \
+    --outdir results \
+    --genome GRCh37
+```
+
+The Bowtie example sets its seed mismatch limit to zero; choose options that match your analysis and the tool's own documentation. `ext.args` values are inserted into the module command, so check the module's command and tool help before adding options that duplicate settings the pipeline already supplies. The applicable process names and argument slots can be checked in the module code; for modules running multiple tools, `ext.args`, `ext.args2`, etc. correspond to the tools in command order. See nf-core's documentation on [ext arguments](https://nf-co.re/docs/contributing/components/ext_args) and [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) for more details.
 
 ### nf-core/configs
 

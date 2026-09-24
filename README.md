@@ -35,8 +35,7 @@ You can find numerous talks on the nf-core events page from various topics inclu
 
 ## Pipeline summary
 
-<!-- TODO nf-core: Include a figure that guides the user through the major workflow steps. Many nf-core
-     workflows use the "tube map" design for that. See https://nf-co.re/docs/guidelines/graphic_design/workflow_diagrams#examples for examples.   -->
+![nf-core/smrnaseq workflow diagram](docs/images/metro_map.svg)
 
 1. Quality check and triming
    1. Raw read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
