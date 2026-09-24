@@ -285,9 +285,37 @@ To use a different container from the default container or conda environment spe
 
 ### Custom Tool Arguments
 
-A pipeline might not always support every possible argument or option of a particular tool used in pipeline. Fortunately, nf-core pipelines provide some freedom to users to insert additional parameters that the pipeline does not include by default.
+A pipeline might not expose every command-line option of every tool as a pipeline parameter. For supported nf-core modules, you can pass extra tool options with the `ext.args` process directive in a Nextflow config file. This is useful, for example, when you want to change Bowtie's mismatch settings or add an option to a SAMtools command. These are module arguments, so put them in a custom config passed with `-c`; pipeline parameters belong in the CLI or a `-params-file` (see [running the pipeline](#running-the-pipeline)).
 
-To learn how to provide additional arguments to a particular tool of the pipeline, please see the [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) section of the nf-core website.
+For this pipeline, the alignment module is named `BOWTIE_ALIGN`. It runs both Bowtie and `samtools view`: set `ext.args` for Bowtie options and `ext.args2` for `samtools view` options. For the separate sorting step, use `ext.args` on `SAMTOOLS_SORT`.
+
+For example, create `tool_args.config`:
+
+```nextflow
+process {
+    withName: BOWTIE_ALIGN {
+        ext.args  = '-n 0'       // Bowtie: allow zero mismatches in the seed
+        ext.args2 = '--no-PG'    // samtools view: example additional option
+    }
+
+    withName: SAMTOOLS_SORT {
+        ext.args = '--no-PG'     // samtools sort: example additional option
+    }
+}
+```
+
+Then include it in your usual run command:
+
+```bash
+nextflow run nf-core/smrnaseq \
+    -profile docker \
+    -c tool_args.config \
+    --input samplesheet.csv \
+    --outdir results \
+    --genome GRCh37
+```
+
+The Bowtie example sets its seed mismatch limit to zero; choose options that match your analysis and the tool's own documentation. `ext.args` values are inserted into the module command, so check the module's command and tool help before adding options that duplicate settings the pipeline already supplies. The applicable process names and argument slots can be checked in the module code; for modules running multiple tools, `ext.args`, `ext.args2`, etc. correspond to the tools in command order. See nf-core's documentation on [ext arguments](https://nf-co.re/docs/contributing/components/ext_args) and [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) for more details.
 
 ### nf-core/configs
 
