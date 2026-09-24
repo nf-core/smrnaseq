@@ -93,6 +93,9 @@ The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire r
 > This warning is based on the execution order and the resulting empty output when the adapter is trimmed before regex-based UMI extraction. In the default UMI handling order, `fastp` adapter trimming runs first, followed by `umicollapse` deduplication and then `umi_tools extract`; a final `fastp` length-only pass runs after UMI extraction to remove short reads.
 >
 > In these cases where UMI trimming relies on the adapter sequence for the location of the UMIs, you can prevent `fastp` from adapter-trimming the reads before UMI extraction with `--skip_fastp`. Note that `--skip_fastp` does not disable `fastp` entirely: the length-only `fastp` pass after UMI extraction is still executed (with adapter and quality trimming disabled).
+> In these cases where UMI trimming relies on the adapter sequence for the location of the UMIs, you can use
+> `--skip_fastp` to skip the initial adapter-trimming step. This does not disable `fastp` entirely: with `--with_umi`,
+> the pipeline still runs a separate `fastp` length-filtering step after `umi_tools extract`.
 
 ## Samplesheet input
 
@@ -255,7 +258,7 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
 - `apptainer`
   - A generic configuration profile to be used with [Apptainer](https://apptainer.org/)
 - `wave`
-  - A generic configuration profile to enable [Wave](https://seqera.io/wave/) containers. Use together with one of the above (requires Nextflow ` 24.03.0-edge` or later).
+  - A generic configuration profile to enable [Wave](https://seqera.io/wave/) containers. Use together with one of the above (requires Nextflow `24.03.0-edge` or later).
 - `conda`
   - A generic configuration profile to be used with [Conda](https://conda.io/docs/). Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter, Charliecloud, or Apptainer.
 

@@ -40,8 +40,8 @@ process UMICOLLAPSE {
     # by conda that allows to set the heap size (Xmx), but not the stack size (Xss).
     # `which` allows us to get the directory that contains `umicollapse`, independent of whether we
     # are in a container or conda environment.
-    # WARN: Please update this string when bumping container versions.
-    UMICOLLAPSE_JAR=\$(dirname \$(which umicollapse))/../share/umicollapse-1.1.0-0/umicollapse.jar
+    # Locate the jar independently of the Conda build suffix (for example, -0 or -2).
+    UMICOLLAPSE_JAR=\$(find "\$(dirname "\$(which umicollapse)")/../share" -path '*/umicollapse.jar' -print -quit)
     java \\
         -Xmx${max_heap_size_mega}M \\
         -Xss${max_stack_size_mega}M \\
