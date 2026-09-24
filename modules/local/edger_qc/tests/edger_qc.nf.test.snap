@@ -18,10 +18,10 @@
             ]
         ],
         "meta": {
-            "nf-test": "0.9.3",
-            "nextflow": "25.04.6"
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
         },
-        "timestamp": "2025-12-23T02:30:58.490963416"
+        "timestamp": "2026-04-29T10:49:00.144316049"
     },
     "Should produce MDS plot": {
         "content": [
@@ -49,9 +49,9 @@
             true
         ],
         "meta": {
-            "nf-test": "0.9.3",
-            "nextflow": "25.04.6"
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
         },
-        "timestamp": "2025-12-23T02:31:46.779238243"
+        "timestamp": "2026-04-29T10:49:13.621933645"
     }
 }

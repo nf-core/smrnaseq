@@ -1,5 +1,3 @@
-def VERSION = '0.0.14'
-
 process FORMAT_FASTA_MIRNA {
     tag "$fasta"
     label 'process_medium'
@@ -20,12 +18,13 @@ process FORMAT_FASTA_MIRNA {
     task.ext.when == null || task.ext.when
 
     script:
+    def version = '0.0.14'
     """
     fasta_formatter -w 0 -i $fasta -o ${fasta}_idx.fa
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":
-        fastx_toolkit:  \$(echo "$VERSION")
+        fastx_toolkit:  \$(echo "$version")
     END_VERSIONS
     """
 }

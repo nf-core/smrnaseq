@@ -1,0 +1,38 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "pivot/wider"
+description: Join long-format mirtop count tables and convert them to a wide sample-by-miRNA table.
+keywords:
+  - pivot
+  - mirna
+  - tsv
+  - tidyr
+tools:
+  - "tidyr":
+      description: "R package for reshaping and tidying data."
+      homepage: "https://tidyr.tidyverse.org/"
+      documentation: "https://tidyr.tidyverse.org/reference/"
+      tool_dev_url: "https://github.com/tidyverse/tidyr"
+      licence: ["MIT"]
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing result group information.
+        e.g. [ id:'Long_Files' ]
+  - csvs:
+      type: file
+      description: Long-format CSV files to join and pivot.
+      pattern: "*_long.csv"
+output:
+  - csv:
+      type: file
+      description: Joined wide-format mirtop result table.
+      pattern: "*joined_samples_mirtop.tsv"
+  - versions:
+      type: file
+      description: File containing software versions.
+      pattern: "versions.yml"
+authors:
+  - "@atrigila"
+maintainers:
+  - "@atrigila"
