@@ -104,7 +104,7 @@
                     "untar": 1.34
                 },
                 "Workflow": {
-                    "nf-core/smrnaseq": "v2.4.1"
+                    "nf-core/smrnaseq": "v2.5.0dev"
                 }
             },
             [
@@ -677,7 +677,7 @@
                 "genome.rev.2.ebwt:md5,65f054c598e3e9fdd33cb22c9f8f8ca5"
             ]
         ],
-        "timestamp": "2026-06-02T15:52:50.979518276",
+        "timestamp": "2026-09-26T19:30:55.123417757",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "26.04.0"
