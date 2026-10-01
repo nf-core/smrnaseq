@@ -1,0 +1,61 @@
+%%metro title: nf-core/smrnaseq
+%%metro logo: ../docs/images/nf-core-smrnaseq_logo_light.png | ../docs/images/nf-core-smrnaseq_logo_dark.png
+%%metro style: nfcore-light
+%%metro legend: bl
+%%metro file: reads | FASTQ | Small RNA reads
+%%metro file: report | HTML | QC report
+%%metro line: mirna | miRNA quantification | #24B064
+%%metro line: qc | Quality control | #DC3545
+%%metro line: isomir | isomiR quantification | #0D6EFD
+%%metro line: genome | Genome quantification (optional) | #FD7E14 | dashed
+%%metro line: discovery | miRNA discovery (optional) | #6F42C1 | dashed
+
+graph LR
+    subgraph preprocessing [Read preparation]
+        reads[ ]
+        raw_qc[FastQC]
+        umi_extract[UMI-tools]
+        trim[fastp]
+        umi_dedup[UMICollapse]
+        contamination[Bowtie2]
+        trimmed_qc[FastQC]
+
+        reads -->|mirna,isomir,genome,discovery,qc| raw_qc
+        raw_qc -->|mirna,isomir,genome,discovery| umi_extract
+        umi_extract -->|mirna,isomir,genome,discovery| trim
+        trim -->|mirna,isomir,genome,discovery| umi_dedup
+        umi_dedup -->|mirna,isomir,genome,discovery| contamination
+        trim -->|qc| trimmed_qc
+    end
+
+    subgraph quantification [miRNA and isomiR analysis]
+        mature[Bowtie]
+        expression[edgeR]
+        isomir_annotation[mirtop]
+
+        mature -->|mirna| expression
+    end
+
+    subgraph genome_analysis [Genome analysis]
+        genome_alignment[Bowtie]
+        discovery[miRDeep2]
+    end
+
+    subgraph reporting [Reporting]
+        mirtrace[miRTrace]
+        multiqc[MultiQC]
+        report[ ]
+
+        mirtrace -->|qc| multiqc
+        multiqc -->|qc| report
+    end
+
+    contamination -->|mirna| mature
+    contamination -->|isomir| isomir_annotation
+    contamination -->|genome| genome_alignment
+    contamination -->|discovery| discovery
+    trimmed_qc -->|qc| mirtrace
+    expression -->|mirna| multiqc
+    isomir_annotation -->|isomir| multiqc
+    genome_alignment -->|genome| multiqc
+    discovery -->|discovery| multiqc
