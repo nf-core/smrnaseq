@@ -4,7 +4,7 @@ lint:
     - config_defaults:
         - params.fastp_known_mirna_adapters
   nf_test_content: false
-nf_core_version: 4.1.0
+nf_core_version: 4.2.1
 repository_type: pipeline
 template:
   author: "P. Ewels, C. Wang, R. Hammar\xE9n, L. Pantano, A. Peltzer"
@@ -14,4 +14,4 @@ template:
   name: smrnaseq
   org: nf-core
   outdir: .
-  version: 2.4.1
+  version: 2.5.0dev
