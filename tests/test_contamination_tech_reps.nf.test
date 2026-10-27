@@ -1,0 +1,22 @@
+
+nextflow_pipeline {
+
+    name "Test Workflow main.nf - test_contamination_tech_reps"
+    script "main.nf"
+    profile "test_contamination_tech_reps,ci"
+    tag "test_contamination_tech_reps"
+    tag "contamination"
+    tag "pipeline"
+
+    def test_scenario = [
+        [
+            name: "-profile test_contamination_tech_reps"
+        ]
+    ]
+
+    // Generate tests for each scenario
+    test_scenario.each { scenario ->
+        test(scenario.name, UTILS.get_test(scenario))
+    }
+
+}
