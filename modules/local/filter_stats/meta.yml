@@ -1,0 +1,46 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "filter/stats"
+description: Create contamination filtering statistics for MultiQC and emit filtered FASTQ reads.
+keywords:
+  - filter
+  - stats
+  - multiqc
+  - contamination
+tools:
+  - "gawk":
+      description: "GNU awk is a utility for text processing and data extraction."
+      homepage: "https://www.gnu.org/software/gawk/"
+      documentation: "https://www.gnu.org/software/gawk/manual/"
+      tool_dev_url: "https://git.savannah.gnu.org/cgit/gawk.git"
+      licence: ["GPL-3.0-or-later"]
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information.
+        e.g. [ id:'test', single_end:true ]
+  - reads:
+      type: file
+      description: Input reads after contaminant filtering.
+      pattern: "*.{fastq,fastq.gz,fq,fq.gz}"
+  - stats_files:
+      type: file
+      description: Contaminant statistics files to summarise.
+      pattern: "*.stats"
+output:
+  - stats:
+      type: file
+      description: MultiQC YAML file containing contamination filtering statistics.
+      pattern: "*_mqc.yaml"
+  - reads:
+      type: file
+      description: Filtered FASTQ reads.
+      pattern: "*.filtered.fastq.gz"
+  - versions:
+      type: file
+      description: File containing software versions.
+      pattern: "versions.yml"
+authors:
+  - "@atrigila"
+maintainers:
+  - "@atrigila"
