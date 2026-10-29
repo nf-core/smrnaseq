@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## v2.5.0 - DATE
 
 - [[#554]](https://github.com/nf-core/smrnaseq/pull/554) - Improve documentation, add metromap.
+- [[#559]](https://github.com/nf-core/smrnaseq/pull/559) - Fix [`MIRDEEP2_MIRDEEP2` errorStrategy](https://github.com/nf-core/smrnaseq/issues/558): exit statuses other than 255 aborted the run instead of retrying or finishing.
 
 ## v2.4.1 - 2026-01-08 - Red Zinc Spaniel
 
