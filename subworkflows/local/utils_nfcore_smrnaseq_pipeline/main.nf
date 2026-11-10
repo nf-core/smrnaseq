@@ -265,7 +265,8 @@ def validateBowtieGenomeArgs() {
     if (rawArgs == null || rawArgs == '') {
         return
     }
-    if (!(rawArgs instanceof CharSequence)) {
+    // A bare '--bowtie_align_args --best' reaches here as true or 'true'
+    if (!(rawArgs instanceof CharSequence) || rawArgs.toString() == 'true') {
         error("[bowtie_align_args] Expected a string of Bowtie options but got '${rawArgs}'. A value holding a single flag must use the '=' form, e.g. --bowtie_align_args=--best, because '--bowtie_align_args --best' is parsed as the boolean true.")
     }
 
