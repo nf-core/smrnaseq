@@ -30,13 +30,13 @@
                     "r-base": "3.6.2"
                 },
                 "FASTP": {
-                    "fastp": "1.1.0"
+                    "fastp": "1.4.0"
                 },
                 "FASTQC_RAW": {
-                    "fastqc": "0.12.1"
+                    "fastqc": "0.13.0"
                 },
                 "FASTQC_TRIM": {
-                    "fastqc": "0.12.1"
+                    "fastqc": "0.13.0"
                 },
                 "FORMAT_HAIRPIN": {
                     "fastx_toolkit": "0.0.14"
@@ -90,28 +90,28 @@
                     "vroom": "1.6.5"
                 },
                 "SAMTOOLS_FLAGSTAT": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.25
                 },
                 "SAMTOOLS_IDXSTATS": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.25
                 },
                 "SAMTOOLS_INDEX": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.25
                 },
                 "SAMTOOLS_SORT": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.25
                 },
                 "SAMTOOLS_STATS": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.25
                 },
                 "SEQCLUSTER_COLLAPSE": {
                     "seqcluster": "1.2.9"
                 },
                 "SEQKIT_FQ2FA": {
-                    "seqkit": "2.9.0"
+                    "seqkit": "2.13.0"
                 },
                 "SEQKIT_REPLACE": {
-                    "seqkit": "2.9.0"
+                    "seqkit": "2.13.0"
                 }
             },
             [
@@ -491,63 +491,63 @@
                 "mirgenedb_hsa_mature.4.ebwt:md5,70977c4174dd54d5715e24cbe148686c",
                 "mirgenedb_hsa_mature.rev.1.ebwt:md5,34feb7692da8d4752343cf327e1f4446",
                 "mirgenedb_hsa_mature.rev.2.ebwt:md5,ea6d4ad4a6fbc394e189ba95c38eaad0",
-                "Clone1_N1.fastp.json:md5,3d6f6bf66b5cb0704578b4716d82b5bd",
-                "Clone9_N1.fastp.json:md5,23fb1a012b3096f89fc989dbb6620494",
-                "Control_N1.fastp.json:md5,60d2cdb58719690aaa9f8bb07955c301",
-                "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,a8b1f90a30f9f39d4f2a4289bceaf2d1",
-                "Clone1_N1_mature_hairpin_genome.sorted.idxstats:md5,102a2777e6cb60500ab144aad81c2e5d",
-                "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,be01338d5a2239b0c9c09245e7d1ea7e",
-                "Clone9_N1_mature_hairpin_genome.sorted.flagstat:md5,d8d6a1d91f5cfc47f2fcd09adc4bc4a7",
-                "Clone9_N1_mature_hairpin_genome.sorted.idxstats:md5,f6261479134cebf27af76b5f01f32c06",
-                "Clone9_N1_mature_hairpin_genome.sorted.stats:md5,0756512a88d26b7bb255d96ee43bc8a7",
-                "Control_N1_mature_hairpin_genome.sorted.flagstat:md5,35898f0f41ae64d6bb452e5b2c7d787e",
-                "Control_N1_mature_hairpin_genome.sorted.idxstats:md5,22f609f75de4544e1c25b63dacf821ac",
-                "Control_N1_mature_hairpin_genome.sorted.stats:md5,6fe214ace4950449bebdf1ce8e00edef",
+                "Clone1_N1.fastp.json:md5,f941e89cf8a61b14b624269013a4c063",
+                "Clone9_N1.fastp.json:md5,a8e625931f4483737a9a67557e912c8e",
+                "Control_N1.fastp.json:md5,a6faf58af77d5553f4a78a90ad3b9bd5",
+                "Clone1_N1_mature_hairpin_genome.sorted.flagstat:md5,6017c64ce34e1e7380b689b423ef74ee",
+                "Clone1_N1_mature_hairpin_genome.sorted.idxstats:md5,69806ca494fd2dc75181e24f02db0aa8",
+                "Clone1_N1_mature_hairpin_genome.sorted.stats:md5,705143215a2a5073eaad4cdc8f4bb1ef",
+                "Clone9_N1_mature_hairpin_genome.sorted.flagstat:md5,e0f9147757828b44bcabeb05d42eed9b",
+                "Clone9_N1_mature_hairpin_genome.sorted.idxstats:md5,537963000f2faed83c66491073f69138",
+                "Clone9_N1_mature_hairpin_genome.sorted.stats:md5,1a2b469fe43ee49bfe0573174c3eccf1",
+                "Control_N1_mature_hairpin_genome.sorted.flagstat:md5,d2130fc47169625f7ed83aedbaf3063b",
+                "Control_N1_mature_hairpin_genome.sorted.idxstats:md5,1718b32d89f862825cd31289fd275cc6",
+                "Control_N1_mature_hairpin_genome.sorted.stats:md5,a32aac4b9a77f1dc2daaeaefb23022cc",
                 "result_Clone1_N1.bed:md5,8e8f94e0b5eb5e33227ad3d48669e5f0",
                 "result_Control_N1.bed:md5,e530ce95844f865536df53fd73c8fbc0",
-                "Clone1_N1_mature_hairpin.sorted.flagstat:md5,3bfa4c07124135a5baf69f3e87995738",
-                "Clone1_N1_mature_hairpin.sorted.idxstats:md5,5eec99b7297a7af645d4cb589ad15e80",
-                "Clone1_N1_mature_hairpin.sorted.stats:md5,8507acb39f33826cd35f328408cdc390",
-                "Clone9_N1_mature_hairpin.sorted.flagstat:md5,b7847ce128b50001da6b5c2c5923ad27",
-                "Clone9_N1_mature_hairpin.sorted.idxstats:md5,3d30a7a0c56ded42c18c0704d3835867",
-                "Clone9_N1_mature_hairpin.sorted.stats:md5,b004cdc81e981b4c2f861c15ec3ca6be",
-                "Control_N1_mature_hairpin.sorted.flagstat:md5,75a1f137651fb59681bbc884ca162102",
-                "Control_N1_mature_hairpin.sorted.idxstats:md5,497b18743b0cd3b440a646636deb8753",
-                "Control_N1_mature_hairpin.sorted.stats:md5,f63f844ba7df5e9e0e2508e474b1bbe9",
-                "Clone1_N1_mature.sorted.flagstat:md5,fd87d3002edb6c321c91b3c38fc5c3b7",
-                "Clone1_N1_mature.sorted.idxstats:md5,c494112fa9773adeca1627d640b10e7e",
-                "Clone1_N1_mature.sorted.stats:md5,60365059b33ae0c950e603f355ec054c",
-                "Clone9_N1_mature.sorted.flagstat:md5,80ad0a3370d2b624bd729483a1cbf7da",
-                "Clone9_N1_mature.sorted.idxstats:md5,9cdc8051b8eb926c3f4e91af01a63bc8",
-                "Clone9_N1_mature.sorted.stats:md5,2a50a1bdb10fb167fc99557d311bc314",
-                "Control_N1_mature.sorted.flagstat:md5,828d8785c5abb25e243c3ba6b79a70fc",
-                "Control_N1_mature.sorted.idxstats:md5,b6ffbb4fc8cd2cdb5e5af14ccd4c5358",
-                "Control_N1_mature.sorted.stats:md5,8678805830500681a2a3dc80ea6ed4e6",
+                "Clone1_N1_mature_hairpin.sorted.flagstat:md5,b9410d511c75aa077fb36602427e0f05",
+                "Clone1_N1_mature_hairpin.sorted.idxstats:md5,c8171eecabd088c24c387a0b456b48c8",
+                "Clone1_N1_mature_hairpin.sorted.stats:md5,174ecd7aa217f02abb00545d80f1b8eb",
+                "Clone9_N1_mature_hairpin.sorted.flagstat:md5,528cf501636a5b16804c5e9c1a5d5c83",
+                "Clone9_N1_mature_hairpin.sorted.idxstats:md5,cc209621733b3c0fd05f7aaee74bad88",
+                "Clone9_N1_mature_hairpin.sorted.stats:md5,1c86ed3a12f99422443a4a2a98f38f19",
+                "Control_N1_mature_hairpin.sorted.flagstat:md5,f77fc1c24e1cc4eb1b175090d4938a43",
+                "Control_N1_mature_hairpin.sorted.idxstats:md5,930082fcb569f2a4b099b0c6323a47da",
+                "Control_N1_mature_hairpin.sorted.stats:md5,fffc0d67f0493f40e187a8bafefe7249",
+                "Clone1_N1_mature.sorted.flagstat:md5,0b3e092f748b36b8718cc662314fb45a",
+                "Clone1_N1_mature.sorted.idxstats:md5,a311b1cfad0346678e7c958739f714f3",
+                "Clone1_N1_mature.sorted.stats:md5,8b5d61d2a24650de01c9382da793adb1",
+                "Clone9_N1_mature.sorted.flagstat:md5,c0c7f0c24baf255a0e3cfa813f026bce",
+                "Clone9_N1_mature.sorted.idxstats:md5,9c0860de0d236b1a19a78a574124f2c6",
+                "Clone9_N1_mature.sorted.stats:md5,61d5a08c1f959e245c4776b2d4329c1e",
+                "Control_N1_mature.sorted.flagstat:md5,1f10f957a3c6b12081e0d6ce100c1d83",
+                "Control_N1_mature.sorted.idxstats:md5,11e09013c76adfe1d7f6574dacbaa94e",
+                "Control_N1_mature.sorted.stats:md5,64836e2083e30811bb70aaf8225678d5",
                 "mirgenedb_hsa_hairpin.fa_igenome.fa:md5,e1d83cf20ffdd1e88d3b37b5e9d1dce4",
                 "mirgenedb_hsa_hairpin.fa_igenome.fa_idx.fa:md5,f0c9616a7b268015af00ce10c3186938",
                 "mirgenedb_hsa_mature.fa_igenome.fa:md5,f8a652b0a51db6ce518f7cdba06c3c01",
                 "mirgenedb_hsa_mature.fa_igenome.fa_idx.fa:md5,f8a652b0a51db6ce518f7cdba06c3c01",
-                "fastp-seq-content-gc-plot_Read_1_After_filtering.txt:md5,f9a5d3cda96bc2914f1b660cda68582a",
+                "fastp-seq-content-gc-plot_Read_1_After_filtering.txt:md5,ab58510e7f46fc7adcfbe1142b35602a",
                 "fastp-seq-content-gc-plot_Read_1_Before_filtering.txt:md5,910576f4999a406ea37306b8dc4eb45b",
                 "fastp-seq-content-n-plot_Read_1_After_filtering.txt:md5,a0502dd4f701c9deb646ffbec80c09de",
                 "fastp-seq-content-n-plot_Read_1_Before_filtering.txt:md5,a0502dd4f701c9deb646ffbec80c09de",
-                "fastp-seq-quality-plot_Read_1_After_filtering.txt:md5,9a36ab630b5061dc1fa91508eca67d1e",
+                "fastp-seq-quality-plot_Read_1_After_filtering.txt:md5,de49f55ba2150aba3d8c4521de8850b2",
                 "fastp-seq-quality-plot_Read_1_Before_filtering.txt:md5,e9d8e3289f84f5a1ae6775813ec5a9b4",
-                "fastp_filtered_reads_plot.txt:md5,81ccb1f944b64baa322834efcfef4ca0",
+                "fastp_filtered_reads_plot.txt:md5,611f71a7829a8ccfbc95b64275d988e2",
                 "fastqc-1-status-check-heatmap.txt:md5,d9c3ce24536a948e1fe9b84c55421ab7",
-                "fastqc-1_adapter_content_plot.txt:md5,af90ac3e532a29ab89e9130f6bde61e8",
-                "fastqc-1_overrepresented_sequences_plot.txt:md5,6323bc5ae12a3df0b3f17879f925846d",
+                "fastqc-1_adapter_content_plot.txt:md5,bc7df31d59a44f5ad322dabb8dc0e405",
+                "fastqc-1_overrepresented_sequences_plot.txt:md5,5c7427cf29af89a9f650048e5b522962",
                 "fastqc-1_per_base_n_content_plot.txt:md5,a0502dd4f701c9deb646ffbec80c09de",
-                "fastqc-1_per_base_sequence_quality_plot.txt:md5,375f791e6e29494eacbd266bf1effa33",
-                "fastqc-1_per_sequence_gc_content_plot_Counts.txt:md5,0bdd9082721b61b7044eb8bd6d90c020",
-                "fastqc-1_per_sequence_gc_content_plot_Percentages.txt:md5,b637f1a775be83592feee0f6cee0b641",
-                "fastqc-1_per_sequence_quality_scores_plot.txt:md5,282e0713f206b61d0615505bec2fca97",
-                "fastqc-1_sequence_counts_plot.txt:md5,9acf778660e6910fb4e508630217a464",
-                "fastqc-1_sequence_duplication_levels_plot.txt:md5,d24fd68d5cae376fecadb1c10fcc8fd9",
-                "fastqc-1_top_overrepresented_sequences_table.txt:md5,969d9742acaf14022582ee7aa12956bf",
+                "fastqc-1_per_base_sequence_quality_plot.txt:md5,2af973149b24f43e87b92e1ad7d923ac",
+                "fastqc-1_per_sequence_gc_content_plot_Counts.txt:md5,d9161ca339201fb21152c2692148f23a",
+                "fastqc-1_per_sequence_gc_content_plot_Percentages.txt:md5,c3ae470c884d6dc038371d2414cbcb1a",
+                "fastqc-1_per_sequence_quality_scores_plot.txt:md5,45fbbb7af89af34b87c5a0c410784922",
+                "fastqc-1_sequence_counts_plot.txt:md5,be2c0093bcf7806496a94045cb0c50dd",
+                "fastqc-1_sequence_duplication_levels_plot.txt:md5,b0b2ac3c2c1f294f6a304a0288f423f8",
+                "fastqc-1_top_overrepresented_sequences_table.txt:md5,1203ce9202eb419a7707e2e9cf5811d5",
                 "fastqc-status-check-heatmap.txt:md5,3f897028847a4a3a5f666325cd732067",
                 "fastqc_adapter_content_plot.txt:md5,bd0fdc9c856c55598976b5a46c23a677",
-                "fastqc_overrepresented_sequences_plot.txt:md5,7d7ecccd5d6c7fd63439785888c0c164",
+                "fastqc_overrepresented_sequences_plot.txt:md5,8ac827e62a052fa3746bcd27fdb99db4",
                 "fastqc_per_base_n_content_plot.txt:md5,d907ac1ac9a4f19908b7b025eb75abfe",
                 "fastqc_per_base_sequence_quality_plot.txt:md5,a8adbff96d9adb317079e6becd7a80f6",
                 "fastqc_per_sequence_gc_content_plot_Counts.txt:md5,7cdf079a279cf080f2e2d7ab00b4f134",
@@ -555,46 +555,46 @@
                 "fastqc_per_sequence_quality_scores_plot.txt:md5,c7aacf1ab75fbe89f86e33273aefaf26",
                 "fastqc_sequence_counts_plot.txt:md5,4861f0dc120e57e0359c53f417756b0c",
                 "fastqc_sequence_duplication_levels_plot.txt:md5,2b1cbdce195d2aedc4bff4c5e9b618d4",
-                "fastqc_sequence_length_distribution_plot.txt:md5,6bd21067e3ab28cd33ac107417e72c4c",
+                "fastqc_sequence_length_distribution_plot.txt:md5,6a94897d9bb6826bd5c4c8df8e737880",
                 "fastqc_top_overrepresented_sequences_table.txt:md5,91b745155fb6c1652cdd8222fc96a9cc",
                 "multiqc_citations.txt:md5,57db2426be011862828d18f767d25b57",
-                "multiqc_fastp.txt:md5,0bbf2f69a6d67998f8da55dd7a4ff4dd",
-                "multiqc_fastqc.txt:md5,5f3d48b29b7909fd7f0c4da6f8745c08",
-                "multiqc_fastqc_fastqc-1.txt:md5,ca8352d25077b529780f4dfa79f343a6",
-                "multiqc_general_stats.txt:md5,237a839be7fc8425c22e00535d2df321",
-                "multiqc_samtools_stats.txt:md5,805d665c8ecc0a099111166581f43c07",
-                "samtools-stats-dp.txt:md5,f263d0f3e065cbc1a7089887ac24938f",
-                "samtools_alignment_plot.txt:md5,f516084a276f0931165b93724d3735ad"
+                "multiqc_fastp.txt:md5,f2a77d06ada11c480e6c153917ad96ff",
+                "multiqc_fastqc.txt:md5,40b0a08abed5da850238ae98fee1f440",
+                "multiqc_fastqc_fastqc-1.txt:md5,71e7272aabd67d810be80c3388f23746",
+                "multiqc_general_stats.txt:md5,4fa1d4e249b5b1418596030267bb4564",
+                "multiqc_samtools_stats.txt:md5,36f3de61f23b5a91e8f7d3cd10944f94",
+                "samtools-stats-dp.txt:md5,fd4fa90d55655eaed872d77640a2a709",
+                "samtools_alignment_plot.txt:md5,28e1acd39dab34b9efe68fccf8e5d4d7"
             ],
             [
-                "Clone1_N1_mature_hairpin_genome.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:1, readCount:2195289, duplicateReadCount:0, sorted:false]",
-                "Clone1_N1_mature_hairpin_genome.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:1, readCount:2195289, duplicateReadCount:0, sorted:false]",
-                "Clone9_N1_mature_hairpin_genome.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:1, readCount:2496884, duplicateReadCount:0, sorted:false]",
-                "Clone9_N1_mature_hairpin_genome.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:1, readCount:2496884, duplicateReadCount:0, sorted:false]",
-                "Control_N1_mature_hairpin_genome.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:33, maxQuality:255, minQuality:0, meanQuality:2, readCount:1716159, duplicateReadCount:0, sorted:false]",
-                "Control_N1_mature_hairpin_genome.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:33, maxQuality:255, minQuality:0, meanQuality:2, readCount:1716159, duplicateReadCount:0, sorted:false]",
-                "Clone1_N1_mature_hairpin.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2193523, duplicateReadCount:0, sorted:false]",
-                "Clone1_N1_mature_hairpin.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2193523, duplicateReadCount:0, sorted:false]",
-                "Clone9_N1_mature_hairpin.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2495374, duplicateReadCount:0, sorted:false]",
-                "Clone9_N1_mature_hairpin.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2495374, duplicateReadCount:0, sorted:false]",
-                "Control_N1_mature_hairpin.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:33, maxQuality:255, minQuality:0, meanQuality:0, readCount:1713463, duplicateReadCount:0, sorted:false]",
-                "Control_N1_mature_hairpin.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:33, maxQuality:255, minQuality:0, meanQuality:0, readCount:1713463, duplicateReadCount:0, sorted:false]",
-                "Clone1_N1_mature.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2193498, duplicateReadCount:0, sorted:false]",
-                "Clone1_N1_mature.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2193498, duplicateReadCount:0, sorted:false]",
-                "Clone9_N1_mature.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2495351, duplicateReadCount:0, sorted:false]",
-                "Clone9_N1_mature.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2495351, duplicateReadCount:0, sorted:false]",
-                "Control_N1_mature.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:33, maxQuality:255, minQuality:0, meanQuality:0, readCount:1713442, duplicateReadCount:0, sorted:false]",
-                "Control_N1_mature.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:33, maxQuality:255, minQuality:0, meanQuality:0, readCount:1713442, duplicateReadCount:0, sorted:false]",
-                "Clone1_N1.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:32, maxQuality:255, minQuality:0, meanQuality:0, readCount:423545, duplicateReadCount:0, sorted:false]",
-                "Clone9_N1.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:32, maxQuality:255, minQuality:0, meanQuality:0, readCount:316335, duplicateReadCount:0, sorted:false]",
-                "Control_N1.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:31, maxQuality:255, minQuality:0, meanQuality:0, readCount:360343, duplicateReadCount:0, sorted:false]"
+                "Clone1_N1_mature_hairpin_genome.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:1, readCount:2195353, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1_mature_hairpin_genome.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:1, readCount:2195353, duplicateReadCount:0, sorted:false]",
+                "Clone9_N1_mature_hairpin_genome.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:1, readCount:2496939, duplicateReadCount:0, sorted:false]",
+                "Clone9_N1_mature_hairpin_genome.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:1, readCount:2496939, duplicateReadCount:0, sorted:false]",
+                "Control_N1_mature_hairpin_genome.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:33, maxQuality:255, minQuality:0, meanQuality:2, readCount:1716163, duplicateReadCount:0, sorted:false]",
+                "Control_N1_mature_hairpin_genome.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:33, maxQuality:255, minQuality:0, meanQuality:2, readCount:1716163, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1_mature_hairpin.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2193587, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1_mature_hairpin.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2193587, duplicateReadCount:0, sorted:false]",
+                "Clone9_N1_mature_hairpin.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2495429, duplicateReadCount:0, sorted:false]",
+                "Clone9_N1_mature_hairpin.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2495429, duplicateReadCount:0, sorted:false]",
+                "Control_N1_mature_hairpin.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:33, maxQuality:255, minQuality:0, meanQuality:0, readCount:1713470, duplicateReadCount:0, sorted:false]",
+                "Control_N1_mature_hairpin.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:33, maxQuality:255, minQuality:0, meanQuality:0, readCount:1713470, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1_mature.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2193562, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1_mature.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2193562, duplicateReadCount:0, sorted:false]",
+                "Clone9_N1_mature.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2495406, duplicateReadCount:0, sorted:false]",
+                "Clone9_N1_mature.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:34, maxQuality:255, minQuality:0, meanQuality:0, readCount:2495406, duplicateReadCount:0, sorted:false]",
+                "Control_N1_mature.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:33, maxQuality:255, minQuality:0, meanQuality:0, readCount:1713449, duplicateReadCount:0, sorted:false]",
+                "Control_N1_mature.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:33, maxQuality:255, minQuality:0, meanQuality:0, readCount:1713449, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:32, maxQuality:255, minQuality:0, meanQuality:0, readCount:423563, duplicateReadCount:0, sorted:false]",
+                "Clone9_N1.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:32, maxQuality:255, minQuality:0, meanQuality:0, readCount:316345, duplicateReadCount:0, sorted:false]",
+                "Control_N1.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:31, maxQuality:255, minQuality:0, meanQuality:0, readCount:360348, duplicateReadCount:0, sorted:false]"
             ],
             "No VCF files"
         ],
-        "timestamp": "2026-06-02T17:09:38.915154423",
+        "timestamp": "2026-11-10T21:54:54.910915",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "26.04.0"
+            "nextflow": "25.10.4"
         }
     }
 }

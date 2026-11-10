@@ -87,7 +87,6 @@ workflow MIRNA_QUANT {
     ch_versions.mix(EDGER_QC.out.versions)
 
     SEQCLUSTER_COLLAPSE ( ch_reads_for_mirna )
-    ch_versions = ch_versions.mix(SEQCLUSTER_COLLAPSE.out.versions)
 
     ch_reads_collapsed = SEQCLUSTER_COLLAPSE.out.fastq
 
@@ -100,7 +99,6 @@ workflow MIRNA_QUANT {
     BAM_STATS_MIRNA_MIRTOP(BOWTIE_MAP_SEQCLUSTER.out.bam, FORMAT_HAIRPIN.out.formatted_fasta, ch_mirna_gtf_species )
 
     ch_mirtop_logs = BAM_STATS_MIRNA_MIRTOP.out.stats_log
-    ch_versions = ch_versions.mix(BAM_STATS_MIRNA_MIRTOP.out.versions)
 
     PIVOT_LONGER( BAM_STATS_MIRNA_MIRTOP.out.counts )
     ch_versions = ch_versions.mix(PIVOT_LONGER.out.versions)

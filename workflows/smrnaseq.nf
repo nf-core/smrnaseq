@@ -158,7 +158,6 @@ workflow NFCORE_SMRNASEQ {
     if (has_mirtrace_species){
 
         MIRTRACE_QC(ch_mirtrace_qc_inputs, ch_mirtrace_species)
-        ch_versions = ch_versions.mix(MIRTRACE_QC.out.versions)
 
     } else {
         log.warn "The parameter --mirtrace_species is absent. MIRTRACE quantification skipped."
@@ -224,7 +223,6 @@ workflow NFCORE_SMRNASEQ {
                         ch_bowtie_index,
                         ch_mature_hairpin,
                 )
-        ch_versions = ch_versions.mix(FASTQ_FIND_MIRNA_MIRDEEP2.out.versions)
         }
     }
 
