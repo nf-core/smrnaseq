@@ -1,0 +1,37 @@
+nextflow_pipeline {
+
+    name "Test pipeline with --bowtie_align_args"
+    script "../main.nf"
+    profile "+ci"
+    tag "pipeline"
+    tag "bowtie_align_args"
+
+    test("-profile test --bowtie_align_args allowed flags") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                bowtie_align_args = '-v 1 --best'
+            }
+        }
+
+        then {
+            assert workflow.success
+        }
+    }
+
+    test("-profile test --bowtie_align_args disallowed flag") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                bowtie_align_args = '--un unaligned.fastq'
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert workflow.stdout.any { it.contains("[bowtie_align_args] Argument '--un' is not allowed") }
+        }
+    }
+}
