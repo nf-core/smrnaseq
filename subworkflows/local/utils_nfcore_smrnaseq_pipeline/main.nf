@@ -261,92 +261,84 @@ def validateInputSamplesheet(input) {
 // Validate the bowtie align arguments provided through params.bowtie_align_args
 //
 def validateBowtieGenomeArgs() {
-    if (!params.bowtie_align_args) return  // empty string is fine
+    def rawArgs = params.bowtie_align_args
+    if (rawArgs == null || rawArgs == '') {
+        return
+    }
+    if (!(rawArgs instanceof CharSequence)) {
+        error("[bowtie_align_args] Expected a string of Bowtie options but got '${rawArgs}'. A value holding a single flag must use the '=' form, e.g. --bowtie_align_args=--best, because '--bowtie_align_args --best' is parsed as the boolean true.")
+    }
 
-    // Allowlist: flag -> expected value type (null = flag only, 'int' = requires integer)
-    def ALLOWED_GENOME_ARGS = [
-    '-v'           : 'int_0_3',
-    '-n'           : 'int_0_3',
-    '--seedmms'    : 'int_0_3',
-    '-e'           : 'int',
-    '--maqerr'     : 'int',
-    '-l'           : 'int',
-    '--seedlen'    : 'int',
-    '-k'           : 'int',
-    '-m'           : 'int',
-    '--maxbts'     : 'int',
-    '--chunkmbs'   : 'int',
-    '--seed'       : 'int',
-    '--best'       : null,
-    '--strata'     : null,
-    '--nomaqround' : null,
-    '--norc'       : null,
-]
-
-    // Mutually exclusive pairs
-    def MUTEX_PAIRS = [
-        ['-v', '-n'],
-        ['-v', '--seedmms'],
-        ['--strata', '--best'],  // --strata requires --best, so flag if --strata without --best
+    // Allowlist: flag -> expected value type (null = flag only)
+    def allowedArgs = [
+        '-v'           : 'int_0_3',
+        '-n'           : 'int_0_3',
+        '--seedmms'    : 'int_0_3',
+        '-e'           : 'int',
+        '--maqerr'     : 'int',
+        '-l'           : 'int',
+        '--seedlen'    : 'int',
+        '-k'           : 'int',
+        '-m'           : 'int',
+        '--maxbts'     : 'int',
+        '--chunkmbs'   : 'int',
+        '--seed'       : 'int',
+        '--best'       : null,
+        '--strata'     : null,
+        '--nomaqround' : null,
+        '--norc'       : null,
     ]
 
-    def tokens = params.bowtie_align_args.trim().split(/\s+/)
-    def i = 0
-    def seen = [] as Set
+    def seen = []
 
-    while (i < tokens.size()) {
-        def token = tokens[i]
-
-        // Handle --flag=value syntax by splitting on '='
-        def flag  = token
-        def value = null
-        if (token.contains('=')) {
-            def parts = token.split('=', 2)
-            flag  = parts[0]
-            value = parts[1]
+    // The accumulator holds the flag still waiting for its value, if any
+    def unfinishedFlag = rawArgs.toString().tokenize().inject(null) { pendingFlag, token ->
+        if (pendingFlag != null) {
+            validateBowtieArgValue(pendingFlag, allowedArgs[pendingFlag], token)
+            return null
         }
 
-        if (!ALLOWED_GENOME_ARGS.containsKey(flag)) {
-            error "[bowtie_align_args] Argument '${flag}' is not allowed. " +
-                  "Only these flags are permitted: ${ALLOWED_GENOME_ARGS.keySet().sort().join(', ')}"
+        def separator = token.indexOf('=')
+        def flag = separator >= 0 ? token.substring(0, separator) : token
+
+        if (!allowedArgs.containsKey(flag)) {
+            error("[bowtie_align_args] Argument '${flag}' is not allowed. Only these flags are permitted: ${allowedArgs.keySet().sort().join(', ')}")
+        }
+        if (separator >= 0 && !flag.startsWith('--')) {
+            // Bowtie does not reject '-v=1': it silently misreads the value
+            error("[bowtie_align_args] Short flag '${flag}' cannot use the '=' form, got '${token}'. Use '${flag} <value>' instead.")
         }
 
-        def expectedType = ALLOWED_GENOME_ARGS[flag]
-        seen << flag
+        seen.add(flag)
+        def expectedType = allowedArgs[flag]
 
-        if (expectedType != null) {
-            // Expect a value — either inline (--flag=val) or next token (--flag val)
-            if (value == null) {
-                i++
-                if (i >= tokens.size()) {
-                    error "[bowtie_align_args] Argument '${flag}' requires a value but none was provided."
-                }
-                value = tokens[i]
+        if (separator >= 0) {
+            if (expectedType == null) {
+                error("[bowtie_align_args] Argument '${flag}' does not take a value, got '${token}'.")
             }
-
-            // Validate the value type
-            if (expectedType == 'int' || expectedType == 'int_0_3') {
-                if (!(value =~ /^\d+$/)) {
-                    error "[bowtie_align_args] Argument '${flag}' requires an integer value, got '${value}'."
-                }
-                if (expectedType == 'int_0_3' && !(value.toInteger() in 0..3)) {
-                    error "[bowtie_align_args] Argument '${flag}' must be between 0 and 3, got '${value}'."
-                }
-            }
-        } else if (value != null) {
-            // Flag-only arg was given a value via = syntax
-            error "[bowtie_align_args] Argument '${flag}' does not take a value, got '${value}'."
+            validateBowtieArgValue(flag, expectedType, token.substring(separator + 1))
+            return null
         }
-
-        i++
+        return expectedType != null ? flag : null
     }
 
-    // Mutual exclusivity checks
+    if (unfinishedFlag != null) {
+        error("[bowtie_align_args] Argument '${unfinishedFlag}' requires a value but none was provided.")
+    }
+
     if (seen.contains('-v') && (seen.contains('-n') || seen.contains('--seedmms'))) {
-        error "[bowtie_align_args] '-v' and '-n'/'--seedmms' are mutually exclusive."
+        error("[bowtie_align_args] '-v' and '-n'/'--seedmms' are mutually exclusive.")
     }
-    if (seen.contains('--strata') && !seen.contains('--best')) {
-        error "[bowtie_align_args] '--strata' requires '--best' to also be specified."
+}
+//
+// Check the value given to a bowtie flag that takes an integer
+//
+def validateBowtieArgValue(flag, expectedType, value) {
+    if (!(value ==~ /\d+/)) {
+        error("[bowtie_align_args] Argument '${flag}' requires an integer value, got '${value}'.")
+    }
+    if (expectedType == 'int_0_3' && !(value ==~ /0*[0-3]/)) {
+        error("[bowtie_align_args] Argument '${flag}' must be between 0 and 3, got '${value}'.")
     }
 }
 //
