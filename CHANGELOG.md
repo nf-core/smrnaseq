@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [[#554]](https://github.com/nf-core/smrnaseq/pull/554) - Improve documentation, add metromap.
 - [[#559]](https://github.com/nf-core/smrnaseq/pull/559) - Fix [`MIRDEEP2_MIRDEEP2` errorStrategy](https://github.com/nf-core/smrnaseq/issues/558): exit statuses other than 255 aborted the run instead of retrying or finishing.
+- [[#539]](https://github.com/nf-core/smrnaseq/pull/539) - Add `--bowtie_align_args` to pass additional Bowtie 1 options to the genome mapping step (contributed by [@piplus2](https://github.com/piplus2)).
 
 ## v2.4.1 - 2026-01-08 - Red Zinc Spaniel
 
