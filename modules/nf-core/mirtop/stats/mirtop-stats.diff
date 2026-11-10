@@ -1,0 +1,15 @@
+Changes in component 'nf-core/mirtop/stats'
+Changes in 'mirtop/stats/environment.yml':
+--- modules/nf-core/mirtop/stats/environment.yml
++++ modules/nf-core/mirtop/stats/environment.yml
+@@ -12,3 +12,4 @@
+   - conda-forge::pandas=2.2.2
+   - conda-forge::python=3.11
+   - conda-forge::setuptools=78.1
++  - conda-forge::six=1.17.0
+
+'modules/nf-core/mirtop/stats/meta.yml' is unchanged
+'modules/nf-core/mirtop/stats/main.nf' is unchanged
+'modules/nf-core/mirtop/stats/tests/main.nf.test.snap' is unchanged
+'modules/nf-core/mirtop/stats/tests/main.nf.test' is unchanged
+************************************************************

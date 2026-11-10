@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - [[#554]](https://github.com/nf-core/smrnaseq/pull/554) - Improve documentation, add metromap.
 - [[#559]](https://github.com/nf-core/smrnaseq/pull/559) - Fix [`MIRDEEP2_MIRDEEP2` errorStrategy](https://github.com/nf-core/smrnaseq/issues/558): exit statuses other than 255 aborted the run instead of retrying or finishing.
+- [[#564]](https://github.com/nf-core/smrnaseq/pull/564) - Fix `mirtop` conda environments missing `six` (`ModuleNotFoundError: No module named 'six'` since conda-forge `python-dateutil` 4.0.0 dropped it); patched `mirtop/{counts,export,gff,stats}` until fixed upstream.
 
 ## v2.4.1 - 2026-01-08 - Red Zinc Spaniel
 
