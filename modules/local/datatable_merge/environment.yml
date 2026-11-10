@@ -1,0 +1,5 @@
+channels:
+  - conda-forge
+dependencies:
+  - conda-forge::r-base=3.6.2
+  - conda-forge::r-data.table=1.12.2

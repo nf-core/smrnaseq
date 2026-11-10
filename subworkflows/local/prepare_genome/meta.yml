@@ -1,0 +1,140 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "prepare_genome"
+description: Prepare genome, miRNA reference, annotation, adapter and contaminant reference channels for nf-core/smrnaseq.
+keywords:
+  - genome
+  - reference
+  - mirna
+  - bowtie
+  - contaminant
+components:
+  - untar
+  - bowtie/build
+  - bioawk
+input:
+  - val_fasta:
+      type: string
+      description: Path to the reference genome FASTA file.
+  - val_bowtie_index:
+      type: string
+      description: Path to a Bowtie index directory or Bowtie index tarball.
+  - val_mirtrace_species:
+      type: string
+      description: Species identifier for miRTrace.
+  - val_rrna:
+      type: string
+      description: Path to the rRNA contaminant FASTA file.
+  - val_trna:
+      type: string
+      description: Path to the tRNA contaminant FASTA file.
+  - val_cdna:
+      type: string
+      description: Path to the cDNA contaminant FASTA file.
+  - val_ncrna:
+      type: string
+      description: Path to the ncRNA contaminant FASTA file.
+  - val_pirna:
+      type: string
+      description: Path to the piRNA contaminant FASTA file.
+  - val_other_contamination:
+      type: string
+      description: Path to an additional contaminant FASTA file.
+  - val_fastp_known_mirna_adapters:
+      type: string
+      description: Path to a FASTA file with known miRNA adapter sequences for adapter trimming.
+  - val_mirna_gtf:
+      type: string
+      description: Path to a GFF/GTF file with precursor and miRNA coordinates.
+output:
+  - fasta:
+      type: file
+      description: |
+        Channel containing the cleaned reference genome FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - has_fasta:
+      type: boolean
+      description: Boolean indicating whether a reference genome FASTA was provided.
+  - bowtie_index:
+      type: directory
+      description: |
+        Channel containing the prepared Bowtie genome index directory.
+        Structure: [ val(meta), path(directory_index) ]
+  - versions:
+      type: file
+      description: |
+        File containing software versions.
+        Structure: [ path(versions.yml) ]
+      pattern: "versions.yml"
+  - mirtrace_species:
+      type: string
+      description: |
+        Channel containing the miRTrace species identifier.
+        Structure: [ val(string) ]
+  - has_mirtrace_species:
+      type: boolean
+      description: Boolean indicating whether a miRTrace species identifier was provided.
+  - reference_mature:
+      type: file
+      description: |
+        Channel containing the mature miRNA reference FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - reference_hairpin:
+      type: file
+      description: |
+        Channel containing the hairpin miRNA reference FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - mirna_gtf:
+      type: file
+      description: |
+        Channel containing miRNA annotation with species stored in the metadata.
+        Structure: [ val(meta), path(gtf) ]
+      pattern: "*.{gtf,gff,gff3}"
+  - rrna:
+      type: file
+      description: |
+        Channel containing the rRNA contaminant FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - trna:
+      type: file
+      description: |
+        Channel containing the tRNA contaminant FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - cdna:
+      type: file
+      description: |
+        Channel containing the cDNA contaminant FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ncrna:
+      type: file
+      description: |
+        Channel containing the ncRNA contaminant FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - pirna:
+      type: file
+      description: |
+        Channel containing the piRNA contaminant FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - other_contamination:
+      type: file
+      description: |
+        Channel containing an additional contaminant FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - mirna_adapters:
+      type: file
+      description: |
+        Channel containing known miRNA adapter FASTA sequences for adapter trimming.
+        Structure: [ path(fasta) ]
+      pattern: "*.{fa,fasta}"
+authors:
+  - "@atrigila"
+maintainers:
+  - "@atrigila"
