@@ -279,7 +279,7 @@ def validateBowtieGenomeArgs() {
         '--maqerr'     : 'int',
         '-l'           : 'int',
         '--seedlen'    : 'int',
-        '-k'           : 'int',
+        '-k'           : 'int_min_2',
         '-m'           : 'int',
         '--maxbts'     : 'int',
         '--chunkmbs'   : 'int',
@@ -340,6 +340,9 @@ def validateBowtieArgValue(flag, expectedType, value) {
     }
     if (expectedType == 'int_0_3' && !(value ==~ /0*[0-3]/)) {
         error("[bowtie_align_args] Argument '${flag}' must be between 0 and 3, got '${value}'.")
+    }
+    if (expectedType == 'int_min_2' && !(value ==~ /0*([2-9]|[1-9]\d+)/)) {
+        error("[bowtie_align_args] Argument '${flag}' must be at least 2, got '${value}'. The default genome mapping arguments include '--strata', which Bowtie only accepts with '-k' above 1. To report a single alignment per read, override ext.args for 'NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME' instead: https://nf-co.re/smrnaseq/dev/docs/usage#custom-tool-arguments")
     }
 }
 //
