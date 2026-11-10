@@ -57,6 +57,8 @@ See examples in: [the test-datasets repository of nf-core](https://github.com/nf
 - `fasta`: the reference genome FASTA file
 - `bowtie_index`: points to the folder containing the `bowtie` indices for the genome reference specified by `fasta`.
 - `bowtie_align_args`: Optional flags to pass to Bowtie 1 for the genome mapping, e.g. `--bowtie_align_args '-v 1 --best'`. Only a subset of Bowtie 1 flags are allowed to keep compatibility with the pipeline. If invalid or disallowed values are included, the pipeline will exit with an error message. A value holding a single flag needs the `=` form, for example `--bowtie_align_args=--best`, because `--bowtie_align_args --best` is parsed as the boolean `true` and is rejected. Short flags take their value as a separate word (`-v 1`, not `-v=1`).
+  - These flags are appended after the pipeline's defaults for genome mapping (`-t -k 50 --best --strata -e 99999 --chunkmbs 2048`). When a flag is repeated, Bowtie uses the last value, so for example `--bowtie_align_args '-k 10'` replaces `-k 50`.
+  - `-k` must be at least 2, because the defaults include `--strata`, which Bowtie only accepts with `-k` above 1. To report a single alignment per read, override `ext.args` for `NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME` instead (see [Custom Tool Arguments](#custom-tool-arguments)).
 
 > [!NOTE]
 > if the FASTA file in `fasta` is not the same file used to generate the `bowtie` indices, then the pipeline will fail.
