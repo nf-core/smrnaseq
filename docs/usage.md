@@ -1,4 +1,4 @@
-# nf-core/smrnaseq: Usage
+﻿# nf-core/smrnaseq: Usage
 
 ## :warning: Please read this documentation on the nf-core website: [https://nf-co.re/smrnaseq/usage](https://nf-co.re/smrnaseq/usage)
 
@@ -11,17 +11,20 @@
 This option indicates the experimental protocol used for the sample preparation. Currently supporting:
 
 - 'illumina': three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`0`), three_prime_clip_r1 (`0`)
-- 'nextflex': three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`4`), three_prime_clip_r1 (`4`)
+- 'nextflex': NEXTFLEX Small RNA-Seq Kit v3; three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`4`), three_prime_clip_r1 (`4`)
+- 'nextflex_v4': NEXTFLEX Small RNA-Seq Kit v4; three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`0`), three_prime_clip_r1 (`0`), fastp_min_length (`16`)
 - 'qiaseq': three_prime_adapter (`AACTGTAGGCACCATCAAT`), clip_r1 (`0`), three_prime_clip_r1 (`0`)
 - 'cats': three_prime_adapter (`AAAAAAAA`), clip_r1(`3`), three_prime_clip_r1 (`0`)
 
-This option is not chosen as a parameter but as an additional profile that sets the corresponding `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` parameters accordingly. You can choose to either use any of the provided profiles by running the pipeline with e.g. `illumina` to set the defaults as described above in a more convenient way.
+This option is not chosen as a parameter but as an additional profile that sets the corresponding `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` parameters and, where applicable, `fastp_min_length` accordingly. You can choose to either use any of the provided profiles by running the pipeline with e.g. `illumina` to set the defaults as described above in a more convenient way.
 
 ```bash
 -profile your_other_profiles,illumina
 ```
 
-In case you have a custom protocol, please supply the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` manually.
+For NEXTFLEX libraries, use `nextflex` for the NEXTFLEX Small RNA-Seq Kit v3 chemistry and `nextflex_v4` for the v4 chemistry. For v4, the settings follow the [manufacturer's trimming instructions](https://resources.revvity.com/pdfs/man-nextflex-small-rna-trimming-instructions.pdf), which specify the 3' adapter and a minimum read length of 16 nt without additional fixed 5' or 3' clipping.
+
+In case you have a custom protocol, please supply the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` manually and adapt `fastp_min_length` if required by your protocol.
 
 The parameter `--three_prime_adapter` is set to the Illumina TruSeq single index adapter sequence `AGATCGGAAGAGCACACGTCTGAACTCCAGTCA`. This is also to ensure, that the auto-detect functionality of `FASTP` is disabled. Please make sure to adapt this adapter sequence accordingly for your run.
 
@@ -82,18 +85,18 @@ Error 255 is typically related to the core algorithm of miRDeep generating empty
 The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire read sequence after 3'adapter removal. Followed by Umitools-extract to extract the miRNA adapter and UMI. This can be achieved by using the parameters for UMI handling as follows (in this case for QIAseq miRNA Library Kit):
 
 ```bash
---with_umi --umitools_extract_method regex --umitools_bc_pattern = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
+--with_umi --umitools_extract_method regex --umitools_bc_pattern '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
 ```
 
 > [!NOTE]
 > If your UMI read structure differs, you'll need to specify custom `umitools_bc_pattern` patterns. Ensure that the pattern is set so that only the insert sequence of the RNA molecule remains after extraction. For details, refer to the UMI handling manual or the documentation of the kit you're using for the expected read structure.
 
 > [!WARNING]
-> Some UMI kits (e.g. QIAseq) locate the UMI relative to a kit-specific adapter/anchor sequence (e.g. AACTGTAGGCACCATCAAT). In nf-core/smrnaseq v2.4.1, `fastp` trims the protocol adapter sequence before `umi_tools extract`. If your `umitools_bc_pattern` requires the adapter/anchor sequence, the regex will not match (often resulting in an empty FASTQ and/or “regex does not match” messages).
+> Some UMI kits (e.g. QIAseq) locate the UMI relative to a kit-specific adapter/anchor sequence (e.g. AACTGTAGGCACCATCAAT). From nf-core/smrnaseq v2.4.1, `fastp` trims the protocol adapter sequence before `umi_tools extract`. If your `umitools_bc_pattern` requires the adapter/anchor sequence, the regex will not match (often resulting in an empty FASTQ and/or “regex does not match” messages).
 >
-> This warning is based on the execution order (`fastp` → `umicollapse` → `umi_tools extract`) and the resulting empty output when the adapter is trimmed before regex-based UMI extraction.
+> This warning is based on the execution order and the resulting empty output when the adapter is trimmed before regex-based UMI extraction. In the default UMI handling order, `fastp` adapter trimming runs first, followed by `umicollapse` deduplication and then `umi_tools extract`; a final `fastp` length-only pass runs after UMI extraction to remove short reads.
 >
-> In these cases where UMI trimming relies on the adapter sequence for the location of the UMIs, you can disable fastp trimming for the run (e.g. `--skip_fastp`).
+> In these cases where UMI trimming relies on the adapter sequence for the location of the UMIs, you can prevent `fastp` from initial adapter-trimming the reads before UMI extraction with `--skip_fastp`. Note that `--skip_fastp` does not disable `fastp` entirely: the length-only `fastp` pass after UMI extraction is still executed (with adapter and quality trimming disabled). When using with `--with_umi`, the pipeline still runs a separate `fastp` length-filtering step after `umi_tools extract`.
 
 ## Samplesheet input
 
@@ -168,7 +171,7 @@ If you wish to repeatedly use the same parameters for multiple runs, rather than
 Pipeline settings can be provided in a `yaml` or `json` file via `-params-file <file>`.
 
 > [!WARNING]
-> Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources), other infrastructural tweaks (such as output directories), or module arguments (args).
+> Do not use `-c <file>` to specify parameters as this will result in errors. Custom config files specified with `-c` must only be used for [tuning process resource specifications](https://nf-co.re/docs/running/run-pipelines#configuring-pipelines), other infrastructural tweaks (such as output directories), or module arguments (args).
 
 The above pipeline run specified with a params file in yaml format:
 
@@ -256,7 +259,7 @@ If `-profile` is not specified, the pipeline will run locally and expect all sof
 - `apptainer`
   - A generic configuration profile to be used with [Apptainer](https://apptainer.org/)
 - `wave`
-  - A generic configuration profile to enable [Wave](https://seqera.io/wave/) containers. Use together with one of the above (requires Nextflow ` 24.03.0-edge` or later).
+  - A generic configuration profile to enable [Wave](https://seqera.io/wave/) containers. Use together with one of the above (requires Nextflow `24.03.0-edge` or later).
 - `conda`
   - A generic configuration profile to be used with [Conda](https://conda.io/docs/). Please only use Conda as a last resort i.e. when it's not possible to run the pipeline with Docker, Singularity, Podman, Shifter, Charliecloud, or Apptainer.
 
@@ -276,19 +279,47 @@ Specify the path to a specific config file (this is a core Nextflow command). Se
 
 Whilst the default requirements set within the pipeline will hopefully work for most people and with most input data, you may find that you want to customise the compute resources that the pipeline requests. Each step in the pipeline has a default set of requirements for number of CPUs, memory and time. For most of the pipeline steps, if the job exits with any of the error codes specified [here](https://github.com/nf-core/rnaseq/blob/4c27ef5610c87db00c3c5a3eed10b1d161abf575/conf/base.config#L18) it will automatically be resubmitted with higher resources request (2 x original, then 3 x original). If it still fails after the third attempt then the pipeline execution is stopped.
 
-To change the resource requests, please see the [max resources](https://nf-co.re/docs/usage/configuration#max-resources) and [tuning workflow resources](https://nf-co.re/docs/usage/configuration#tuning-workflow-resources) section of the nf-core website.
+To change the resource requests, please see the [max resources](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#set-max-resources) and [customise process resources](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#customize-process-resources) section of the nf-core website.
 
 ### Custom Containers
 
 In some cases, you may wish to change the container or conda environment used by a pipeline steps for a particular tool. By default, nf-core pipelines use containers and software from the [biocontainers](https://biocontainers.pro/) or [bioconda](https://bioconda.github.io/) projects. However, in some cases the pipeline specified version maybe out of date.
 
-To use a different container from the default container or conda environment specified in a pipeline, please see the [updating tool versions](https://nf-co.re/docs/usage/configuration#updating-tool-versions) section of the nf-core website.
+To use a different container from the default container or conda environment specified in a pipeline, please see the [updating tool versions](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#update-tool-versions) section of the nf-core website.
 
 ### Custom Tool Arguments
 
-A pipeline might not always support every possible argument or option of a particular tool used in pipeline. Fortunately, nf-core pipelines provide some freedom to users to insert additional parameters that the pipeline does not include by default.
+A pipeline might not expose every command-line option of every tool as a pipeline parameter. For supported nf-core modules, you can pass extra tool options with the `ext.args` process directive in a Nextflow config file. This is useful, for example, when you want to change Bowtie's mismatch settings or add an option to a SAMtools command. These are module arguments, so put them in a custom config passed with `-c`; pipeline parameters belong in the CLI or a `-params-file` (see [running the pipeline](#running-the-pipeline)).
 
-To learn how to provide additional arguments to a particular tool of the pipeline, please see the [customising tool arguments](https://nf-co.re/docs/usage/configuration#customising-tool-arguments) section of the nf-core website.
+For this pipeline, the alignment module is named `BOWTIE_ALIGN`. It runs both Bowtie and `samtools view`: set `ext.args` for Bowtie options and `ext.args2` for `samtools view` options. For the separate sorting step, use `ext.args` on `SAMTOOLS_SORT`.
+
+For example, create `tool_args.config`:
+
+```nextflow
+process {
+    withName: BOWTIE_ALIGN {
+        ext.args  = '-n 0'       // Bowtie: allow zero mismatches in the seed
+        ext.args2 = '--no-PG'    // samtools view: example additional option
+    }
+
+    withName: SAMTOOLS_SORT {
+        ext.args = '--no-PG'     // samtools sort: example additional option
+    }
+}
+```
+
+Then include it in your usual run command:
+
+```bash
+nextflow run nf-core/smrnaseq \
+    -profile docker \
+    -c tool_args.config \
+    --input samplesheet.csv \
+    --outdir results \
+    --genome GRCh37
+```
+
+The Bowtie example sets its seed mismatch limit to zero; choose options that match your analysis and the tool's own documentation. `ext.args` values are inserted into the module command, so check the module's command and tool help before adding options that duplicate settings the pipeline already supplies. The applicable process names and argument slots can be checked in the module code; for modules running multiple tools, `ext.args`, `ext.args2`, etc. correspond to the tools in command order. See nf-core's documentation on [ext arguments](https://nf-co.re/docs/contributing/components/ext_args) and [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) for more details.
 
 ### nf-core/configs
 

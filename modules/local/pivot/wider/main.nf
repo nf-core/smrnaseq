@@ -22,7 +22,8 @@ process PIVOT_WIDER {
         --input final_long_results_temp.csv \\
         --output ${meta.id}_concatenated_temp.csv
 
-    sort -t\$'\t' -k1,1 ${meta.id}_concatenated_temp.csv > joined_samples_mirtop.tsv
+    head -n 1 ${meta.id}_concatenated_temp.csv > joined_samples_mirtop.tsv
+    tail -n +2 ${meta.id}_concatenated_temp.csv | sort -t\$'\t' -k1,1 >> joined_samples_mirtop.tsv
 
     cat <<-END_VERSIONS > versions.yml
     "${task.process}":

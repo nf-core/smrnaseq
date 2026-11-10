@@ -1,0 +1,98 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "mirna_quant"
+description: Quantify miRNA reads against mature and hairpin references, run QC, and prepare read sets for genome quantification.
+keywords:
+  - mirna
+  - quantification
+  - bowtie
+  - mirtop
+  - samtools
+components:
+  - parse/fasta/mirna
+  - format/fasta/mirna
+  - bowtie/build
+  - bowtie/align
+  - bam_sort_stats_samtools
+  - seqcluster/collapse
+  - datatable/merge
+  - edger/qc
+  - bam_stats_mirna_mirtop
+  - pivot/longer
+  - pivot/wider
+input:
+  - ch_reference_mature:
+      type: file
+      description: |
+        Input channel containing the mature miRNA reference FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_reference_hairpin:
+      type: file
+      description: |
+        Input channel containing the hairpin miRNA reference FASTA file.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - ch_mirna_gtf:
+      type: file
+      description: |
+        Input channel containing miRNA annotation with species stored in the metadata.
+        Structure: [ val(meta), path(gtf) ]
+      pattern: "*.{gtf,gff,gff3}"
+  - ch_reads_for_mirna:
+      type: file
+      description: |
+        Input channel containing reads for miRNA quantification.
+        Structure: [ val(meta), path(reads) ]
+      pattern: "*.{fastq,fastq.gz,fq,fq.gz}"
+  - ch_mirtrace_species:
+      type: string
+      description: |
+        Channel containing the miRTrace species identifier.
+        Structure: [ val(string) ]
+output:
+  - fasta_mature:
+      type: file
+      description: |
+        Channel containing formatted mature miRNA FASTA files.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - fasta_hairpin:
+      type: file
+      description: |
+        Channel containing formatted hairpin miRNA FASTA files.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta}"
+  - unmapped:
+      type: file
+      description: |
+        Channel containing reads unmapped from hairpin alignment for genome quantification.
+        Structure: [ val(meta), path(reads) ]
+      pattern: "*.{fastq,fastq.gz,fq,fq.gz}"
+  - mature_stats:
+      type: file
+      description: |
+        Channel containing Samtools statistics for mature miRNA alignments.
+        Structure: [ val(meta), path(stats) ]
+      pattern: "*.{stats}"
+  - hairpin_stats:
+      type: file
+      description: |
+        Channel containing Samtools statistics for hairpin miRNA alignments.
+        Structure: [ val(meta), path(stats) ]
+      pattern: "*.{stats}"
+  - mirtop_logs:
+      type: file
+      description: |
+        Channel containing mirtop statistics logs.
+        Structure: [ val(meta), path(log) ]
+      pattern: "*.log"
+  - versions:
+      type: file
+      description: |
+        File containing software versions.
+        Structure: [ path(versions.yml) ]
+      pattern: "versions.yml"
+authors:
+  - "@atrigila"
+maintainers:
+  - "@atrigila"
