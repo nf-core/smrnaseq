@@ -293,12 +293,14 @@ A pipeline might not expose every command-line option of every tool as a pipelin
 
 For this pipeline, the alignment module is named `BOWTIE_ALIGN`. It runs both Bowtie and `samtools view`: set `ext.args` for Bowtie options and `ext.args2` for `samtools view` options. For the separate sorting step, use `ext.args` on `SAMTOOLS_SORT`.
 
+Genome mapping runs this module as `BOWTIE_MAP_GENOME`, and the pipeline configures it with a fully qualified selector, so a shorter selector such as `BOWTIE_ALIGN` has no effect on that step. Setting `ext.args` replaces the pipeline's defaults, so repeat any you want to keep.
+
 For example, create `tool_args.config`:
 
 ```nextflow
 process {
-    withName: BOWTIE_ALIGN {
-        ext.args  = '-n 0'       // Bowtie: allow zero mismatches in the seed
+    withName: 'NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME' {
+        ext.args  = '-t -k 50 --best --strata -e 99999 --chunkmbs 2048 -n 0' // Bowtie: pipeline defaults, plus zero mismatches in the seed
         ext.args2 = '--no-PG'    // samtools view: example additional option
     }
 
