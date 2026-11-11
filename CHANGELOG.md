@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#554]](https://github.com/nf-core/smrnaseq/pull/554) - Improve documentation, add metromap.
 - [[#559]](https://github.com/nf-core/smrnaseq/pull/559) - Fix [`MIRDEEP2_MIRDEEP2` errorStrategy](https://github.com/nf-core/smrnaseq/issues/558): exit statuses other than 255 aborted the run instead of retrying or finishing.
 - [[#561]](https://github.com/nf-core/smrnaseq/pull/561) - Template update for nf-core/tools v4.2.1.
-- [[#565]](https://github.com/nf-core/smrnaseq/pull/565) - Update nf-core modules and subworkflows (FastQC 0.13.0, fastp 1.4.0) and adapt pipeline code to the new module interfaces. Fix the mirtop conda environments (`ModuleNotFoundError: No module named 'six'`) via the upstream modules fix ([nf-core/modules#13679](https://github.com/nf-core/modules/pull/13679)).
+- [[#565]](https://github.com/nf-core/smrnaseq/pull/565) - Update nf-core modules and subworkflows (FastQC 0.13.0, fastp 1.4.0) and adapt pipeline code to the new module interfaces. Fix the mirtop conda environments (`ModuleNotFoundError: No module named 'six'`) via the upstream modules fix ([nf-core/modules#13679](https://github.com/nf-core/modules/pull/13679)). Fix the contamination filter statistics, which read fixed line numbers of the bowtie2 log and miscounted when bowtie2 prepended warnings. Temporarily patch the bowtie2 modules' version parsing for newer bioconda builds (empty version under conda).
 
 ## v2.4.1 - 2026-01-08 - Red Zinc Spaniel
 
