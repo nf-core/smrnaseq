@@ -472,9 +472,6 @@
                 "pipeline_info/nf_core_smrnaseq_software_mqc_versions.yml"
             ],
             [
-                "Clone1_N1.fastp.json:md5,f941e89cf8a61b14b624269013a4c063",
-                "Clone9_N1.fastp.json:md5,a8e625931f4483737a9a67557e912c8e",
-                "Control_N1.fastp.json:md5,a6faf58af77d5553f4a78a90ad3b9bd5",
                 "_clean.fa:md5,1023292bc0ec00ec22d1c7cf909ff86a",
                 "genome.1.ebwt:md5,1bfbf95848b5a2e8a786d0a2c1054bbb",
                 "genome.2.ebwt:md5,8f007efb2d23e46035cc47340c4d981e",
@@ -558,10 +555,8 @@
                 "fastqc_sequence_length_distribution_plot.txt:md5,6a94897d9bb6826bd5c4c8df8e737880",
                 "fastqc_top_overrepresented_sequences_table.txt:md5,91b745155fb6c1652cdd8222fc96a9cc",
                 "multiqc_citations.txt:md5,57db2426be011862828d18f767d25b57",
-                "multiqc_fastp.txt:md5,f2a77d06ada11c480e6c153917ad96ff",
                 "multiqc_fastqc.txt:md5,40b0a08abed5da850238ae98fee1f440",
                 "multiqc_fastqc_fastqc-1.txt:md5,71e7272aabd67d810be80c3388f23746",
-                "multiqc_general_stats.txt:md5,4fa1d4e249b5b1418596030267bb4564",
                 "multiqc_samtools_stats.txt:md5,36f3de61f23b5a91e8f7d3cd10944f94",
                 "samtools-stats-dp.txt:md5,fd4fa90d55655eaed872d77640a2a709",
                 "samtools_alignment_plot.txt:md5,28e1acd39dab34b9efe68fccf8e5d4d7"
@@ -591,7 +586,7 @@
             ],
             "No VCF files"
         ],
-        "timestamp": "2026-11-11T11:29:01.379739",
+        "timestamp": "2026-11-11T11:08:52.413271",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "25.10.4"
