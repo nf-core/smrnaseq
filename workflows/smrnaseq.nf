@@ -143,10 +143,14 @@ workflow NFCORE_SMRNASEQ {
     // MODULE: mirtrace QC
     //
 
-    if (has_mirtrace_species) {
-        MIRTRACE_RENAME_READS(ch_reads_for_mirtrace)
-        ch_reads_for_mirtrace = MIRTRACE_RENAME_READS.out.reads
-    }
+    // Combine with ch_mirtrace_species so the reads are only staged when miRTrace runs
+    // (has_mirtrace_species arrives here as a channel, so an `if` on it is always true)
+    MIRTRACE_RENAME_READS(
+        ch_reads_for_mirtrace
+            .combine(ch_mirtrace_species)
+            .map { meta, reads, _species -> [ meta, reads ] }
+    )
+    ch_reads_for_mirtrace = MIRTRACE_RENAME_READS.out.reads
 
     ch_mirtrace_config = ch_reads_for_mirtrace
         .transpose()
