@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "rename_reads"
+description: Give a single-end FASTQ file a new name (via a symlink, no copy), set with `ext.prefix`.
+keywords:
+  - rename
+  - fastq
+  - symlink
+tools:
+  - "coreutils":
+      description: "GNU core utilities (ln)."
+      homepage: "https://www.gnu.org/software/coreutils/"
+      documentation: "https://www.gnu.org/software/coreutils/manual/"
+      licence: ["GPL-3.0-or-later"]
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information.
+        e.g. [ id:'test', single_end:true ]
+  - reads:
+      type: file
+      description: Single-end FASTQ file.
+      pattern: "*.{fastq,fastq.gz,fq,fq.gz}"
+output:
+  - reads:
+      type: file
+      description: |
+        The input FASTQ file as `<ext.prefix>.fastq(.gz)`, or under its original name
+        when `ext.prefix` is not set.
+      pattern: "renamed/*"
+authors:
+  - "@apeltzer"
+maintainers:
+  - "@apeltzer"

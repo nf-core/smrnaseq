@@ -1,7 +1,7 @@
 {
     "-profile test_umi": {
         "content": [
-            76,
+            78,
             {
                 "BOWTIE_MAP_GENOME": {
                     "bowtie": "1.3.1",
@@ -266,9 +266,9 @@
                 "mirtrace/SRX8195117_SRR11631013/mirtrace-stats-qcstatus.tsv",
                 "mirtrace/SRX8195117_SRR11631013/mirtrace-stats-rnatype.tsv",
                 "mirtrace/SRX8195117_SRR11631013/qc_passed_reads.all.collapsed",
-                "mirtrace/SRX8195117_SRR11631013/qc_passed_reads.all.collapsed/SRX8195117_SRR11631013_1.subsamp.fasta",
+                "mirtrace/SRX8195117_SRR11631013/qc_passed_reads.all.collapsed/SRX8195117_SRR11631013.fastp.fasta",
                 "mirtrace/SRX8195117_SRR11631013/qc_passed_reads.rnatype_unknown.collapsed",
-                "mirtrace/SRX8195117_SRR11631013/qc_passed_reads.rnatype_unknown.collapsed/SRX8195117_SRR11631013_1.subsamp.fasta",
+                "mirtrace/SRX8195117_SRR11631013/qc_passed_reads.rnatype_unknown.collapsed/SRX8195117_SRR11631013.fastp.fasta",
                 "mirtrace/SRX8195118_SRR11631014",
                 "mirtrace/SRX8195118_SRR11631014/mirtrace-report.html",
                 "mirtrace/SRX8195118_SRR11631014/mirtrace-results.json",
@@ -280,9 +280,9 @@
                 "mirtrace/SRX8195118_SRR11631014/mirtrace-stats-qcstatus.tsv",
                 "mirtrace/SRX8195118_SRR11631014/mirtrace-stats-rnatype.tsv",
                 "mirtrace/SRX8195118_SRR11631014/qc_passed_reads.all.collapsed",
-                "mirtrace/SRX8195118_SRR11631014/qc_passed_reads.all.collapsed/SRX8195118_SRR11631014_1.subsamp.fasta",
+                "mirtrace/SRX8195118_SRR11631014/qc_passed_reads.all.collapsed/SRX8195118_SRR11631014.fastp.fasta",
                 "mirtrace/SRX8195118_SRR11631014/qc_passed_reads.rnatype_unknown.collapsed",
-                "mirtrace/SRX8195118_SRR11631014/qc_passed_reads.rnatype_unknown.collapsed/SRX8195118_SRR11631014_1.subsamp.fasta",
+                "mirtrace/SRX8195118_SRR11631014/qc_passed_reads.rnatype_unknown.collapsed/SRX8195118_SRR11631014.fastp.fasta",
                 "multiqc",
                 "multiqc/multiqc_data",
                 "multiqc/multiqc_data/fastp-seq-content-gc-plot_Read_1_After_filtering.txt",
@@ -538,8 +538,8 @@
                 "mirtrace-stats-phred.tsv:md5,aa2c266626949217f30b9c111f42faf2",
                 "mirtrace-stats-qcstatus.tsv:md5,5f88526d360d574d822109fb9662f8ac",
                 "mirtrace-stats-rnatype.tsv:md5,3d720af98b52eadd5dd46e714ce87c9f",
-                "SRX8195117_SRR11631013_1.subsamp.fasta:md5,d6e7afee3ba22fad13d8c74b45af6193",
-                "SRX8195117_SRR11631013_1.subsamp.fasta:md5,8dcf474b2ba8e179055d2ed5005fbf9c",
+                "SRX8195117_SRR11631013.fastp.fasta:md5,d6e7afee3ba22fad13d8c74b45af6193",
+                "SRX8195117_SRR11631013.fastp.fasta:md5,8dcf474b2ba8e179055d2ed5005fbf9c",
                 "mirtrace-stats-contamination_basic.tsv:md5,fd4a208e18d6b5d6a377c691a521693c",
                 "mirtrace-stats-contamination_detailed.tsv:md5,51d8e42c294702bca4fd9cb5a5e2c839",
                 "mirtrace-stats-length.tsv:md5,dffc327359e1c2c9ba7ce3a57258a6bc",
@@ -547,8 +547,8 @@
                 "mirtrace-stats-phred.tsv:md5,a4cfd23066b05b9ff34b33956244dea0",
                 "mirtrace-stats-qcstatus.tsv:md5,7d62a526fad7334d6348b08fecaa3c50",
                 "mirtrace-stats-rnatype.tsv:md5,b03f2ae6eaf6622bc3ef4d09ea653060",
-                "SRX8195118_SRR11631014_1.subsamp.fasta:md5,0f00508390f84b47c93c0df8c125e5b1",
-                "SRX8195118_SRR11631014_1.subsamp.fasta:md5,0c0141a5cdcabe6adfe0d9395e942888",
+                "SRX8195118_SRR11631014.fastp.fasta:md5,0f00508390f84b47c93c0df8c125e5b1",
+                "SRX8195118_SRR11631014.fastp.fasta:md5,0c0141a5cdcabe6adfe0d9395e942888",
                 "fastp-seq-content-gc-plot_Read_1_After_filtering.txt:md5,5e206ba8dbc176c8fbc6224be3a8489b",
                 "fastp-seq-content-gc-plot_Read_1_Before_filtering.txt:md5,f832e92fb36db181ed1079be110edb2a",
                 "fastp-seq-content-n-plot_Read_1_After_filtering.txt:md5,1f56dc5b44aa103d29d2b7978ff7e856",
@@ -588,7 +588,7 @@
                 "multiqc_mirtrace_complexity.txt:md5,4b4ec780ac1444cc9dd6c585d84782a4",
                 "multiqc_mirtrace_contamination.txt:md5,bc45227c1ee392048f6565386d20f2e4",
                 "multiqc_mirtrace_length.txt:md5,10877baee5610bba725534b03a16adc8",
-                "multiqc_mirtrace_summary.txt:md5,a9432f6ea0df1dc4e0d14027e145c3a0",
+                "multiqc_mirtrace_summary.txt:md5,9e4f2512c51c92d319ffc8ee9d4b9d07",
                 "multiqc_samtools_stats.txt:md5,cd1941dc4fbcbeaebb8ef3f099bcc178",
                 "multiqc_umicollapse.txt:md5,5c5045569b83f861f6ba26d6ab8f10ca",
                 "samtools-stats-dp.txt:md5,f2f1cee4d281719db54ff781c38172fc",
@@ -620,7 +620,7 @@
             ],
             "No VCF files"
         ],
-        "timestamp": "2026-11-11T09:34:06.805121",
+        "timestamp": "2026-11-11T10:59:24.447346",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "25.10.4"
