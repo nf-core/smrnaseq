@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#561]](https://github.com/nf-core/smrnaseq/pull/561) - Template update for nf-core/tools v4.2.1.
 - [[#565]](https://github.com/nf-core/smrnaseq/pull/565) - Update nf-core modules and subworkflows (FastQC 0.13.0, fastp 1.4.0) and adapt pipeline code to the new module interfaces. Fix the mirtop conda environments (`ModuleNotFoundError: No module named 'six'`) via the upstream modules fix ([nf-core/modules#13679](https://github.com/nf-core/modules/pull/13679)).
 - [[#566]](https://github.com/nf-core/smrnaseq/pull/566) - Fix [#555](https://github.com/nf-core/smrnaseq/issues/555): migrate output publishing from `publishDir` to Nextflow workflow outputs (`output {}` block in `main.nf`); the output layout is unchanged.
-- [[#PRNUM]](https://github.com/nf-core/smrnaseq/pull/PRNUM) - Fix two publishing rules that never matched: merged technical replicates are now saved to `cat_fastq/` with `--save_merged`, and an untarred `--bowtie_index` is only saved to `untar/` with `--save_intermediates` (previously always).
+- [[#580]](https://github.com/nf-core/smrnaseq/pull/580) - Fix two publishing rules that never matched: merged technical replicates are now saved to `cat_fastq/` with `--save_merged`, and an untarred `--bowtie_index` is only saved to `untar/` with `--save_intermediates` (previously always).
 
 ## v2.4.1 - 2026-01-08 - Red Zinc Spaniel
 
