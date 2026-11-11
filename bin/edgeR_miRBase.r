@@ -59,8 +59,9 @@ for (i in 1:2) {
     o <- order(rowSums(dataDGE$counts), decreasing=TRUE)
     dataDGE <- dataDGE[o,]
 
-    # Save log10(TPM)
-    tpm = cpm(dataDGE, normalized.lib.sizes=F, log = F, prior.count = 0.001)
+    # Save log10(CPM + 0.001): library-size scaling only (no TMM, no length normalisation).
+    # Despite the name, these are not TPM values; the "logtpm" filenames are kept for backwards compatibility.
+    tpm = cpm(dataDGE, normalized.lib.sizes=F, log = F)
     tpm = tpm + 0.001
     tpm = log10(tpm)
     ttpm = t(tpm)
