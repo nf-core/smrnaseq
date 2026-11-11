@@ -30,16 +30,16 @@
                     "r-base": "3.6.2"
                 },
                 "FASTP": {
-                    "fastp": "1.1.0"
+                    "fastp": "1.4.0"
                 },
                 "FASTP_LENGTH_FILTER": {
-                    "fastp": "1.1.0"
+                    "fastp": "1.4.0"
                 },
                 "FASTQC_RAW": {
-                    "fastqc": "0.12.1"
+                    "fastqc": "0.13.0"
                 },
                 "FASTQC_TRIM": {
-                    "fastqc": "0.12.1"
+                    "fastqc": "0.13.0"
                 },
                 "FORMAT_HAIRPIN": {
                     "fastx_toolkit": "0.0.14"
@@ -87,19 +87,19 @@
                     "vroom": "1.6.5"
                 },
                 "SAMTOOLS_FLAGSTAT": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.25
                 },
                 "SAMTOOLS_IDXSTATS": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.25
                 },
                 "SAMTOOLS_INDEX": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.25
                 },
                 "SAMTOOLS_SORT": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.25
                 },
                 "SAMTOOLS_STATS": {
-                    "samtools": "1.23.1"
+                    "samtools": 1.25
                 },
                 "SEQCLUSTER_COLLAPSE": {
                     "seqcluster": "1.2.9"
@@ -505,28 +505,24 @@
                 "mature.4.ebwt:md5,78260e9dde22d8f31622c77d71bbb605",
                 "mature.rev.1.ebwt:md5,0520d43b6b75328f3c30254a2d6baa18",
                 "mature.rev.2.ebwt:md5,ab52bc362b4c382cf213a71219e9efee",
-                "SRX8195117_SRR11631013.fastp.json:md5,58dd94e43078a72d5683bcb65a33ee74",
-                "SRX8195118_SRR11631014.fastp.json:md5,b3b20a1ee4e0b47de9de52fa07eb5e75",
-                "SRX8195117_SRR11631013.fastp.json:md5,9e5d35b1afe756fccf6225442f912a1d",
-                "SRX8195118_SRR11631014.fastp.json:md5,62bd26454a47f69f0d56653c8a0b6590",
                 "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.flagstat:md5,b2d7641adf9b3b32158c4bfb4d68fd5c",
                 "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.idxstats:md5,960214b32881a23baa8c10b2821b764b",
-                "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.stats:md5,562aeba6968e273561fa676ba883a67b",
+                "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.stats:md5,4db45e70a058dd8729cf0a6d258c7b27",
                 "SRX8195118_SRR11631014_mature_hairpin_genome.sorted.flagstat:md5,5ac2fa7e3916a21b06155ab51b4f0746",
                 "SRX8195118_SRR11631014_mature_hairpin_genome.sorted.idxstats:md5,56919992a7c13adf70bf755439cad3b1",
-                "SRX8195118_SRR11631014_mature_hairpin_genome.sorted.stats:md5,3ee84a0ad651027fb8f2a7b004010469",
+                "SRX8195118_SRR11631014_mature_hairpin_genome.sorted.stats:md5,50ee81145770c5e9cde9229043502f7d",
                 "SRX8195117_SRR11631013_mature_hairpin.sorted.flagstat:md5,3af7403da4286f8b893afe278766f55a",
                 "SRX8195117_SRR11631013_mature_hairpin.sorted.idxstats:md5,2e778563a36f78253673995e50f4d005",
-                "SRX8195117_SRR11631013_mature_hairpin.sorted.stats:md5,15a08d1ae5aa9a1df1c1fc3915ac9161",
+                "SRX8195117_SRR11631013_mature_hairpin.sorted.stats:md5,bb48da5490e9f25fc4891158319a5862",
                 "SRX8195118_SRR11631014_mature_hairpin.sorted.flagstat:md5,b2509feb193b8d8b34e364a6489d46e3",
                 "SRX8195118_SRR11631014_mature_hairpin.sorted.idxstats:md5,c90d3bc5b29b478bd0646ad3038ab1d2",
-                "SRX8195118_SRR11631014_mature_hairpin.sorted.stats:md5,4d412f003f40b8ff6301c18256f8e88c",
+                "SRX8195118_SRR11631014_mature_hairpin.sorted.stats:md5,1122a9a5971095c4cbb4ad6dcf84925f",
                 "SRX8195117_SRR11631013_mature.sorted.flagstat:md5,67068039702aefbb310f517661b17737",
                 "SRX8195117_SRR11631013_mature.sorted.idxstats:md5,354cca1540e42d118694c9cc891ccc0d",
-                "SRX8195117_SRR11631013_mature.sorted.stats:md5,571e2f88d5bc73661f36f894f3c6d5b4",
+                "SRX8195117_SRR11631013_mature.sorted.stats:md5,ea0356ce4960e032fbfa256c33d5c3ba",
                 "SRX8195118_SRR11631014_mature.sorted.flagstat:md5,3360f9b88d0f4f14f741a48aaedd37d9",
                 "SRX8195118_SRR11631014_mature.sorted.idxstats:md5,46d2ea68a97ba95ea8f5411ecaf13253",
-                "SRX8195118_SRR11631014_mature.sorted.stats:md5,3d6e86e1feab254bd91d3f2ab317aba8",
+                "SRX8195118_SRR11631014_mature.sorted.stats:md5,cd5b60619967f8518131aa556c4d29d1",
                 "hairpin.fa_igenome.fa:md5,5fb538f60d5288846600dba31010251e",
                 "hairpin.fa_igenome.fa_idx.fa:md5,482b0327b0c1e36748c1ee3d3be9be77",
                 "mature.fa_igenome.fa:md5,ef4cabcbea05adf334ba6891a50c951a",
@@ -538,8 +534,8 @@
                 "mirtrace-stats-phred.tsv:md5,b27e82b51e53d6d686df141e35c1f041",
                 "mirtrace-stats-qcstatus.tsv:md5,5f2a51ee9475638af730b2c31f47c797",
                 "mirtrace-stats-rnatype.tsv:md5,c4e4db698aa81f42f49c4d2368a7a735",
-                "SRX8195117_SRR11631013.fastp.fasta:md5,7a678e71f06ef14bbb484cdf095f4a13",
-                "SRX8195117_SRR11631013.fastp.fasta:md5,0efbde61cab10d5d2d4906fa729cc2fa",
+                "SRX8195117_SRR11631013.fastp.fasta:md5,1d85484be43d9d4f49cd1833d68a9daa",
+                "SRX8195117_SRR11631013.fastp.fasta:md5,daa12b85514b7705d3824b5d7a3f3809",
                 "mirtrace-stats-contamination_basic.tsv:md5,677d95c9df736edd47db2be36411213c",
                 "mirtrace-stats-contamination_detailed.tsv:md5,ff78979388fffe5e3805a7080e7a0987",
                 "mirtrace-stats-length.tsv:md5,3c14567f0b2ce74131b618a130c9283e",
@@ -581,10 +577,8 @@
                 "mirtrace_qc_plot.txt:md5,4602b041b47522b96b750fd97682bf20",
                 "mirtrace_rna_categories_plot.txt:md5,68d0ab6030b0c103b55de39e0b1d14b7",
                 "multiqc_citations.txt:md5,3f952977c627cf09125cf1f697728ebd",
-                "multiqc_fastp.txt:md5,5863f9ada6411730a1177893464917e6",
-                "multiqc_fastqc.txt:md5,94d8a1832b3a4db0c1dcb7388f8c1213",
-                "multiqc_fastqc_fastqc-1.txt:md5,0493da07c03309e75d3248c8fe09ef51",
-                "multiqc_general_stats.txt:md5,850061ebe16066328668e7b14c709c6c",
+                "multiqc_fastqc.txt:md5,4bf6c601f34e26edb050067e87da1621",
+                "multiqc_fastqc_fastqc-1.txt:md5,6a1432983bf815118e610862ac772a76",
                 "multiqc_mirtrace_complexity.txt:md5,854c594dd6e96fd66b5d0a4cc825369e",
                 "multiqc_mirtrace_contamination.txt:md5,e36c3c7b523808d1483e422f3ea904dc",
                 "multiqc_mirtrace_length.txt:md5,a5be80d205af9ae7e47ded0c2262e60a",
@@ -620,10 +614,10 @@
             ],
             "No VCF files"
         ],
-        "timestamp": "2026-06-02T17:19:41.007922823",
+        "timestamp": "2026-11-11T11:22:44.458836",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "26.04.0"
+            "nextflow": "25.10.4"
         }
     }
 }

@@ -72,7 +72,7 @@ workflow CONTAMINANT_FILTER {
         // Obtain how many hits were contaminants
         ch_bowtie = BOWTIE2_ALIGN_RRNA.out.log
 
-        STATS_GAWK_RRNA(ch_bowtie, [], false)
+        STATS_GAWK_RRNA(ch_bowtie.map { meta, log -> [ meta, log, 'stats' ] }, [], false)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
@@ -98,7 +98,7 @@ workflow CONTAMINANT_FILTER {
         // Obtain how many hits were contaminants
         ch_bowtie = BOWTIE2_ALIGN_TRNA.out.log
 
-        STATS_GAWK_TRNA(ch_bowtie, [], false)
+        STATS_GAWK_TRNA(ch_bowtie.map { meta, log -> [ meta, log, 'stats' ] }, [], false)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
@@ -119,7 +119,7 @@ workflow CONTAMINANT_FILTER {
         BLAT_CDNA(ch_reference_hairpin, ch_cdna)
 
         // Extract the significant hits
-        GAWK_CDNA(BLAT_CDNA.out.psl, ch_program, false)
+        GAWK_CDNA(BLAT_CDNA.out.psl.map { meta, psl -> [ meta, psl, '' ] }, ch_program, false)
 
         // Get only unique elements of the list
         ch_pattern = GAWK_CDNA.out.output
@@ -129,7 +129,7 @@ workflow CONTAMINANT_FILTER {
                 .collectFile(name: 'ch_hairpin_cDNA_unique.txt', newLine: true)
 
         // Remove the hairpin miRNAs from the cDNA data
-        SEQKIT_GREP_CDNA(ch_cdna, ch_pattern)
+        SEQKIT_GREP_CDNA(ch_cdna, ch_pattern, '')
 
         // Previous original code:
         INDEX_CDNA ( SEQKIT_GREP_CDNA.out.filter )
@@ -141,7 +141,7 @@ workflow CONTAMINANT_FILTER {
         BOWTIE2_ALIGN_CDNA(trna_reads, INDEX_CDNA.out.index.first(), [[],[]], true, false)
 
         // Obtain how many hits were contaminants
-        STATS_GAWK_CDNA(BOWTIE2_ALIGN_CDNA.out.log, [], false)
+        STATS_GAWK_CDNA(BOWTIE2_ALIGN_CDNA.out.log.map { meta, log -> [ meta, log, 'stats' ] }, [], false)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
@@ -159,7 +159,7 @@ workflow CONTAMINANT_FILTER {
         BLAT_NCRNA(ch_reference_hairpin, ch_ncrna)
 
         // Extract the significant hits
-        GAWK_NCRNA(BLAT_NCRNA.out.psl, ch_program, false)
+        GAWK_NCRNA(BLAT_NCRNA.out.psl.map { meta, psl -> [ meta, psl, '' ] }, ch_program, false)
 
         // Get only unique elements of the list
         ch_pattern = GAWK_NCRNA.out.output
@@ -169,7 +169,7 @@ workflow CONTAMINANT_FILTER {
                 .collectFile(name: 'ch_hairpin_ncRNA_unique.txt', newLine: true)
 
         // Remove the hairpin miRNAs from the ncRNA data
-        SEQKIT_GREP_NCRNA(ch_ncrna, ch_pattern)
+        SEQKIT_GREP_NCRNA(ch_ncrna, ch_pattern, '')
 
         // Previous original code:
         INDEX_NCRNA ( SEQKIT_GREP_NCRNA.out.filter )
@@ -181,7 +181,7 @@ workflow CONTAMINANT_FILTER {
         BOWTIE2_ALIGN_NCRNA(cdna_reads, INDEX_NCRNA.out.index.first(), [[],[]], true, false)
 
         // Obtain how many hits were contaminants
-        STATS_GAWK_NCRNA(BOWTIE2_ALIGN_NCRNA.out.log, [], false)
+        STATS_GAWK_NCRNA(BOWTIE2_ALIGN_NCRNA.out.log.map { meta, log -> [ meta, log, 'stats' ] }, [], false)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
@@ -199,7 +199,7 @@ workflow CONTAMINANT_FILTER {
         BLAT_PIRNA(ch_reference_hairpin, ch_pirna)
 
         // Extract the significant hits
-        GAWK_PIRNA(BLAT_PIRNA.out.psl, ch_program, false)
+        GAWK_PIRNA(BLAT_PIRNA.out.psl.map { meta, psl -> [ meta, psl, '' ] }, ch_program, false)
 
         // Get only unique elements of the list
         ch_pattern = GAWK_PIRNA.out.output
@@ -209,7 +209,7 @@ workflow CONTAMINANT_FILTER {
                 .collectFile(name: 'ch_hairpin_piRNA_unique.txt', newLine: true)
 
         // Remove the hairpin miRNAs from the piRNA data
-        SEQKIT_GREP_PIRNA(ch_pirna, ch_pattern)
+        SEQKIT_GREP_PIRNA(ch_pirna, ch_pattern, '')
 
         // Previous original code:
         INDEX_PIRNA ( SEQKIT_GREP_PIRNA.out.filter )
@@ -221,7 +221,7 @@ workflow CONTAMINANT_FILTER {
         BOWTIE2_ALIGN_PIRNA(ncrna_reads, INDEX_PIRNA.out.index.first(), [[],[]], true, false)
 
         // Obtain how many hits were contaminants
-        STATS_GAWK_PIRNA(BOWTIE2_ALIGN_PIRNA.out.log, [], false)
+        STATS_GAWK_PIRNA(BOWTIE2_ALIGN_PIRNA.out.log.map { meta, log -> [ meta, log, 'stats' ] }, [], false)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
@@ -239,7 +239,7 @@ workflow CONTAMINANT_FILTER {
         BLAT_OTHER(ch_reference_hairpin, ch_other_contamination)
 
         // Extract the significant hits
-        GAWK_OTHER(BLAT_OTHER.out.psl, ch_program, false)
+        GAWK_OTHER(BLAT_OTHER.out.psl.map { meta, psl -> [ meta, psl, '' ] }, ch_program, false)
 
         // Get only unique elements of the list
         ch_pattern = GAWK_OTHER.out.output
@@ -249,7 +249,7 @@ workflow CONTAMINANT_FILTER {
                 .collectFile(name: 'ch_hairpin_other_unique.txt', newLine: true)
 
         // Remove the hairpin miRNAs from the other data
-        SEQKIT_GREP_OTHER(ch_other_contamination, ch_pattern)
+        SEQKIT_GREP_OTHER(ch_other_contamination, ch_pattern, '')
 
         // Previous original code:
         INDEX_OTHER ( SEQKIT_GREP_OTHER.out.filter )
@@ -258,7 +258,7 @@ workflow CONTAMINANT_FILTER {
         BOWTIE2_ALIGN_OTHER(pirna_reads, INDEX_OTHER.out.index.first(), [[],[]], true, false)
 
         // Obtain how many hits were contaminants
-        STATS_GAWK_OTHER(BOWTIE2_ALIGN_OTHER.out.log, [], false)
+        STATS_GAWK_OTHER(BOWTIE2_ALIGN_OTHER.out.log.map { meta, log -> [ meta, log, 'stats' ] }, [], false)
 
         // Remove meta.contaminant and collect all contaminant stats in a single channel
         ch_filter_stats = ch_filter_stats
