@@ -202,7 +202,7 @@ workflow PIPELINE_COMPLETION {
 def validateInputParameters() {
     genomeExistsError()
 
-    if (!params.mirgenedb) {
+    if (!paramAsBool(params.mirgenedb)) {
         // Validate mature miRNA fasta file
         if (!params.mature) {
             error("Mature miRNA fasta file not found. Please specify using the `--mature` parameter.")
@@ -285,11 +285,11 @@ def toolCitationText() {
     // Uncomment function in methodsDescriptionText to render in MultiQC report
     def citation_text = [
             "Tools used in the workflow included:",
-            !params.skip_fastqc          ? "FastQC (Andrews 2010)," : "",
-            !params.skip_multiqc         ? "MultiQC (Ewels et al. 2016)," : "",
-            !params.skip_fastp           ? "fastp (Chen et al. 2018)," : "",
-            !params.skip_mirdeep         ? "MiRDeep2 (Friedländer et al. 2012)," : "",
-            params.filter_contamination  ? "Contamination filtering tools: BLAT (Kent 2002), Bowtie2 (Langmead and Salzberg 2012)," : "",
+            !paramAsBool(params.skip_fastqc)          ? "FastQC (Andrews 2010)," : "",
+            !paramAsBool(params.skip_multiqc)         ? "MultiQC (Ewels et al. 2016)," : "",
+            !paramAsBool(params.skip_fastp)           ? "fastp (Chen et al. 2018)," : "",
+            !paramAsBool(params.skip_mirdeep)         ? "MiRDeep2 (Friedländer et al. 2012)," : "",
+            paramAsBool(params.filter_contamination) ? "Contamination filtering tools: BLAT (Kent 2002), Bowtie2 (Langmead and Salzberg 2012)," : "",
             params.mirtrace_species      ? "miRTrace (Kang et al. 2018)," : "",
             "UMI-tools (Smith et al. 2017),",
             "Bowtie (Langmead et al. 2009),",
@@ -365,4 +365,39 @@ def methodsDescriptionText(mqc_methods_yaml) {
     def description_html = engine.createTemplate(methods_text).make(meta)
 
     return description_html.toString()
+}
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    PARAMETER TYPE HELPERS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+//
+// With the strict syntax parser (default from Nextflow 26.04), parameters given on the
+// command line reach the pipeline scripts as Strings, e.g. `--skip_mirdeep false` gives
+// 'false', which is truthy. nf-schema only casts a copy of the params for validation.
+// Use these helpers wherever a boolean or integer parameter is used in a script.
+//
+def paramAsBool(value) {
+    if (value == null) {
+        return false
+    }
+    if (value instanceof CharSequence) {
+        return value.toString().trim().toBoolean()
+    }
+    return value as Boolean
+}
+
+def paramAsInt(value) {
+    if (value == null || value.toString().trim() == '') {
+        return null
+    }
+    if (value instanceof Number) {
+        return value.intValue()
+    }
+    def text = value.toString().trim()
+    if (!text.isInteger()) {
+        error("Expected an integer parameter value but got '${value}'")
+    }
+    return text.toInteger()
 }

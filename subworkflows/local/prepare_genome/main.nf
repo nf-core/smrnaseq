@@ -7,6 +7,9 @@ include { UNTAR         as UNTAR_BOWTIE_INDEX } from '../../../modules/nf-core/u
 include { BOWTIE_BUILD  as INDEX_GENOME       } from '../../../modules/nf-core/bowtie/build/main'
 include { BIOAWK        as CLEAN_FASTA        } from '../../../modules/nf-core/bioawk/main'
 
+// local functions
+include { paramAsBool                         } from '../utils_nfcore_smrnaseq_pipeline'
+
 /*
 ========================================================================================
     FUNCTIONS
@@ -68,7 +71,7 @@ workflow PREPARE_GENOME {
             [new_meta, gtf]
         }
 
-    ch_mirna_adapters         = params.with_umi               ? [] : channel.fromPath(val_fastp_known_mirna_adapters, checkIfExists: true).collect()
+    ch_mirna_adapters         = paramAsBool(params.with_umi)  ? [] : channel.fromPath(val_fastp_known_mirna_adapters, checkIfExists: true).collect()
 
     ch_rrna                   = val_rrna                      ? channel.fromPath(val_rrna, checkIfExists: true).map{ it -> [ [id:'rRNA'], it ] }.collect()                 : channel.empty()
     ch_trna                   = val_trna                      ? channel.fromPath(val_trna, checkIfExists: true).map{ it -> [ [id:'tRNA'], it ] }.collect()                 : channel.empty()
@@ -115,12 +118,12 @@ workflow PREPARE_GENOME {
 
     //Config checks
     // Check optional parameters
-    if (!params.mirgenedb && !val_mirtrace_species && !(params.help || params.help_full)) {
+    if (!paramAsBool(params.mirgenedb) && !val_mirtrace_species && !(params.help || params.help_full)) {
             exit 1, "Reference species for miRTrace is not defined via the --mirtrace_species parameter."
         }
 
     // Genome options
-    if (!params.mirgenedb) {
+    if (!paramAsBool(params.mirgenedb)) {
         ch_reference_mature  = params.mature  ? channel.fromPath(params.mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : { exit 1, "Specify a Mature miRNA fasta file via '--mature'" }
         ch_reference_hairpin = params.hairpin ? channel.fromPath(params.hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : { exit 1, "Specify a Hairpin miRNA fasta file via '--hairpin'" }
     } else {
