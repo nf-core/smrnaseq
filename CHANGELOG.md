@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#565]](https://github.com/nf-core/smrnaseq/pull/565) - Update nf-core modules and subworkflows (FastQC 0.13.0, fastp 1.4.0) and adapt pipeline code to the new module interfaces. Fix the mirtop conda environments (`ModuleNotFoundError: No module named 'six'`) via the upstream modules fix ([nf-core/modules#13679](https://github.com/nf-core/modules/pull/13679)).
 - [[#577]](https://github.com/nf-core/smrnaseq/pull/577) - Fix [#544](https://github.com/nf-core/smrnaseq/issues/544): run miRTrace on the raw reads instead of the fastp-trimmed reads, so it no longer trims reads a second time.
 - [[#582]](https://github.com/nf-core/smrnaseq/pull/582) - Fix [#581](https://github.com/nf-core/smrnaseq/issues/581): with `--three_prime_adapter auto-detect`, leave the adapter field of the miRTrace config empty instead of writing the literal string `auto-detect`. miRTrace cannot auto-detect adapters, so it runs without adapter trimming in this case.
-- [[#585]](https://github.com/nf-core/smrnaseq/pull/585) - Fix [#584](https://github.com/nf-core/smrnaseq/issues/584): with `--three_prime_adapter auto-detect`, give miRTrace the adapter that fastp detected for each sample. If fastp is skipped or detects no adapter, the adapter field stays empty and a warning lists the samples.
+- [[#590]](https://github.com/nf-core/smrnaseq/pull/590) - Fix [#584](https://github.com/nf-core/smrnaseq/issues/584): with `--three_prime_adapter auto-detect`, give miRTrace the adapter that fastp detected for each sample. If fastp is skipped or detects no adapter, the adapter field stays empty and a warning lists the samples.
 
 ## v2.4.1 - 2026-01-08 - Red Zinc Spaniel
 
