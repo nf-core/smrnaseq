@@ -47,9 +47,13 @@ Preprocessing is done to format reference files before using them in the workflo
 <details markdown="1">
 <summary>Output files</summary>
 
-- `fastqc/`
+- `fastqc/raw/`: reports for the raw reads.
+- `fastqc/trimmed/`: reports for the reads after adapter and quality trimming.
   - `*_fastqc.html`: FastQC report containing quality metrics.
   - `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images.
+
+> [!NOTE]
+> The FastQC files are only published with `--save_intermediates`. By default, FastQC still runs and its results are included in the MultiQC report, but the individual reports are not written to the output directory.
 
 </details>
 
