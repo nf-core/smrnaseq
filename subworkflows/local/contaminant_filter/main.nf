@@ -57,7 +57,7 @@ workflow CONTAMINANT_FILTER {
     ch_versions     = channel.empty()
     ch_filter_stats = channel.empty()
 
-    ch_reads_for_mirna.set { rrna_reads }
+    rrna_reads = ch_reads_for_mirna
 
     if (params.rrna) {
         // Index DB and filter $reads emit: $rrna_reads
