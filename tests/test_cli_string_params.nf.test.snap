@@ -429,7 +429,6 @@
                 "mirtrace_rna_categories_plot.txt:md5,606174b789bdb9841f8e99206d147bb9",
                 "multiqc_citations.txt:md5,9003fcb9991fe8399ef2b9b7a006d46c",
                 "multiqc_fastqc.txt:md5,d8cffa09d0eea53caf96728c9367e230",
-                "multiqc_general_stats.txt:md5,bedaad8087d5dd74849e0e39456b3a5f",
                 "multiqc_mirtrace_complexity.txt:md5,a5ed7a31e0f518871634fc3746d91b68",
                 "multiqc_mirtrace_contamination.txt:md5,d41d8cd98f00b204e9800998ecf8427e",
                 "multiqc_mirtrace_length.txt:md5,47c48e637c3ed63cad4b31ebf42aa2dd",
@@ -462,10 +461,10 @@
             ],
             "No VCF files"
         ],
-        "timestamp": "2026-11-10T22:04:18.145899",
+        "timestamp": "2026-11-11T11:17:27.422919",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "26.10.5"
+            "nextflow": "25.10.4"
         }
     }
 }
