@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "mirtrace_config"
+description: |
+  Write one miRTrace config file per sample. With `--three_prime_adapter auto-detect`, the adapter that fastp
+  detected for a sample is written to its config; if fastp was skipped or reported no adapter, the adapter field
+  is left empty (miRTrace then runs without adapter trimming).
+keywords:
+  - mirtrace
+  - adapter
+  - config
+components:
+  - mirtraceadapter
+  - mirtraceconfigline
+input:
+  - ch_reads:
+      type: file
+      description: |
+        Reads to run miRTrace on.
+        Structure: [ val(meta), [ path(reads) ] ]
+      pattern: "*.{fastq,fq}.gz"
+  - ch_fastp_adapter:
+      type: string
+      description: |
+        Adapter detected by fastp for each sample (`adapter_cutting.read1_adapter_sequence`), matched by `meta.id`.
+        Empty channel if fastp was skipped.
+        Structure: [ val(meta), val(adapter) ]
+  - ch_three_prime_adapter:
+      type: string
+      description: |
+        Value of `--three_prime_adapter`.
+        Structure: [ val(string) ]
+  - ch_phred_offset:
+      type: string
+      description: |
+        PHRED quality offset of the reads.
+        Structure: [ val(string) ]
+output:
+  - config:
+      type: file
+      description: |
+        miRTrace config file per sample.
+        Structure: [ val(meta), path(config) ]
+      pattern: "*.data"
+authors:
+  - "@apeltzer"
+maintainers:
+  - "@apeltzer"

@@ -275,6 +275,19 @@ def mirtraceConfigLine(reads_name, sample_id, adapter, phred_offset) {
 }
 
 //
+// Adapter to give miRTrace for one sample. With `--three_prime_adapter auto-detect`, use the adapter fastp
+// detected for the sample (`adapter_cutting.read1_adapter_sequence` in its JSON report). If fastp did not run
+// or reported no adapter (empty, missing or 'unspecified'), keep 'auto-detect', which mirtraceConfigLine()
+// turns into an empty adapter field (no adapter trimming). Explicit adapters are returned unchanged.
+//
+def mirtraceAdapter(three_prime_adapter, fastp_adapter) {
+    if (three_prime_adapter != 'auto-detect' || !fastp_adapter || fastp_adapter == 'unspecified') {
+        return three_prime_adapter
+    }
+    return fastp_adapter
+}
+
+//
 // Exit pipeline if incorrect --genome key provided
 //
 def genomeExistsError() {

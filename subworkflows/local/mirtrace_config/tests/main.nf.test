@@ -1,0 +1,83 @@
+nextflow_workflow {
+
+    name "Test Workflow MIRTRACE_CONFIG"
+    script "../main.nf"
+    workflow "MIRTRACE_CONFIG"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/mirtrace_config"
+    tag "mirtrace_config"
+
+    // Only channel operators, no processes: the reads do not need to exist
+    test("auto-detect - uses the adapter detected by fastp, falls back to an empty field") {
+
+        when {
+            workflow {
+                """
+                input[0] = channel.of(
+                    [ [ id:'detected',    single_end:true ], [ file('detected.fastq.gz') ] ],
+                    [ [ id:'unspecified', single_end:true ], [ file('unspecified.fastq.gz') ] ],
+                    [ [ id:'missing',     single_end:true ], [ file('missing.fastq.gz') ] ],
+                    [ [ id:'no_fastp',    single_end:true ], [ file('no_fastp.fastq.gz') ] ]
+                )
+                // fastp output; UMI processing may change meta, so samples are matched by id.
+                // 'no_fastp' has no fastp result (e.g. --skip_fastp).
+                input[1] = channel.of(
+                    [ [ id:'detected',    single_end:false ], 'AACTGTAGGCACCATCAAT' ],
+                    [ [ id:'unspecified', single_end:true  ], 'unspecified' ],
+                    [ [ id:'missing',     single_end:true  ], '' ]
+                )
+                input[2] = channel.value('auto-detect')
+                input[3] = channel.value('33')
+                """
+            }
+        }
+
+        then {
+            // the warning goes to the Nextflow log (the console output is not captured here)
+            def config = workflow.out.config.collectEntries { meta, config_file -> [ meta.id, path(config_file).text ] }
+            assertAll(
+                { assert workflow.success },
+                { assert config == [
+                    detected:    './detected.fastq.gz,detected,AACTGTAGGCACCATCAAT,33\n',
+                    unspecified: './unspecified.fastq.gz,unspecified,,33\n',
+                    missing:     './missing.fastq.gz,missing,,33\n',
+                    no_fastp:    './no_fastp.fastq.gz,no_fastp,,33\n'
+                ] },
+                { assert path("${launchDir}/meta/nextflow.log").text.contains('fastp reported no adapter (or was skipped) for: missing, no_fastp, unspecified.') }
+            )
+        }
+    }
+
+    test("explicit adapter - unchanged, fastp adapter ignored") {
+
+        when {
+            workflow {
+                """
+                input[0] = channel.of(
+                    [ [ id:'sample1', single_end:true ], [ file('sample1.fastq.gz') ] ],
+                    [ [ id:'sample2', single_end:true ], [ file('sample2.fastq.gz') ] ]
+                )
+                input[1] = channel.of(
+                    [ [ id:'sample1', single_end:true ], 'AACTGTAGGCACCATCAAT' ]
+                )
+                input[2] = channel.value('TGGAATTCTCGGGTGCCAAGG')
+                input[3] = channel.value('33')
+                """
+            }
+        }
+
+        then {
+            // the warning goes to the Nextflow log (the console output is not captured here)
+            def config = workflow.out.config.collectEntries { meta, config_file -> [ meta.id, path(config_file).text ] }
+            assertAll(
+                { assert workflow.success },
+                { assert config == [
+                    sample1: './sample1.fastq.gz,sample1,TGGAATTCTCGGGTGCCAAGG,33\n',
+                    sample2: './sample2.fastq.gz,sample2,TGGAATTCTCGGGTGCCAAGG,33\n'
+                ] },
+                { assert !path("${launchDir}/meta/nextflow.log").text.contains('miRTrace cannot auto-detect adapters') }
+            )
+        }
+    }
+}
