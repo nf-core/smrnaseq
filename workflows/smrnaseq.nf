@@ -21,6 +21,7 @@ include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils
 include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/main'
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant/main'
 include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant/main'
+include { mirtraceConfigLine               } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { methodsDescriptionText           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 // plugins
 include { paramsSummaryMap                 } from 'plugin/nf-schema'
@@ -147,7 +148,7 @@ workflow NFCORE_SMRNASEQ {
         .combine(ch_phred_offset)
         .collectFile { meta, reads, adapter, phred ->
         def config_filename = "${meta.id}.data"
-        [ config_filename, "./${reads.getFileName().toString()},${meta.id},${adapter},${phred}\n" ]
+        [ config_filename, mirtraceConfigLine(reads.getFileName().toString(), meta.id, adapter, phred) ]
         }
         .map { config_file ->
         def base_name = config_file.getBaseName()
@@ -159,6 +160,9 @@ workflow NFCORE_SMRNASEQ {
             .join(ch_mirtrace_config)
 
     if (has_mirtrace_species){
+        if (params.three_prime_adapter == 'auto-detect') {
+            log.warn "miRTrace cannot auto-detect adapters, so with '--three_prime_adapter auto-detect' it runs without adapter trimming. Set '--three_prime_adapter' to the adapter sequence for adapter-trimmed miRTrace QC."
+        }
 
         MIRTRACE_QC(ch_mirtrace_qc_inputs, ch_mirtrace_species)
 

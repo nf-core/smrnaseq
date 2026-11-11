@@ -265,6 +265,16 @@ def getGenomeAttribute(attribute) {
 }
 
 //
+// Build one line of the miRTrace config file: <reads>,<display name>,<adapter>,<PHRED offset>
+// miRTrace (1.0.1) cannot auto-detect adapters, and an empty adapter field means no adapter trimming.
+// `--three_prime_adapter auto-detect` only applies to fastp, so it becomes an empty field here.
+//
+def mirtraceConfigLine(reads_name, sample_id, adapter, phred_offset) {
+    def mirtrace_adapter = adapter == 'auto-detect' ? '' : adapter
+    return "./${reads_name},${sample_id},${mirtrace_adapter},${phred_offset}\n".toString()
+}
+
+//
 // Exit pipeline if incorrect --genome key provided
 //
 def genomeExistsError() {
