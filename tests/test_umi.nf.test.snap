@@ -505,10 +505,6 @@
                 "mature.4.ebwt:md5,78260e9dde22d8f31622c77d71bbb605",
                 "mature.rev.1.ebwt:md5,0520d43b6b75328f3c30254a2d6baa18",
                 "mature.rev.2.ebwt:md5,ab52bc362b4c382cf213a71219e9efee",
-                "SRX8195117_SRR11631013.fastp.json:md5,b3fea8a72284f530bb58e23837c69278",
-                "SRX8195118_SRR11631014.fastp.json:md5,5882ce2c84dc8574a9f50b8dcd599ad9",
-                "SRX8195117_SRR11631013.fastp.json:md5,e77c1ab573c9833182769cc484e68cd9",
-                "SRX8195118_SRR11631014.fastp.json:md5,1cc2555e7db26953c510352f97981d41",
                 "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.flagstat:md5,b2d7641adf9b3b32158c4bfb4d68fd5c",
                 "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.idxstats:md5,960214b32881a23baa8c10b2821b764b",
                 "SRX8195117_SRR11631013_mature_hairpin_genome.sorted.stats:md5,4db45e70a058dd8729cf0a6d258c7b27",
@@ -581,10 +577,8 @@
                 "mirtrace_qc_plot.txt:md5,4602b041b47522b96b750fd97682bf20",
                 "mirtrace_rna_categories_plot.txt:md5,68d0ab6030b0c103b55de39e0b1d14b7",
                 "multiqc_citations.txt:md5,3f952977c627cf09125cf1f697728ebd",
-                "multiqc_fastp.txt:md5,6d607da0c3f940a3dc0607b9e8677b69",
                 "multiqc_fastqc.txt:md5,4bf6c601f34e26edb050067e87da1621",
                 "multiqc_fastqc_fastqc-1.txt:md5,6a1432983bf815118e610862ac772a76",
-                "multiqc_general_stats.txt:md5,850061ebe16066328668e7b14c709c6c",
                 "multiqc_mirtrace_complexity.txt:md5,854c594dd6e96fd66b5d0a4cc825369e",
                 "multiqc_mirtrace_contamination.txt:md5,e36c3c7b523808d1483e422f3ea904dc",
                 "multiqc_mirtrace_length.txt:md5,a5be80d205af9ae7e47ded0c2262e60a",
@@ -620,7 +614,7 @@
             ],
             "No VCF files"
         ],
-        "timestamp": "2026-11-10T22:10:40.53405",
+        "timestamp": "2026-11-11T11:22:44.458836",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "25.10.4"
