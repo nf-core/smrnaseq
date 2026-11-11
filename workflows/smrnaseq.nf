@@ -75,6 +75,9 @@ workflow NFCORE_SMRNASEQ {
         ch_fastq.multiple
     )
     ch_cat_fastq = CAT_FASTQ.out.reads.mix(ch_fastq.single)
+    // miRTrace is a QC tool for raw reads and does its own adapter, quality and length filtering,
+    // so keep the untrimmed reads for it (see https://github.com/nf-core/smrnaseq/issues/544)
+    ch_reads_for_mirtrace = ch_cat_fastq
 
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters & dedup UMIs if necessary / desired by the user
@@ -138,7 +141,7 @@ workflow NFCORE_SMRNASEQ {
     // MODULE: mirtrace QC
     //
 
-    ch_mirtrace_config = ch_reads_for_mirna
+    ch_mirtrace_config = ch_reads_for_mirtrace
         .transpose()
         .combine(ch_three_prime_adapter)
         .combine(ch_phred_offset)
@@ -151,7 +154,7 @@ workflow NFCORE_SMRNASEQ {
         [ ['id':base_name], config_file ]
     }
 
-    ch_mirtrace_qc_inputs = ch_reads_for_mirna
+    ch_mirtrace_qc_inputs = ch_reads_for_mirtrace
             .map{meta, reads -> [[id: meta.id], reads]}
             .join(ch_mirtrace_config)
 
