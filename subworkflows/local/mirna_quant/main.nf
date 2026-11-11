@@ -160,10 +160,10 @@ workflow MIRNA_QUANT {
     )                                                        // channel: [ val(meta), path(file) ]
     seqcluster          = SEQCLUSTER_COLLAPSE.out.fastq      // channel: [ val(meta), path(fastq.gz) ]
     edger_qc            = EDGER_QC.out.edger_files           // channel: [ path(txt|pdf|csv) ]
-    mirtop              = BAM_STATS_MIRNA_MIRTOP.out.isomirs.mix(
-        PIVOT_WIDER.out.csv,
+    mirtop              = BAM_STATS_MIRNA_MIRTOP.out.isomirs.map { _meta, tsv -> tsv }.mix(
+        PIVOT_WIDER.out.csv.map { _meta, tsv -> tsv },
         DATATABLE_MERGE.out.mirna_tsv
-    )                                                        // channel: [ val(meta), path(tsv) ] or [ path(tsv) ]
+    )                                                        // channel: [ path(tsv) ]
 }
 
 def add_suffix(row, suffix) {

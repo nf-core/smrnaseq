@@ -287,5 +287,5 @@ workflow CONTAMINANT_FILTER {
     versions        = ch_versions            // channel: [ versions.yml ]
 
     // Files to publish
-    filter          = FILTER_STATS.out.stats.mix(FILTER_STATS.out.reads) // channel: [ path(stats) ] or [ val(meta), path(fastq.gz) ]
+    filter          = FILTER_STATS.out.reads.map { _meta, reads -> reads }.mix(FILTER_STATS.out.stats) // channel: [ path(fastq.gz|yaml) ]
 }
