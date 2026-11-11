@@ -127,6 +127,43 @@ workflow MIRNA_QUANT {
     hairpin_stats       = BAM_STATS_HAIRPIN.out.stats        // channel: [ val(meta), [ stats ] ]
     mirtop_logs         = ch_mirtop_logs                     // channel: [ val(meta), path(log) ]
     versions            = ch_versions                        // channel: [ versions.yml ]
+
+    // Files to publish
+    reference           = PARSE_MATURE.out.parsed_fasta.mix(
+        PARSE_HAIRPIN.out.parsed_fasta,
+        FORMAT_MATURE.out.formatted_fasta,
+        FORMAT_HAIRPIN.out.formatted_fasta
+    )                                                        // channel: [ val(meta), path(fasta) ]
+    index_mature        = INDEX_MATURE.out.index             // channel: [ val(meta), path(bowtie) ]
+    index_hairpin       = INDEX_HAIRPIN.out.index            // channel: [ val(meta), path(bowtie) ]
+    bam_mature          = BOWTIE_MAP_MATURE.out.bam.mix(
+        BOWTIE_MAP_MATURE.out.log,
+        BOWTIE_MAP_MATURE.out.fastq,
+        BAM_STATS_MATURE.out.bam,
+        BAM_STATS_MATURE.out.index,
+        BAM_STATS_MATURE.out.stats,
+        BAM_STATS_MATURE.out.flagstat,
+        BAM_STATS_MATURE.out.idxstats
+    )                                                        // channel: [ val(meta), path(file) ]
+    bam_hairpin         = BOWTIE_MAP_HAIRPIN.out.bam.mix(
+        BOWTIE_MAP_HAIRPIN.out.log,
+        BOWTIE_MAP_HAIRPIN.out.fastq,
+        BAM_STATS_HAIRPIN.out.bam,
+        BAM_STATS_HAIRPIN.out.index,
+        BAM_STATS_HAIRPIN.out.stats,
+        BAM_STATS_HAIRPIN.out.flagstat,
+        BAM_STATS_HAIRPIN.out.idxstats
+    )                                                        // channel: [ val(meta), path(file) ]
+    bam_seqcluster      = BOWTIE_MAP_SEQCLUSTER.out.bam.mix(
+        BOWTIE_MAP_SEQCLUSTER.out.log,
+        BOWTIE_MAP_SEQCLUSTER.out.fastq
+    )                                                        // channel: [ val(meta), path(file) ]
+    seqcluster          = SEQCLUSTER_COLLAPSE.out.fastq      // channel: [ val(meta), path(fastq.gz) ]
+    edger_qc            = EDGER_QC.out.edger_files           // channel: [ path(txt|pdf|csv) ]
+    mirtop              = BAM_STATS_MIRNA_MIRTOP.out.isomirs.mix(
+        PIVOT_WIDER.out.csv,
+        DATATABLE_MERGE.out.mirna_tsv
+    )                                                        // channel: [ val(meta), path(tsv) ] or [ path(tsv) ]
 }
 
 def add_suffix(row, suffix) {

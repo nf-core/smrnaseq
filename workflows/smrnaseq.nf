@@ -57,6 +57,22 @@ workflow NFCORE_SMRNASEQ {
 
     def ch_versions = channel.empty()
     def ch_multiqc_files = channel.empty()
+
+    // Channels collecting the files to publish (see the `output` block in main.nf)
+    def ch_fastp_reports      = channel.empty()
+    def ch_fastp_logs         = channel.empty()
+    def ch_umi_extract_logs   = channel.empty()
+    def ch_umi_extract_reads  = channel.empty()
+    def ch_umi_dedup          = channel.empty()
+    def ch_umi_fastp_reports  = channel.empty()
+    def ch_umi_fastp_logs     = channel.empty()
+    def ch_umi_fastp_fail     = channel.empty()
+    def ch_mirtrace           = channel.empty()
+    def ch_contaminant_filter = channel.empty()
+    def ch_genome_quant_stats = channel.empty()
+    def ch_genome_quant_bam   = channel.empty()
+    def ch_mirdeep2           = channel.empty()
+    def ch_multiqc            = channel.empty()
     //
     // Create separate channels for samples that have single/multiple FastQ files to merge
     //
@@ -102,6 +118,11 @@ workflow NFCORE_SMRNASEQ {
     )
 
     ch_reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
+
+    ch_fastp_reports     = FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_json.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_html)
+    ch_fastp_logs        = FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_log
+    ch_umi_extract_logs  = FASTQ_FASTQC_UMITOOLS_FASTP.out.umi_log
+    ch_umi_extract_reads = FASTQ_FASTQC_UMITOOLS_FASTP.out.umi_reads
     // Trim 3' end nucleotides after adapter is removed, otherwise they are not really trimmed
     if (params.three_prime_clip_r1){
         FASTP3(
@@ -111,6 +132,8 @@ workflow NFCORE_SMRNASEQ {
             false
         )
         ch_reads_for_mirna  = FASTP3.out.reads
+        ch_fastp_reports    = ch_fastp_reports.mix(FASTP3.out.json, FASTP3.out.html)
+        ch_fastp_logs       = ch_fastp_logs.mix(FASTP3.out.log)
     }
 
     // UMI Dedup for fastq input
@@ -132,6 +155,13 @@ workflow NFCORE_SMRNASEQ {
         )
 
         ch_reads_for_mirna = FASTP_LENGTH_FILTER.out.reads
+
+        ch_umi_dedup         = UMICOLLAPSE_FASTQ.out.bam.mix(UMICOLLAPSE_FASTQ.out.fastq)
+        ch_umi_extract_logs  = ch_umi_extract_logs.mix(UMITOOLS_EXTRACT.out.log)
+        ch_umi_extract_reads = ch_umi_extract_reads.mix(UMITOOLS_EXTRACT.out.reads)
+        ch_umi_fastp_reports = FASTP_LENGTH_FILTER.out.json.mix(FASTP_LENGTH_FILTER.out.html)
+        ch_umi_fastp_logs    = FASTP_LENGTH_FILTER.out.log
+        ch_umi_fastp_fail    = FASTP_LENGTH_FILTER.out.reads_fail
     }
 
     //
@@ -158,6 +188,12 @@ workflow NFCORE_SMRNASEQ {
     if (has_mirtrace_species){
 
         MIRTRACE_QC(ch_mirtrace_qc_inputs, ch_mirtrace_species)
+        ch_mirtrace = MIRTRACE_QC.out.html.mix(
+            MIRTRACE_QC.out.json,
+            MIRTRACE_QC.out.tsv,
+            MIRTRACE_QC.out.all_fa,
+            MIRTRACE_QC.out.rnatype_unknown_fa
+        )
 
     } else {
         log.warn "The parameter --mirtrace_species is absent. MIRTRACE quantification skipped."
@@ -181,6 +217,7 @@ workflow NFCORE_SMRNASEQ {
         contamination_stats = CONTAMINANT_FILTER.out.filter_stats
         ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
         ch_reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
+        ch_contaminant_filter = CONTAMINANT_FILTER.out.filter
     }
 
     //MIRNA_QUANT process should still run even if mirtrace_species is null, when mirgendb is true
@@ -204,6 +241,8 @@ workflow NFCORE_SMRNASEQ {
             MIRNA_QUANT.out.unmapped
         )
         genome_stats = GENOME_QUANT.out.stats
+        ch_genome_quant_stats = GENOME_QUANT.out.bam_stats
+        ch_genome_quant_bam   = GENOME_QUANT.out.bam
         ch_versions = ch_versions.mix(GENOME_QUANT.out.versions)
 
         ch_hairpin_clean = MIRNA_QUANT.out.fasta_hairpin.map { it -> it[1] }
@@ -223,6 +262,7 @@ workflow NFCORE_SMRNASEQ {
                         ch_bowtie_index,
                         ch_mature_hairpin,
                 )
+                ch_mirdeep2 = FASTQ_FIND_MIRNA_MIRDEEP2.out.outputs
         }
     }
 
@@ -318,12 +358,42 @@ workflow NFCORE_SMRNASEQ {
 
         MULTIQC ( ch_multiqc_input )
         ch_multiqc_report = MULTIQC.out.report
+        ch_multiqc        = MULTIQC.out.report.mix(MULTIQC.out.data, MULTIQC.out.plots)
 
     }
 
     emit:
     multiqc_report = ch_multiqc_report // channel: /path/to/multiqc_report.html
     versions       = ch_versions       // channel: [ path(versions.yml) ]
+
+    // Files to publish (see the `output` block in main.nf)
+    fastqc_raw            = FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_html.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip)
+    fastqc_trim           = FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_html.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_zip)
+    fastp_reports         = ch_fastp_reports
+    fastp_logs            = ch_fastp_logs
+    fastp_reads_fail      = FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_reads_fail
+    fastp_reads           = params.skip_fastp ? channel.empty() : FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
+    umi_extract_logs      = ch_umi_extract_logs
+    umi_extract_reads     = ch_umi_extract_reads
+    umi_dedup             = ch_umi_dedup
+    umi_fastp_reports     = ch_umi_fastp_reports
+    umi_fastp_logs        = ch_umi_fastp_logs
+    umi_fastp_reads_fail  = ch_umi_fastp_fail
+    mirtrace              = ch_mirtrace
+    contaminant_filter    = ch_contaminant_filter
+    mirna_reference       = MIRNA_QUANT.out.reference
+    mirna_index_mature    = MIRNA_QUANT.out.index_mature
+    mirna_index_hairpin   = MIRNA_QUANT.out.index_hairpin
+    mirna_bam_mature      = MIRNA_QUANT.out.bam_mature
+    mirna_bam_hairpin     = MIRNA_QUANT.out.bam_hairpin
+    mirna_bam_seqcluster  = MIRNA_QUANT.out.bam_seqcluster
+    mirna_seqcluster      = MIRNA_QUANT.out.seqcluster
+    mirna_edger_qc        = MIRNA_QUANT.out.edger_qc
+    mirna_mirtop          = MIRNA_QUANT.out.mirtop
+    genome_quant_stats    = ch_genome_quant_stats
+    genome_quant_bam      = ch_genome_quant_bam
+    mirdeep2              = ch_mirdeep2
+    multiqc               = ch_multiqc
 }
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

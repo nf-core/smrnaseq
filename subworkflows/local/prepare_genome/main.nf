@@ -48,6 +48,8 @@ workflow PREPARE_GENOME {
 
     main:
     ch_versions = channel.empty()
+    ch_bowtie_index_untar = channel.empty()
+    ch_bowtie_index_built = channel.empty()
 
     // Parameter channel handling
     ch_fasta                  = val_fasta                     ? channel.fromPath(val_fasta, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : channel.empty()
@@ -90,6 +92,7 @@ workflow PREPARE_GENOME {
         if(val_bowtie_index) {
             if (val_bowtie_index.toString().endsWith(".tar.gz")) {
                 UNTAR_BOWTIE_INDEX ( ch_bowtie_index )
+                ch_bowtie_index_untar = UNTAR_BOWTIE_INDEX.out.untar
                 ch_bowtie_index = UNTAR_BOWTIE_INDEX.out.untar
                     .map{ _meta, index_dir ->
                         def index_prefix = extractFirstIndexPrefix(index_dir)
@@ -110,6 +113,7 @@ workflow PREPARE_GENOME {
 
             // Set channels: clean fasta and its index
             ch_bowtie_index  = INDEX_GENOME.out.index.collect()
+            ch_bowtie_index_built = INDEX_GENOME.out.index
         }
     }
 
@@ -150,6 +154,8 @@ workflow PREPARE_GENOME {
     fasta                 = ch_fasta               // channel: [ val(meta), path(fasta) ]
     has_fasta             = bool_has_fasta         // boolean
     bowtie_index          = ch_bowtie_index        // channel: [ val(meta), path(directory_index) ]
+    bowtie_index_untar    = ch_bowtie_index_untar  // channel: [ val(meta), path(directory_index) ] (only when a .tar.gz index is provided)
+    bowtie_index_built    = ch_bowtie_index_built  // channel: [ val(meta), path(directory_index) ] (only when the index is built by the pipeline)
     versions              = ch_versions            // channel: [ versions.yml ]
     mirtrace_species      = ch_mirtrace_species    // channel: [ val(string) ]
     has_mirtrace_species  = bool_mirtrace_species  // boolean
