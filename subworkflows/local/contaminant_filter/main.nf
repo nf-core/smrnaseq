@@ -111,8 +111,8 @@ workflow CONTAMINANT_FILTER {
 
     cdna_reads = trna_reads
 
-    // Define how to filter significant BLAT hits
-    ch_program = channel.value('BEGIN{FS="\t"}{if(\$11 < 1e-5) print \$2;}').collectFile(name:"program.txt")
+    // Define how to filter significant BLAT hits (unique target IDs with e-value < 1e-5)
+    ch_program = channel.value('BEGIN{FS="\t"}{if(\$11 < 1e-5 && !seen[\$2]++) print \$2;}').collectFile(name:"program.txt")
 
     if (params.cdna) {
         // Search which hairpin miRNAs are present in the cDNA data
@@ -121,12 +121,9 @@ workflow CONTAMINANT_FILTER {
         // Extract the significant hits
         GAWK_CDNA(BLAT_CDNA.out.psl.map { meta, psl -> [ meta, psl, '' ] }, ch_program, false)
 
-        // Get only unique elements of the list
-        ch_pattern = GAWK_CDNA.out.output
-                .map { _meta, file -> file.text.readLines() }
-                .flatten()
-                .unique()
-                .collectFile(name: 'ch_hairpin_cDNA_unique.txt', newLine: true)
+        // Use the hit list as seqkit pattern file. It is emitted even when empty (no hits),
+        // so the class still runs and simply filters nothing (see #586)
+        ch_pattern = GAWK_CDNA.out.output.map { _meta, hits -> hits }
 
         // Remove the hairpin miRNAs from the cDNA data
         SEQKIT_GREP_CDNA(ch_cdna, ch_pattern, '')
@@ -161,12 +158,9 @@ workflow CONTAMINANT_FILTER {
         // Extract the significant hits
         GAWK_NCRNA(BLAT_NCRNA.out.psl.map { meta, psl -> [ meta, psl, '' ] }, ch_program, false)
 
-        // Get only unique elements of the list
-        ch_pattern = GAWK_NCRNA.out.output
-                .map { _meta, file -> file.text.readLines() }
-                .flatten()
-                .unique()
-                .collectFile(name: 'ch_hairpin_ncRNA_unique.txt', newLine: true)
+        // Use the hit list as seqkit pattern file. It is emitted even when empty (no hits),
+        // so the class still runs and simply filters nothing (see #586)
+        ch_pattern = GAWK_NCRNA.out.output.map { _meta, hits -> hits }
 
         // Remove the hairpin miRNAs from the ncRNA data
         SEQKIT_GREP_NCRNA(ch_ncrna, ch_pattern, '')
@@ -201,12 +195,9 @@ workflow CONTAMINANT_FILTER {
         // Extract the significant hits
         GAWK_PIRNA(BLAT_PIRNA.out.psl.map { meta, psl -> [ meta, psl, '' ] }, ch_program, false)
 
-        // Get only unique elements of the list
-        ch_pattern = GAWK_PIRNA.out.output
-                .map { _meta, file -> file.text.readLines() }
-                .flatten()
-                .unique()
-                .collectFile(name: 'ch_hairpin_piRNA_unique.txt', newLine: true)
+        // Use the hit list as seqkit pattern file. It is emitted even when empty (no hits),
+        // so the class still runs and simply filters nothing (see #586)
+        ch_pattern = GAWK_PIRNA.out.output.map { _meta, hits -> hits }
 
         // Remove the hairpin miRNAs from the piRNA data
         SEQKIT_GREP_PIRNA(ch_pirna, ch_pattern, '')
@@ -241,18 +232,18 @@ workflow CONTAMINANT_FILTER {
         // Extract the significant hits
         GAWK_OTHER(BLAT_OTHER.out.psl.map { meta, psl -> [ meta, psl, '' ] }, ch_program, false)
 
-        // Get only unique elements of the list
-        ch_pattern = GAWK_OTHER.out.output
-                .map { _meta, file -> file.text.readLines() }
-                .flatten()
-                .unique()
-                .collectFile(name: 'ch_hairpin_other_unique.txt', newLine: true)
+        // Use the hit list as seqkit pattern file. It is emitted even when empty (no hits),
+        // so the class still runs and simply filters nothing (see #586)
+        ch_pattern = GAWK_OTHER.out.output.map { _meta, hits -> hits }
 
         // Remove the hairpin miRNAs from the other data
         SEQKIT_GREP_OTHER(ch_other_contamination, ch_pattern, '')
 
         // Previous original code:
         INDEX_OTHER ( SEQKIT_GREP_OTHER.out.filter )
+
+        // Add meta.contaminant to input reads channel (otherwise the stats file name clashes with the previous class)
+        pirna_reads = pirna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "other", single_end:meta.single_end], fastq]}
 
         // Map which reads are other
         BOWTIE2_ALIGN_OTHER(pirna_reads, INDEX_OTHER.out.index.first(), [[],[]], true, false)
