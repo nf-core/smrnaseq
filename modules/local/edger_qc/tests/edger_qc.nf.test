@@ -1,0 +1,73 @@
+nextflow_process {
+
+    name "Test Process EDGER_QC"
+    script "../main.nf"
+    process "EDGER_QC"
+
+    test("Should not produce MDS plot") {
+
+        when {
+            params {
+                outdir = "${outputDir}"
+            }
+            process {
+                """
+                input[0] = [file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N1_mature.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N1_mature_hairpin.sorted.idxstats")
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+            { assert process.success },
+            { assert snapshot(
+                // Snapshot only the stable files (.txt, .csv) and exclude PDFs
+                process.out.edger_files.get(0).findAll { !it.endsWith('pdf')},
+                process.out.versions
+                )
+                .match() }
+        )
+        }
+
+    }
+
+    test("Should produce MDS plot") {
+
+        when {
+            params {
+                outdir = "${outputDir}"
+            }
+            process {
+                """
+                input[0] = [
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N1_mature.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N1_mature_hairpin.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N3_mature.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Clone1_N3_mature_hairpin.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Control_N1_mature.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Control_N1_mature_hairpin.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Control_N2_mature.sorted.idxstats"),
+                file("https://github.com/nf-core/test-datasets/raw/smrnaseq/nf-test_data/edger_qc/Control_N2_mature_hairpin.sorted.idxstats"),
+                ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+            { assert process.success },
+            { assert snapshot(
+                // Snapshot only the stable files (.txt, .csv) and exclude PDFs
+                process.out.edger_files.get(0).findAll { !it.endsWith('pdf')},
+                process.out.versions,
+                // Check MDS plot exists
+                file(process.out.edger_files[0].find { file(it).name == "hairpin_edgeR_MDS_plot.pdf" }).exists()
+                )
+                .match() }
+        )
+        }
+    }
+
+}

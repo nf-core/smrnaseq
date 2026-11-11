@@ -13,3 +13,23 @@ report_section_order:
 export_plots: true
 
 disable_version_detection: true
+
+module_order:
+  - fastqc:
+      name: "FastQC (raw)"
+      info: "This section of the report shows FastQC results on the input files."
+      path_filters:
+        - "**/*.raw_fastqc.zip"
+  - fastqc:
+      name: "FastQC (trimmed)"
+      info: "This section of the report shows FastQC results after adapter trimming."
+      path_filters:
+        - "**/*.trim_fastqc.zip"
+  - fastqc:
+      name: "FastQC (deduplicated)"
+      info: "This section of the report shows FastQC results after UMI-based deduplication."
+      path_filters:
+        - "**/*.deduplicated_fastqc.zip"
+sp:
+  mirtop:
+    fn: mirtop_stats.log

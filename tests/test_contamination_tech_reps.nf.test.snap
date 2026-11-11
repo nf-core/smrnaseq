@@ -1,0 +1,433 @@
+{
+    "-profile test_contamination_tech_reps": {
+        "content": [
+            103,
+            {
+                "BLAT_CDNA": {
+                    "blat": "39x1"
+                },
+                "BLAT_NCRNA": {
+                    "blat": "39x1"
+                },
+                "BOWTIE2_ALIGN_CDNA": {
+                    "bowtie2": "2.5.5",
+                    "pigz": 2.8,
+                    "samtools": 1.24
+                },
+                "BOWTIE2_ALIGN_NCRNA": {
+                    "bowtie2": "2.5.5",
+                    "pigz": 2.8,
+                    "samtools": 1.24
+                },
+                "BOWTIE2_ALIGN_TRNA": {
+                    "bowtie2": "2.5.5",
+                    "pigz": 2.8,
+                    "samtools": 1.24
+                },
+                "BOWTIE_MAP_HAIRPIN": {
+                    "bowtie": "1.3.1",
+                    "gzip": 1.12,
+                    "samtools": 1.21
+                },
+                "BOWTIE_MAP_MATURE": {
+                    "bowtie": "1.3.1",
+                    "gzip": 1.12,
+                    "samtools": 1.21
+                },
+                "BOWTIE_MAP_SEQCLUSTER": {
+                    "bowtie": "1.3.1",
+                    "gzip": 1.12,
+                    "samtools": 1.21
+                },
+                "CAT_FASTQ": {
+                    "cat": 9.5
+                },
+                "DATATABLE_MERGE": {
+                    "r-base": "3.6.2"
+                },
+                "FASTP": {
+                    "fastp": "1.4.0"
+                },
+                "FILTER_STATS": {
+                    "GNU coreutils": 9.4,
+                    "gawk": "5.3.0",
+                    "gzip": 1.12
+                },
+                "FORMAT_HAIRPIN": {
+                    "fastx_toolkit": "0.0.14"
+                },
+                "FORMAT_MATURE": {
+                    "fastx_toolkit": "0.0.14"
+                },
+                "GAWK_CDNA": {
+                    "gawk": "5.3.1"
+                },
+                "GAWK_NCRNA": {
+                    "gawk": "5.3.1"
+                },
+                "INDEX_CDNA": {
+                    "bowtie2": "2.5.5"
+                },
+                "INDEX_HAIRPIN": {
+                    "bowtie": "1.3.1"
+                },
+                "INDEX_MATURE": {
+                    "bowtie": "1.3.1"
+                },
+                "INDEX_NCRNA": {
+                    "bowtie2": "2.5.5"
+                },
+                "INDEX_TRNA": {
+                    "bowtie2": "2.5.5"
+                },
+                "MIRTOP_COUNTS": {
+                    "mirtop": "0.4.30"
+                },
+                "MIRTOP_EXPORT": {
+                    "mirtop": "0.4.30"
+                },
+                "MIRTOP_GFF": {
+                    "mirtop": "0.4.30"
+                },
+                "MIRTOP_STATS": {
+                    "mirtop": "0.4.30"
+                },
+                "MIRTRACE_QC": {
+                    "mirtrace": "1.0.1"
+                },
+                "PARSE_HAIRPIN": {
+                    "seqkit": "2.6.1"
+                },
+                "PARSE_MATURE": {
+                    "seqkit": "2.6.1"
+                },
+                "PIVOT_LONGER": {
+                    "optparse": "1.7.5",
+                    "r-base": "4.4.2",
+                    "tidyr": "1.3.1"
+                },
+                "PIVOT_WIDER": {
+                    "dplyr": "1.1.4",
+                    "optparse": "1.7.5",
+                    "r-base": "4.4.2",
+                    "tidyr": "1.3.1",
+                    "vroom": "1.6.5"
+                },
+                "SAMTOOLS_FLAGSTAT": {
+                    "samtools": 1.25
+                },
+                "SAMTOOLS_IDXSTATS": {
+                    "samtools": 1.25
+                },
+                "SAMTOOLS_INDEX": {
+                    "samtools": 1.25
+                },
+                "SAMTOOLS_SORT": {
+                    "samtools": 1.25
+                },
+                "SAMTOOLS_STATS": {
+                    "samtools": 1.25
+                },
+                "SEQCLUSTER_COLLAPSE": {
+                    "seqcluster": "1.2.9"
+                },
+                "SEQKIT_GREP_CDNA": {
+                    "seqkit": "2.13.0"
+                },
+                "SEQKIT_GREP_NCRNA": {
+                    "seqkit": "2.13.0"
+                },
+                "STATS_GAWK_CDNA": {
+                    "gawk": "5.3.1"
+                },
+                "STATS_GAWK_NCRNA": {
+                    "gawk": "5.3.1"
+                },
+                "STATS_GAWK_TRNA": {
+                    "gawk": "5.3.1"
+                }
+            },
+            [
+                "bowtie_index",
+                "bowtie_index/mirna_hairpin",
+                "bowtie_index/mirna_hairpin/bowtie",
+                "bowtie_index/mirna_hairpin/bowtie/hairpin.1.ebwt",
+                "bowtie_index/mirna_hairpin/bowtie/hairpin.2.ebwt",
+                "bowtie_index/mirna_hairpin/bowtie/hairpin.3.ebwt",
+                "bowtie_index/mirna_hairpin/bowtie/hairpin.4.ebwt",
+                "bowtie_index/mirna_hairpin/bowtie/hairpin.rev.1.ebwt",
+                "bowtie_index/mirna_hairpin/bowtie/hairpin.rev.2.ebwt",
+                "bowtie_index/mirna_mature",
+                "bowtie_index/mirna_mature/bowtie",
+                "bowtie_index/mirna_mature/bowtie/mature.1.ebwt",
+                "bowtie_index/mirna_mature/bowtie/mature.2.ebwt",
+                "bowtie_index/mirna_mature/bowtie/mature.3.ebwt",
+                "bowtie_index/mirna_mature/bowtie/mature.4.ebwt",
+                "bowtie_index/mirna_mature/bowtie/mature.rev.1.ebwt",
+                "bowtie_index/mirna_mature/bowtie/mature.rev.2.ebwt",
+                "contaminant_filter",
+                "contaminant_filter/filter",
+                "contaminant_filter/filter/Clone1_N1.contamination_mqc.yaml",
+                "contaminant_filter/filter/Clone1_N1.filtered.fastq.gz",
+                "contaminant_filter/filter/Clone1_N1_trimmed.contamination_mqc.yaml",
+                "contaminant_filter/filter/Clone1_N1_trimmed.filtered.fastq.gz",
+                "contaminant_filter/filter/Clone1_N3_trimmed.contamination_mqc.yaml",
+                "contaminant_filter/filter/Clone1_N3_trimmed.filtered.fastq.gz",
+                "fastp",
+                "fastp/on_raw",
+                "fastp/on_raw/Clone1_N1.fastp.html",
+                "fastp/on_raw/Clone1_N1.fastp.json",
+                "fastp/on_raw/Clone1_N1_trimmed.fastp.html",
+                "fastp/on_raw/Clone1_N1_trimmed.fastp.json",
+                "fastp/on_raw/Clone1_N3_trimmed.fastp.html",
+                "fastp/on_raw/Clone1_N3_trimmed.fastp.json",
+                "fastp/on_raw/log",
+                "fastp/on_raw/log/Clone1_N1.fastp.log",
+                "fastp/on_raw/log/Clone1_N1_trimmed.fastp.log",
+                "fastp/on_raw/log/Clone1_N3_trimmed.fastp.log",
+                "mirna_quant",
+                "mirna_quant/bam",
+                "mirna_quant/bam/hairpin",
+                "mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.bam",
+                "mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.out",
+                "mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.bam",
+                "mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.bam.csi",
+                "mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.flagstat",
+                "mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.idxstats",
+                "mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.sorted.stats",
+                "mirna_quant/bam/hairpin/Clone1_N1_mature_hairpin.unmapped.fastq.gz",
+                "mirna_quant/bam/hairpin/Clone1_N1_trimmed_mature_hairpin.bam",
+                "mirna_quant/bam/hairpin/Clone1_N1_trimmed_mature_hairpin.out",
+                "mirna_quant/bam/hairpin/Clone1_N1_trimmed_mature_hairpin.sorted.bam",
+                "mirna_quant/bam/hairpin/Clone1_N1_trimmed_mature_hairpin.sorted.bam.csi",
+                "mirna_quant/bam/hairpin/Clone1_N1_trimmed_mature_hairpin.sorted.flagstat",
+                "mirna_quant/bam/hairpin/Clone1_N1_trimmed_mature_hairpin.sorted.idxstats",
+                "mirna_quant/bam/hairpin/Clone1_N1_trimmed_mature_hairpin.sorted.stats",
+                "mirna_quant/bam/hairpin/Clone1_N1_trimmed_mature_hairpin.unmapped.fastq.gz",
+                "mirna_quant/bam/hairpin/Clone1_N3_trimmed_mature_hairpin.bam",
+                "mirna_quant/bam/hairpin/Clone1_N3_trimmed_mature_hairpin.out",
+                "mirna_quant/bam/hairpin/Clone1_N3_trimmed_mature_hairpin.sorted.bam",
+                "mirna_quant/bam/hairpin/Clone1_N3_trimmed_mature_hairpin.sorted.bam.csi",
+                "mirna_quant/bam/hairpin/Clone1_N3_trimmed_mature_hairpin.sorted.flagstat",
+                "mirna_quant/bam/hairpin/Clone1_N3_trimmed_mature_hairpin.sorted.idxstats",
+                "mirna_quant/bam/hairpin/Clone1_N3_trimmed_mature_hairpin.sorted.stats",
+                "mirna_quant/bam/hairpin/Clone1_N3_trimmed_mature_hairpin.unmapped.fastq.gz",
+                "mirna_quant/bam/mature",
+                "mirna_quant/bam/mature/Clone1_N1_mature.bam",
+                "mirna_quant/bam/mature/Clone1_N1_mature.out",
+                "mirna_quant/bam/mature/Clone1_N1_mature.sorted.bam",
+                "mirna_quant/bam/mature/Clone1_N1_mature.sorted.bam.csi",
+                "mirna_quant/bam/mature/Clone1_N1_mature.sorted.flagstat",
+                "mirna_quant/bam/mature/Clone1_N1_mature.sorted.idxstats",
+                "mirna_quant/bam/mature/Clone1_N1_mature.sorted.stats",
+                "mirna_quant/bam/mature/Clone1_N1_mature.unmapped.fastq.gz",
+                "mirna_quant/bam/mature/Clone1_N1_trimmed_mature.bam",
+                "mirna_quant/bam/mature/Clone1_N1_trimmed_mature.out",
+                "mirna_quant/bam/mature/Clone1_N1_trimmed_mature.sorted.bam",
+                "mirna_quant/bam/mature/Clone1_N1_trimmed_mature.sorted.bam.csi",
+                "mirna_quant/bam/mature/Clone1_N1_trimmed_mature.sorted.flagstat",
+                "mirna_quant/bam/mature/Clone1_N1_trimmed_mature.sorted.idxstats",
+                "mirna_quant/bam/mature/Clone1_N1_trimmed_mature.sorted.stats",
+                "mirna_quant/bam/mature/Clone1_N1_trimmed_mature.unmapped.fastq.gz",
+                "mirna_quant/bam/mature/Clone1_N3_trimmed_mature.bam",
+                "mirna_quant/bam/mature/Clone1_N3_trimmed_mature.out",
+                "mirna_quant/bam/mature/Clone1_N3_trimmed_mature.sorted.bam",
+                "mirna_quant/bam/mature/Clone1_N3_trimmed_mature.sorted.bam.csi",
+                "mirna_quant/bam/mature/Clone1_N3_trimmed_mature.sorted.flagstat",
+                "mirna_quant/bam/mature/Clone1_N3_trimmed_mature.sorted.idxstats",
+                "mirna_quant/bam/mature/Clone1_N3_trimmed_mature.sorted.stats",
+                "mirna_quant/bam/mature/Clone1_N3_trimmed_mature.unmapped.fastq.gz",
+                "mirna_quant/bam/seqcluster",
+                "mirna_quant/bam/seqcluster/Clone1_N1.bam",
+                "mirna_quant/bam/seqcluster/Clone1_N1.out",
+                "mirna_quant/bam/seqcluster/Clone1_N1.unmapped.fastq.gz",
+                "mirna_quant/bam/seqcluster/Clone1_N1_trimmed.bam",
+                "mirna_quant/bam/seqcluster/Clone1_N1_trimmed.out",
+                "mirna_quant/bam/seqcluster/Clone1_N1_trimmed.unmapped.fastq.gz",
+                "mirna_quant/bam/seqcluster/Clone1_N3_trimmed.bam",
+                "mirna_quant/bam/seqcluster/Clone1_N3_trimmed.out",
+                "mirna_quant/bam/seqcluster/Clone1_N3_trimmed.unmapped.fastq.gz",
+                "mirna_quant/edger_qc",
+                "mirna_quant/edger_qc/hairpin_CPM_heatmap.pdf",
+                "mirna_quant/edger_qc/hairpin_counts.csv",
+                "mirna_quant/edger_qc/hairpin_edgeR_MDS_distance_matrix.txt",
+                "mirna_quant/edger_qc/hairpin_edgeR_MDS_plot.pdf",
+                "mirna_quant/edger_qc/hairpin_edgeR_MDS_plot_coordinates.txt",
+                "mirna_quant/edger_qc/hairpin_log2CPM_sample_distances.txt",
+                "mirna_quant/edger_qc/hairpin_log2CPM_sample_distances_dendrogram.pdf",
+                "mirna_quant/edger_qc/hairpin_log2CPM_sample_distances_heatmap.pdf",
+                "mirna_quant/edger_qc/hairpin_logtpm.csv",
+                "mirna_quant/edger_qc/hairpin_logtpm.txt",
+                "mirna_quant/edger_qc/hairpin_normalized_CPM.txt",
+                "mirna_quant/edger_qc/hairpin_unmapped_read_counts.txt",
+                "mirna_quant/edger_qc/mature_CPM_heatmap.pdf",
+                "mirna_quant/edger_qc/mature_counts.csv",
+                "mirna_quant/edger_qc/mature_edgeR_MDS_distance_matrix.txt",
+                "mirna_quant/edger_qc/mature_edgeR_MDS_plot.pdf",
+                "mirna_quant/edger_qc/mature_edgeR_MDS_plot_coordinates.txt",
+                "mirna_quant/edger_qc/mature_log2CPM_sample_distances.txt",
+                "mirna_quant/edger_qc/mature_log2CPM_sample_distances_dendrogram.pdf",
+                "mirna_quant/edger_qc/mature_log2CPM_sample_distances_heatmap.pdf",
+                "mirna_quant/edger_qc/mature_logtpm.csv",
+                "mirna_quant/edger_qc/mature_logtpm.txt",
+                "mirna_quant/edger_qc/mature_normalized_CPM.txt",
+                "mirna_quant/edger_qc/mature_unmapped_read_counts.txt",
+                "mirna_quant/mirtop",
+                "mirna_quant/mirtop/export",
+                "mirna_quant/mirtop/export/Clone1_N1_mirtop_rawData.tsv",
+                "mirna_quant/mirtop/export/Clone1_N1_trimmed_mirtop_rawData.tsv",
+                "mirna_quant/mirtop/export/Clone1_N3_trimmed_mirtop_rawData.tsv",
+                "mirna_quant/mirtop/gff",
+                "mirna_quant/mirtop/gff/mirtop",
+                "mirna_quant/mirtop/gff/mirtop/Clone1_N1_mirtop.gff",
+                "mirna_quant/mirtop/gff/mirtop/Clone1_N1_trimmed_mirtop.gff",
+                "mirna_quant/mirtop/gff/mirtop/Clone1_N3_trimmed_mirtop.gff",
+                "mirna_quant/mirtop/joined_samples_mirtop.tsv",
+                "mirna_quant/mirtop/mirna.tsv",
+                "mirna_quant/reference",
+                "mirna_quant/reference/hairpin.fa_igenome.fa",
+                "mirna_quant/reference/hairpin.fa_igenome.fa_idx.fa",
+                "mirna_quant/reference/mature.fa_igenome.fa",
+                "mirna_quant/reference/mature.fa_igenome.fa_idx.fa",
+                "mirna_quant/seqcluster",
+                "mirna_quant/seqcluster/Clone1_N1_seqcluster.fastq.gz",
+                "mirna_quant/seqcluster/Clone1_N1_trimmed_seqcluster.fastq.gz",
+                "mirna_quant/seqcluster/Clone1_N3_trimmed_seqcluster.fastq.gz",
+                "mirtrace",
+                "mirtrace/Clone1_N1",
+                "mirtrace/Clone1_N1/mirtrace-report.html",
+                "mirtrace/Clone1_N1/mirtrace-results.json",
+                "mirtrace/Clone1_N1/mirtrace-stats-contamination_basic.tsv",
+                "mirtrace/Clone1_N1/mirtrace-stats-contamination_detailed.tsv",
+                "mirtrace/Clone1_N1/mirtrace-stats-length.tsv",
+                "mirtrace/Clone1_N1/mirtrace-stats-mirna-complexity.tsv",
+                "mirtrace/Clone1_N1/mirtrace-stats-phred.tsv",
+                "mirtrace/Clone1_N1/mirtrace-stats-qcstatus.tsv",
+                "mirtrace/Clone1_N1/mirtrace-stats-rnatype.tsv",
+                "mirtrace/Clone1_N1/qc_passed_reads.all.collapsed",
+                "mirtrace/Clone1_N1/qc_passed_reads.all.collapsed/Clone1_N1.fastp.fasta",
+                "mirtrace/Clone1_N1/qc_passed_reads.rnatype_unknown.collapsed",
+                "mirtrace/Clone1_N1/qc_passed_reads.rnatype_unknown.collapsed/Clone1_N1.fastp.fasta",
+                "mirtrace/Clone1_N1_trimmed",
+                "mirtrace/Clone1_N1_trimmed/mirtrace-report.html",
+                "mirtrace/Clone1_N1_trimmed/mirtrace-results.json",
+                "mirtrace/Clone1_N1_trimmed/mirtrace-stats-contamination_basic.tsv",
+                "mirtrace/Clone1_N1_trimmed/mirtrace-stats-contamination_detailed.tsv",
+                "mirtrace/Clone1_N1_trimmed/mirtrace-stats-length.tsv",
+                "mirtrace/Clone1_N1_trimmed/mirtrace-stats-mirna-complexity.tsv",
+                "mirtrace/Clone1_N1_trimmed/mirtrace-stats-phred.tsv",
+                "mirtrace/Clone1_N1_trimmed/mirtrace-stats-qcstatus.tsv",
+                "mirtrace/Clone1_N1_trimmed/mirtrace-stats-rnatype.tsv",
+                "mirtrace/Clone1_N1_trimmed/qc_passed_reads.all.collapsed",
+                "mirtrace/Clone1_N1_trimmed/qc_passed_reads.all.collapsed/Clone1_N1_trimmed.fastp.fasta",
+                "mirtrace/Clone1_N1_trimmed/qc_passed_reads.rnatype_unknown.collapsed",
+                "mirtrace/Clone1_N1_trimmed/qc_passed_reads.rnatype_unknown.collapsed/Clone1_N1_trimmed.fastp.fasta",
+                "mirtrace/Clone1_N3_trimmed",
+                "mirtrace/Clone1_N3_trimmed/mirtrace-report.html",
+                "mirtrace/Clone1_N3_trimmed/mirtrace-results.json",
+                "mirtrace/Clone1_N3_trimmed/mirtrace-stats-contamination_basic.tsv",
+                "mirtrace/Clone1_N3_trimmed/mirtrace-stats-contamination_detailed.tsv",
+                "mirtrace/Clone1_N3_trimmed/mirtrace-stats-length.tsv",
+                "mirtrace/Clone1_N3_trimmed/mirtrace-stats-mirna-complexity.tsv",
+                "mirtrace/Clone1_N3_trimmed/mirtrace-stats-phred.tsv",
+                "mirtrace/Clone1_N3_trimmed/mirtrace-stats-qcstatus.tsv",
+                "mirtrace/Clone1_N3_trimmed/mirtrace-stats-rnatype.tsv",
+                "mirtrace/Clone1_N3_trimmed/qc_passed_reads.all.collapsed",
+                "mirtrace/Clone1_N3_trimmed/qc_passed_reads.all.collapsed/Clone1_N3_trimmed.fastp.fasta",
+                "mirtrace/Clone1_N3_trimmed/qc_passed_reads.rnatype_unknown.collapsed",
+                "mirtrace/Clone1_N3_trimmed/qc_passed_reads.rnatype_unknown.collapsed/Clone1_N3_trimmed.fastp.fasta",
+                "pipeline_info",
+                "pipeline_info/nf_core_smrnaseq_software_mqc_versions.yml"
+            ],
+            [
+                "hairpin.1.ebwt:md5,40c2c142e094ab5ea531a0564ad62cee",
+                "hairpin.2.ebwt:md5,6d99166d1a8a7a1bbf262e89db218278",
+                "hairpin.3.ebwt:md5,5c60180e2f6fc2e0c399f10b9f9bbee2",
+                "hairpin.4.ebwt:md5,c3d4dbfbb587261ddf29e906029c10b1",
+                "hairpin.rev.1.ebwt:md5,4532fb1426b29163b23702c8daf84d62",
+                "hairpin.rev.2.ebwt:md5,4270939b810aa3f461bacee1edc993aa",
+                "mature.1.ebwt:md5,11a2f568aa785d32246cb8ce1aa8add4",
+                "mature.2.ebwt:md5,778bd05aa462c2119736f9a4056bc41f",
+                "mature.3.ebwt:md5,7aeccc6ec919ce1cfcd2b1e40be743fe",
+                "mature.4.ebwt:md5,78260e9dde22d8f31622c77d71bbb605",
+                "mature.rev.1.ebwt:md5,0520d43b6b75328f3c30254a2d6baa18",
+                "mature.rev.2.ebwt:md5,ab52bc362b4c382cf213a71219e9efee",
+                "Clone1_N1.contamination_mqc.yaml:md5,d7bb02a5b103b90b1be3294a19a0b81d",
+                "Clone1_N1_trimmed.contamination_mqc.yaml:md5,e5f8560bd0c126f532a0bd9642f396af",
+                "Clone1_N3_trimmed.contamination_mqc.yaml:md5,23988d6e42a0df48dfa5542fda69bee9",
+                "Clone1_N1_mature_hairpin.sorted.flagstat:md5,4bb76ff9694fa931ab2e7eb7a72113ef",
+                "Clone1_N1_mature_hairpin.sorted.idxstats:md5,a49cd85be650585f77fe22b6cc288d4e",
+                "Clone1_N1_mature_hairpin.sorted.stats:md5,72098833a1be142d766b2d88e68b2c30",
+                "Clone1_N1_trimmed_mature_hairpin.sorted.flagstat:md5,7909ccfdd3fbf33c1f677b59cf3f4e5c",
+                "Clone1_N1_trimmed_mature_hairpin.sorted.idxstats:md5,93ca0d0557484d6d503aa64326e7785c",
+                "Clone1_N1_trimmed_mature_hairpin.sorted.stats:md5,d0ca639e9ecb4f4aec5061799a8e16cc",
+                "Clone1_N3_trimmed_mature_hairpin.sorted.flagstat:md5,31cb3fbecc32bc4fa2db2ab089a7e95a",
+                "Clone1_N3_trimmed_mature_hairpin.sorted.idxstats:md5,da4906b8db406b4a93d6a44dcf1b7198",
+                "Clone1_N3_trimmed_mature_hairpin.sorted.stats:md5,3037d6839d43b045d3f302b3e8979963",
+                "Clone1_N1_mature.sorted.flagstat:md5,522c88db721f7dd1d05250ea8a358a3f",
+                "Clone1_N1_mature.sorted.idxstats:md5,3445e1db62d8a199444d47a4e97cb9e3",
+                "Clone1_N1_mature.sorted.stats:md5,881fc8c0b1a557fed8d55d8801e69297",
+                "Clone1_N1_trimmed_mature.sorted.flagstat:md5,9a7e0f484cf8d484a3021bfa50318f47",
+                "Clone1_N1_trimmed_mature.sorted.idxstats:md5,4129c3c70f292855f06396756f3e6210",
+                "Clone1_N1_trimmed_mature.sorted.stats:md5,96b23a84a78b600b5754a0c4244a9454",
+                "Clone1_N3_trimmed_mature.sorted.flagstat:md5,359fa98b24af2903ca3837ae27f482c5",
+                "Clone1_N3_trimmed_mature.sorted.idxstats:md5,3a1862ac42813e108094a04fe2f53f20",
+                "Clone1_N3_trimmed_mature.sorted.stats:md5,97bff781d1b4216a14d7ace8a0d39c32",
+                "hairpin.fa_igenome.fa:md5,5fb538f60d5288846600dba31010251e",
+                "hairpin.fa_igenome.fa_idx.fa:md5,482b0327b0c1e36748c1ee3d3be9be77",
+                "mature.fa_igenome.fa:md5,ef4cabcbea05adf334ba6891a50c951a",
+                "mature.fa_igenome.fa_idx.fa:md5,ef4cabcbea05adf334ba6891a50c951a",
+                "mirtrace-stats-contamination_basic.tsv:md5,34005177b3038da76236b5d8fb468825",
+                "mirtrace-stats-contamination_detailed.tsv:md5,141f6f46a4f9fcfac91303c125a2fc75",
+                "mirtrace-stats-length.tsv:md5,1ffc732255525a3da44fab6d9c4a632b",
+                "mirtrace-stats-mirna-complexity.tsv:md5,6338aa4215bfdc7c8e86025f9d636d1d",
+                "mirtrace-stats-phred.tsv:md5,cbe53ea784d3ab071d5452a29d36cc53",
+                "mirtrace-stats-qcstatus.tsv:md5,4ae2ce07be3661229618a30e1c3eae97",
+                "mirtrace-stats-rnatype.tsv:md5,5fe0e4cddfcc3a985b49ee19af5020cd",
+                "Clone1_N1.fastp.fasta:md5,2a501d38007b76b0bed3a37bb68c7fcc",
+                "Clone1_N1.fastp.fasta:md5,c0c58d5c6c4f161afd7ff49f0a2de494",
+                "mirtrace-stats-contamination_basic.tsv:md5,307eceb1b067f014aaad9e09263cebfc",
+                "mirtrace-stats-contamination_detailed.tsv:md5,c1af2894292fcd3242fe27a4adcaef49",
+                "mirtrace-stats-length.tsv:md5,b715fa28fe3b7f728cb8b18f75f9c6ce",
+                "mirtrace-stats-mirna-complexity.tsv:md5,ba8536a337a54fbbffa6684f9cd40720",
+                "mirtrace-stats-phred.tsv:md5,1e22e87de080fe6d59a50ffb9965ebc2",
+                "mirtrace-stats-qcstatus.tsv:md5,d455736c85a9ab8607591858b4152b0e",
+                "mirtrace-stats-rnatype.tsv:md5,2bad5c359a26bc0e62b333566d2b78db",
+                "Clone1_N1_trimmed.fastp.fasta:md5,b404e2ddba8b7a5d1d91b007c26f2d3a",
+                "Clone1_N1_trimmed.fastp.fasta:md5,933f2569d7bee49471c2f602f30c15a4",
+                "mirtrace-stats-contamination_basic.tsv:md5,651b466f7a6c8f4abff9f9ec44be06fd",
+                "mirtrace-stats-contamination_detailed.tsv:md5,329c0800ed9e59553e74e121b927047a",
+                "mirtrace-stats-length.tsv:md5,ec4ed5234460d45410291d4c174fcab5",
+                "mirtrace-stats-mirna-complexity.tsv:md5,fd3f18babd41a5900d53c2246ad9978a",
+                "mirtrace-stats-phred.tsv:md5,f18c37a3022e77e9f9a77d72429e99be",
+                "mirtrace-stats-qcstatus.tsv:md5,845172700538bcd741fc9d60f588e77b",
+                "mirtrace-stats-rnatype.tsv:md5,07f95ef7d5383fc0f689a8b3693db9c2",
+                "Clone1_N3_trimmed.fastp.fasta:md5,7ab5945ed6e88105ccfe9810dd81adc6",
+                "Clone1_N3_trimmed.fastp.fasta:md5,8360fbec5407f2e8b6d2621596c30622"
+            ],
+            [
+                "Clone1_N1_mature_hairpin.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:30, maxQuality:255, minQuality:0, meanQuality:4, readCount:624928, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1_mature_hairpin.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:30, maxQuality:255, minQuality:0, meanQuality:4, readCount:624928, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1_trimmed_mature_hairpin.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:30, maxQuality:255, minQuality:0, meanQuality:4, readCount:286149, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1_trimmed_mature_hairpin.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:30, maxQuality:255, minQuality:0, meanQuality:4, readCount:286149, duplicateReadCount:0, sorted:false]",
+                "Clone1_N3_trimmed_mature_hairpin.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:32, maxQuality:255, minQuality:0, meanQuality:2, readCount:121102, duplicateReadCount:0, sorted:false]",
+                "Clone1_N3_trimmed_mature_hairpin.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:32, maxQuality:255, minQuality:0, meanQuality:2, readCount:121102, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1_mature.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:30, maxQuality:255, minQuality:0, meanQuality:0, readCount:624008, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1_mature.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:30, maxQuality:255, minQuality:0, meanQuality:0, readCount:624008, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1_trimmed_mature.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:30, maxQuality:255, minQuality:0, meanQuality:0, readCount:285735, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1_trimmed_mature.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:30, maxQuality:255, minQuality:0, meanQuality:0, readCount:285735, duplicateReadCount:0, sorted:false]",
+                "Clone1_N3_trimmed_mature.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:32, maxQuality:255, minQuality:0, meanQuality:0, readCount:120977, duplicateReadCount:0, sorted:false]",
+                "Clone1_N3_trimmed_mature.sorted.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:32, maxQuality:255, minQuality:0, meanQuality:0, readCount:120977, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:30, maxQuality:255, minQuality:0, meanQuality:4, readCount:248029, duplicateReadCount:0, sorted:false]",
+                "Clone1_N1_trimmed.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:30, maxQuality:255, minQuality:0, meanQuality:4, readCount:156456, duplicateReadCount:0, sorted:false]",
+                "Clone1_N3_trimmed.bam:stats,[maxReadLength:36, minReadLength:17, meanReadLength:31, maxQuality:255, minQuality:0, meanQuality:3, readCount:70007, duplicateReadCount:0, sorted:false]"
+            ],
+            "No VCF files"
+        ],
+        "timestamp": "2026-11-11T10:57:42.213627",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}
