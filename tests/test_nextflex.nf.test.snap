@@ -502,12 +502,6 @@
                 "mature.4.ebwt:md5,62e35549f28a1a85ccaf35858b1726aa",
                 "mature.rev.1.ebwt:md5,27578696198a61b0a3f783802823337e",
                 "mature.rev.2.ebwt:md5,726c60d9a0108739ba9b61774bc39633",
-                "sample1.fastp.json:md5,04e3547c2ba5854ce2dd4fcce1a648a1",
-                "sample1.fastp3.fastp.json:md5,f36a211f8e26b002a5c0c5e81144d06e",
-                "sample2.fastp.json:md5,0fa338760c32f66daca5f14af5a10292",
-                "sample2.fastp3.fastp.json:md5,54b60ca3b5c131f77a0ef191a1ce511e",
-                "sample3.fastp.json:md5,59cb9336e9e39cd0bab2510f2d83130f",
-                "sample3.fastp3.fastp.json:md5,20c40d274f8aabc0161454f220ecdd3f",
                 "sample1_mature_hairpin.sorted.flagstat:md5,ceae46b5150c4b1e8db554f917a0e9c0",
                 "sample1_mature_hairpin.sorted.idxstats:md5,db54c203e1565ccf894873337832597e",
                 "sample1_mature_hairpin.sorted.stats:md5,71131a4e653932a24a91dec66b9198c7",
@@ -591,10 +585,8 @@
                 "mirtrace_qc_plot.txt:md5,0a6b6d56226eddb5c0917bd93e249df0",
                 "mirtrace_rna_categories_plot.txt:md5,099920f6d263cabdb580d0f7cd7b63e3",
                 "multiqc_citations.txt:md5,c2900ba941a5e78a3f42ef6a1033ace7",
-                "multiqc_fastp.txt:md5,38bdf09ae5941de1c91914170dcf2cf7",
                 "multiqc_fastqc.txt:md5,da0223b439fa8e474d8589c72471c6e9",
                 "multiqc_fastqc_fastqc-1.txt:md5,e5eb8306e89fc2dd17511a20b6facf3f",
-                "multiqc_general_stats.txt:md5,afca904bf543356808796a517dd36163",
                 "multiqc_mirtrace_complexity.txt:md5,44387cba572a00a3c0eb372ed9f5d70d",
                 "multiqc_mirtrace_contamination.txt:md5,29f5ad8942ca93d94a7b005a3325b910",
                 "multiqc_mirtrace_length.txt:md5,0f3450d8f18832e98389907984cc68a2",
@@ -622,7 +614,7 @@
             ],
             "No VCF files"
         ],
-        "timestamp": "2026-11-10T21:59:58.24991",
+        "timestamp": "2026-11-11T11:13:34.610249",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "25.10.4"

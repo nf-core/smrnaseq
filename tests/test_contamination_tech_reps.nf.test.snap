@@ -359,15 +359,12 @@
                 "mature.rev.1.ebwt:md5,0520d43b6b75328f3c30254a2d6baa18",
                 "mature.rev.2.ebwt:md5,ab52bc362b4c382cf213a71219e9efee",
                 "Clone1_N1.merged.fastq.gz:md5,72ace417f6f26cab6bb6d0293037452d",
-                "Clone1_N1.contamination_mqc.yaml:md5,5d67e180d201dd5f434a96ee0f39c5d8",
-                "Clone1_N1_trimmed.contamination_mqc.yaml:md5,0661d19291eacdc4121c816f6c3c1dc7",
-                "Clone1_N3_trimmed.contamination_mqc.yaml:md5,44dc8568c7be21eb44c93e4046b972fb",
+                "Clone1_N1.contamination_mqc.yaml:md5,d7bb02a5b103b90b1be3294a19a0b81d",
+                "Clone1_N1_trimmed.contamination_mqc.yaml:md5,e5f8560bd0c126f532a0bd9642f396af",
+                "Clone1_N3_trimmed.contamination_mqc.yaml:md5,23988d6e42a0df48dfa5542fda69bee9",
                 "Clone1_N1.fastp.fastq.gz:md5,065a9d5dccaf816535824a623571852c",
                 "Clone1_N1_trimmed.fastp.fastq.gz:md5,3f5b8c7a3643de6111344557ff8dcceb",
                 "Clone1_N3_trimmed.fastp.fastq.gz:md5,b4c83a3740da95d430540ced27bb2497",
-                "Clone1_N1.fastp.json:md5,6bd85828f13a3bf17c754968e1e86b8a",
-                "Clone1_N1_trimmed.fastp.json:md5,97e1f940abdb577226f8e776101bf007",
-                "Clone1_N3_trimmed.fastp.json:md5,c61b1d92cb9a9c91d4aba9565560eb86",
                 "Clone1_N1_mature_hairpin.sorted.flagstat:md5,4bb76ff9694fa931ab2e7eb7a72113ef",
                 "Clone1_N1_mature_hairpin.sorted.idxstats:md5,a49cd85be650585f77fe22b6cc288d4e",
                 "Clone1_N1_mature_hairpin.sorted.stats:md5,72098833a1be142d766b2d88e68b2c30",
@@ -437,7 +434,7 @@
             ],
             "No VCF files"
         ],
-        "timestamp": "2026-11-11T10:12:37.255265",
+        "timestamp": "2026-11-11T10:57:42.213627",
         "meta": {
             "nf-test": "0.9.5",
             "nextflow": "25.10.4"
