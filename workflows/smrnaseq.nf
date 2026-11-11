@@ -367,6 +367,7 @@ workflow NFCORE_SMRNASEQ {
     versions       = ch_versions       // channel: [ path(versions.yml) ]
 
     // Files to publish (see the `output` block in main.nf)
+    cat_fastq             = CAT_FASTQ.out.reads
     fastqc_raw            = FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_html.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip)
     fastqc_trim           = FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_html.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_zip)
     fastp_reports         = ch_fastp_reports

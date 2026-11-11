@@ -120,6 +120,7 @@ workflow {
     publish:
     bowtie_index_untar   = PREPARE_GENOME.out.bowtie_index_untar
     bowtie_index_genome  = PREPARE_GENOME.out.bowtie_index_built.mix(PREPARE_GENOME.out.fasta)
+    cat_fastq            = NFCORE_SMRNASEQ.out.cat_fastq
     fastqc_raw           = NFCORE_SMRNASEQ.out.fastqc_raw
     fastqc_trim          = NFCORE_SMRNASEQ.out.fastqc_trim
     fastp_reports        = NFCORE_SMRNASEQ.out.fastp_reports
@@ -163,6 +164,7 @@ output {
     // Reference preparation
     bowtie_index_untar {
         path 'untar'
+        enabled params.save_intermediates
     }
     bowtie_index_genome {
         path 'bowtie_index/genome'
@@ -170,6 +172,10 @@ output {
     }
 
     // Read QC and trimming
+    cat_fastq {
+        path 'cat_fastq'
+        enabled params.save_merged
+    }
     fastqc_raw {
         path 'fastqc/raw'
         enabled params.save_intermediates
