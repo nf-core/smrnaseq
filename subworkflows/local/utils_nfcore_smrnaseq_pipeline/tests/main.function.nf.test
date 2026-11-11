@@ -53,4 +53,68 @@ nextflow_function {
             )
         }
     }
+
+    test("Test Function mirtraceAdapterWarning - adapter sequence") {
+
+        function "mirtraceAdapterWarning"
+
+        when {
+            function {
+                """
+                input[0] = 'TGGAATTCTCGGGTGCCAAGG'
+                input[1] = 'hsa'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null }
+            )
+        }
+    }
+
+    test("Test Function mirtraceAdapterWarning - auto-detect") {
+
+        function "mirtraceAdapterWarning"
+
+        when {
+            function {
+                """
+                input[0] = 'auto-detect'
+                input[1] = 'hsa'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result.contains("miRTrace cannot auto-detect adapters") }
+            )
+        }
+    }
+
+    test("Test Function mirtraceAdapterWarning - auto-detect without miRTrace species") {
+
+        function "mirtraceAdapterWarning"
+
+        when {
+            function {
+                """
+                input[0] = 'auto-detect'
+                input[1] = null
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                // miRTrace does not run without a species, so there is nothing to warn about
+                { assert function.result == null }
+            )
+        }
+    }
 }

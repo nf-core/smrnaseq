@@ -275,6 +275,17 @@ def mirtraceConfigLine(reads_name, sample_id, adapter, phred_offset) {
 }
 
 //
+// Warning for miRTrace when the adapter is 'auto-detect' and miRTrace runs, i.e. a miRTrace
+// species is set (null otherwise).
+//
+def mirtraceAdapterWarning(adapter, mirtrace_species) {
+    if (adapter != 'auto-detect' || !mirtrace_species) {
+        return null
+    }
+    return "miRTrace cannot auto-detect adapters, so with '--three_prime_adapter auto-detect' it runs without adapter trimming. Set '--three_prime_adapter' to the adapter sequence for adapter-trimmed miRTrace QC."
+}
+
+//
 // Exit pipeline if incorrect --genome key provided
 //
 def genomeExistsError() {
