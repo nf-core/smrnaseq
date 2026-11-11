@@ -67,22 +67,22 @@
                     },
                     "mirtop/counts": {
                         "branch": "master",
-                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
+                        "git_sha": "7f232b0ad8f467a936860be81ead70b75cfe6c4a",
                         "installed_by": ["bam_stats_mirna_mirtop"]
                     },
                     "mirtop/export": {
                         "branch": "master",
-                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
+                        "git_sha": "7f232b0ad8f467a936860be81ead70b75cfe6c4a",
                         "installed_by": ["bam_stats_mirna_mirtop"]
                     },
                     "mirtop/gff": {
                         "branch": "master",
-                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
+                        "git_sha": "7f232b0ad8f467a936860be81ead70b75cfe6c4a",
                         "installed_by": ["bam_stats_mirna_mirtop"]
                     },
                     "mirtop/stats": {
                         "branch": "master",
-                        "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
+                        "git_sha": "7f232b0ad8f467a936860be81ead70b75cfe6c4a",
                         "installed_by": ["bam_stats_mirna_mirtop"]
                     },
                     "mirtrace/qc": {
