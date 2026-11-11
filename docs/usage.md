@@ -30,7 +30,7 @@ The parameter `--three_prime_adapter` is set to the Illumina TruSeq single index
 
 :warning: If you do not choose a profile that sets the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` options, the pipeline won't run. If you want to auto-detect the adapters using `fastp`, please set `--three_prime_adapter` to `auto-detect`.
 
-miRTrace cannot auto-detect adapters. With `--three_prime_adapter auto-detect`, miRTrace QC runs on the raw reads without adapter trimming, so its read length, RNA type and contamination statistics are computed on untrimmed reads. To get adapter-trimmed miRTrace QC, set `--three_prime_adapter` to the adapter sequence of your library.
+miRTrace cannot auto-detect adapters. With `--three_prime_adapter auto-detect`, miRTrace QC runs on the raw reads without adapter trimming, so its read length, RNA type and contamination statistics are computed on untrimmed reads. To get adapter-trimmed miRTrace QC, set `--three_prime_adapter` to the adapter sequence of your library. As fastp's adapter auto-detection is also unreliable on small RNA data, setting `--three_prime_adapter` explicitly to your kit's adapter is recommended for meaningful miRTrace QC.
 
 ### `mirtrace_species` or `mirgenedb_species`
 
