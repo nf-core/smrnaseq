@@ -144,7 +144,9 @@ These files will be saved in this directory if `--save_intermediates` is specifi
 
 **Output directory: `results/mirna_quant/edger_qc`**
 
-- `[mature/hairpin]_normalized_CPM.txt` TMM normalized counts of reads aligned to mature miRNAs/miRNA precursors (hairpins)
+- `[mature/hairpin]_counts.csv` Raw read counts of reads aligned to mature miRNAs/miRNA precursors (hairpins), one row per sample
+- `[mature/hairpin]_logtpm.{txt,csv}` log10(CPM + 0.001) of reads aligned to mature miRNAs/miRNA precursors (hairpins), one row per sample. Despite the filename, these values are counts per million scaled by library size only: they are neither TMM- nor length-normalised (not TPM). CPM is appropriate here because each small RNA read represents one whole (~22 nt) mature miRNA molecule, so read counts do not scale with feature length. The filenames are kept for backwards compatibility.
+- `[mature/hairpin]_normalized_CPM.txt` TMM normalized counts per million (CPM, not log-transformed) of reads aligned to mature miRNAs/miRNA precursors (hairpins), one row per miRNA
 - `[mature/hairpin]_edgeR_MDS_plot.pdf` Multidimensional scaling plot of all samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
 - `[mature/hairpin]_CPM_heatmap.pdf` Heatmap based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
 - `[mature/hairpin]_log2CPM_sample_distances_dendrogram.pdf` Dendrograms of distance among samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
