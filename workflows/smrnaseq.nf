@@ -12,6 +12,7 @@ include { MULTIQC                          } from '../modules/nf-core/multiqc/ma
 include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
 include { UMITOOLS_EXTRACT                 } from '../modules/nf-core/umitools/extract/main'
 include { MIRTRACE_QC                      } from '../modules/nf-core/mirtrace/qc/main'
+include { RENAME_READS as MIRTRACE_RENAME_READS } from '../modules/local/rename_reads/main'
 // nf-core subworkflows
 include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
 include { FASTQ_FIND_MIRNA_MIRDEEP2        } from '../subworkflows/nf-core/fastq_find_mirna_mirdeep2/main'
@@ -141,6 +142,11 @@ workflow NFCORE_SMRNASEQ {
     //
     // MODULE: mirtrace QC
     //
+
+    if (has_mirtrace_species) {
+        MIRTRACE_RENAME_READS(ch_reads_for_mirtrace)
+        ch_reads_for_mirtrace = MIRTRACE_RENAME_READS.out.reads
+    }
 
     ch_mirtrace_config = ch_reads_for_mirtrace
         .transpose()
