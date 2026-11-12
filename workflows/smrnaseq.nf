@@ -295,7 +295,8 @@ workflow NFCORE_SMRNASEQ {
             ch_multiqc_files = ch_multiqc_files.mix(MIRTRACE_QC.out.json.collect { item -> item[1] }.ifEmpty([]))
             ch_mirtrace_tsv_for_multiqc = MIRTRACE_QC.out.tsv
                 .map { _meta, tsv_files ->
-                    tsv_files.findAll { tsv ->
+                    // A single output file arrives as a bare Path (e.g. the module stub), not a list
+                    [tsv_files].flatten().findAll { tsv ->
                         def lines = tsv.text.readLines().drop(1).findAll { line -> line.trim() }
                         tsv.name == "mirtrace-stats-contamination_detailed.tsv" ? lines :
                             tsv.name == "mirtrace-stats-contamination_basic.tsv" ?

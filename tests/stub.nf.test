@@ -1,0 +1,23 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf - test (stub)"
+    script "main.nf"
+    profile "test,ci"
+    tag "stub"
+    tag "pipeline"
+
+    // Cheap full-pipeline run with `-stub`: catches channel wiring errors
+    // and checks the published file names without running the tools.
+    def test_scenario = [
+        [
+            name: "-profile test -stub",
+            stub: true
+        ]
+    ]
+
+    // Generate tests for each scenario
+    test_scenario.each { scenario ->
+        test(scenario.name, UTILS.get_test(scenario))
+    }
+
+}
