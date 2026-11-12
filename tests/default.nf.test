@@ -27,7 +27,13 @@ nextflow_pipeline {
                     stable_path,
                     // All files with stable contents
                     stable_content
-                ).match() }
+                ).match() },
+                // miRTrace must run on the untrimmed reads (#544): it sees every raw read, not only those kept by fastp
+                { new File("$outputDir/mirtrace").listFiles().findAll { it.isDirectory() }.each { dir ->
+                    def mirtrace_reads = new File(dir, 'mirtrace-stats-qcstatus.tsv').readLines().drop(1).sum { line -> line.split('\t')[1] as long }
+                    def fastp_json     = new groovy.json.JsonSlurper().parse(new File("$outputDir/fastp/on_raw/${dir.name}.fastp.json"))
+                    assert mirtrace_reads == fastp_json.summary.before_filtering.total_reads
+                } }
             )
         }
     }

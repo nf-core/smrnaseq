@@ -21,6 +21,8 @@ include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils
 include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/main'
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant/main'
 include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant/main'
+include { mirtraceConfigLine               } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
+include { mirtraceAdapterWarning           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { methodsDescriptionText           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { paramAsBool                      } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { paramAsInt                       } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
@@ -77,6 +79,9 @@ workflow NFCORE_SMRNASEQ {
         ch_fastq.multiple
     )
     ch_cat_fastq = CAT_FASTQ.out.reads.mix(ch_fastq.single)
+    // miRTrace is a QC tool for raw reads and does its own adapter, quality and length filtering,
+    // so keep the untrimmed reads for it (see https://github.com/nf-core/smrnaseq/issues/544)
+    ch_reads_for_mirtrace = ch_cat_fastq
 
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters & dedup UMIs if necessary / desired by the user
@@ -140,22 +145,30 @@ workflow NFCORE_SMRNASEQ {
     // MODULE: mirtrace QC
     //
 
-    ch_mirtrace_config = ch_reads_for_mirna
+    ch_mirtrace_config = ch_reads_for_mirtrace
         .transpose()
         .combine(ch_three_prime_adapter)
         .combine(ch_phred_offset)
-        .collectFile { meta, reads, adapter, phred ->
+        .collectFile { meta, _reads, adapter, phred ->
         def config_filename = "${meta.id}.data"
-        [ config_filename, "./${reads.getFileName().toString()},${meta.id},${adapter},${phred}\n" ]
+        // MIRTRACE_QC stages the reads as <id>.fastq.gz, so its output FASTA files are named <id>.fasta
+        [ config_filename, mirtraceConfigLine("${meta.id}.fastq.gz", meta.id, adapter, phred) ]
         }
         .map { config_file ->
         def base_name = config_file.getBaseName()
         [ ['id':base_name], config_file ]
     }
 
-    ch_mirtrace_qc_inputs = ch_reads_for_mirna
+    ch_mirtrace_qc_inputs = ch_reads_for_mirtrace
             .map{meta, reads -> [[id: meta.id], reads]}
             .join(ch_mirtrace_config)
+
+    // Check the species value itself: has_mirtrace_species arrives here as a channel, so an `if` on it is always true.
+    // ch_mirtrace_species is built from params.mirtrace_species, so miRTrace runs exactly when it is set.
+    def mirtrace_warning = mirtraceAdapterWarning(params.three_prime_adapter, params.mirtrace_species)
+    if (mirtrace_warning) {
+        log.warn(mirtrace_warning)
+    }
 
     if (has_mirtrace_species){
 
