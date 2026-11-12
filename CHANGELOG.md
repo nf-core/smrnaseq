@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#575]](https://github.com/nf-core/smrnaseq/pull/575) - Fix [#568](https://github.com/nf-core/smrnaseq/issues/568): boolean and integer parameters given on the command line were treated as strings with the Nextflow >= 26.04 strict syntax parser (e.g. `--skip_mirdeep false` was ignored).
 - [[#576]](https://github.com/nf-core/smrnaseq/pull/576) - Fix [#569](https://github.com/nf-core/smrnaseq/issues/569): remove the deprecated process `when:` section from local modules.
 - [[#578]](https://github.com/nf-core/smrnaseq/pull/578) - Fix [#570](https://github.com/nf-core/smrnaseq/issues/570): strict-syntax cleanup in local code (`exit` replaced by `error()`, dead `exit` closures that never stopped the run, legacy `.set {}`).
+- [[#579]](https://github.com/nf-core/smrnaseq/pull/579) - Fix [#571](https://github.com/nf-core/smrnaseq/issues/571): CI requires nf-test with Nextflow 26.10.5 and a `nextflow lint` job (errors only). The minimum Nextflow version is raised from 25.10.4 to 26.10.5, and CI no longer tests 25.10.4.
 - [[#554]](https://github.com/nf-core/smrnaseq/pull/554) - Improve documentation, add metromap.
 - [[#559]](https://github.com/nf-core/smrnaseq/pull/559) - Fix [`MIRDEEP2_MIRDEEP2` errorStrategy](https://github.com/nf-core/smrnaseq/issues/558): exit statuses other than 255 aborted the run instead of retrying or finishing.
 - [[#561]](https://github.com/nf-core/smrnaseq/pull/561) - Template update for nf-core/tools v4.2.1.
