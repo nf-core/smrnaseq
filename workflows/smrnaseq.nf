@@ -69,6 +69,7 @@ workflow NFCORE_SMRNASEQ {
     def ch_umi_fastp_fail     = channel.empty()
     def ch_mirtrace           = channel.empty()
     def ch_contaminant_filter = channel.empty()
+    def ch_contaminant_index  = channel.empty()
     def ch_genome_quant_stats = channel.empty()
     def ch_genome_quant_bam   = channel.empty()
     def ch_mirdeep2           = channel.empty()
@@ -218,6 +219,7 @@ workflow NFCORE_SMRNASEQ {
         ch_versions = ch_versions.mix(CONTAMINANT_FILTER.out.versions)
         ch_reads_for_mirna = CONTAMINANT_FILTER.out.filtered_reads
         ch_contaminant_filter = CONTAMINANT_FILTER.out.filter
+        ch_contaminant_index  = CONTAMINANT_FILTER.out.index
     }
 
     //MIRNA_QUANT process should still run even if mirtrace_species is null, when mirgendb is true
@@ -367,6 +369,7 @@ workflow NFCORE_SMRNASEQ {
     versions       = ch_versions       // channel: [ path(versions.yml) ]
 
     // Files to publish (see the `output` block in main.nf)
+    cat_fastq             = CAT_FASTQ.out.reads
     fastqc_raw            = FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_html.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip)
     fastqc_trim           = FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_html.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_zip)
     fastp_reports         = ch_fastp_reports
@@ -381,6 +384,7 @@ workflow NFCORE_SMRNASEQ {
     umi_fastp_reads_fail  = ch_umi_fastp_fail
     mirtrace              = ch_mirtrace
     contaminant_filter    = ch_contaminant_filter
+    contaminant_index     = ch_contaminant_index
     mirna_reference       = MIRNA_QUANT.out.reference
     mirna_index_mature    = MIRNA_QUANT.out.index_mature
     mirna_index_hairpin   = MIRNA_QUANT.out.index_hairpin
