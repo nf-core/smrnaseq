@@ -112,6 +112,11 @@ workflow PIPELINE_INITIALISATION {
     validateInputParameters()
 
     //
+    // Validate the bowtie align arguments provided through params.bowtie_align_args
+    //
+    validateBowtieGenomeArgs()
+
+    //
     // Create channel from input file provided through params.input
     //
 
@@ -202,7 +207,7 @@ workflow PIPELINE_COMPLETION {
 def validateInputParameters() {
     genomeExistsError()
 
-    if (!params.mirgenedb) {
+    if (!paramAsBool(params.mirgenedb)) {
         // Validate mature miRNA fasta file
         if (!params.mature) {
             error("Mature miRNA fasta file not found. Please specify using the `--mature` parameter.")
@@ -253,6 +258,94 @@ def validateInputSamplesheet(input) {
     return [ metas[0], fastqs ]
 }
 //
+// Validate the bowtie align arguments provided through params.bowtie_align_args
+//
+def validateBowtieGenomeArgs() {
+    def rawArgs = params.bowtie_align_args
+    if (rawArgs == null || rawArgs == '') {
+        return
+    }
+    // A bare '--bowtie_align_args --best' reaches here as true or 'true'
+    if (!(rawArgs instanceof CharSequence) || rawArgs.toString() == 'true') {
+        error("[bowtie_align_args] Expected a string of Bowtie options but got '${rawArgs}'. A value holding a single flag must use the '=' form, e.g. --bowtie_align_args=--best, because '--bowtie_align_args --best' is parsed as the boolean true.")
+    }
+
+    // Allowlist: flag -> expected value type (null = flag only)
+    def allowedArgs = [
+        '-v'           : 'int_0_3',
+        '-n'           : 'int_0_3',
+        '--seedmms'    : 'int_0_3',
+        '-e'           : 'int',
+        '--maqerr'     : 'int',
+        '-l'           : 'int',
+        '--seedlen'    : 'int',
+        '-k'           : 'int_min_2',
+        '-m'           : 'int',
+        '--maxbts'     : 'int',
+        '--chunkmbs'   : 'int',
+        '--seed'       : 'int',
+        '--best'       : null,
+        '--strata'     : null,
+        '--nomaqround' : null,
+        '--norc'       : null,
+    ]
+
+    def seen = []
+
+    // The accumulator holds the flag still waiting for its value, if any
+    def unfinishedFlag = rawArgs.toString().tokenize().inject(null) { pendingFlag, token ->
+        if (pendingFlag != null) {
+            validateBowtieArgValue(pendingFlag, allowedArgs[pendingFlag], token)
+            return null
+        }
+
+        def separator = token.indexOf('=')
+        def flag = separator >= 0 ? token.substring(0, separator) : token
+
+        if (!allowedArgs.containsKey(flag)) {
+            error("[bowtie_align_args] Argument '${flag}' is not allowed. Only these flags are permitted: ${allowedArgs.keySet().sort().join(', ')}")
+        }
+        if (separator >= 0 && !flag.startsWith('--')) {
+            // Bowtie does not reject '-v=1': it silently misreads the value
+            error("[bowtie_align_args] Short flag '${flag}' cannot use the '=' form, got '${token}'. Use '${flag} <value>' instead.")
+        }
+
+        seen.add(flag)
+        def expectedType = allowedArgs[flag]
+
+        if (separator >= 0) {
+            if (expectedType == null) {
+                error("[bowtie_align_args] Argument '${flag}' does not take a value, got '${token}'.")
+            }
+            validateBowtieArgValue(flag, expectedType, token.substring(separator + 1))
+            return null
+        }
+        return expectedType != null ? flag : null
+    }
+
+    if (unfinishedFlag != null) {
+        error("[bowtie_align_args] Argument '${unfinishedFlag}' requires a value but none was provided.")
+    }
+
+    if (seen.contains('-v') && (seen.contains('-n') || seen.contains('--seedmms'))) {
+        error("[bowtie_align_args] '-v' and '-n'/'--seedmms' are mutually exclusive.")
+    }
+}
+//
+// Check the value given to a bowtie flag that takes an integer
+//
+def validateBowtieArgValue(flag, expectedType, value) {
+    if (!(value ==~ /\d+/)) {
+        error("[bowtie_align_args] Argument '${flag}' requires an integer value, got '${value}'.")
+    }
+    if (expectedType == 'int_0_3' && !(value ==~ /0*[0-3]/)) {
+        error("[bowtie_align_args] Argument '${flag}' must be between 0 and 3, got '${value}'.")
+    }
+    if (expectedType == 'int_min_2' && !(value ==~ /0*([2-9]|[1-9]\d+)/)) {
+        error("[bowtie_align_args] Argument '${flag}' must be at least 2, got '${value}'. The default genome mapping arguments include '--strata', which Bowtie only accepts with '-k' above 1. To report a single alignment per read, override ext.args for 'NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME' instead: https://nf-co.re/smrnaseq/dev/docs/usage#custom-tool-arguments")
+    }
+}
+//
 // Get attribute from genome config file e.g. fasta
 //
 def getGenomeAttribute(attribute) {
@@ -262,6 +355,27 @@ def getGenomeAttribute(attribute) {
         }
     }
     return null
+}
+
+//
+// Build one line of the miRTrace config file: <reads>,<display name>,<adapter>,<PHRED offset>
+// miRTrace (1.0.1) cannot auto-detect adapters, and an empty adapter field means no adapter trimming.
+// `--three_prime_adapter auto-detect` only applies to fastp, so it becomes an empty field here.
+//
+def mirtraceConfigLine(reads_name, sample_id, adapter, phred_offset) {
+    def mirtrace_adapter = adapter == 'auto-detect' ? '' : adapter
+    return "./${reads_name},${sample_id},${mirtrace_adapter},${phred_offset}\n".toString()
+}
+
+//
+// Warning for miRTrace when the adapter is 'auto-detect' and miRTrace runs, i.e. a miRTrace
+// species is set (null otherwise).
+//
+def mirtraceAdapterWarning(adapter, mirtrace_species) {
+    if (adapter != 'auto-detect' || !mirtrace_species) {
+        return null
+    }
+    return "miRTrace cannot auto-detect adapters, so with '--three_prime_adapter auto-detect' it runs without adapter trimming. Set '--three_prime_adapter' to the adapter sequence for adapter-trimmed miRTrace QC."
 }
 
 //
@@ -285,11 +399,11 @@ def toolCitationText() {
     // Uncomment function in methodsDescriptionText to render in MultiQC report
     def citation_text = [
             "Tools used in the workflow included:",
-            !params.skip_fastqc          ? "FastQC (Andrews 2010)," : "",
-            !params.skip_multiqc         ? "MultiQC (Ewels et al. 2016)," : "",
-            !params.skip_fastp           ? "fastp (Chen et al. 2018)," : "",
-            !params.skip_mirdeep         ? "MiRDeep2 (Friedländer et al. 2012)," : "",
-            params.filter_contamination  ? "Contamination filtering tools: BLAT (Kent 2002), Bowtie2 (Langmead and Salzberg 2012)," : "",
+            !paramAsBool(params.skip_fastqc)          ? "FastQC (Andrews 2010)," : "",
+            !paramAsBool(params.skip_multiqc)         ? "MultiQC (Ewels et al. 2016)," : "",
+            !paramAsBool(params.skip_fastp)           ? "fastp (Chen et al. 2018)," : "",
+            !paramAsBool(params.skip_mirdeep)         ? "MiRDeep2 (Friedländer et al. 2012)," : "",
+            paramAsBool(params.filter_contamination) ? "Contamination filtering tools: BLAT (Kent 2002), Bowtie2 (Langmead and Salzberg 2012)," : "",
             params.mirtrace_species      ? "miRTrace (Kang et al. 2018)," : "",
             "UMI-tools (Smith et al. 2017),",
             "Bowtie (Langmead et al. 2009),",
@@ -365,4 +479,39 @@ def methodsDescriptionText(mqc_methods_yaml) {
     def description_html = engine.createTemplate(methods_text).make(meta)
 
     return description_html.toString()
+}
+
+/*
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    PARAMETER TYPE HELPERS
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+*/
+//
+// With the strict syntax parser (default from Nextflow 26.04), parameters given on the
+// command line reach the pipeline scripts as Strings, e.g. `--skip_mirdeep false` gives
+// 'false', which is truthy. nf-schema only casts a copy of the params for validation.
+// Use these helpers wherever a boolean or integer parameter is used in a script.
+//
+def paramAsBool(value) {
+    if (value == null) {
+        return false
+    }
+    if (value instanceof CharSequence) {
+        return value.toString().trim().toBoolean()
+    }
+    return value as Boolean
+}
+
+def paramAsInt(value) {
+    if (value == null || value.toString().trim() == '') {
+        return null
+    }
+    if (value instanceof Number) {
+        return value.intValue()
+    }
+    def text = value.toString().trim()
+    if (!text.isInteger()) {
+        error("Expected an integer parameter value but got '${value}'")
+    }
+    return text.toInteger()
 }
