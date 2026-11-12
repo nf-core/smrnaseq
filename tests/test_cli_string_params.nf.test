@@ -1,0 +1,38 @@
+nextflow_pipeline {
+
+    name "Test Workflow main.nf - test_cli_string_params"
+    script "main.nf"
+    profile "test_skipfastp,ci"
+    tag "cli_string_params"
+    tag "pipeline"
+
+    // With the strict syntax parser (default from Nextflow 26.04), boolean and integer
+    // parameters given on the command line reach the pipeline scripts as Strings.
+    // These values match the test_skipfastp profile and the pipeline defaults, so the
+    // results must be identical to the test_skipfastp test. Without type handling,
+    // '--skip_fastqc false' is truthy and the run stops with
+    // "At least one of skip_fastp or skip_fastqc must be false".
+    test("-profile test_skipfastp with boolean and integer params given on the command line") {
+
+        options "--skip_fastqc false --skip_multiqc false --filter_contamination false --with_umi false --skip_umi_extract_before_dedup true --umi_discard_read 0 --min_trimmed_reads 10 --three_prime_clip_r1 0"
+
+        when {
+            params {
+                outdir = "${outputDir}"
+            }
+        }
+
+        then {
+            assert workflow.success
+            assertAll(
+                { assert snapshot(
+                    *UTILS.get_assertion(
+                        outdir: params.outdir,
+                        scenario: [:],
+                        workflow: workflow
+                    )
+                ).match() }
+            )
+        }
+    }
+}

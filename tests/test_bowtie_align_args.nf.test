@@ -1,0 +1,62 @@
+nextflow_pipeline {
+
+    name "Test pipeline with --bowtie_align_args"
+    script "../main.nf"
+    profile "+ci"
+    tag "pipeline"
+    tag "bowtie_align_args"
+
+    test("-profile test --bowtie_align_args allowed flags") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                bowtie_align_args = '-v 1 --best'
+            }
+        }
+
+        then {
+            // Scripts of the BOWTIE_MAP_GENOME tasks, found through their .command.run
+            def genome_scripts = []
+            new File("${workDir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
+                if (file.name == '.command.run' && file.text.contains('NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME')) {
+                    genome_scripts.add(new File(file.parentFile, '.command.sh').text)
+                }
+            }
+            assert workflow.success
+            assert genome_scripts.size() > 0
+            // User args are appended after the pipeline defaults
+            assert genome_scripts.every { script -> script.contains('-t -k 50 --best --strata -e 99999 --chunkmbs 2048 -v 1 --best') }
+        }
+    }
+
+    test("-profile test --bowtie_align_args disallowed flag") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                bowtie_align_args = '--un unaligned.fastq'
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert workflow.stdout.any { it.contains("[bowtie_align_args] Argument '--un' is not allowed") }
+        }
+    }
+
+    test("-profile test --bowtie_align_args -k below 2") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                bowtie_align_args = '-k 1'
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert workflow.stdout.any { it.contains("[bowtie_align_args] Argument '-k' must be at least 2, got '1'") }
+        }
+    }
+}

@@ -22,6 +22,8 @@ include { CONTAMINANT_FILTER               } from '../subworkflows/local/contami
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant/main'
 include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant/main'
 include { methodsDescriptionText           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
+include { paramAsBool                      } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
+include { paramAsInt                       } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 // plugins
 include { paramsSummaryMap                 } from 'plugin/nf-schema'
 
@@ -79,11 +81,11 @@ workflow NFCORE_SMRNASEQ {
     //
     // SUBWORKFLOW: Read QC, extract UMI and trim adapters & dedup UMIs if necessary / desired by the user
     //
-    if ( params.skip_fastp && params.skip_fastqc ) {
+    if ( paramAsBool(params.skip_fastp) && paramAsBool(params.skip_fastqc) ) {
         exit 1, "At least one of skip_fastp or skip_fastqc must be false"
     }
 
-    if (params.with_umi) {
+    if (paramAsBool(params.with_umi)) {
         ch_cat_fastq = ch_cat_fastq.map { meta, reads -> [meta, reads, []] }
     } else {
         ch_cat_fastq = ch_cat_fastq.combine(ch_mirna_adapters)
@@ -91,19 +93,19 @@ workflow NFCORE_SMRNASEQ {
 
     FASTQ_FASTQC_UMITOOLS_FASTP (
         ch_cat_fastq,
-        params.skip_fastqc,
-        params.with_umi,
-        params.skip_umi_extract_before_dedup,
-        params.umi_discard_read,
-        params.skip_fastp,
-        params.save_trimmed_fail,
-        params.save_merged,
-        params.min_trimmed_reads
+        paramAsBool(params.skip_fastqc),
+        paramAsBool(params.with_umi),
+        paramAsBool(params.skip_umi_extract_before_dedup),
+        paramAsInt(params.umi_discard_read),
+        paramAsBool(params.skip_fastp),
+        paramAsBool(params.save_trimmed_fail),
+        paramAsBool(params.save_merged),
+        paramAsInt(params.min_trimmed_reads)
     )
 
     ch_reads_for_mirna = FASTQ_FASTQC_UMITOOLS_FASTP.out.reads
     // Trim 3' end nucleotides after adapter is removed, otherwise they are not really trimmed
-    if (params.three_prime_clip_r1){
+    if ((paramAsInt(params.three_prime_clip_r1) ?: 0) > 0){
         FASTP3(
             ch_reads_for_mirna.map { meta, reads -> [meta, reads, []] },
             false,
@@ -117,7 +119,7 @@ workflow NFCORE_SMRNASEQ {
     // This involves running on the sequencing adapter trimmed remnants of the entire reads
     // consisting of sequence + common sequence "miRNA adapter" + UMI
     // once collapsing happened, we will use umitools extract to get rid of the common miRNA sequence + the UMI to have only plain collapsed reads without any other clutter
-    if (params.with_umi) {
+    if (paramAsBool(params.with_umi)) {
         ch_fastq = channel.value('fastq')
         ch_input_for_collapse = ch_reads_for_mirna.map{ meta, reads -> [meta, reads, []]} //Needs to be done to add a []
         UMICOLLAPSE_FASTQ(ch_input_for_collapse, ch_fastq)
@@ -127,8 +129,8 @@ workflow NFCORE_SMRNASEQ {
         FASTP_LENGTH_FILTER (
             UMITOOLS_EXTRACT.out.reads.map {meta, reads -> [meta, reads, []] },
             false,
-            params.save_trimmed_fail,
-            params.save_merged
+            paramAsBool(params.save_trimmed_fail),
+            paramAsBool(params.save_merged)
         )
 
         ch_reads_for_mirna = FASTP_LENGTH_FILTER.out.reads
@@ -167,7 +169,7 @@ workflow NFCORE_SMRNASEQ {
     // SUBWORKFLOW: remove contaminants from reads
     //
     contamination_stats = channel.empty()
-    if (params.filter_contamination){
+    if (paramAsBool(params.filter_contamination)){
         CONTAMINANT_FILTER (
             ch_reference_hairpin,
             ch_rrna,
@@ -216,7 +218,7 @@ workflow NFCORE_SMRNASEQ {
                 }
                 .first()
 
-        if (!params.skip_mirdeep) {
+        if (!paramAsBool(params.skip_mirdeep)) {
                 FASTQ_FIND_MIRNA_MIRDEEP2 (
                         ch_reads_for_mirna,
                         ch_fasta,
@@ -259,7 +261,7 @@ workflow NFCORE_SMRNASEQ {
     // MODULE: MultiQC
     //
     ch_multiqc_report = channel.empty()
-    if (!params.skip_multiqc) {
+    if (!paramAsBool(params.skip_multiqc)) {
         summary_params      = paramsSummaryMap(
             workflow, parameters_schema: "nextflow_schema.json")
         ch_workflow_summary = channel.value(paramsSummaryMultiqc(summary_params))
@@ -280,7 +282,7 @@ workflow NFCORE_SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip.collect { item -> item[1] }.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_zip.collect { item -> item[1] }.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_json.collect { item -> item[1] }.ifEmpty([]))
-        if(params.with_umi) {
+        if(paramAsBool(params.with_umi)) {
             ch_multiqc_files = ch_multiqc_files.mix(UMICOLLAPSE_FASTQ.out.log.collect { item -> item[1] }.ifEmpty([]))
         }
         ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
