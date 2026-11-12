@@ -14,9 +14,6 @@ process PARSE_FASTA_MIRNA {
     tuple val(meta2), path('*_igenome.fa'), emit: parsed_fasta
     path "versions.yml"                   , emit: versions
 
-    when:
-    task.ext.when == null || task.ext.when
-
     script:
     """
     # Uncompress FASTA reference files if necessary

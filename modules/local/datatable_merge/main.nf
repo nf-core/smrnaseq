@@ -13,9 +13,6 @@ process DATATABLE_MERGE {
     path "mirna.tsv"   , emit: mirna_tsv
     path "versions.yml", emit: versions
 
-    when:
-    task.ext.when == null || task.ext.when
-
     script:
     """
     collapse_mirtop.r ${mirtop}
