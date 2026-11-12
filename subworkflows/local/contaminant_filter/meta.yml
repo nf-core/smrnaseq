@@ -75,6 +75,12 @@ output:
         Channel containing contaminant filtering statistics.
         Structure: [ path(stats) ]
       pattern: "*.{txt,tsv}"
+  - index:
+      type: directory
+      description: |
+        Channel containing the Bowtie2 indices built for each contaminant database
+        (meta.id is the contaminant type, e.g. rRNA, tRNA, cDNA).
+        Structure: [ val(meta), path(bowtie2) ]
   - versions:
       type: file
       description: |
