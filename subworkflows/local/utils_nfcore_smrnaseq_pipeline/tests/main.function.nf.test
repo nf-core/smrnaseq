@@ -1,0 +1,120 @@
+nextflow_function {
+
+    name "Test Functions"
+    script "../main.nf"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "utils_nfcore_smrnaseq_pipeline"
+    tag "subworkflows/utils_nfcore_smrnaseq_pipeline"
+
+    test("Test Function mirtraceConfigLine - adapter sequence") {
+
+        function "mirtraceConfigLine"
+
+        when {
+            function {
+                """
+                input[0] = 'sample1.fastq.gz'
+                input[1] = 'sample1'
+                input[2] = 'TGGAATTCTCGGGTGCCAAGG'
+                input[3] = '33'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == "./sample1.fastq.gz,sample1,TGGAATTCTCGGGTGCCAAGG,33\n" }
+            )
+        }
+    }
+
+    test("Test Function mirtraceConfigLine - auto-detect") {
+
+        function "mirtraceConfigLine"
+
+        when {
+            function {
+                """
+                input[0] = 'sample1.fastq.gz'
+                input[1] = 'sample1'
+                input[2] = 'auto-detect'
+                input[3] = '33'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                // miRTrace cannot auto-detect adapters: an empty adapter field means no adapter trimming
+                { assert function.result == "./sample1.fastq.gz,sample1,,33\n" }
+            )
+        }
+    }
+
+    test("Test Function mirtraceAdapterWarning - adapter sequence") {
+
+        function "mirtraceAdapterWarning"
+
+        when {
+            function {
+                """
+                input[0] = 'TGGAATTCTCGGGTGCCAAGG'
+                input[1] = 'hsa'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null }
+            )
+        }
+    }
+
+    test("Test Function mirtraceAdapterWarning - auto-detect") {
+
+        function "mirtraceAdapterWarning"
+
+        when {
+            function {
+                """
+                input[0] = 'auto-detect'
+                input[1] = 'hsa'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result.contains("miRTrace cannot auto-detect adapters") }
+            )
+        }
+    }
+
+    test("Test Function mirtraceAdapterWarning - auto-detect without miRTrace species") {
+
+        function "mirtraceAdapterWarning"
+
+        when {
+            function {
+                """
+                input[0] = 'auto-detect'
+                input[1] = null
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                // miRTrace does not run without a species, so there is nothing to warn about
+                { assert function.result == null }
+            )
+        }
+    }
+}
