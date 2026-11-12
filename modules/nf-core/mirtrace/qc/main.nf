@@ -11,7 +11,7 @@ process MIRTRACE_QC {
         'quay.io/biocontainers/mirtrace:1.0.1--0' }"
 
     input:
-    tuple val(meta), path(reads), path(mirtrace_config)
+    tuple val(meta), path("${meta.id}.fastq.gz"), path(mirtrace_config)
     val(mirtrace_species)
 
     output:
@@ -26,7 +26,8 @@ process MIRTRACE_QC {
     task.ext.when == null || task.ext.when
 
     script:
-    def mirtrace_mode = mirtrace_config ? "--config ${mirtrace_config}": "${reads}"
+    // Reads are staged as <id>.fastq.gz, so the output FASTA files are named <id>.fasta
+    def mirtrace_mode = mirtrace_config ? "--config ${mirtrace_config}": "${meta.id}.fastq.gz"
 
     """
     mirtrace qc  \\

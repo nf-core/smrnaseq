@@ -12,7 +12,6 @@ include { MULTIQC                          } from '../modules/nf-core/multiqc/ma
 include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
 include { UMITOOLS_EXTRACT                 } from '../modules/nf-core/umitools/extract/main'
 include { MIRTRACE_QC                      } from '../modules/nf-core/mirtrace/qc/main'
-include { RENAME_READS as MIRTRACE_RENAME_READS } from '../modules/local/rename_reads/main'
 // nf-core subworkflows
 include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
 include { FASTQ_FIND_MIRNA_MIRDEEP2        } from '../subworkflows/nf-core/fastq_find_mirna_mirdeep2/main'
@@ -142,22 +141,14 @@ workflow NFCORE_SMRNASEQ {
     // MODULE: mirtrace QC
     //
 
-    // Combine with ch_mirtrace_species so the reads are only staged when miRTrace runs
-    // (has_mirtrace_species arrives here as a channel, so an `if` on it is always true)
-    MIRTRACE_RENAME_READS(
-        ch_reads_for_mirtrace
-            .combine(ch_mirtrace_species)
-            .map { meta, reads, _species -> [ meta, reads ] }
-    )
-    ch_reads_for_mirtrace = MIRTRACE_RENAME_READS.out.reads
-
     ch_mirtrace_config = ch_reads_for_mirtrace
         .transpose()
         .combine(ch_three_prime_adapter)
         .combine(ch_phred_offset)
-        .collectFile { meta, reads, adapter, phred ->
+        .collectFile { meta, _reads, adapter, phred ->
         def config_filename = "${meta.id}.data"
-        [ config_filename, "./${reads.getFileName().toString()},${meta.id},${adapter},${phred}\n" ]
+        // MIRTRACE_QC stages the reads as <id>.fastq.gz, so its output FASTA files are named <id>.fasta
+        [ config_filename, "./${meta.id}.fastq.gz,${meta.id},${adapter},${phred}\n" ]
         }
         .map { config_file ->
         def base_name = config_file.getBaseName()
