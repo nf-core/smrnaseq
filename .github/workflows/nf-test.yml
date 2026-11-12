@@ -78,8 +78,8 @@ jobs:
           - isMain: false
             profile: "singularity"
         NXF_VER:
-          - "25.10.4"
-          # Required: Nextflow 26.x enables the strict syntax parser by default
+          # Minimum supported version (manifest.nextflowVersion); pinned so the required shards are reproducible.
+          # latest-everything also uses the strict syntax parser, but it moves and is continue-on-error.
           - "26.10.5"
           - "latest-everything"
     env:
