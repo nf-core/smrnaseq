@@ -1,7 +1,7 @@
 {
     "-profile test_contamination_tech_reps": {
         "content": [
-            106,
+            103,
             {
                 "BLAT_CDNA": {
                     "blat": "39x1"

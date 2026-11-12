@@ -1,7 +1,7 @@
 {
     "-profile test_umi": {
         "content": [
-            78,
+            76,
             {
                 "BOWTIE_MAP_GENOME": {
                     "bowtie": "1.3.1",
@@ -582,7 +582,7 @@
                 "multiqc_mirtrace_complexity.txt:md5,4b4ec780ac1444cc9dd6c585d84782a4",
                 "multiqc_mirtrace_contamination.txt:md5,bc45227c1ee392048f6565386d20f2e4",
                 "multiqc_mirtrace_length.txt:md5,10877baee5610bba725534b03a16adc8",
-                "multiqc_mirtrace_summary.txt:md5,9e4f2512c51c92d319ffc8ee9d4b9d07",
+                "multiqc_mirtrace_summary.txt:md5,94893fbc8570235e1bcdd52c21734d19",
                 "multiqc_samtools_stats.txt:md5,cd1941dc4fbcbeaebb8ef3f099bcc178",
                 "multiqc_umicollapse.txt:md5,5c5045569b83f861f6ba26d6ab8f10ca",
                 "samtools-stats-dp.txt:md5,f2f1cee4d281719db54ff781c38172fc",

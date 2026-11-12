@@ -1,7 +1,7 @@
 {
     "-profile test_nextflex": {
         "content": [
-            85,
+            82,
             {
                 "BOWTIE_MAP_HAIRPIN": {
                     "bowtie": "1.3.1",
@@ -590,7 +590,7 @@
                 "multiqc_mirtrace_complexity.txt:md5,de0be6b0b42f391b24edb0215525e966",
                 "multiqc_mirtrace_contamination.txt:md5,424abaf5a020525781fcc2850f962578",
                 "multiqc_mirtrace_length.txt:md5,4272b5d0e4774f86cd1b3216a0df0a93",
-                "multiqc_mirtrace_summary.txt:md5,bd55186af7ae42f4246a5fc68995875e",
+                "multiqc_mirtrace_summary.txt:md5,3bfa8cc6070e410ef98dea35dc0586cf",
                 "multiqc_samtools_stats.txt:md5,82eb9266973843f031074094c9f42c21",
                 "samtools-stats-dp.txt:md5,c5169c16c3d16d29405eb62824eaa14b",
                 "samtools_alignment_plot.txt:md5,99b94d2eb81c78739e172a5094de4c93"

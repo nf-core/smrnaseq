@@ -655,7 +655,7 @@
                 "multiqc_mirtrace_complexity.txt:md5,f0da69b15c693feb3e6865a64073ebb6",
                 "multiqc_mirtrace_contamination.txt:md5,d41d8cd98f00b204e9800998ecf8427e",
                 "multiqc_mirtrace_length.txt:md5,0de7c1d54357b48749a012fd0cf41520",
-                "multiqc_mirtrace_summary.txt:md5,7e9927825c71ab8c3e1c90773550060b",
+                "multiqc_mirtrace_summary.txt:md5,e121c19e46c6e118395b8c0aa4d980f3",
                 "multiqc_samtools_stats.txt:md5,c96ab0c3c5e5d3394453ce1a14bb0309",
                 "samtools-stats-dp.txt:md5,202f176efda79692ee1da19f5c0d23e0",
                 "samtools_alignment_plot.txt:md5,f44e2cda45734c490d48de4e81d45942",

@@ -1,7 +1,7 @@
 {
     "-profile test_skipfastp": {
         "content": [
-            68,
+            66,
             {
                 "BOWTIE_MAP_GENOME": {
                     "bowtie": "1.3.1",
@@ -432,7 +432,7 @@
                 "multiqc_mirtrace_complexity.txt:md5,a5ed7a31e0f518871634fc3746d91b68",
                 "multiqc_mirtrace_contamination.txt:md5,d41d8cd98f00b204e9800998ecf8427e",
                 "multiqc_mirtrace_length.txt:md5,47c48e637c3ed63cad4b31ebf42aa2dd",
-                "multiqc_mirtrace_summary.txt:md5,99394511aacdd525e64c43a2113fc161",
+                "multiqc_mirtrace_summary.txt:md5,cca2643bc39c7a4bbf389ab8b9c5a7e6",
                 "multiqc_samtools_stats.txt:md5,086d3b10496eba32b3422b63fdb49555",
                 "samtools-stats-dp.txt:md5,d1854b0ed73a4c9ae62a3a625c19d4b2",
                 "samtools_alignment_plot.txt:md5,2778636ce5b6c9432b67014382fc35af",
