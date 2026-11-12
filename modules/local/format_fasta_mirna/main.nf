@@ -27,4 +27,15 @@ process FORMAT_FASTA_MIRNA {
         fastx_toolkit:  \$(echo "$version")
     END_VERSIONS
     """
+
+    stub:
+    def version = '0.0.14'
+    """
+    touch ${fasta}_idx.fa
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        fastx_toolkit:  \$(echo "$version")
+    END_VERSIONS
+    """
 }
