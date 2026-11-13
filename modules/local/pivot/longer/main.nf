@@ -1,3 +1,5 @@
+nextflow.enable.types = true
+
 process PIVOT_LONGER {
     tag"$meta.id"
     label 'process_single'
@@ -8,36 +10,26 @@ process PIVOT_LONGER {
         'community.wave.seqera.io/library/r-base_r-optparse_r-tidyr_r-vroom:ae58a487c93865f0' }"
 
     input:
-    tuple val(meta), path(tsv)
+    tuple(meta: Map, tsv: Path)
 
     output:
-    tuple val(meta), path("*_long.csv") , emit: csv
-    path "versions.yml"                 , emit: versions
+    csv = tuple(meta, file('*_long.csv'))
+
+    topic:
+    tuple(task.process, 'r-base', eval("Rscript -e 'cat(as.character(getRversion()))'")) >> 'versions'
+    tuple(task.process, 'tidyr', eval("Rscript -e \"cat(as.character(packageVersion('tidyr')))\"")) >> 'versions'
+    tuple(task.process, 'optparse', eval("Rscript -e \"cat(as.character(packageVersion('optparse')))\"")) >> 'versions'
 
     script:
     """
     pivot_longer.R \\
         --input ${tsv} \\
         --output ${meta.id}_long.csv
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
-        tidyr: \$(Rscript -e "library(tidyr); cat(as.character(packageVersion('tidyr')))")
-        optparse: \$(Rscript -e "library(optparse); cat(as.character(packageVersion('optparse')))")
-    END_VERSIONS
     """
 
     stub:
     """
      touch "${meta.id}_long.csv"
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
-        tidyr: \$(Rscript -e "library(tidyr); cat(as.character(packageVersion('tidyr')))")
-        optparse: \$(Rscript -e "library(optparse); cat(as.character(packageVersion('optparse')))")
-    END_VERSIONS
     """
 
 }
