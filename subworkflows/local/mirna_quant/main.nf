@@ -25,7 +25,6 @@ include { BAM_STATS_MIRNA_MIRTOP } from '../../../subworkflows/nf-core/bam_stats
 
 include { PIVOT_LONGER           } from '../../../modules/local/pivot/longer/main'
 include { PIVOT_WIDER            } from '../../../modules/local/pivot/wider/main'
-include { paramAsBool            } from '../utils_nfcore_smrnaseq_pipeline'
 
 workflow MIRNA_QUANT {
     take:
@@ -37,14 +36,12 @@ workflow MIRNA_QUANT {
 
     main:
     ch_versions = channel.empty()
-    ch_parse_species_input = paramAsBool(params.mirgenedb) ? channel.value(params.mirgenedb_species) : ch_mirtrace_species
+    ch_parse_species_input = params.mirgenedb ? channel.value(params.mirgenedb_species) : ch_mirtrace_species
 
     PARSE_MATURE ( ch_reference_mature, ch_parse_species_input )
     ch_mirna_parsed = PARSE_MATURE.out.parsed_fasta
-    ch_versions = ch_versions.mix(PARSE_MATURE.out.versions)
 
     FORMAT_MATURE ( ch_mirna_parsed )
-    ch_versions = ch_versions.mix(FORMAT_MATURE.out.versions)
     ch_mature_fasta_fai = FORMAT_MATURE.out.formatted_fasta.map { row ->
         row.size() == 2 ? [ row[0], row[1], [] ] : row
     }
@@ -64,10 +61,8 @@ workflow MIRNA_QUANT {
 
     PARSE_HAIRPIN ( ch_reference_hairpin, ch_parse_species_input )
     ch_hairpin_parsed = PARSE_HAIRPIN.out.parsed_fasta
-    ch_versions = ch_versions.mix(PARSE_HAIRPIN.out.versions)
 
     FORMAT_HAIRPIN ( ch_hairpin_parsed )
-    ch_versions = ch_versions.mix(FORMAT_HAIRPIN.out.versions)
     ch_hairpin_fasta_fai = FORMAT_HAIRPIN.out.formatted_fasta.map { row ->
         row.size() == 2 ? [ row[0], row[1], [] ] : row
     }
@@ -85,7 +80,6 @@ workflow MIRNA_QUANT {
         .collect()
 
     EDGER_QC ( ch_edger_input )
-    ch_versions.mix(EDGER_QC.out.versions)
 
     SEQCLUSTER_COLLAPSE ( ch_reads_for_mirna )
 
@@ -102,7 +96,6 @@ workflow MIRNA_QUANT {
     ch_mirtop_logs = BAM_STATS_MIRNA_MIRTOP.out.stats_log
 
     PIVOT_LONGER( BAM_STATS_MIRNA_MIRTOP.out.counts )
-    ch_versions = ch_versions.mix(PIVOT_LONGER.out.versions)
 
     ch_long_files = PIVOT_LONGER.out.csv
         .map { _meta, file -> file }
@@ -112,10 +105,8 @@ workflow MIRNA_QUANT {
         }
 
     PIVOT_WIDER( ch_long_files )
-    ch_versions = ch_versions.mix(PIVOT_WIDER.out.versions)
 
     DATATABLE_MERGE ( PIVOT_WIDER.out.csv )
-    ch_versions = ch_versions.mix(DATATABLE_MERGE.out.versions)
 
     ch_reads_genome = BOWTIE_MAP_HAIRPIN.out.fastq
         .map { row -> add_suffix(row, "genome") }
@@ -128,6 +119,11 @@ workflow MIRNA_QUANT {
     hairpin_stats       = BAM_STATS_HAIRPIN.out.stats        // channel: [ val(meta), [ stats ] ]
     mirtop_logs         = ch_mirtop_logs                     // channel: [ val(meta), path(log) ]
     versions            = ch_versions                        // channel: [ versions.yml ]
+    versions_tuples     = PARSE_MATURE.out.versions.mix(       // channel: [ process, tool, version ]
+        PARSE_HAIRPIN.out.versions,
+        FORMAT_MATURE.out.versions,
+        FORMAT_HAIRPIN.out.versions
+    )
 
     // Files to publish
     reference           = PARSE_MATURE.out.parsed_fasta.mix(

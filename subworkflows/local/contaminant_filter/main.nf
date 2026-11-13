@@ -277,7 +277,6 @@ workflow CONTAMINANT_FILTER {
     // Filter all contaminant stats and create MultiQC file
     FILTER_STATS ( ch_reads_contaminants )
     FILTER_STATS.out.stats.dump(tag:"FILTER_STATS.out.stats")
-    ch_versions = ch_versions.mix(FILTER_STATS.out.versions)
 
     emit:
     filtered_reads  = other_cont_reads       // channel: [ val(meta), path(fastq) ]

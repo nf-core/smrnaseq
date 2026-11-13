@@ -1,3 +1,5 @@
+nextflow.enable.types = true
+
 process PARSE_FASTA_MIRNA {
     label 'process_medium'
 
@@ -7,12 +9,14 @@ process PARSE_FASTA_MIRNA {
         'community.wave.seqera.io/library/seqkit:2.6.1--49efc1ecf715e29f' }"
 
     input:
-    tuple val(meta2), path(fasta)
-    val filter_species
+    tuple(meta2: Map, fasta: Path)
+    filter_species: String
 
     output:
-    tuple val(meta2), path('*_igenome.fa'), emit: parsed_fasta
-    path "versions.yml"                   , emit: versions
+    parsed_fasta = tuple(meta2, file('*_igenome.fa'))
+    // Not emitted via the versions topic: Nextflow 26.04 never closes a topic fed by a
+    // typed process that is included under several aliases (PARSE_MATURE/PARSE_HAIRPIN).
+    versions     = tuple(task.process, 'seqkit', eval("seqkit version | sed 's/^seqkit v//'"))
 
     script:
     """
@@ -29,11 +33,6 @@ process PARSE_FASTA_MIRNA {
     sed -i 's#\s.*##' \${FASTA}_parsed.fa
     seqkit grep -r --pattern \".*${filter_species}-.*\" \${FASTA}_parsed.fa > \${FASTA}_sps.fa
     seqkit seq --rna2dna \${FASTA}_sps.fa > \${FASTA}_igenome.fa
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        seqkit: \$(echo \$(seqkit 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
-    END_VERSIONS
     """
 
     stub:
@@ -41,10 +40,5 @@ process PARSE_FASTA_MIRNA {
     def fasta_name = fasta.name.endsWith('.gz') ? fasta.baseName : fasta.name
     """
     touch ${fasta_name}_igenome.fa
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        seqkit: \$(echo \$(seqkit 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
-    END_VERSIONS
     """
 }
