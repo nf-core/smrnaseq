@@ -20,6 +20,7 @@ include { PREPARE_GENOME          } from './subworkflows/local/prepare_genome'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_smrnaseq_pipeline'
+include { paramAsBool             } from './subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -171,29 +172,29 @@ output {
     // both flags are set. User-provided indices are never published here.
     bowtie_index_untar {
         path 'untar'
-        enabled params.save_intermediates
+        enabled paramAsBool(params.save_intermediates)
     }
     bowtie_index_genome {
-        path (params.save_reference ? 'genome/index' : 'bowtie_index/genome')
-        enabled params.save_reference || params.save_intermediates
+        path (paramAsBool(params.save_reference) ? 'genome/index' : 'bowtie_index/genome')
+        enabled paramAsBool(params.save_reference) || paramAsBool(params.save_intermediates)
     }
     genome_fasta {
-        path (params.save_reference ? 'genome' : 'bowtie_index/genome')
-        enabled params.save_reference || params.save_intermediates
+        path (paramAsBool(params.save_reference) ? 'genome' : 'bowtie_index/genome')
+        enabled paramAsBool(params.save_reference) || paramAsBool(params.save_intermediates)
     }
 
     // Read QC and trimming
     cat_fastq {
         path 'cat_fastq'
-        enabled params.save_merged
+        enabled paramAsBool(params.save_merged)
     }
     fastqc_raw {
         path 'fastqc/raw'
-        enabled params.save_intermediates
+        enabled paramAsBool(params.save_intermediates)
     }
     fastqc_trim {
         path 'fastqc/trimmed'
-        enabled params.save_intermediates
+        enabled paramAsBool(params.save_intermediates)
     }
     fastp_reports {
         path 'fastp/on_raw'
@@ -203,11 +204,11 @@ output {
     }
     fastp_reads_fail {
         path 'fastp/on_raw'
-        enabled params.save_trimmed_fail
+        enabled paramAsBool(params.save_trimmed_fail)
     }
     fastp_reads {
         path 'fastp/fastq'
-        enabled params.save_merged
+        enabled paramAsBool(params.save_merged)
     }
 
     // UMI handling
@@ -216,11 +217,11 @@ output {
     }
     umi_extract_reads {
         path 'umi_dedup/fastq_extracted_umi'
-        enabled params.save_umi_intermeds
+        enabled paramAsBool(params.save_umi_intermeds)
     }
     umi_dedup {
         path 'umi_dedup/bam_deduplicated'
-        enabled params.save_umi_intermeds
+        enabled paramAsBool(params.save_umi_intermeds)
     }
     umi_fastp_reports {
         path 'fastp/on_umi_extracted'
@@ -230,7 +231,7 @@ output {
     }
     umi_fastp_reads_fail {
         path 'fastp/on_umi_extracted'
-        enabled params.save_trimmed_fail
+        enabled paramAsBool(params.save_trimmed_fail)
     }
 
     // miRNA QC
@@ -241,41 +242,41 @@ output {
     // Contamination filtering
     contaminant_filter {
         path 'contaminant_filter/filter'
-        enabled params.save_intermediates
+        enabled paramAsBool(params.save_intermediates)
     }
     contaminant_index {
         path { meta, _index -> "genome/index/contaminants/${meta.id}" }
-        enabled params.save_reference
+        enabled paramAsBool(params.save_reference)
     }
 
     // miRNA quantification
     mirna_reference {
         path 'mirna_quant/reference'
-        enabled params.save_intermediates
+        enabled paramAsBool(params.save_intermediates)
     }
     mirna_index_mature {
-        path (params.save_reference ? 'genome/index/mirna_mature' : 'bowtie_index/mirna_mature')
-        enabled params.save_reference || params.save_intermediates
+        path (paramAsBool(params.save_reference) ? 'genome/index/mirna_mature' : 'bowtie_index/mirna_mature')
+        enabled paramAsBool(params.save_reference) || paramAsBool(params.save_intermediates)
     }
     mirna_index_hairpin {
-        path (params.save_reference ? 'genome/index/mirna_hairpin' : 'bowtie_index/mirna_hairpin')
-        enabled params.save_reference || params.save_intermediates
+        path (paramAsBool(params.save_reference) ? 'genome/index/mirna_hairpin' : 'bowtie_index/mirna_hairpin')
+        enabled paramAsBool(params.save_reference) || paramAsBool(params.save_intermediates)
     }
     mirna_bam_mature {
         path 'mirna_quant/bam/mature'
-        enabled params.save_intermediates
+        enabled paramAsBool(params.save_intermediates)
     }
     mirna_bam_hairpin {
         path 'mirna_quant/bam/hairpin'
-        enabled params.save_intermediates
+        enabled paramAsBool(params.save_intermediates)
     }
     mirna_bam_seqcluster {
         path 'mirna_quant/bam/seqcluster'
-        enabled params.save_intermediates
+        enabled paramAsBool(params.save_intermediates)
     }
     mirna_seqcluster {
         path 'mirna_quant/seqcluster'
-        enabled params.save_intermediates
+        enabled paramAsBool(params.save_intermediates)
     }
     mirna_edger_qc {
         path 'mirna_quant/edger_qc'
@@ -290,7 +291,7 @@ output {
     }
     genome_quant_bam {
         path 'genome_quant/bam'
-        enabled params.save_intermediates
+        enabled paramAsBool(params.save_intermediates)
     }
 
     // Novel miRNA discovery
