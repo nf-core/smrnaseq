@@ -36,4 +36,15 @@ process PARSE_FASTA_MIRNA {
     END_VERSIONS
     """
 
+    stub:
+    // Same output name as the script: a .gz suffix is dropped before adding _igenome.fa
+    def fasta_name = fasta.name.endsWith('.gz') ? fasta.baseName : fasta.name
+    """
+    touch ${fasta_name}_igenome.fa
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        seqkit: \$(echo \$(seqkit 2>&1) | sed 's/^.*Version: //; s/ .*\$//')
+    END_VERSIONS
+    """
 }

@@ -1,0 +1,307 @@
+{
+    "-profile test -stub": {
+        "content": [
+            244,
+            {
+                "BOWTIE_MAP_GENOME": {
+                    "bowtie": "1.3.1",
+                    "gzip": 1.12,
+                    "samtools": 1.21
+                },
+                "BOWTIE_MAP_HAIRPIN": {
+                    "bowtie": "1.3.1",
+                    "gzip": 1.12,
+                    "samtools": 1.21
+                },
+                "BOWTIE_MAP_MATURE": {
+                    "bowtie": "1.3.1",
+                    "gzip": 1.12,
+                    "samtools": 1.21
+                },
+                "BOWTIE_MAP_SEQCLUSTER": {
+                    "bowtie": "1.3.1",
+                    "gzip": 1.12,
+                    "samtools": 1.21
+                },
+                "CLEAN_FASTA": {
+                    "bioawk": 1.0
+                },
+                "DATATABLE_MERGE": {
+                    "r-base": "3.6.2"
+                },
+                "FASTP": {
+                    "fastp": "1.4.0"
+                },
+                "FASTQC_RAW": {
+                    "fastqc": "0.13.0"
+                },
+                "FASTQC_TRIM": {
+                    "fastqc": "0.13.0"
+                },
+                "FORMAT_HAIRPIN": {
+                    "fastx_toolkit": "0.0.14"
+                },
+                "FORMAT_MATURE": {
+                    "fastx_toolkit": "0.0.14"
+                },
+                "INDEX_HAIRPIN": {
+                    "bowtie": "1.3.1"
+                },
+                "INDEX_MATURE": {
+                    "bowtie": "1.3.1"
+                },
+                "MIRTOP_COUNTS": {
+                    "mirtop": "0.4.30"
+                },
+                "MIRTOP_EXPORT": {
+                    "mirtop": "0.4.30"
+                },
+                "MIRTOP_GFF": {
+                    "mirtop": "0.4.30"
+                },
+                "MIRTOP_STATS": {
+                    "mirtop": "0.4.30"
+                },
+                "MIRTRACE_QC": {
+                    "mirtrace": "1.0.1"
+                },
+                "PARSE_HAIRPIN": {
+                    "seqkit": "2.6.1"
+                },
+                "PARSE_MATURE": {
+                    "seqkit": "2.6.1"
+                },
+                "PIVOT_LONGER": {
+                    "optparse": "1.7.5",
+                    "r-base": "4.4.2",
+                    "tidyr": "1.3.1"
+                },
+                "PIVOT_WIDER": {
+                    "dplyr": "1.1.4",
+                    "optparse": "1.7.5",
+                    "r-base": "4.4.2",
+                    "tidyr": "1.3.1",
+                    "vroom": "1.6.5"
+                },
+                "SAMTOOLS_FLAGSTAT": {
+                    "samtools": 1.25
+                },
+                "SAMTOOLS_IDXSTATS": {
+                    "samtools": 1.25
+                },
+                "SAMTOOLS_INDEX": {
+                    "samtools": 1.25
+                },
+                "SAMTOOLS_SORT": {
+                    "samtools": 1.25
+                },
+                "SAMTOOLS_STATS": {
+                    "samtools": 1.25
+                },
+                "SEQCLUSTER_COLLAPSE": {
+                    "seqcluster": "1.2.9"
+                },
+                "UNTAR_BOWTIE_INDEX": {
+                    "untar": 1.34
+                }
+            },
+            [
+                "fastp",
+                "fastp/on_raw",
+                "fastp/on_raw/Clone1_N1.fastp.html",
+                "fastp/on_raw/Clone1_N1.fastp.json",
+                "fastp/on_raw/Clone1_N3.fastp.html",
+                "fastp/on_raw/Clone1_N3.fastp.json",
+                "fastp/on_raw/Clone9_N1.fastp.html",
+                "fastp/on_raw/Clone9_N1.fastp.json",
+                "fastp/on_raw/Clone9_N2.fastp.html",
+                "fastp/on_raw/Clone9_N2.fastp.json",
+                "fastp/on_raw/Clone9_N3.fastp.html",
+                "fastp/on_raw/Clone9_N3.fastp.json",
+                "fastp/on_raw/Control_N1.fastp.html",
+                "fastp/on_raw/Control_N1.fastp.json",
+                "fastp/on_raw/Control_N2.fastp.html",
+                "fastp/on_raw/Control_N2.fastp.json",
+                "fastp/on_raw/Control_N3.fastp.html",
+                "fastp/on_raw/Control_N3.fastp.json",
+                "fastp/on_raw/log",
+                "fastp/on_raw/log/Clone1_N1.fastp.log",
+                "fastp/on_raw/log/Clone1_N3.fastp.log",
+                "fastp/on_raw/log/Clone9_N1.fastp.log",
+                "fastp/on_raw/log/Clone9_N2.fastp.log",
+                "fastp/on_raw/log/Clone9_N3.fastp.log",
+                "fastp/on_raw/log/Control_N1.fastp.log",
+                "fastp/on_raw/log/Control_N2.fastp.log",
+                "fastp/on_raw/log/Control_N3.fastp.log",
+                "genome_quant",
+                "genome_quant/bam",
+                "genome_quant/bam/Clone1_N1_mature_hairpin_genome.sorted.flagstat",
+                "genome_quant/bam/Clone1_N1_mature_hairpin_genome.sorted.idxstats",
+                "genome_quant/bam/Clone1_N1_mature_hairpin_genome.sorted.stats",
+                "genome_quant/bam/Clone1_N3_mature_hairpin_genome.sorted.flagstat",
+                "genome_quant/bam/Clone1_N3_mature_hairpin_genome.sorted.idxstats",
+                "genome_quant/bam/Clone1_N3_mature_hairpin_genome.sorted.stats",
+                "genome_quant/bam/Clone9_N1_mature_hairpin_genome.sorted.flagstat",
+                "genome_quant/bam/Clone9_N1_mature_hairpin_genome.sorted.idxstats",
+                "genome_quant/bam/Clone9_N1_mature_hairpin_genome.sorted.stats",
+                "genome_quant/bam/Clone9_N2_mature_hairpin_genome.sorted.flagstat",
+                "genome_quant/bam/Clone9_N2_mature_hairpin_genome.sorted.idxstats",
+                "genome_quant/bam/Clone9_N2_mature_hairpin_genome.sorted.stats",
+                "genome_quant/bam/Clone9_N3_mature_hairpin_genome.sorted.flagstat",
+                "genome_quant/bam/Clone9_N3_mature_hairpin_genome.sorted.idxstats",
+                "genome_quant/bam/Clone9_N3_mature_hairpin_genome.sorted.stats",
+                "genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.flagstat",
+                "genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.idxstats",
+                "genome_quant/bam/Control_N1_mature_hairpin_genome.sorted.stats",
+                "genome_quant/bam/Control_N2_mature_hairpin_genome.sorted.flagstat",
+                "genome_quant/bam/Control_N2_mature_hairpin_genome.sorted.idxstats",
+                "genome_quant/bam/Control_N2_mature_hairpin_genome.sorted.stats",
+                "genome_quant/bam/Control_N3_mature_hairpin_genome.sorted.flagstat",
+                "genome_quant/bam/Control_N3_mature_hairpin_genome.sorted.idxstats",
+                "genome_quant/bam/Control_N3_mature_hairpin_genome.sorted.stats",
+                "mirna_quant",
+                "mirna_quant/edger_qc",
+                "mirna_quant/edger_qc/hairpin_CPM_heatmap.pdf",
+                "mirna_quant/edger_qc/hairpin_counts.csv",
+                "mirna_quant/edger_qc/hairpin_edgeR_MDS_distance_matrix.txt",
+                "mirna_quant/edger_qc/hairpin_edgeR_MDS_plot.pdf",
+                "mirna_quant/edger_qc/hairpin_edgeR_MDS_plot_coordinates.txt",
+                "mirna_quant/edger_qc/hairpin_log2CPM_sample_distances.txt",
+                "mirna_quant/edger_qc/hairpin_log2CPM_sample_distances_dendrogram.pdf",
+                "mirna_quant/edger_qc/hairpin_log2CPM_sample_distances_heatmap.pdf",
+                "mirna_quant/edger_qc/hairpin_logtpm.csv",
+                "mirna_quant/edger_qc/hairpin_logtpm.txt",
+                "mirna_quant/edger_qc/hairpin_normalized_CPM.txt",
+                "mirna_quant/edger_qc/hairpin_unmapped_read_counts.txt",
+                "mirna_quant/edger_qc/mature_CPM_heatmap.pdf",
+                "mirna_quant/edger_qc/mature_counts.csv",
+                "mirna_quant/edger_qc/mature_edgeR_MDS_distance_matrix.txt",
+                "mirna_quant/edger_qc/mature_edgeR_MDS_plot.pdf",
+                "mirna_quant/edger_qc/mature_edgeR_MDS_plot_coordinates.txt",
+                "mirna_quant/edger_qc/mature_log2CPM_sample_distances.txt",
+                "mirna_quant/edger_qc/mature_log2CPM_sample_distances_dendrogram.pdf",
+                "mirna_quant/edger_qc/mature_log2CPM_sample_distances_heatmap.pdf",
+                "mirna_quant/edger_qc/mature_logtpm.csv",
+                "mirna_quant/edger_qc/mature_logtpm.txt",
+                "mirna_quant/edger_qc/mature_normalized_CPM.txt",
+                "mirna_quant/edger_qc/mature_unmapped_read_counts.txt",
+                "mirna_quant/mirtop",
+                "mirna_quant/mirtop/export",
+                "mirna_quant/mirtop/export/Clone1_N1.fasta",
+                "mirna_quant/mirtop/export/Clone1_N1.vcf",
+                "mirna_quant/mirtop/export/Clone1_N3.fasta",
+                "mirna_quant/mirtop/export/Clone1_N3.vcf",
+                "mirna_quant/mirtop/export/Clone9_N1.fasta",
+                "mirna_quant/mirtop/export/Clone9_N1.vcf",
+                "mirna_quant/mirtop/export/Clone9_N2.fasta",
+                "mirna_quant/mirtop/export/Clone9_N2.vcf",
+                "mirna_quant/mirtop/export/Clone9_N3.fasta",
+                "mirna_quant/mirtop/export/Clone9_N3.vcf",
+                "mirna_quant/mirtop/export/Control_N1.fasta",
+                "mirna_quant/mirtop/export/Control_N1.vcf",
+                "mirna_quant/mirtop/export/Control_N2.fasta",
+                "mirna_quant/mirtop/export/Control_N2.vcf",
+                "mirna_quant/mirtop/export/Control_N3.fasta",
+                "mirna_quant/mirtop/export/Control_N3.vcf",
+                "mirna_quant/mirtop/gff",
+                "mirna_quant/mirtop/gff/mirtop",
+                "mirna_quant/mirtop/gff/mirtop/Clone1_N1_mirtop.gff",
+                "mirna_quant/mirtop/gff/mirtop/Clone1_N3_mirtop.gff",
+                "mirna_quant/mirtop/gff/mirtop/Clone9_N1_mirtop.gff",
+                "mirna_quant/mirtop/gff/mirtop/Clone9_N2_mirtop.gff",
+                "mirna_quant/mirtop/gff/mirtop/Clone9_N3_mirtop.gff",
+                "mirna_quant/mirtop/gff/mirtop/Control_N1_mirtop.gff",
+                "mirna_quant/mirtop/gff/mirtop/Control_N2_mirtop.gff",
+                "mirna_quant/mirtop/gff/mirtop/Control_N3_mirtop.gff",
+                "mirna_quant/mirtop/joined_samples_mirtop.tsv",
+                "mirna_quant/mirtop/mirna.tsv",
+                "mirtrace",
+                "mirtrace/Clone1_N1",
+                "mirtrace/Clone1_N1/Clone1_N1.html",
+                "mirtrace/Clone1_N1/Clone1_N1.json",
+                "mirtrace/Clone1_N1/Clone1_N1.tsv",
+                "mirtrace/Clone1_N1/qc_passed_reads.all.collapsed",
+                "mirtrace/Clone1_N1/qc_passed_reads.all.collapsed/Clone1_N1.fa",
+                "mirtrace/Clone1_N1/qc_passed_reads.rnatype_unknown.collapsed",
+                "mirtrace/Clone1_N1/qc_passed_reads.rnatype_unknown.collapsed/Clone1_N1.fa",
+                "mirtrace/Clone1_N3",
+                "mirtrace/Clone1_N3/Clone1_N3.html",
+                "mirtrace/Clone1_N3/Clone1_N3.json",
+                "mirtrace/Clone1_N3/Clone1_N3.tsv",
+                "mirtrace/Clone1_N3/qc_passed_reads.all.collapsed",
+                "mirtrace/Clone1_N3/qc_passed_reads.all.collapsed/Clone1_N3.fa",
+                "mirtrace/Clone1_N3/qc_passed_reads.rnatype_unknown.collapsed",
+                "mirtrace/Clone1_N3/qc_passed_reads.rnatype_unknown.collapsed/Clone1_N3.fa",
+                "mirtrace/Clone9_N1",
+                "mirtrace/Clone9_N1/Clone9_N1.html",
+                "mirtrace/Clone9_N1/Clone9_N1.json",
+                "mirtrace/Clone9_N1/Clone9_N1.tsv",
+                "mirtrace/Clone9_N1/qc_passed_reads.all.collapsed",
+                "mirtrace/Clone9_N1/qc_passed_reads.all.collapsed/Clone9_N1.fa",
+                "mirtrace/Clone9_N1/qc_passed_reads.rnatype_unknown.collapsed",
+                "mirtrace/Clone9_N1/qc_passed_reads.rnatype_unknown.collapsed/Clone9_N1.fa",
+                "mirtrace/Clone9_N2",
+                "mirtrace/Clone9_N2/Clone9_N2.html",
+                "mirtrace/Clone9_N2/Clone9_N2.json",
+                "mirtrace/Clone9_N2/Clone9_N2.tsv",
+                "mirtrace/Clone9_N2/qc_passed_reads.all.collapsed",
+                "mirtrace/Clone9_N2/qc_passed_reads.all.collapsed/Clone9_N2.fa",
+                "mirtrace/Clone9_N2/qc_passed_reads.rnatype_unknown.collapsed",
+                "mirtrace/Clone9_N2/qc_passed_reads.rnatype_unknown.collapsed/Clone9_N2.fa",
+                "mirtrace/Clone9_N3",
+                "mirtrace/Clone9_N3/Clone9_N3.html",
+                "mirtrace/Clone9_N3/Clone9_N3.json",
+                "mirtrace/Clone9_N3/Clone9_N3.tsv",
+                "mirtrace/Clone9_N3/qc_passed_reads.all.collapsed",
+                "mirtrace/Clone9_N3/qc_passed_reads.all.collapsed/Clone9_N3.fa",
+                "mirtrace/Clone9_N3/qc_passed_reads.rnatype_unknown.collapsed",
+                "mirtrace/Clone9_N3/qc_passed_reads.rnatype_unknown.collapsed/Clone9_N3.fa",
+                "mirtrace/Control_N1",
+                "mirtrace/Control_N1/Control_N1.html",
+                "mirtrace/Control_N1/Control_N1.json",
+                "mirtrace/Control_N1/Control_N1.tsv",
+                "mirtrace/Control_N1/qc_passed_reads.all.collapsed",
+                "mirtrace/Control_N1/qc_passed_reads.all.collapsed/Control_N1.fa",
+                "mirtrace/Control_N1/qc_passed_reads.rnatype_unknown.collapsed",
+                "mirtrace/Control_N1/qc_passed_reads.rnatype_unknown.collapsed/Control_N1.fa",
+                "mirtrace/Control_N2",
+                "mirtrace/Control_N2/Control_N2.html",
+                "mirtrace/Control_N2/Control_N2.json",
+                "mirtrace/Control_N2/Control_N2.tsv",
+                "mirtrace/Control_N2/qc_passed_reads.all.collapsed",
+                "mirtrace/Control_N2/qc_passed_reads.all.collapsed/Control_N2.fa",
+                "mirtrace/Control_N2/qc_passed_reads.rnatype_unknown.collapsed",
+                "mirtrace/Control_N2/qc_passed_reads.rnatype_unknown.collapsed/Control_N2.fa",
+                "mirtrace/Control_N3",
+                "mirtrace/Control_N3/Control_N3.html",
+                "mirtrace/Control_N3/Control_N3.json",
+                "mirtrace/Control_N3/Control_N3.tsv",
+                "mirtrace/Control_N3/qc_passed_reads.all.collapsed",
+                "mirtrace/Control_N3/qc_passed_reads.all.collapsed/Control_N3.fa",
+                "mirtrace/Control_N3/qc_passed_reads.rnatype_unknown.collapsed",
+                "mirtrace/Control_N3/qc_passed_reads.rnatype_unknown.collapsed/Control_N3.fa",
+                "multiqc",
+                "multiqc/multiqc_data",
+                "multiqc/multiqc_data/.stub",
+                "multiqc/multiqc_plots",
+                "multiqc/multiqc_plots/.stub",
+                "multiqc/multiqc_report.html",
+                "pipeline_info",
+                "pipeline_info/nf_core_smrnaseq_software_mqc_versions.yml",
+                "untar",
+                "untar/bowtie_index",
+                "untar/bowtie_index/genome.1.ebwt",
+                "untar/bowtie_index/genome.2.ebwt",
+                "untar/bowtie_index/genome.3.ebwt",
+                "untar/bowtie_index/genome.4.ebwt",
+                "untar/bowtie_index/genome.rev.1.ebwt",
+                "untar/bowtie_index/genome.rev.2.ebwt"
+            ]
+        ],
+        "timestamp": "2026-11-11T15:16:41.05987",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "25.10.4"
+        }
+    }
+}

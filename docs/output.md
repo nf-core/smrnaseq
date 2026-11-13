@@ -77,9 +77,13 @@ If `--save_reference` is specified, the reference files and indices that the pip
 <details markdown="1">
 <summary>Output files</summary>
 
-- `fastqc/`
+- `fastqc/raw/`: reports for the raw reads.
+- `fastqc/trimmed/`: reports for the reads after adapter and quality trimming.
   - `*_fastqc.html`: FastQC report containing quality metrics.
   - `*_fastqc.zip`: Zip archive containing the FastQC report, tab-delimited data file and plot images.
+
+> [!NOTE]
+> The FastQC files are only published with `--save_intermediates`. By default, FastQC still runs and its results are included in the MultiQC report, but the individual reports are not written to the output directory.
 
 </details>
 
@@ -171,7 +175,9 @@ These files will be saved in this directory if `--save_intermediates` is specifi
 
 **Output directory: `results/mirna_quant/edger_qc`**
 
-- `[mature/hairpin]_normalized_CPM.txt` TMM normalized counts of reads aligned to mature miRNAs/miRNA precursors (hairpins)
+- `[mature/hairpin]_counts.csv` Raw read counts of reads aligned to mature miRNAs/miRNA precursors (hairpins), one row per sample
+- `[mature/hairpin]_logtpm.{txt,csv}` log10(CPM + 0.001) of reads aligned to mature miRNAs/miRNA precursors (hairpins), one row per sample. Despite the filename, these values are counts per million scaled by library size only: they are neither TMM- nor length-normalised (not TPM). CPM is appropriate here because each small RNA read represents one whole (~22 nt) mature miRNA molecule, so read counts do not scale with feature length. The filenames are kept for backwards compatibility.
+- `[mature/hairpin]_normalized_CPM.txt` TMM normalized counts per million (CPM, not log-transformed) of reads aligned to mature miRNAs/miRNA precursors (hairpins), one row per miRNA
 - `[mature/hairpin]_edgeR_MDS_plot.pdf` Multidimensional scaling plot of all samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
 - `[mature/hairpin]_CPM_heatmap.pdf` Heatmap based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
 - `[mature/hairpin]_log2CPM_sample_distances_dendrogram.pdf` Dendrograms of distance among samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
@@ -206,7 +212,7 @@ These files will be saved in this directory if `--save_intermediates` is specifi
 
 ## miRTrace
 
-[miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts). By default, the pipeline sets the PHRED offset to the most common value of +33, so if you need to adjust this, use the `params.phred_offset` option to include this accordingly for your FASTQ files.
+[miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts). By default, the pipeline sets the PHRED offset to the most common value of +33, so if you need to adjust this, use the `params.phred_offset` option to include this accordingly for your FASTQ files. miRTrace is run on the raw (untrimmed, but concatenated if needed) reads, because it performs its own adapter removal (using `--three_prime_adapter`) and quality and length filtering. The QC-passed reads it writes are named after the sample, for example `qc_passed_reads.all.collapsed/<sample>.fasta`.
 
 **Output directory: `results/mirtrace/${sample.id}`**
 

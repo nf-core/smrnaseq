@@ -41,4 +41,29 @@ process FILTER_STATS {
         GNU coreutils: \$(echo \$(cat --version 2>&1) | sed 's/^.*coreutils) //; s/ .*\$//')
     END_VERSIONS
     """
+
+    stub:
+    """
+    cat <<-END_YAML > ${meta.id}.contamination_mqc.yaml
+    id: "my_pca_section"
+    section_name: "Contamination Filtering"
+    description: "This plot shows the amount of reads filtered by contaminant type."
+    plot_type: "bargraph"
+    pconfig:
+      id: "contamination_filter_plot"
+      title: "Contamination Plot"
+      ylab: "Number of reads"
+    data:
+        "${meta.id}": {"remaining reads": 0}
+    END_YAML
+
+    echo -n | gzip -c > ${meta.id}.filtered.fastq.gz
+
+    cat <<-END_VERSIONS > versions.yml
+    "${task.process}":
+        gawk: \$(awk -Wversion | sed '1!d; s/.*Awk //; s/,.*//')
+        gzip: \$(gzip --version | head -1 | cut -d ' ' -f 2)
+        GNU coreutils: \$(echo \$(cat --version 2>&1) | sed 's/^.*coreutils) //; s/ .*\$//')
+    END_VERSIONS
+    """
 }

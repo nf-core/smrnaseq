@@ -30,6 +30,8 @@ The parameter `--three_prime_adapter` is set to the Illumina TruSeq single index
 
 :warning: If you do not choose a profile that sets the `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` options, the pipeline won't run. If you want to auto-detect the adapters using `fastp`, please set `--three_prime_adapter` to `auto-detect`.
 
+miRTrace cannot auto-detect adapters. With `--three_prime_adapter auto-detect`, miRTrace QC runs on the raw reads without adapter trimming, so its read length, RNA type and contamination statistics are computed on untrimmed reads. To get adapter-trimmed miRTrace QC, set `--three_prime_adapter` to the adapter sequence of your library. As fastp's adapter auto-detection is also unreliable on small RNA data, setting `--three_prime_adapter` explicitly to your kit's adapter is recommended for meaningful miRTrace QC.
+
 ### `mirtrace_species` or `mirgenedb_species`
 
 It should point to the 3-letter species name used by [miRBase](https://www.mirbase.org/browse) or [MirGeneDB](https://www.mirgenedb.org/browse). Note the difference in case for the two databases.
@@ -56,6 +58,9 @@ See examples in: [the test-datasets repository of nf-core](https://github.com/nf
 
 - `fasta`: the reference genome FASTA file
 - `bowtie_index`: points to the folder containing the `bowtie` indices for the genome reference specified by `fasta`.
+- `bowtie_align_args`: Optional flags to pass to Bowtie 1 for the genome mapping, e.g. `--bowtie_align_args '-v 1 --best'`. Only a subset of Bowtie 1 flags are allowed to keep compatibility with the pipeline. If invalid or disallowed values are included, the pipeline will exit with an error message. A value holding a single flag needs the `=` form, for example `--bowtie_align_args=--best`, because `--bowtie_align_args --best` is parsed as the boolean `true` and is rejected. Short flags take their value as a separate word (`-v 1`, not `-v=1`).
+  - These flags are appended after the pipeline's defaults for genome mapping (`-t -k 50 --best --strata -e 99999 --chunkmbs 2048`). When a flag is repeated, Bowtie uses the last value, so for example `--bowtie_align_args '-k 10'` replaces `-k 50`.
+  - `-k` must be at least 2, because the defaults include `--strata`, which Bowtie only accepts with `-k` above 1. To report a single alignment per read, override `ext.args` for `NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME` instead (see [Custom Tool Arguments](#custom-tool-arguments)).
 
 > [!NOTE]
 > if the FASTA file in `fasta` is not the same file used to generate the `bowtie` indices, then the pipeline will fail.
@@ -296,12 +301,14 @@ A pipeline might not expose every command-line option of every tool as a pipelin
 
 For this pipeline, the alignment module is named `BOWTIE_ALIGN`. It runs both Bowtie and `samtools view`: set `ext.args` for Bowtie options and `ext.args2` for `samtools view` options. For the separate sorting step, use `ext.args` on `SAMTOOLS_SORT`.
 
+Genome mapping runs this module as `BOWTIE_MAP_GENOME`, and the pipeline configures it with a fully qualified selector, so a shorter selector such as `BOWTIE_ALIGN` has no effect on that step. Setting `ext.args` replaces the pipeline's defaults, so repeat any you want to keep.
+
 For example, create `tool_args.config`:
 
 ```nextflow
 process {
-    withName: BOWTIE_ALIGN {
-        ext.args  = '-n 0'       // Bowtie: allow zero mismatches in the seed
+    withName: 'NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME' {
+        ext.args  = '-t -k 50 --best --strata -e 99999 --chunkmbs 2048 -n 0' // Bowtie: pipeline defaults, plus zero mismatches in the seed
         ext.args2 = '--no-PG'    // samtools view: example additional option
     }
 
