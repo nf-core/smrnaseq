@@ -9,7 +9,7 @@ process EDGER_QC {
         'community.wave.seqera.io/library/bioconductor-edger_bioconductor-limma_r-base_r-data.table_pruned:d592e095d0f6a5f0' }"
 
     input:
-    input_files: Set<Path>
+    input_files: List<Path>
 
     output:
     edger_files = files('*.{txt,pdf,csv}')

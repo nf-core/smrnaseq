@@ -10,7 +10,7 @@ process PIVOT_WIDER {
         'community.wave.seqera.io/library/r-base_r-dplyr_r-optparse_r-tidyr_r-vroom:c983cf5da1eb6e00' }"
 
     input:
-    tuple(meta: Map, csvs: Set<Path>)
+    tuple(meta: Map, csvs: List<Path>)
 
     output:
     csv = tuple(meta, file('*joined_samples_mirtop.tsv'))
