@@ -78,7 +78,9 @@ jobs:
           - isMain: false
             profile: "singularity"
         NXF_VER:
-          - "25.10.4"
+          # Minimum supported version (manifest.nextflowVersion); pinned so the required shards are reproducible.
+          # latest-everything also uses the strict syntax parser, but it moves and is continue-on-error.
+          - "26.10.5"
           - "latest-everything"
     env:
       NXF_ANSI_LOG: false
@@ -132,8 +134,22 @@ jobs:
           name: pr-comment-fragment-${{ strategy.job-index }}
           path: pr-comment-fragment/
 
+  # Fails on strict syntax errors only; deprecation warnings (e.g. `when:` in nf-core modules) are allowed
+  nextflow-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+
+      - name: Install Nextflow
+        uses: nf-core/setup-nextflow@v3
+        with:
+          version: "26.10.5"
+
+      - name: Run nextflow lint
+        run: nextflow lint . -o concise
+
   confirm-pass:
-    needs: [nf-test]
+    needs: [nf-test, nextflow-lint]
     if: always()
     runs-on: # use self-hosted runners
       - runs-on=${{ github.run_id }}-confirm-pass

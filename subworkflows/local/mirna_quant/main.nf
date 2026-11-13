@@ -25,6 +25,7 @@ include { BAM_STATS_MIRNA_MIRTOP } from '../../../subworkflows/nf-core/bam_stats
 
 include { PIVOT_LONGER           } from '../../../modules/local/pivot/longer/main'
 include { PIVOT_WIDER            } from '../../../modules/local/pivot/wider/main'
+include { paramAsBool            } from '../utils_nfcore_smrnaseq_pipeline'
 
 workflow MIRNA_QUANT {
     take:
@@ -36,7 +37,7 @@ workflow MIRNA_QUANT {
 
     main:
     ch_versions = channel.empty()
-    ch_parse_species_input = params.mirgenedb ? channel.value(params.mirgenedb_species) : ch_mirtrace_species
+    ch_parse_species_input = paramAsBool(params.mirgenedb) ? channel.value(params.mirgenedb_species) : ch_mirtrace_species
 
     PARSE_MATURE ( ch_reference_mature, ch_parse_species_input )
     ch_mirna_parsed = PARSE_MATURE.out.parsed_fasta
