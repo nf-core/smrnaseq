@@ -51,6 +51,8 @@ workflow PREPARE_GENOME {
 
     main:
     ch_versions = channel.empty()
+    ch_bowtie_index_untar = channel.empty()
+    ch_bowtie_index_built = channel.empty()
 
     // Parameter channel handling
     ch_fasta                  = val_fasta                     ? channel.fromPath(val_fasta, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : channel.empty()
@@ -93,6 +95,7 @@ workflow PREPARE_GENOME {
         if(val_bowtie_index) {
             if (val_bowtie_index.toString().endsWith(".tar.gz")) {
                 UNTAR_BOWTIE_INDEX ( ch_bowtie_index )
+                ch_bowtie_index_untar = UNTAR_BOWTIE_INDEX.out.untar
                 ch_bowtie_index = UNTAR_BOWTIE_INDEX.out.untar
                     .map{ _meta, index_dir ->
                         def index_prefix = extractFirstIndexPrefix(index_dir)
@@ -113,26 +116,27 @@ workflow PREPARE_GENOME {
 
             // Set channels: clean fasta and its index
             ch_bowtie_index  = INDEX_GENOME.out.index.collect()
+            ch_bowtie_index_built = INDEX_GENOME.out.index
         }
     }
 
     //Config checks
     // Check optional parameters
     if (!paramAsBool(params.mirgenedb) && !val_mirtrace_species && !(params.help || params.help_full)) {
-            exit 1, "Reference species for miRTrace is not defined via the --mirtrace_species parameter."
+            error("Reference species for miRTrace is not defined via the --mirtrace_species parameter.")
         }
 
     // Genome options
     if (!paramAsBool(params.mirgenedb)) {
-        ch_reference_mature  = params.mature  ? channel.fromPath(params.mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : { exit 1, "Specify a Mature miRNA fasta file via '--mature'" }
-        ch_reference_hairpin = params.hairpin ? channel.fromPath(params.hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : { exit 1, "Specify a Hairpin miRNA fasta file via '--hairpin'" }
+        ch_reference_mature  = params.mature  ? channel.fromPath(params.mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : error("Specify a Mature miRNA fasta file via '--mature'")
+        ch_reference_hairpin = params.hairpin ? channel.fromPath(params.hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : error("Specify a Hairpin miRNA fasta file via '--hairpin'")
     } else {
         if (!params.mirgenedb_species) {
-            exit 1, "MirGeneDB species not set, please specify via the --mirgenedb_species parameter"
+            error("MirGeneDB species not set, please specify via the --mirgenedb_species parameter")
         }
-        ch_reference_mature  = params.mirgenedb_mature  ? channel.fromPath(params.mirgenedb_mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : { exit 1, "Specify a mirgenedb Mature miRNA fasta file via '--mirgenedb_mature'" }
-        ch_reference_hairpin = params.mirgenedb_hairpin ? channel.fromPath(params.mirgenedb_hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : { exit 1, "Specify a mirgenedb Hairpin miRNA fasta file via '--mirgenedb_hairpin'" }
-        ch_mirna_gtf         = params.mirgenedb_gff     ? channel.fromPath(params.mirgenedb_gff, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()     : { exit 1, "Specify a MirGeneDB gff file via '--mirgenedb_gff'"}
+        ch_reference_mature  = params.mirgenedb_mature  ? channel.fromPath(params.mirgenedb_mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : error("Specify a mirgenedb Mature miRNA fasta file via '--mirgenedb_mature'")
+        ch_reference_hairpin = params.mirgenedb_hairpin ? channel.fromPath(params.mirgenedb_hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : error("Specify a mirgenedb Hairpin miRNA fasta file via '--mirgenedb_hairpin'")
+        ch_mirna_gtf         = params.mirgenedb_gff     ? channel.fromPath(params.mirgenedb_gff, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()     : error("Specify a MirGeneDB gff file via '--mirgenedb_gff'")
 
         // Create a channel for mirgenedb_species
         ch_mirgenedb_species = channel.value(params.mirgenedb_species)
@@ -153,6 +157,8 @@ workflow PREPARE_GENOME {
     fasta                 = ch_fasta               // channel: [ val(meta), path(fasta) ]
     has_fasta             = bool_has_fasta         // boolean
     bowtie_index          = ch_bowtie_index        // channel: [ val(meta), path(directory_index) ]
+    bowtie_index_untar    = ch_bowtie_index_untar  // channel: [ val(meta), path(directory_index) ] (only when a .tar.gz index is provided)
+    bowtie_index_built    = ch_bowtie_index_built  // channel: [ val(meta), path(directory_index) ] (only when the index is built by the pipeline)
     versions              = ch_versions            // channel: [ versions.yml ]
     mirtrace_species      = ch_mirtrace_species    // channel: [ val(string) ]
     has_mirtrace_species  = bool_mirtrace_species  // boolean

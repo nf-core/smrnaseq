@@ -56,12 +56,14 @@ workflow CONTAMINANT_FILTER {
 
     ch_versions     = channel.empty()
     ch_filter_stats = channel.empty()
+    ch_index        = channel.empty()
 
-    ch_reads_for_mirna.set { rrna_reads }
+    rrna_reads = ch_reads_for_mirna
 
     if (params.rrna) {
         // Index DB and filter $reads emit: $rrna_reads
         INDEX_RRNA ( ch_rrna )
+        ch_index = ch_index.mix(INDEX_RRNA.out.index)
 
         // Add meta.contaminant to input reads channel
         ch_reads_for_mirna = ch_reads_for_mirna.map{meta, fastq -> return [[id: meta.id, contaminant: "rRNA", single_end: meta.single_end], fastq]}
@@ -88,6 +90,7 @@ workflow CONTAMINANT_FILTER {
     if (params.trna) {
         // Index DB and filter $rrna_reads emit: $trna_reads
         INDEX_TRNA ( ch_trna )
+        ch_index = ch_index.mix(INDEX_TRNA.out.index)
 
         // Add meta.contaminant to input reads channel
         rrna_reads = rrna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "tRNA", single_end:meta.single_end], fastq]}
@@ -130,6 +133,7 @@ workflow CONTAMINANT_FILTER {
 
         // Previous original code:
         INDEX_CDNA ( SEQKIT_GREP_CDNA.out.filter )
+        ch_index = ch_index.mix(INDEX_CDNA.out.index)
 
         // Add meta.contaminant to input reads channel
         trna_reads = trna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "cDNA", single_end:meta.single_end], fastq]}
@@ -167,6 +171,7 @@ workflow CONTAMINANT_FILTER {
 
         // Previous original code:
         INDEX_NCRNA ( SEQKIT_GREP_NCRNA.out.filter )
+        ch_index = ch_index.mix(INDEX_NCRNA.out.index)
 
         // Add meta.contaminant to input reads channel
         cdna_reads = cdna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "ncRNA", single_end:meta.single_end], fastq]}
@@ -204,6 +209,7 @@ workflow CONTAMINANT_FILTER {
 
         // Previous original code:
         INDEX_PIRNA ( SEQKIT_GREP_PIRNA.out.filter )
+        ch_index = ch_index.mix(INDEX_PIRNA.out.index)
 
         // Add meta.contaminant to input reads channel
         ncrna_reads = ncrna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "piRNA", single_end:meta.single_end], fastq]}
@@ -241,6 +247,7 @@ workflow CONTAMINANT_FILTER {
 
         // Previous original code:
         INDEX_OTHER ( SEQKIT_GREP_OTHER.out.filter )
+        ch_index = ch_index.mix(INDEX_OTHER.out.index)
 
         // Add meta.contaminant to input reads channel (otherwise the stats file name clashes with the previous class)
         pirna_reads = pirna_reads.map{meta, fastq -> return [[id:meta.id, contaminant: "other", single_end:meta.single_end], fastq]}
@@ -276,4 +283,8 @@ workflow CONTAMINANT_FILTER {
     filtered_reads  = other_cont_reads       // channel: [ val(meta), path(fastq) ]
     filter_stats    = FILTER_STATS.out.stats // channel: [  path(stats) ]
     versions        = ch_versions            // channel: [ versions.yml ]
+
+    // Files to publish
+    filter          = FILTER_STATS.out.reads.map { _meta, reads -> reads }.mix(FILTER_STATS.out.stats) // channel: [ path(fastq.gz|yaml) ]
+    index           = ch_index                                                                          // channel: [ val(meta), path(bowtie2) ] (meta.id = contaminant type)
 }

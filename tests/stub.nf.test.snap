@@ -186,23 +186,6 @@
                 "mirna_quant/edger_qc/mature_normalized_CPM.txt",
                 "mirna_quant/edger_qc/mature_unmapped_read_counts.txt",
                 "mirna_quant/mirtop",
-                "mirna_quant/mirtop/export",
-                "mirna_quant/mirtop/export/Clone1_N1.fasta",
-                "mirna_quant/mirtop/export/Clone1_N1.vcf",
-                "mirna_quant/mirtop/export/Clone1_N3.fasta",
-                "mirna_quant/mirtop/export/Clone1_N3.vcf",
-                "mirna_quant/mirtop/export/Clone9_N1.fasta",
-                "mirna_quant/mirtop/export/Clone9_N1.vcf",
-                "mirna_quant/mirtop/export/Clone9_N2.fasta",
-                "mirna_quant/mirtop/export/Clone9_N2.vcf",
-                "mirna_quant/mirtop/export/Clone9_N3.fasta",
-                "mirna_quant/mirtop/export/Clone9_N3.vcf",
-                "mirna_quant/mirtop/export/Control_N1.fasta",
-                "mirna_quant/mirtop/export/Control_N1.vcf",
-                "mirna_quant/mirtop/export/Control_N2.fasta",
-                "mirna_quant/mirtop/export/Control_N2.vcf",
-                "mirna_quant/mirtop/export/Control_N3.fasta",
-                "mirna_quant/mirtop/export/Control_N3.vcf",
                 "mirna_quant/mirtop/gff",
                 "mirna_quant/mirtop/gff/mirtop",
                 "mirna_quant/mirtop/gff/mirtop/Clone1_N1_mirtop.gff",
@@ -287,21 +270,13 @@
                 "multiqc/multiqc_plots/.stub",
                 "multiqc/multiqc_report.html",
                 "pipeline_info",
-                "pipeline_info/nf_core_smrnaseq_software_mqc_versions.yml",
-                "untar",
-                "untar/bowtie_index",
-                "untar/bowtie_index/genome.1.ebwt",
-                "untar/bowtie_index/genome.2.ebwt",
-                "untar/bowtie_index/genome.3.ebwt",
-                "untar/bowtie_index/genome.4.ebwt",
-                "untar/bowtie_index/genome.rev.1.ebwt",
-                "untar/bowtie_index/genome.rev.2.ebwt"
+                "pipeline_info/nf_core_smrnaseq_software_mqc_versions.yml"
             ]
         ],
-        "timestamp": "2026-11-11T15:16:41.05987",
+        "timestamp": "2026-11-13T16:09:33.035435",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "25.10.4"
+            "nextflow": "26.10.5"
         }
     }
 }

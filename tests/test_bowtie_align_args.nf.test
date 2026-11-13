@@ -41,7 +41,7 @@ nextflow_pipeline {
 
         then {
             assert workflow.failed
-            assert workflow.stdout.any { it.contains("[bowtie_align_args] Argument '--un' is not allowed") }
+            assert (workflow.stdout + workflow.stderr).any { it.contains("[bowtie_align_args] Argument '--un' is not allowed") }
         }
     }
 
@@ -56,7 +56,7 @@ nextflow_pipeline {
 
         then {
             assert workflow.failed
-            assert workflow.stdout.any { it.contains("[bowtie_align_args] Argument '-k' must be at least 2, got '1'") }
+            assert (workflow.stdout + workflow.stderr).any { it.contains("[bowtie_align_args] Argument '-k' must be at least 2, got '1'") }
         }
     }
 }

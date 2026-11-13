@@ -15,9 +15,6 @@ process FILTER_STATS {
     tuple val(meta), path('*.filtered.fastq.gz'), emit: reads, optional: true
     path "versions.yml"                         , emit: versions
 
-    when:
-    task.ext.when == null || task.ext.when
-
     script:
     """
 

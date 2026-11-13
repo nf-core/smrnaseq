@@ -24,4 +24,16 @@ workflow GENOME_QUANT {
     emit:
     stats    = BAM_SORT_STATS_SAMTOOLS.out.stats // channel: [ val(meta), [ stats ] ]
     versions = ch_versions                       // channel: [ versions.yml ]
+
+    // Files to publish
+    bam_stats = BAM_SORT_STATS_SAMTOOLS.out.stats.mix(
+        BAM_SORT_STATS_SAMTOOLS.out.flagstat,
+        BAM_SORT_STATS_SAMTOOLS.out.idxstats
+    )                                            // channel: [ val(meta), path(stats|flagstat|idxstats) ]
+    bam       = BOWTIE_MAP_GENOME.out.bam.mix(
+        BOWTIE_MAP_GENOME.out.log,
+        BOWTIE_MAP_GENOME.out.fastq,
+        BAM_SORT_STATS_SAMTOOLS.out.bam,
+        BAM_SORT_STATS_SAMTOOLS.out.index
+    )                                            // channel: [ val(meta), path(bam|out|fastq.gz|bam.csi) ]
 }
