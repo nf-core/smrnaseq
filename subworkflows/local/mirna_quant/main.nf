@@ -119,6 +119,11 @@ workflow MIRNA_QUANT {
     hairpin_stats       = BAM_STATS_HAIRPIN.out.stats        // channel: [ val(meta), [ stats ] ]
     mirtop_logs         = ch_mirtop_logs                     // channel: [ val(meta), path(log) ]
     versions            = ch_versions                        // channel: [ versions.yml ]
+    versions_tuples     = PARSE_MATURE.out.versions.mix(       // channel: [ process, tool, version ]
+        PARSE_HAIRPIN.out.versions,
+        FORMAT_MATURE.out.versions,
+        FORMAT_HAIRPIN.out.versions
+    )
 
     // Files to publish
     reference           = PARSE_MATURE.out.parsed_fasta.mix(

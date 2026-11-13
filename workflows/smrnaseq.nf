@@ -292,6 +292,7 @@ workflow NFCORE_SMRNASEQ {
         }
 
     def topic_versions_string = topic_versions.versions_tuple
+        .mix(MIRNA_QUANT.out.versions_tuples)
         .map { process, tool, version ->
             [ process[process.lastIndexOf(':')+1..-1], "  ${tool}: ${version}" ]
         }

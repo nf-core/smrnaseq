@@ -14,9 +14,9 @@ process PARSE_FASTA_MIRNA {
 
     output:
     parsed_fasta = tuple(meta2, file('*_igenome.fa'))
-
-    topic:
-    tuple(task.process, 'seqkit', eval("seqkit version | sed 's/^seqkit v//'")) >> 'versions'
+    // Not emitted via the versions topic: Nextflow 26.04 never closes a topic fed by a
+    // typed process that is included under several aliases (PARSE_MATURE/PARSE_HAIRPIN).
+    versions     = tuple(task.process, 'seqkit', eval("seqkit version | sed 's/^seqkit v//'"))
 
     script:
     """

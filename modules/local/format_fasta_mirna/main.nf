@@ -14,9 +14,9 @@ process FORMAT_FASTA_MIRNA {
 
     output:
     formatted_fasta = tuple(meta2, file('*_idx.fa'))
-
-    topic:
-    tuple(task.process, 'fastx_toolkit', '0.0.14') >> 'versions'
+    // Not emitted via the versions topic: Nextflow 26.04 never closes a topic fed by a
+    // typed process that is included under several aliases (FORMAT_MATURE/FORMAT_HAIRPIN).
+    versions        = tuple(task.process, 'fastx_toolkit', '0.0.14')
 
     script:
     """
