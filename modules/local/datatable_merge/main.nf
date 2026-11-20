@@ -1,3 +1,5 @@
+nextflow.enable.types = true
+
 process DATATABLE_MERGE {
     label 'process_medium'
 
@@ -7,29 +9,21 @@ process DATATABLE_MERGE {
         'community.wave.seqera.io/library/r-base_r-data.table:409a65bae991099c' }"
 
     input:
-    tuple val(meta), path(mirtop)
+    tuple(meta: Map, mirtop: Path)
 
     output:
-    path "mirna.tsv"   , emit: mirna_tsv
-    path "versions.yml", emit: versions
+    mirna_tsv = file('mirna.tsv')
+
+    topic:
+    tuple(task.process, 'r-base', eval("Rscript -e 'cat(as.character(getRversion()))'")) >> 'versions'
 
     script:
     """
     collapse_mirtop.r ${mirtop}
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
-    END_VERSIONS
     """
 
     stub:
     """
     touch "mirna.tsv"
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
-    END_VERSIONS
     """
 }

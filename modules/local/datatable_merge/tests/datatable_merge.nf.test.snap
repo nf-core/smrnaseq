@@ -5,22 +5,16 @@
                 "0": [
                     "mirna.tsv:md5,f59a6aeb15588c43c2977950a1b0a080"
                 ],
-                "1": [
-                    "versions.yml:md5,13bf3c8bbf1285dfc0ef547dcbb692b2"
-                ],
                 "mirna_tsv": [
                     "mirna.tsv:md5,f59a6aeb15588c43c2977950a1b0a080"
-                ],
-                "versions": [
-                    "versions.yml:md5,13bf3c8bbf1285dfc0ef547dcbb692b2"
                 ]
             }
         ],
+        "timestamp": "2026-11-13T16:55:22.217506",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "25.10.4"
-        },
-        "timestamp": "2026-04-29T10:48:30.478398522"
+            "nextflow": "26.10.5"
+        }
     },
     "Does not contain hsa-miR-107, hsa-miR-365a-3p": {
         "content": [
@@ -28,21 +22,15 @@
                 "0": [
                     "mirna.tsv:md5,f59a6aeb15588c43c2977950a1b0a080"
                 ],
-                "1": [
-                    "versions.yml:md5,13bf3c8bbf1285dfc0ef547dcbb692b2"
-                ],
                 "mirna_tsv": [
                     "mirna.tsv:md5,f59a6aeb15588c43c2977950a1b0a080"
-                ],
-                "versions": [
-                    "versions.yml:md5,13bf3c8bbf1285dfc0ef547dcbb692b2"
                 ]
             }
         ],
+        "timestamp": "2026-11-13T16:55:31.862971",
         "meta": {
             "nf-test": "0.9.5",
-            "nextflow": "25.10.4"
-        },
-        "timestamp": "2026-04-29T10:48:44.110450266"
+            "nextflow": "26.10.5"
+        }
     }
 }

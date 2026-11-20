@@ -1,3 +1,5 @@
+nextflow.enable.types = true
+
 process FILTER_STATS {
     label 'process_medium'
     tag "$meta.id"
@@ -8,12 +10,16 @@ process FILTER_STATS {
         'community.wave.seqera.io/library/gawk:5.3.0--180f75ae8b0ce739' }"
 
     input:
-    tuple val(meta), path(reads), path (stats_files)
+    tuple(meta: Map, reads: Path, stats_files: Set<Path>)
 
     output:
-    path "*_mqc.yaml"                           , emit: stats
-    tuple val(meta), path('*.filtered.fastq.gz'), emit: reads, optional: true
-    path "versions.yml"                         , emit: versions
+    stats = file('*_mqc.yaml')
+    reads = tuple(meta, file('*.filtered.fastq.gz'))
+
+    topic:
+    tuple(task.process, 'gawk', eval("awk -Wversion | sed '1!d; s/.*Awk //; s/,.*//'")) >> 'versions'
+    tuple(task.process, 'gzip', eval("gzip --version | head -1 | cut -d ' ' -f 2")) >> 'versions'
+    tuple(task.process, 'GNU coreutils', eval("cat --version | head -1 | sed 's/^.*coreutils) //; s/ .*\$//'")) >> 'versions'
 
     script:
     """
@@ -33,13 +39,6 @@ process FILTER_STATS {
     else
         gzip -c ${reads} > ${meta.id}.filtered.fastq.gz
     fi
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        gawk: \$(awk -Wversion | sed '1!d; s/.*Awk //; s/,.*//')
-        gzip: \$(gzip --version | head -1 | cut -d ' ' -f 2)
-        GNU coreutils: \$(echo \$(cat --version 2>&1) | sed 's/^.*coreutils) //; s/ .*\$//')
-    END_VERSIONS
     """
 
     stub:
@@ -58,12 +57,5 @@ process FILTER_STATS {
     END_YAML
 
     echo -n | gzip -c > ${meta.id}.filtered.fastq.gz
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        gawk: \$(awk -Wversion | sed '1!d; s/.*Awk //; s/,.*//')
-        gzip: \$(gzip --version | head -1 | cut -d ' ' -f 2)
-        GNU coreutils: \$(echo \$(cat --version 2>&1) | sed 's/^.*coreutils) //; s/ .*\$//')
-    END_VERSIONS
     """
 }

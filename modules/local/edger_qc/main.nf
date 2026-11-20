@@ -1,3 +1,5 @@
+nextflow.enable.types = true
+
 process EDGER_QC {
     label 'process_medium'
 
@@ -7,26 +9,23 @@ process EDGER_QC {
         'community.wave.seqera.io/library/bioconductor-edger_bioconductor-limma_r-base_r-data.table_pruned:d592e095d0f6a5f0' }"
 
     input:
-    path input_files
+    input_files: List<Path>
 
     output:
-    path '*.{txt,pdf,csv}', emit: edger_files
-    path "versions.yml"   , emit: versions
+    edger_files = files('*.{txt,pdf,csv}')
+
+    topic:
+    tuple(task.process, 'r-base', eval("Rscript -e 'cat(as.character(getRversion()))'")) >> 'versions'
+    tuple(task.process, 'limma', eval("Rscript -e \"cat(as.character(packageVersion('limma')))\"")) >> 'versions'
+    tuple(task.process, 'edgeR', eval("Rscript -e \"cat(as.character(packageVersion('edgeR')))\"")) >> 'versions'
+    tuple(task.process, 'data.table', eval("Rscript -e \"cat(as.character(packageVersion('data.table')))\"")) >> 'versions'
+    tuple(task.process, 'gplots', eval("Rscript -e \"cat(as.character(packageVersion('gplots')))\"")) >> 'versions'
+    tuple(task.process, 'methods', eval("Rscript -e \"cat(as.character(packageVersion('methods')))\"")) >> 'versions'
+    tuple(task.process, 'statmod', eval("Rscript -e \"cat(as.character(packageVersion('statmod')))\"")) >> 'versions'
 
     script:
     """
-    edgeR_miRBase.r $input_files
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
-        limma: \$(Rscript -e "library(limma); cat(as.character(packageVersion('limma')))")
-        edgeR: \$(Rscript -e "library(edgeR); cat(as.character(packageVersion('edgeR')))")
-        data.table: \$(Rscript -e "library(data.table); cat(as.character(packageVersion('data.table')))")
-        gplots: \$(Rscript -e "library(gplots); cat(as.character(packageVersion('gplots')))")
-        methods: \$(Rscript -e "library(methods); cat(as.character(packageVersion('methods')))")
-        statmod: \$(Rscript -e "library(statmod); cat(as.character(packageVersion('statmod')))")
-    END_VERSIONS
+    edgeR_miRBase.r ${input_files.join(" ")}
     """
 
     stub:
@@ -55,16 +54,5 @@ process EDGER_QC {
     touch "hairpin_log2CPM_sample_distances_dendrogram.pdf"
     touch "mature_log2CPM_sample_distances.txt"
     touch "hairpin_log2CPM_sample_distances.txt"
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
-        limma: \$(Rscript -e "library(limma); cat(as.character(packageVersion('limma')))")
-        edgeR: \$(Rscript -e "library(edgeR); cat(as.character(packageVersion('edgeR')))")
-        data.table: \$(Rscript -e "library(data.table); cat(as.character(packageVersion('data.table')))")
-        gplots: \$(Rscript -e "library(gplots); cat(as.character(packageVersion('gplots')))")
-        methods: \$(Rscript -e "library(methods); cat(as.character(packageVersion('methods')))")
-        statmod: \$(Rscript -e "library(statmod); cat(as.character(packageVersion('statmod')))")
-    END_VERSIONS
     """
 }

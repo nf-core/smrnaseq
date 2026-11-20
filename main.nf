@@ -19,25 +19,106 @@ include { NFCORE_SMRNASEQ         } from './workflows/smrnaseq'
 include { PREPARE_GENOME          } from './subworkflows/local/prepare_genome'
 include { PIPELINE_INITIALISATION } from './subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { PIPELINE_COMPLETION     } from './subworkflows/local/utils_nfcore_smrnaseq_pipeline'
-include { getGenomeAttribute      } from './subworkflows/local/utils_nfcore_smrnaseq_pipeline'
-include { paramAsBool             } from './subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    GENOME PARAMETER VALUES
+    PIPELINE PARAMETERS
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Defaults stay in nextflow.config: the config (and conf/*.config, test profiles,
+    nf-core lint, nextflow_schema.json) is resolved before this block and takes
+    precedence. This block declares the types, so Nextflow casts command-line values
+    (e.g. `--skip_mirdeep false` -> Boolean false), also for the config closures.
+    The iGenomes-derived references (fasta, mirtrace_species) are set in nextflow.config.
 */
 
-params.fasta               = getGenomeAttribute('fasta')
-params.mirtrace_species    = getGenomeAttribute('mirtrace_species')
-params.bowtie_index        = getGenomeAttribute('bowtie')
-params.mirna_gtf           = getGenomeAttribute('mirna_gtf') //not in igenomes yet
-params.rrna                = getGenomeAttribute('rrna') //not in igenomes yet
-params.trna                = getGenomeAttribute('trna') //not in igenomes yet
-params.cdna                = getGenomeAttribute('cdna') //not in igenomes yet
-params.ncrna               = getGenomeAttribute('ncrna') //not in igenomes yet
-params.pirna               = getGenomeAttribute('pirna') //not in igenomes yet
-params.other_contamination = getGenomeAttribute('other_contamination') //not in igenomes yet
+params {
+    // Input/output options
+    input:                         String?
+    outdir:                        String?
+    email:                         String?
+    multiqc_title:                 String?
+    save_intermediates:            Boolean
+
+    // UMI options
+    with_umi:                      Boolean
+    umitools_extract_method:       String
+    umitools_method:               String
+    skip_umi_extract_before_dedup: Boolean
+    umitools_bc_pattern:           String?
+    umi_discard_read:              Integer?
+    save_umi_intermeds:            Boolean
+
+    // Reference genome options
+    genome:                        String?
+    mirgenedb:                     Boolean
+    fasta:                         String?
+    mirtrace_species:              String?
+    mirgenedb_species:             String?
+    mirna_gtf:                     String?
+    mirgenedb_gff:                 String?
+    mature:                        String?
+    mirgenedb_mature:              String?
+    hairpin:                       String?
+    mirgenedb_hairpin:             String?
+    bowtie_index:                  String?
+    bowtie_align_args:             String?
+    save_reference:                Boolean
+    igenomes_base:                 String
+    igenomes_ignore:               Boolean
+
+    // Trimming options
+    clip_r1:                       Integer?
+    three_prime_clip_r1:           Integer?
+    three_prime_adapter:           String
+    trim_fastq:                    Boolean
+    fastp_min_length:              Integer
+    fastp_max_length:              Integer
+    save_trimmed_fail:             Boolean
+    fastp_known_mirna_adapters:    String
+    min_trimmed_reads:             Integer
+    save_merged:                   Boolean
+    phred_offset:                  Integer
+
+    // Contamination filtering
+    filter_contamination:          Boolean
+    rrna:                          String?
+    trna:                          String?
+    cdna:                          String?
+    ncrna:                         String?
+    pirna:                         String?
+    other_contamination:           String?
+
+    // Skipping pipeline steps
+    skip_fastqc:                   Boolean
+    skip_mirdeep:                  Boolean
+    skip_multiqc:                  Boolean
+    skip_fastp:                    Boolean
+
+    // Institutional config options
+    custom_config_version:         String
+    custom_config_base:            String
+    config_profile_name:           String?
+    config_profile_description:    String?
+    config_profile_contact:        String?
+    config_profile_url:            String?
+
+    // Generic options
+    version:                       Boolean
+    publish_dir_mode:              String
+    email_on_fail:                 String?
+    plaintext_email:               Boolean
+    max_multiqc_email_size:        String
+    monochrome_logs:               Boolean
+    multiqc_config:                String?
+    multiqc_logo:                  String?
+    multiqc_methods_description:   String?
+    validate_params:               Boolean
+    pipelines_testdata_base_path:  String
+    trace_report_suffix:           String
+    help:                          String?
+    help_full:                     Boolean
+    show_hidden:                   Boolean
+}
 
 
 /*
@@ -172,29 +253,29 @@ output {
     // both flags are set. User-provided indices are never published here.
     bowtie_index_untar {
         path 'untar'
-        enabled paramAsBool(params.save_intermediates)
+        enabled params.save_intermediates
     }
     bowtie_index_genome {
-        path (paramAsBool(params.save_reference) ? 'genome/index' : 'bowtie_index/genome')
-        enabled paramAsBool(params.save_reference) || paramAsBool(params.save_intermediates)
+        path (params.save_reference ? 'genome/index' : 'bowtie_index/genome')
+        enabled params.save_reference || params.save_intermediates
     }
     genome_fasta {
-        path (paramAsBool(params.save_reference) ? 'genome' : 'bowtie_index/genome')
-        enabled paramAsBool(params.save_reference) || paramAsBool(params.save_intermediates)
+        path (params.save_reference ? 'genome' : 'bowtie_index/genome')
+        enabled params.save_reference || params.save_intermediates
     }
 
     // Read QC and trimming
     cat_fastq {
         path 'cat_fastq'
-        enabled paramAsBool(params.save_merged)
+        enabled params.save_merged
     }
     fastqc_raw {
         path 'fastqc/raw'
-        enabled paramAsBool(params.save_intermediates)
+        enabled params.save_intermediates
     }
     fastqc_trim {
         path 'fastqc/trimmed'
-        enabled paramAsBool(params.save_intermediates)
+        enabled params.save_intermediates
     }
     fastp_reports {
         path 'fastp/on_raw'
@@ -204,11 +285,11 @@ output {
     }
     fastp_reads_fail {
         path 'fastp/on_raw'
-        enabled paramAsBool(params.save_trimmed_fail)
+        enabled params.save_trimmed_fail
     }
     fastp_reads {
         path 'fastp/fastq'
-        enabled paramAsBool(params.save_merged)
+        enabled params.save_merged
     }
 
     // UMI handling
@@ -217,11 +298,11 @@ output {
     }
     umi_extract_reads {
         path 'umi_dedup/fastq_extracted_umi'
-        enabled paramAsBool(params.save_umi_intermeds)
+        enabled params.save_umi_intermeds
     }
     umi_dedup {
         path 'umi_dedup/bam_deduplicated'
-        enabled paramAsBool(params.save_umi_intermeds)
+        enabled params.save_umi_intermeds
     }
     umi_fastp_reports {
         path 'fastp/on_umi_extracted'
@@ -231,7 +312,7 @@ output {
     }
     umi_fastp_reads_fail {
         path 'fastp/on_umi_extracted'
-        enabled paramAsBool(params.save_trimmed_fail)
+        enabled params.save_trimmed_fail
     }
 
     // miRNA QC
@@ -242,41 +323,41 @@ output {
     // Contamination filtering
     contaminant_filter {
         path 'contaminant_filter/filter'
-        enabled paramAsBool(params.save_intermediates)
+        enabled params.save_intermediates
     }
     contaminant_index {
         path { meta, _index -> "genome/index/contaminants/${meta.id}" }
-        enabled paramAsBool(params.save_reference)
+        enabled params.save_reference
     }
 
     // miRNA quantification
     mirna_reference {
         path 'mirna_quant/reference'
-        enabled paramAsBool(params.save_intermediates)
+        enabled params.save_intermediates
     }
     mirna_index_mature {
-        path (paramAsBool(params.save_reference) ? 'genome/index/mirna_mature' : 'bowtie_index/mirna_mature')
-        enabled paramAsBool(params.save_reference) || paramAsBool(params.save_intermediates)
+        path (params.save_reference ? 'genome/index/mirna_mature' : 'bowtie_index/mirna_mature')
+        enabled params.save_reference || params.save_intermediates
     }
     mirna_index_hairpin {
-        path (paramAsBool(params.save_reference) ? 'genome/index/mirna_hairpin' : 'bowtie_index/mirna_hairpin')
-        enabled paramAsBool(params.save_reference) || paramAsBool(params.save_intermediates)
+        path (params.save_reference ? 'genome/index/mirna_hairpin' : 'bowtie_index/mirna_hairpin')
+        enabled params.save_reference || params.save_intermediates
     }
     mirna_bam_mature {
         path 'mirna_quant/bam/mature'
-        enabled paramAsBool(params.save_intermediates)
+        enabled params.save_intermediates
     }
     mirna_bam_hairpin {
         path 'mirna_quant/bam/hairpin'
-        enabled paramAsBool(params.save_intermediates)
+        enabled params.save_intermediates
     }
     mirna_bam_seqcluster {
         path 'mirna_quant/bam/seqcluster'
-        enabled paramAsBool(params.save_intermediates)
+        enabled params.save_intermediates
     }
     mirna_seqcluster {
         path 'mirna_quant/seqcluster'
-        enabled paramAsBool(params.save_intermediates)
+        enabled params.save_intermediates
     }
     mirna_edger_qc {
         path 'mirna_quant/edger_qc'
@@ -291,7 +372,7 @@ output {
     }
     genome_quant_bam {
         path 'genome_quant/bam'
-        enabled paramAsBool(params.save_intermediates)
+        enabled params.save_intermediates
     }
 
     // Novel miRNA discovery

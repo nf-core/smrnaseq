@@ -1,3 +1,5 @@
+nextflow.enable.types = true
+
 process PIVOT_WIDER {
     tag"$meta.id"
     label 'process_high'
@@ -8,11 +10,17 @@ process PIVOT_WIDER {
         'community.wave.seqera.io/library/r-base_r-dplyr_r-optparse_r-tidyr_r-vroom:c983cf5da1eb6e00' }"
 
     input:
-    tuple val(meta), path(csvs)
+    tuple(meta: Map, csvs: List<Path>)
 
     output:
-    tuple val(meta), path("*joined_samples_mirtop.tsv") , emit: csv
-    path "versions.yml"                                 , emit: versions
+    csv = tuple(meta, file('*joined_samples_mirtop.tsv'))
+
+    topic:
+    tuple(task.process, 'r-base', eval("Rscript -e 'cat(as.character(getRversion()))'")) >> 'versions'
+    tuple(task.process, 'tidyr', eval("Rscript -e \"cat(as.character(packageVersion('tidyr')))\"")) >> 'versions'
+    tuple(task.process, 'dplyr', eval("Rscript -e \"cat(as.character(packageVersion('dplyr')))\"")) >> 'versions'
+    tuple(task.process, 'optparse', eval("Rscript -e \"cat(as.character(packageVersion('optparse')))\"")) >> 'versions'
+    tuple(task.process, 'vroom', eval("Rscript -e \"cat(as.character(packageVersion('vroom')))\"")) >> 'versions'
 
     script:
     """
@@ -24,28 +32,10 @@ process PIVOT_WIDER {
 
     head -n 1 ${meta.id}_concatenated_temp.csv > joined_samples_mirtop.tsv
     tail -n +2 ${meta.id}_concatenated_temp.csv | sort -t\$'\t' -k1,1 >> joined_samples_mirtop.tsv
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
-        tidyr: \$(Rscript -e "library(tidyr); cat(as.character(packageVersion('tidyr')))")
-        dplyr: \$(Rscript -e "library(dplyr); cat(as.character(packageVersion('dplyr')))")
-        optparse: \$(Rscript -e "library(optparse); cat(as.character(packageVersion('optparse')))")
-        vroom: \$(Rscript -e "library(vroom); cat(as.character(packageVersion('vroom')))")
-    END_VERSIONS
     """
 
     stub:
     """
     touch "joined_samples_mirtop.tsv"
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        r-base: \$(echo \$(R --version 2>&1) | sed 's/^.*R version //; s/ .*\$//')
-        tidyr: \$(Rscript -e "library(tidyr); cat(as.character(packageVersion('tidyr')))")
-        dplyr: \$(Rscript -e "library(dplyr); cat(as.character(packageVersion('dplyr')))")
-        optparse: \$(Rscript -e "library(optparse); cat(as.character(packageVersion('optparse')))")
-        vroom: \$(Rscript -e "library(vroom); cat(as.character(packageVersion('vroom')))")
-    END_VERSIONS
     """
 }
