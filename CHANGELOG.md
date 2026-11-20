@@ -5,6 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## v2.5.0 - 2026-11-16
 
+- Fix [#598](https://github.com/nf-core/smrnaseq/issues/598): add `--mirna_forward_only` to restrict mature-miRNA, hairpin and seqcluster-to-hairpin Bowtie alignment to the forward RNA-reference strand. Enable it in the QIAseq profile to avoid reverse-complement miRNA assignments; other profiles and genome alignment retain their previous behavior. QIAseq counts and downstream read allocation may change; `--mirna_forward_only false` restores both-strand miRNA alignment.
 - [[#575]](https://github.com/nf-core/smrnaseq/pull/575) - Fix [#568](https://github.com/nf-core/smrnaseq/issues/568): boolean and integer parameters given on the command line were treated as strings with the Nextflow >= 26.04 strict syntax parser (e.g. `--skip_mirdeep false` was ignored).
 - [[#576]](https://github.com/nf-core/smrnaseq/pull/576) - Fix [#569](https://github.com/nf-core/smrnaseq/issues/569): remove the deprecated process `when:` section from local modules.
 - [[#578]](https://github.com/nf-core/smrnaseq/pull/578) - Fix [#570](https://github.com/nf-core/smrnaseq/issues/570): strict-syntax cleanup in local code (`exit` replaced by `error()`, dead `exit` closures that never stopped the run, legacy `.set {}`).

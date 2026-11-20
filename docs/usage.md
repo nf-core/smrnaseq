@@ -13,10 +13,10 @@ This option indicates the experimental protocol used for the sample preparation.
 - 'illumina': three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`0`), three_prime_clip_r1 (`0`)
 - 'nextflex': NEXTFLEX Small RNA-Seq Kit v3; three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`4`), three_prime_clip_r1 (`4`)
 - 'nextflex_v4': NEXTFLEX Small RNA-Seq Kit v4; three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`0`), three_prime_clip_r1 (`0`), fastp_min_length (`16`)
-- 'qiaseq': three_prime_adapter (`AACTGTAGGCACCATCAAT`), clip_r1 (`0`), three_prime_clip_r1 (`0`)
+- 'qiaseq': three_prime_adapter (`AACTGTAGGCACCATCAAT`), clip_r1 (`0`), three_prime_clip_r1 (`0`), mirna_forward_only (`true`)
 - 'cats': three_prime_adapter (`AAAAAAAA`), clip_r1(`3`), three_prime_clip_r1 (`0`)
 
-This option is not chosen as a parameter but as an additional profile that sets the corresponding `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` parameters and, where applicable, `fastp_min_length` accordingly. You can choose to either use any of the provided profiles by running the pipeline with e.g. `illumina` to set the defaults as described above in a more convenient way.
+This option is not chosen as a parameter but as an additional profile that sets the corresponding `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` parameters and, where applicable, `fastp_min_length` and `mirna_forward_only` accordingly. You can choose to either use any of the provided profiles by running the pipeline with e.g. `illumina` to set the defaults as described above in a more convenient way.
 
 ```bash
 -profile your_other_profiles,illumina
@@ -53,6 +53,17 @@ If MirGeneDB should be used instead it needs to be specified using `--mirgenedb`
 See examples in: [the test-datasets repository of nf-core](https://github.com/nf-core/test-datasets/tree/smrnaseq/MirGeneDB).
 
 > [!NOTE] > `mirtop` is hard-coded to use the `pre` sequences, which originate from the hairpin FASTA, rather than the `pri` sequences, which come from the mature FASTA. Users must provide `pre` files from the start to ensure consistency between the FASTA and GFF files, as the coordinates in the GFF file are referenced to `pre` sequences. This also ensures that names in the BAM file will match those in the GFF.
+
+### miRNA reference orientation
+
+For directional libraries whose trimmed reads match the 5′ to 3′ orientation of the mature and precursor RNA sequences, use `--mirna_forward_only`. This adds Bowtie 1 [`--norc`](https://bowtie-bio.sourceforge.net/manual.shtml#the-nofw-norc-options) to mature-miRNA, hairpin and seqcluster-to-hairpin alignment, excluding reverse-complement matches to these RNA references. A read with both a forward match to one miRNA and a reverse-complement match to another can still retain its forward match. The existing mismatch and multimapping settings are unchanged.
+
+The `qiaseq` profile enables this setting, consistent with QIAGEN's [strand-specific QIAseq miRNA quantification](https://resources.qiagenbioinformatics.com/manuals/rnaanalysisportal/4100/index.php?manual=QIAseq_miRNA_Library_Kit.html). In QIAGEN's [miRNA quantification documentation](https://resources.qiagenbioinformatics.com/manuals/clcgenomicsworkbench/2104/index.php?manual=Quantify_miRNA.html), strand-specific mapping searches only the plus strand of the RNA reference. Other profiles retain both-strand miRNA alignment by default; check the orientation of your trimmed inserts before enabling this option for a custom library.
+
+This is RNA-reference orientation, not genomic strand: a miRNA encoded on the negative genomic strand can still align forward to its own RNA sequence. Genome alignment remains bidirectional, and this option does not change miRDeep2 or contaminant alignment.
+
+> [!WARNING]
+> QIAseq counts may change compared with earlier releases. Reads without an allowed mature-miRNA alignment continue to the hairpin and genome steps, so downstream read allocation may also change. To reproduce the previous both-strand miRNA alignment, set `--mirna_forward_only false` explicitly. Rerun alignment and downstream quantification rather than just filtering previously reported BAM records, because restricting the search can reveal alternative forward alignments.
 
 ### Genome
 
