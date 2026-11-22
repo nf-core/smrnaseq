@@ -41,9 +41,10 @@ nextflow_pipeline {
         when {
             params {
                 outdir = "${outputDir}"
-                // Star arms of the test-datasets MirGeneDB v2.0 files: extracted from mirgenedb_hsa_hairpin.fa
-                // at the coordinates of the `*` miRNAs in mirgenedb_hsa.gff (the live download is v3.0)
-                mirgenedb_star = "${projectDir}/tests/fixtures/mirgenedb_hsa_star.fa"
+                // Star arms of the test-datasets MirGeneDB v2.0 files (see MirGeneDB/README.md there),
+                // referenced like the other files in conf/test_mirgenedb.config: config params such as
+                // `pipelines_testdata_base_path` are not visible in this nf-test `params` block
+                mirgenedb_star = "https://github.com/nf-core/test-datasets/raw/smrnaseq/MirGeneDB/mirgenedb_hsa_star.fa"
                 skip_mirdeep = true
             }
         }
