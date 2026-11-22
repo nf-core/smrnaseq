@@ -279,7 +279,7 @@ def validateBowtieGenomeArgs() {
         '-l'           : 'int',
         '--seedlen'    : 'int',
         '-k'           : 'int_min_2',
-        '-m'           : 'int',
+        '-m'           : 'int_min_1',
         '-M'           : 'int_min_1',
         '--maxbts'     : 'int',
         '--chunkmbs'   : 'int',

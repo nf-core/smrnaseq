@@ -126,4 +126,19 @@ nextflow_pipeline {
             assert (workflow.stdout + workflow.stderr).any { it.contains("[bowtie_align_args] '-m' and '-M' are mutually exclusive.") }
         }
     }
+
+    test("-profile test --bowtie_align_args -m 0") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                bowtie_align_args = '-m 0'
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert (workflow.stdout + workflow.stderr).any { it.contains("[bowtie_align_args] Argument '-m' must be at least 1, got '0'.") }
+        }
+    }
 }
