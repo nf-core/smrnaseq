@@ -11,18 +11,18 @@ nextflow_workflow {
     // Small miRDeep2-like BED files: A, B and C share a novel locus on chr1 (+), A and B share
     // a known locus on chr1 (-), B has a locus overlapping it on the opposite strand, A has a
     // locus on chr2 and D has no miRNAs at all
-    def input_channel = """
+    def input_channel = { base_dir -> """
         channel.of('A', 'B', 'C', 'D').map { id ->
-            [ [ id: id, single_end: true ], [ file("${baseDir}/subworkflows/local/mirdeep2_consensus/tests/data/result_\${id}.bed", checkIfExists: true) ] ]
+            [ [ id: id, single_end: true ], [ file("${base_dir}/subworkflows/local/mirdeep2_consensus/tests/data/result_\${id}.bed", checkIfExists: true) ] ]
         }
-    """
+    """ }
 
     test("min_samples = 2") {
 
         when {
             workflow {
                 """
-                input[0] = ${input_channel}
+                input[0] = ${input_channel(baseDir)}
                 input[1] = 2
                 """
             }
@@ -45,7 +45,7 @@ nextflow_workflow {
         when {
             workflow {
                 """
-                input[0] = ${input_channel}
+                input[0] = ${input_channel(baseDir)}
                 input[1] = 1
                 """
             }
@@ -67,7 +67,7 @@ nextflow_workflow {
         when {
             workflow {
                 """
-                input[0] = ${input_channel}
+                input[0] = ${input_channel(baseDir)}
                 input[1] = 5
                 """
             }
@@ -90,7 +90,7 @@ nextflow_workflow {
         when {
             workflow {
                 """
-                input[0] = ${input_channel}
+                input[0] = ${input_channel(baseDir)}
                 input[1] = 2
                 """
             }
