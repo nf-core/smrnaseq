@@ -378,6 +378,21 @@ def mirtraceAdapterWarning(adapter, mirtrace_species) {
 }
 
 //
+// First lines of a text file, transparently decompressing gzip (detected by its magic bytes)
+//
+def readFirstLines(file_path, n_lines) {
+    return file_path.withInputStream { raw ->
+        def input = new java.io.BufferedInputStream(raw)
+        input.mark(2)
+        def is_gzip = input.read() == 0x1f && input.read() == 0x8b
+        input.reset()
+        def stream = is_gzip ? new java.util.zip.GZIPInputStream(input) : input
+        def reader = new java.io.BufferedReader(new java.io.InputStreamReader(stream, 'UTF-8'))
+        reader.iterator().take(n_lines).toList()
+    }
+}
+
+//
 // Version of the miRNA reference database and its genome build, read from the comment header
 // of the miRNA GFF3 (--mirna_gtf, --mirgenedb_gff or the GFF3 downloaded for --mirtrace_species).
 // miRBase and MirGeneDB GFF3 files start with lines such as:
@@ -386,10 +401,26 @@ def mirtraceAdapterWarning(adapter, mirtrace_species) {
 // Returns [ process, tool, version ] tuples for the software versions YAML. The database
 // version is "unknown" when the header has no "microRNAs:" line.
 //
+// Also checks the file: a GFF that is an HTML page (e.g. the miRBase website serving
+// <p>##gff-version 3<br>... instead of the plain file) stops the run, since mirtop cannot read
+// it. A file that does not start with the "##gff-version" pragma only gives a warning, as
+// custom GFF files may lack it. Gzipped files are decompressed before these checks.
+//
 def mirnaReferenceVersions(gff) {
-    def header = gff.withReader { reader ->
-        reader.iterator().takeWhile { line -> line.startsWith('#') }.toList()
+    def lines = readFirstLines(gff, 200)
+    def first_line = lines.find { line -> line.trim() }?.trim() ?: ''
+    def first_line_lower = first_line.toLowerCase()
+    def is_html = first_line.startsWith('<') ||
+        ['<html', '<!doctype', '<p>', '<br'].any { tag -> first_line_lower.contains(tag) }
+    if (is_html) {
+        error("The miRNA GFF file '${gff.toUriString()}' is an HTML page, not a GFF3 file (it starts with '${first_line.take(40)}'). " +
+            "If it was downloaded from the miRBase website, download the plain GFF3 from https://mirbase.org/download/<species>.gff3 " +
+            "(e.g. https://mirbase.org/download/mmu.gff3) and pass the local file with '--mirna_gtf' (or '--mirgenedb_gff' with '--mirgenedb').")
     }
+    if (!first_line.startsWith('##gff-version')) {
+        log.warn "The miRNA GFF file '${gff.toUriString()}' does not start with a '##gff-version' line. Please check that it is a GFF3 file with miRNA coordinates."
+    }
+    def header = lines.takeWhile { line -> line.startsWith('#') }
     def database = header.findResult { line ->
         def match = line =~ /^#+\s*microRNAs:\s*(\S+)\s+(\S+)/
         match.find() ? [match.group(1), match.group(2)] : null
