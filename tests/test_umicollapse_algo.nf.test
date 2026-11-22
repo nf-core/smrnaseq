@@ -25,7 +25,8 @@ nextflow_pipeline {
             }
             assert workflow.success
             assert umicollapse_scripts.size() > 0
-            assert umicollapse_scripts.every { script -> script.contains('--algo cc --two-pass') }
+            // Only check --algo: other UMICollapse arguments (e.g. the no-op --two-pass) may change
+            assert umicollapse_scripts.every { script -> (script =~ /--algo cc\b/).find() }
         }
     }
 

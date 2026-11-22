@@ -118,12 +118,12 @@ For example:
 --with_umi --umitools_method adj
 ```
 
-Other UMICollapse options, such as the mismatch threshold (`-k`, default 1) or the directional threshold (`-p`, default 0.5), are not exposed as pipeline parameters. You can set them in a custom config file passed with `-c`. Note that this replaces the arguments set by the pipeline (`--algo <umitools_method> --two-pass`), so include them in your arguments:
+Other UMICollapse options, such as the mismatch threshold (`-k`, default 1) or the directional threshold (`-p`, default 0.5), are not exposed as pipeline parameters. You can set them in a custom config file passed with `-c`. Note that `ext.args` replaces the arguments set by the pipeline, so keep the `--algo` option:
 
 ```groovy
 process {
     withName: '.*:UMICOLLAPSE_FASTQ' {
-        ext.args = '--algo dir --two-pass -k 2'
+        ext.args = '--algo dir -k 2'
     }
 }
 ```
