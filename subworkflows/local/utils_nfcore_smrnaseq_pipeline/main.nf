@@ -117,6 +117,11 @@ workflow PIPELINE_INITIALISATION {
     validateBowtieGenomeArgs()
 
     //
+    // Warn if a genome Bowtie index is given without a genome FASTA (it is then ignored)
+    //
+    warnBowtieIndexWithoutFasta(params.bowtie_index, params.fasta)
+
+    //
     // Create channel from input file provided through params.input
     //
 
@@ -375,6 +380,22 @@ def mirtraceAdapterWarning(adapter, mirtrace_species) {
         return null
     }
     return "miRTrace cannot auto-detect adapters, so with '--three_prime_adapter auto-detect' it runs without adapter trimming. Set '--three_prime_adapter' to the adapter sequence for adapter-trimmed miRTrace QC."
+}
+
+//
+// Warn when a genome Bowtie index is given without a genome FASTA. Genome quantification and
+// miRDeep2 only run with a FASTA (`--fasta`, or `--genome` with an iGenomes entry), so the index
+// is ignored and both steps are skipped. Returns the warning message, or null if there is none.
+//
+def warnBowtieIndexWithoutFasta(bowtie_index, fasta) {
+    if (!bowtie_index || fasta) {
+        return null
+    }
+    def message = "A genome Bowtie index was given with '--bowtie_index', but no genome FASTA. The index is ignored, " +
+        "and genome quantification and miRDeep2 are skipped. To run them, also provide the FASTA the index was " +
+        "built from with '--fasta', or use '--genome' with an iGenomes reference that provides a FASTA."
+    log.warn(message)
+    return message
 }
 
 //

@@ -117,4 +117,71 @@ nextflow_function {
             )
         }
     }
+
+    test("Test Function warnBowtieIndexWithoutFasta - bowtie_index without fasta") {
+
+        function "warnBowtieIndexWithoutFasta"
+
+        when {
+            function {
+                """
+                input[0] = '/path/to/bowtie_index'
+                input[1] = null
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result.contains("The index is ignored, and genome quantification and miRDeep2 are skipped") },
+                // log.warn always goes to .nextflow.log; the console only shows it outside agent log mode
+                { assert new File("${launchDir}/meta/nextflow.log").text.contains("WARN  nextflow.Nextflow - A genome Bowtie index was given with '--bowtie_index', but no genome FASTA") }
+            )
+        }
+    }
+
+    test("Test Function warnBowtieIndexWithoutFasta - bowtie_index with fasta") {
+
+        function "warnBowtieIndexWithoutFasta"
+
+        when {
+            function {
+                """
+                input[0] = '/path/to/bowtie_index'
+                input[1] = '/path/to/genome.fa'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null },
+                { assert !new File("${launchDir}/meta/nextflow.log").text.contains("A genome Bowtie index was given") }
+            )
+        }
+    }
+
+    test("Test Function warnBowtieIndexWithoutFasta - no bowtie_index") {
+
+        function "warnBowtieIndexWithoutFasta"
+
+        when {
+            function {
+                """
+                input[0] = null
+                input[1] = null
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null },
+                { assert !new File("${launchDir}/meta/nextflow.log").text.contains("A genome Bowtie index was given") }
+            )
+        }
+    }
 }
