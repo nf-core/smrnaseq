@@ -379,7 +379,7 @@
                     "minimum": 0,
                     "maximum": 100,
                     "description": "Only use miRDeep2 miRNAs with an estimated true-positive probability of at least this many percent for the consensus BED. 0 disables the filter.",
-                    "help_text": "Only used when `--mirdeep2_consensus_min_samples` is 1 or more. The probability is the column 'estimated probability that the miRNA (candidate) is a true positive' of the per-sample `result_{sample.id}.csv` (for example `91 +/- 2%` counts as 91). Entries below the threshold are removed in each sample before the samples are merged, so they do not count towards `--mirdeep2_consensus_min_samples`. miRDeep2 gives no probability (`-`) for known miRBase miRNAs in a sample in which it found no novel miRNA candidates; such entries are kept. The per-sample miRDeep2 output files are not changed.",
+                    "help_text": "Only used when `--mirdeep2_consensus_min_samples` is 1 or more. The probability is the column 'estimated probability that the miRNA (candidate) is a true positive' of the per-sample `result_{sample.id}.csv` (for example `91 +/- 2%` counts as 91). Entries below the threshold are removed in each sample before the samples are merged, so they do not count towards `--mirdeep2_consensus_min_samples`. miRDeep2 gives no probability (`-`) for known miRBase miRNAs in a sample in which it found no novel miRNA candidates; such entries are removed as well when this is above 0. The per-sample miRDeep2 output files are not changed.",
                     "fa_icon": "fas fa-percent"
                 }
             }

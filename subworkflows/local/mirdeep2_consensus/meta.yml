@@ -26,7 +26,7 @@ input:
       type: integer
       description: |
         Minimum miRDeep2 estimated true-positive probability in percent (0 disables the filter).
-        Entries without a probability ("-") are kept.
+        When it is above 0, entries without a probability ("-") are removed too.
 output:
   - bed:
       type: file

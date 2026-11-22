@@ -39,6 +39,7 @@ nextflow_workflow {
                 { assert lines.size() == 3 },
                 { assert lines[0] == header },
                 { assert lines[1] == ['chr1', '100', '180', 'novel:consensus_1', '7.7', '+', '3', 'A,B,C', '91', 'A:novel:chr1_1,B:novel:chr1_2,C:novel:chr1_4'].join('\t') },
+                // B's known entry has no probability ("-") and is kept without a filter
                 { assert lines[2] == ['chr1', '1000', '1075', 'known:consensus_2', '10.1', '-', '2', 'A,B', '95', 'A:known:chr1_5,B:known:chr1_9'].join('\t') }
             )
         }
@@ -105,16 +106,39 @@ nextflow_workflow {
             assertAll(
                 { assert workflow.success },
                 // B's novel chr1 locus (75 %) is removed, so the locus is supported by A and C only
-                // and no longer reaches B's end coordinate. B's known locus has no probability and is kept.
-                { assert lines.size() == 3 },
+                // and no longer reaches B's end coordinate. B's known entry has no probability and is
+                // removed, so the known locus is only found in A and does not reach min_samples.
+                { assert lines.size() == 2 },
                 { assert lines[0] == header },
-                { assert lines[1] == ['chr1', '100', '175', 'novel:consensus_1', '7.7', '+', '2', 'A,C', '91', 'A:novel:chr1_1,C:novel:chr1_4'].join('\t') },
-                { assert lines[2] == ['chr1', '1000', '1075', 'known:consensus_2', '10.1', '-', '2', 'A,B', '95', 'A:known:chr1_5,B:known:chr1_9'].join('\t') }
+                { assert lines[1] == ['chr1', '100', '175', 'novel:consensus_1', '7.7', '+', '2', 'A,C', '91', 'A:novel:chr1_1,C:novel:chr1_4'].join('\t') }
             )
         }
     }
 
-    test("min_probability = 99 keeps only entries without a probability") {
+    test("min_probability = 1 removes only entries without a probability") {
+
+        when {
+            workflow {
+                """
+                input[0] = ${input_channel(baseDir)}
+                input[1] = 1
+                input[2] = 1
+                """
+            }
+        }
+
+        then {
+            def lines = path(workflow.out.bed.get(0).get(1)).readLines()
+            assertAll(
+                { assert workflow.success },
+                { assert lines.size() == 5 },
+                { assert !lines.any { line -> line.contains('B:known:chr1_9') } },
+                { assert lines.findAll { line -> line.startsWith('chr1\t1000\t1075\tknown:') && line.endsWith('\t-\t1\tA\t95\tA:known:chr1_5') }.size() == 1 }
+            )
+        }
+    }
+
+    test("min_probability = 99 removes all entries") {
 
         when {
             workflow {
@@ -130,8 +154,7 @@ nextflow_workflow {
             def lines = path(workflow.out.bed.get(0).get(1)).readLines()
             assertAll(
                 { assert workflow.success },
-                { assert lines.size() == 2 },
-                { assert lines[1] == ['chr1', '1000', '1075', 'known:consensus_1', '8', '-', '1', 'B', '-', 'B:known:chr1_9'].join('\t') }
+                { assert lines == [ header ] }
             )
         }
     }

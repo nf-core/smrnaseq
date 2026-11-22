@@ -50,10 +50,9 @@ nextflow_pipeline {
             def lines = consensus.exists() ? consensus.readLines() : []
             assertAll(
                 { assert workflow.success },
-                // Clone1_N1 (0 %) is removed, Control_N1 (no probability) is kept
-                { assert lines.size() == 2 },
-                { assert lines[0] == header },
-                { assert lines[1] == ['hg38_dna', '1259227', '1259294', 'known:consensus_1', '2.4', '+', '1', 'Control_N1', '-', 'Control_N1:known:hg38_dna_6'].join('\t') }
+                // Clone1_N1 (0 %) and Control_N1 (no probability) are both removed
+                { assert consensus.exists() },
+                { assert lines == [ header ] }
             )
         }
     }

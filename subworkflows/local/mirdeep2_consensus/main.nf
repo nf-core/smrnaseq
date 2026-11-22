@@ -30,8 +30,9 @@ workflow MIRDEEP2_CONSENSUS {
     // third column of the novel and the known ("mature miRBase miRNAs detected") sections,
     // e.g. "91 +/- 2%", or "-" when miRDeep2 gives no estimate. The BED name field is
     // <novel|known>:<first CSV column> (see mirdeep2bed.pl).
-    // Then concatenate the BED files, drop entries below min_probability (entries without
-    // a probability are kept), prefix each miRDeep2 ID with its sample and add columns:
+    // Then concatenate the BED files, drop entries below min_probability (with min_probability
+    // above 0, entries without a probability are dropped too), prefix each miRDeep2 ID with
+    // its sample and add columns:
     // chrom, start, end, <sample>:<known|novel>:<id>, miRDeep2 score, strand, sample, probability
     ch_samples_program = channel.value(
         'BEGIN { FS = OFS = "\t"; min_probability = ' + min_probability + ' } ' +
@@ -46,7 +47,7 @@ workflow MIRDEEP2_CONSENSUS {
         'next } ' +
         '/^(track|browser|#)/ || NF < 6 { next } ' +
         '{ key = sample SUBSEP $4; p = (key in prob) ? prob[key] : "-"; ' +
-        'if (min_probability > 0 && p != "-" && p + 0 < min_probability) next; ' +
+        'if (min_probability > 0 && (p == "-" || p + 0 < min_probability)) next; ' +
         'print $1, $2, $3, sample ":" $4, $5, $6, sample, p }'
     ).collectFile(name: 'mirdeep2_samples.awk')
 
