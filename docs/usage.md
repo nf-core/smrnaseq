@@ -105,7 +105,11 @@ To get counts per small RNA (for example per tRNA gene or per piRNA locus), coun
 2. Count `genome_quant/bam/*.sorted.bam` against an annotation that matches your genome assembly, for example the [GENCODE](https://www.gencodegenes.org/) or [Ensembl](https://www.ensembl.org/) GTF (snoRNA, snRNA, rRNA, misc_RNA and more, see the `gene_type`/`gene_biotype` attribute), [GtRNAdb](http://gtrnadb.ucsc.edu/) (tRNA genes), [piRBase](http://bigdata.ibp.ac.cn/piRBase/) (piRNAs) or [RNAcentral](https://rnacentral.org/) (genome coordinates of many ncRNA databases). For example, with [featureCounts](https://subread.sourceforge.net/featureCounts.html):
 
    ```bash
-   featureCounts -s 1 -M -O --fraction -a annotation.gtf -t exon -g gene_id -o counts.txt genome_quant/bam/*.sorted.bam
+   # Bowtie 1 writes no NH tag; copy its XM tag (number of reported alignments) to NH, so that featureCounts recognises multi-mapping reads
+   for bam in genome_quant/bam/*.sorted.bam; do
+       samtools view -h "$bam" | perl -pe 's/\tXM:i:/\tNH:i:/' | samtools view -b -o "${bam%.sorted.bam}.nh.bam" -
+   done
+   featureCounts -s 1 -M -O --fraction -a annotation.gtf -t exon -g gene_id -o counts.txt genome_quant/bam/*.nh.bam
    ```
 
    `-g gene_type` (GENCODE) or `-g gene_biotype` (Ensembl) gives one count per biotype instead of per gene. featureCounts reads GTF/GFF or its own SAF format, so convert BED annotations (as offered by GtRNAdb) to SAF first.
@@ -114,7 +118,7 @@ Things to consider when counting:
 
 - Reads that align to a mature miRNA or hairpin are not part of the genome BAM files: take miRNA counts from `mirna_quant/`.
 - Most small RNA library kits sequence the RNA in sense orientation, hence `-s 1`. Check your kit.
-- The genome mapping reports up to 50 alignments per read (`-k 50 --best --strata`), and many small RNAs come from multi-copy loci (tRNA, rRNA, piRNA clusters). Bowtie 1 does not write the `NH` tag that featureCounts uses to recognise multi-mapping reads, so a read with several alignments can be counted at each of its loci. To get one alignment per read, override `ext.args` of `NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME` (see [Genome](#genome)), keeping in mind that the reported locus of a multi-mapping read is then arbitrary.
+- The genome mapping reports up to 50 alignments per read (`-k 50 --best --strata`), and many small RNAs come from multi-copy loci (tRNA, rRNA, piRNA clusters). Bowtie 1 does not set the secondary alignment flag or the `NH` tag, and gives every alignment a MAPQ of 255. featureCounts uses the `NH` tag to recognise multi-mapping reads, so on the BAM files as written it counts each alignment of a multi-mapping read as a separate, uniquely aligned read (`-M` and `--fraction` have no effect), which inflates multi-copy classes. The example above therefore copies Bowtie's `XM` tag to `NH` first, so that `-M --fraction` splits each read over its loci. A read with exactly 50 alignments may have more that Bowtie did not report. To count uniquely aligned reads only, run the pipeline with `--bowtie_align_args '-m 1'` instead and count without `-M --fraction`.
 - Mature tRNAs carry a non-templated 3' `CCA` and lack their introns, and tRNA-derived fragments are short. Genome alignment misses many of these reads. Dedicated tools that align against mature tRNA sequences give better tRNA and tRNA fragment counts.
 
 If you need full annotation and quantification of all small RNA classes, consider using a dedicated tool on the adapter-trimmed reads (saved to `fastp/fastq/` with `--save_merged`), such as [unitas](https://www.smallrnagroup.uni-mainz.de/software.html), [SPORTS](https://github.com/junchaoshi/sports1.1), [exceRpt](https://github.com/gersteinlab/exceRpt) or, for tRNA fragments, [MINTmap](https://github.com/TJU-CMC-Org/MINTmap). Support for further biotypes in the pipeline is discussed in [#548](https://github.com/nf-core/smrnaseq/issues/548).
