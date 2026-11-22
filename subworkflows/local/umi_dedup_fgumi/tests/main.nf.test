@@ -1,0 +1,102 @@
+nextflow_workflow {
+
+    name "Test Workflow UMI_DEDUP_FGUMI (prototype #535)"
+    script "../main.nf"
+    config "./nextflow.config"
+    workflow "UMI_DEDUP_FGUMI"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "umi_dedup_fgumi"
+
+    setup {
+        run("PARSE_FASTA_MIRNA") {
+            script "../../../../modules/local/parse_fasta_mirna/main.nf"
+            process {
+                """
+                input[0] = channel.of([[id:'hairpin'], file(params.pipelines_testdata_base_path + 'miRBase/hairpin.fa', checkIfExists: true)])
+                input[1] = 'hsa'
+                """
+            }
+        }
+        run("FORMAT_FASTA_MIRNA") {
+            script "../../../../modules/local/format_fasta_mirna/main.nf"
+            process {
+                """
+                input[0] = PARSE_FASTA_MIRNA.out.parsed_fasta
+                """
+            }
+        }
+        run("BOWTIE_BUILD") {
+            script "../../../../modules/nf-core/bowtie/build/main.nf"
+            process {
+                """
+                input[0] = FORMAT_FASTA_MIRNA.out.formatted_fasta
+                """
+            }
+        }
+        run("UMITOOLS_EXTRACT") {
+            script "../../../../modules/nf-core/umitools/extract/main.nf"
+            process {
+                """
+                input[0] = channel.of([[id:'SRX8195117_SRR11631013', single_end:true], file('s3://ngi-igenomes/testdata/nf-core/pipelines/smrnaseq/2.3.0/fastq/SRX8195117_SRR11631013_1.subsamp.fastq.gz', checkIfExists: true)])
+                """
+            }
+        }
+    }
+
+    test("QIAseq test_umi sample - fgumi adjacency dedup against the hsa hairpin index") {
+
+        when {
+            workflow {
+                """
+                input[0] = UMITOOLS_EXTRACT.out.reads
+                input[1] = BOWTIE_BUILD.out.index
+                """
+            }
+        }
+
+        then {
+            def metrics = path(workflow.out.metrics.get(0).get(1)).readLines()
+            def header  = metrics[0].split('\t') as List
+            def total   = metrics[1].split('\t')
+            def value   = { String col -> total[header.indexOf(col)] as long }
+            def fastq   = path(workflow.out.reads.get(0).get(1)).linesGzip
+            def copyumi = path(workflow.out.copy_umi.get(0).get(1)).readLines()
+
+            assert workflow.success
+            // every input read got its RX tag from the umi_tools read-name suffix
+            assert copyumi[1].split('\t')[0] == copyumi[1].split('\t')[1]
+            // duplicates were found and removed; unmapped reads were passed through
+            assert value('duplicate_templates') > 0
+            assert value('passthrough_templates') > 0
+            assert value('secondary_reads') == 0
+            assert value('missing_tc_tag') == 0
+            // FASTQ output = unique templates (mapped survivors + unmapped passthrough)
+            assert fastq.size() / 4 == value('unique_templates')
+            assert value('unique_templates') < value('total_templates')
+            // the UMI stays in the read name for downstream tools
+            assert fastq[0] ==~ /^@\S+_[ACGTN]{12}.*/
+        }
+    }
+
+    test("stub") {
+
+        options "-stub"
+
+        when {
+            workflow {
+                """
+                input[0] = UMITOOLS_EXTRACT.out.reads
+                input[1] = BOWTIE_BUILD.out.index
+                """
+            }
+        }
+
+        then {
+            assert workflow.success
+            assert workflow.out.reads.size() == 1
+            assert workflow.out.metrics.size() == 1
+            assert workflow.out.copy_umi.size() == 1
+        }
+    }
+}
