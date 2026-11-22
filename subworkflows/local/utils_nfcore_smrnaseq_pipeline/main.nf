@@ -288,7 +288,8 @@ def umiSaturationWarning(stats_text) {
     if (fraction <= threshold) {
         return null
     }
-    def percent = String.format('%.2f', fraction * 100)
+    // Not String.format: its decimal separator depends on the locale
+    def percent = (fraction * 100).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString()
     return "UMI saturation in sample '${row.sample}': after deduplication, the most frequent sequence (${row.top_sequence}) has ${row.top_sequence_reads} reads, ${percent}% of all ${row.umi_space} possible ${row.umi_length} nt UMIs (warning threshold 0.5%). One-mismatch UMI clustering then merges distinct molecules, so the counts of the most abundant miRNAs are underestimated. Consider exact UMI matching (UMICollapse '-k 0'). See https://nf-co.re/smrnaseq/usage#choosing-a-umi-strategy"
 }
 

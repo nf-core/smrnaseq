@@ -1,0 +1,60 @@
+{
+    "umi_tools extract reads - UMI moved into sequence and quality": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": true
+                        },
+                        "test.umi_in_sequence.fastq.gz:md5,49c4c4815b5b10132f08d505962c7dcd"
+                    ]
+                ],
+                "reads": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": true
+                        },
+                        "test.umi_in_sequence.fastq.gz:md5,49c4c4815b5b10132f08d505962c7dcd"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-11-22T17:22:30.355223",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.6"
+        }
+    },
+    "umi_tools extract reads - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": true
+                        },
+                        "test.umi_in_sequence.fastq.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "reads": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": true
+                        },
+                        "test.umi_in_sequence.fastq.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-11-22T17:22:36.378396",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.6"
+        }
+    }
+}

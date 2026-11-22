@@ -2,16 +2,14 @@ nextflow_pipeline {
 
     name "Test pipeline UMI handling"
     script "../main.nf"
-    profile "test_umi,ci"
+    // test_umi already includes the QIAseq protocol config; the qiaseq profile is named here as well
+    // so that these tests document that '-profile qiaseq --with_umi' works without other UMI parameters
+    profile "test_umi,qiaseq,ci"
     tag "pipeline"
     tag "umi"
     tag "umi_params"
 
     test("-profile test_umi,qiaseq --clip_r1 2 --three_prime_clip_r1 2: step order and saturation warning") {
-
-        // test_umi already includes the QIAseq protocol config; the profile is named here so that this
-        // test documents that '-profile qiaseq --with_umi' works without any other UMI parameter
-        profile "test_umi,qiaseq,ci"
 
         when {
             params {
@@ -83,9 +81,10 @@ nextflow_pipeline {
             def mirtrace_config = new File(task_dirs['MIRTRACE_QC'][0], "${sample}.data").text
             assert mirtrace_config.contains(",${sample},AACTGTAGGCACCATCAAT,")
 
-            // The most frequent insert (miR-16-5p) uses more than 0.5% of the 12 nt UMI space after deduplication
+            // The most frequent insert (miR-16-5p, TAGCAGCACGTAAATATTGGCG, here clipped by 2 nt at each end)
+            // uses more than 0.5% of the 12 nt UMI space after deduplication
             assert nextflow_log.contains("UMI saturation in sample '${sample}'")
-            assert nextflow_log.contains('(TAGCAGCACGTAAATATTGGCG)')
+            assert nextflow_log.contains('(GCAGCACGTAAATATTGG)')
         }
     }
 
