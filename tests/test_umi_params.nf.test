@@ -40,7 +40,10 @@ nextflow_pipeline {
         }
     }
 
-    test("-profile test_umi with the UMI anchor as fastp adapter") {
+    test("-profile test_umi with the UMI anchor as fastp adapter -stub") {
+
+        // Only the parameter check is tested here, so the tools do not need to run
+        options "-stub"
 
         when {
             params {
@@ -50,8 +53,11 @@ nextflow_pipeline {
         }
 
         then {
-            assert workflow.failed
-            assert (workflow.stdout + workflow.stderr).any { it.contains("'--umitools_bc_pattern' contains the 3' adapter given in '--three_prime_adapter' (AACTGTAGGCACCATCAAT)") }
+            // WARN lines are not always shown on stdout, so read them from the Nextflow log
+            def nextflow_log = new File("${metaDir}/nextflow.log").text
+            assert workflow.success
+            assert nextflow_log.contains("WARN")
+            assert nextflow_log.contains("'--umitools_bc_pattern' contains the 3' adapter given in '--three_prime_adapter' (AACTGTAGGCACCATCAAT)")
         }
     }
 

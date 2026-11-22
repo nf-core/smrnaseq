@@ -118,8 +118,7 @@ nextflow_function {
         }
     }
 
-    // umiParameterError inputs: with_umi, bc_pattern, skip_umi_extract_before_dedup,
-    // three_prime_adapter, skip_fastp, trim_fastq
+    // umiParameterError inputs: with_umi, bc_pattern, skip_umi_extract_before_dedup
 
     test("Test Function umiParameterError - without UMI") {
 
@@ -131,9 +130,6 @@ nextflow_function {
                 input[0] = false
                 input[1] = null
                 input[2] = false
-                input[3] = 'AACTGTAGGCACCATCAAT'
-                input[4] = false
-                input[5] = true
                 """
             }
         }
@@ -146,7 +142,7 @@ nextflow_function {
         }
     }
 
-    test("Test Function umiParameterError - QIAseq pattern with TruSeq adapter") {
+    test("Test Function umiParameterError - valid") {
 
         function "umiParameterError"
 
@@ -156,9 +152,6 @@ nextflow_function {
                 input[0] = true
                 input[1] = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
                 input[2] = true
-                input[3] = 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'
-                input[4] = false
-                input[5] = true
                 """
             }
         }
@@ -181,9 +174,6 @@ nextflow_function {
                 input[0] = true
                 input[1] = null
                 input[2] = true
-                input[3] = 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'
-                input[4] = false
-                input[5] = true
                 """
             }
         }
@@ -206,9 +196,6 @@ nextflow_function {
                 input[0] = true
                 input[1] = 'NNNNNNNN'
                 input[2] = false
-                input[3] = 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'
-                input[4] = false
-                input[5] = true
                 """
             }
         }
@@ -221,19 +208,44 @@ nextflow_function {
         }
     }
 
-    test("Test Function umiParameterError - pattern anchored on the trimmed adapter") {
+    // umiAdapterWarning inputs: with_umi, bc_pattern, three_prime_adapter, skip_fastp, trim_fastq
 
-        function "umiParameterError"
+    test("Test Function umiAdapterWarning - QIAseq pattern with TruSeq adapter") {
+
+        function "umiAdapterWarning"
 
         when {
             function {
                 """
                 input[0] = true
                 input[1] = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
-                input[2] = true
-                input[3] = 'AACTGTAGGCACCATCAAT'
-                input[4] = false
-                input[5] = true
+                input[2] = 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'
+                input[3] = false
+                input[4] = true
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null }
+            )
+        }
+    }
+
+    test("Test Function umiAdapterWarning - pattern anchored on the trimmed adapter") {
+
+        function "umiAdapterWarning"
+
+        when {
+            function {
+                """
+                input[0] = true
+                input[1] = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
+                input[2] = 'AACTGTAGGCACCATCAAT'
+                input[3] = false
+                input[4] = true
                 """
             }
         }
@@ -246,19 +258,18 @@ nextflow_function {
         }
     }
 
-    test("Test Function umiParameterError - pattern anchored on the adapter with --skip_fastp") {
+    test("Test Function umiAdapterWarning - pattern anchored on the adapter with --skip_fastp") {
 
-        function "umiParameterError"
+        function "umiAdapterWarning"
 
         when {
             function {
                 """
                 input[0] = true
                 input[1] = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
-                input[2] = true
-                input[3] = 'AACTGTAGGCACCATCAAT'
+                input[2] = 'AACTGTAGGCACCATCAAT'
+                input[3] = true
                 input[4] = true
-                input[5] = true
                 """
             }
         }
@@ -267,6 +278,30 @@ nextflow_function {
             assertAll(
                 { assert function.success },
                 // fastp does not trim the adapter, so the pattern still finds it
+                { assert function.result == null }
+            )
+        }
+    }
+
+    test("Test Function umiAdapterWarning - without UMI") {
+
+        function "umiAdapterWarning"
+
+        when {
+            function {
+                """
+                input[0] = false
+                input[1] = null
+                input[2] = 'AACTGTAGGCACCATCAAT'
+                input[3] = false
+                input[4] = true
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
                 { assert function.result == null }
             )
         }
