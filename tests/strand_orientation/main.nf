@@ -1,5 +1,8 @@
 // Synthetic alignment-only harness: retain the production process names so
 // conf/modules.config, rather than test-specific Bowtie arguments, is exercised.
+// nf-test passes the pipeline nextflow.config with -c, so the real defaults, protocol
+// profiles and selectors apply. tests/test_mirna_forward_only_pipeline.nf.test checks
+// the same settings on the real pipeline.
 include { BOWTIE_BUILD } from '../../modules/nf-core/bowtie/build/main'
 include {
     BOWTIE_ALIGN as BOWTIE_MAP_MATURE
@@ -10,7 +13,7 @@ include {
 
 process ALIGNMENT_SUMMARY {
     container 'community.wave.seqera.io/library/bowtie_htslib_samtools:e1e242368ffcb5d3'
-    conda '../../modules/nf-core/bowtie/align/environment.yml'
+    conda "${moduleDir}/../../modules/nf-core/bowtie/align/environment.yml"
     publishDir params.outdir, mode: 'copy'
 
     input:
