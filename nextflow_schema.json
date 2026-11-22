@@ -190,7 +190,7 @@
                 "mirna_forward_only": {
                     "type": "boolean",
                     "description": "Align reads only to the forward strand of mature and hairpin miRNA references.",
-                    "help_text": "Adds Bowtie 1 --norc to mature-miRNA, hairpin and seqcluster-to-hairpin alignment. Use for libraries whose trimmed reads have the same 5-prime to 3-prime orientation as the RNA reference. Enabled by the qiaseq profile; otherwise disabled for compatibility. Set --mirna_forward_only false to restore both-strand miRNA alignment. Genome alignment is unaffected.",
+                    "help_text": "Adds Bowtie 1 `--norc` to the mature, hairpin and seqcluster-to-hairpin alignments, so that reads are not assigned to the reverse complement of a miRNA reference. Use it for libraries whose trimmed reads have the same 5' to 3' orientation as the miRNA, which is the case for all built-in protocols (`illumina`, `nextflex`, `nextflex_v4`, `qiaseq`, `cats`). Enabled by the `qiaseq` profile; set `--mirna_forward_only false` to restore both-strand miRNA alignment. Genome, miRDeep2 and contaminant alignments are not affected.",
                     "fa_icon": "fas fa-directions"
                 },
                 "save_reference": {

@@ -56,14 +56,30 @@ See examples in: [the test-datasets repository of nf-core](https://github.com/nf
 
 ### miRNA reference orientation
 
-For directional libraries whose trimmed reads match the 5′ to 3′ orientation of the mature and precursor RNA sequences, use `--mirna_forward_only`. This adds Bowtie 1 [`--norc`](https://bowtie-bio.sourceforge.net/manual.shtml#the-nofw-norc-options) to mature-miRNA, hairpin and seqcluster-to-hairpin alignment, excluding reverse-complement matches to these RNA references. A read with both a forward match to one miRNA and a reverse-complement match to another can still retain its forward match. The existing mismatch and multimapping settings are unchanged.
+The mature and hairpin FASTA files contain miRNA sequences in RNA (sense) orientation. In all library protocols that the pipeline has a profile for, read 1 starts at the 5′ end of the small RNA, so after trimming a read has the same orientation as the miRNA it comes from. By default, the pipeline still lets Bowtie 1 align reads to both strands of the mature, hairpin and seqcluster-to-hairpin references. A read from an abundant miRNA can then also align to the reverse complement of another annotated miRNA. Several miRBase entries are antisense to abundant miRNAs, for example miR-3184-3p (miR-423-5p), miR-103b (miR-103a-3p and miR-107), miR-3529-3p (miR-7-5p), miR-122b-3p (miR-122-5p) and miR-451b (miR-451a). Some precursors (e.g. mir-486) are self-complementary, so a read from one arm also aligns to the other arm in reverse.
 
-The `qiaseq` profile enables this setting, consistent with QIAGEN's [strand-specific QIAseq miRNA quantification](https://resources.qiagenbioinformatics.com/manuals/rnaanalysisportal/4100/index.php?manual=QIAseq_miRNA_Library_Kit.html). In QIAGEN's [miRNA quantification documentation](https://resources.qiagenbioinformatics.com/manuals/clcgenomicsworkbench/2104/index.php?manual=Quantify_miRNA.html), strand-specific mapping searches only the plus strand of the RNA reference. Other profiles retain both-strand miRNA alignment by default; check the orientation of your trimmed inserts before enabling this option for a custom library.
+`--mirna_forward_only` adds Bowtie 1 [`--norc`](https://bowtie-bio.sourceforge.net/manual.shtml#the-nofw-norc-options) to these three alignments, so only forward alignments to the miRNA references are reported. The mismatch and multimapping settings are unchanged. Reads that no longer align to the mature miRNAs continue to the hairpin and genome alignments. Genome, miRDeep2 and contaminant alignments are not changed: this is about the orientation relative to the RNA reference, not the genomic strand, and a miRNA encoded on the minus strand of the genome still aligns forward to its own sequence.
 
-This is RNA-reference orientation, not genomic strand: a miRNA encoded on the negative genomic strand can still align forward to its own RNA sequence. Genome alignment remains bidirectional, and this option does not change miRDeep2 or contaminant alignment.
+The effect on the outputs:
+
+- `mirna_quant/edger_qc/` (`mature_counts.csv`, `hairpin_counts.csv` and the files derived from them): these counts come from `samtools idxstats`, which counts every alignment record, including reverse-strand ones. With `--mirna_forward_only`, the antisense miRNAs listed above are no longer reported with counts that actually come from their sense partners. In the pipeline test data (`illumina`, `nextflex` and `qiaseq` with UMIs), mature totals dropped by 1.7-2.9 % and hairpin totals by 2-31 %, and 16-74 miRNAs or hairpins per sample that only had reverse-strand alignments were no longer reported. The most abundant miRNAs did not change.
+- `mirna_quant/mirtop/` (`mirna.tsv`, `joined_samples_mirtop.tsv`): mirtop already ignores reverse-strand alignments, so these counts change very little (below 0.1 % in the test data). A few miRNAs can gain counts, because a reverse-strand alignment with fewer mismatches no longer hides a forward alignment of the same read (`--best --strata`).
+
+The `qiaseq` profile enables `--mirna_forward_only`, in line with QIAGEN's [strand-specific QIAseq miRNA quantification](https://resources.qiagenbioinformatics.com/manuals/rnaanalysisportal/4100/index.php?manual=QIAseq_miRNA_Library_Kit.html) (QIAGEN's [miRNA quantification](https://resources.qiagenbioinformatics.com/manuals/clcgenomicsworkbench/2104/index.php?manual=Quantify_miRNA.html) only searches the plus strand of the RNA reference when strand-specific). This also applies with `--with_umi`: UMI extraction moves the UMI to the read name and keeps the insert in its original orientation.
+
+For the other protocols, the option is not enabled by default (to keep results comparable with earlier releases), but it is safe and recommended to set `--mirna_forward_only` for:
+
+| Profile                   | Library chemistry                                              | Read 1 orientation               |
+| ------------------------- | -------------------------------------------------------------- | -------------------------------- |
+| `illumina`                | TruSeq Small RNA: 5′ and 3′ adapter ligation                   | sense                            |
+| `nextflex`, `nextflex_v4` | NEXTFLEX Small RNA-Seq v3/v4: 5′ and 3′ adapter ligation       | sense                            |
+| `qiaseq`                  | QIAseq miRNA: 3′ and 5′ adapter ligation, UMI in the RT primer | sense (enabled by default)       |
+| `cats`                    | CATS: 3′ polyadenylation and template switching at the 5′ end  | sense (`GGG` + insert + poly(A)) |
+
+Do not use `--mirna_forward_only` for reads in antisense orientation, for example if read 2 of a paired-end run was provided as `fastq_1`, or for a custom protocol with unknown or mixed orientation. In these cases, a large fraction of reads aligning in reverse to the mature miRNAs without the option (see `mirna_quant/bam/mature/` with `--save_intermediates`) indicates the problem. For paired-end samplesheets, the pipeline only uses `fastq_1`.
 
 > [!WARNING]
-> QIAseq counts may change compared with earlier releases. Reads without an allowed mature-miRNA alignment continue to the hairpin and genome steps, so downstream read allocation may also change. To reproduce the previous both-strand miRNA alignment, set `--mirna_forward_only false` explicitly. Rerun alignment and downstream quantification rather than just filtering previously reported BAM records, because restricting the search can reveal alternative forward alignments.
+> With the `qiaseq` profile, the edgeR count tables differ from earlier releases (see above). To reproduce the previous both-strand miRNA alignment, set `--mirna_forward_only false`. Rerun the alignment rather than filtering reverse-strand records from existing BAM files, because restricting the search can reveal forward alignments that were hidden before.
 
 ### Genome
 
