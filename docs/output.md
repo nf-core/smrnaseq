@@ -183,6 +183,8 @@ These files will be saved in this directory if `--save_intermediates` is specifi
 - `[mature/hairpin]_log2CPM_sample_distances_dendrogram.pdf` Dendrograms of distance among samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
 - `[mature/hairpin]_log2CPM_sample_distances_heatmap.pdf` Pairwise correlation of samples based on the expression profile of mature miRNAs/miRNA precursors (hairpins)
 
+miRNAs are identified by name, not by miRBase accession. See [miRNA identifiers](#mirna-identifiers) for how to add accessions such as `MIMAT0000062`.
+
 **Example**: MDS plot of 10 samples based on their expression profiles of mature miRNAs. Here we can see that samples cluster based on different sample types and library preparation kits.
 ![edgeR](images/Example_MDS_plot.png)
 
@@ -195,10 +197,69 @@ These files will be saved in this directory if `--save_intermediates` is specifi
 
 **Output directory: `results/mirna_quant/mirtop`**
 
-- `gff/{sample.id}.gff`: [mirgff3](https://github.com/miRTop/mirGFF3) file
+- `gff/mirtop/{sample.id}_mirtop.gff`: [mirgff3](https://github.com/miRTop/mirGFF3) file
 - `joined_samples_mirtop.tsv`: a tabular version of the previous file for easy integration with downstream analysis.
 - `export/{sample.id}_mirtop_rawData.tsv`: File compatible with [isomiRs](http://lpantano.github.io/isomiRs/reference/IsomirDataSeqFromMirtop.html) Bioconductor package to perform isomiRs analysis.
 - `mirna.tsv`: tabular file with miRNA counts after summarizing unique isomiRs for each miRNA
+
+miRNAs are identified by name, not by miRBase accession. See [miRNA identifiers](#mirna-identifiers) for how to add accessions such as `MIMAT0000062`.
+
+## miRNA identifiers
+
+The edgeR and mirtop count tables identify miRNAs by **name**, for example `hsa-let-7a-5p` (mature) or `hsa-let-7a-1` (hairpin). They do not contain miRBase accessions (`MIMAT…` for mature miRNAs, `MI…` for hairpins). The names come from the reference files:
+
+| Output                                                           | miRBase (default)                                                | MirGeneDB (`--mirgenedb`)                                         |
+| ---------------------------------------------------------------- | ---------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `edger_qc/mature_*`                                              | first word of the `--mature` FASTA headers, e.g. `hsa-let-7a-5p` | `--mirgenedb_mature` FASTA headers, e.g. `Hsa-Let-7-P1b_5p`       |
+| `edger_qc/hairpin_*`                                             | first word of the `--hairpin` FASTA headers, e.g. `hsa-let-7a-1` | `--mirgenedb_hairpin` FASTA headers, e.g. `Hsa-Let-7-P1b_pre`     |
+| mirtop `miRNA` column (`mirna.tsv`, `joined_samples_mirtop.tsv`) | `Name` attribute of the `--mirna_gtf` GFF3, e.g. `hsa-let-7a-5p` | `ID` attribute of the `--mirgenedb_gff`, e.g. `Hsa-Let-7-P1b_3p*` |
+| mirtop `Parent` attribute (`gff/`)                               | hairpin name, e.g. `hsa-let-7a-1`                                | hairpin ID, e.g. `Hsa-Let-7-P1b_pre`                              |
+
+The pipeline keeps only the first word of each FASTA header, which is why the accession that follows the name in miRBase's `mature.fa` and `hairpin.fa` (`>hsa-let-7a-5p MIMAT0000062 Homo sapiens let-7a-5p`) is not carried into the outputs.
+
+With MirGeneDB, mirtop uses the GFF IDs as they are, and these mark the star (less abundant) arm with a trailing `*`, for example `Hsa-Mir-3613_3p*`. The edgeR tables use the FASTA header names instead. The MirGeneDB mature FASTA usually contains only the dominant arm, so star arms are reported by mirtop but are not in `edger_qc/mature_*`.
+
+Mature miRNA names are unique within a database release, so you can add accessions after the run. Build a name-to-accession table from the same GFF file you passed to the pipeline (`--mirna_gtf` for miRBase, which defaults to `https://mirbase.org/download/CURRENT/genomes/<species>.gff3`, or `--mirgenedb_gff` for MirGeneDB). It covers both mature miRNAs and hairpins, and works for both formats: miRBase GFF3 files store the name in `Name` and the accession in `Alias`, and MirGeneDB GFF files store the name in `ID` and the miRBase accession in `Alias`:
+
+```bash
+gff=hsa.gff3 # the file passed to --mirna_gtf or --mirgenedb_gff
+{
+  printf 'miRNA\taccession\n'
+  awk -F'\t' -v OFS='\t' '
+    $3 == "miRNA" || $3 == "miRNA_primary_transcript" || $3 == "pre_miRNA" {
+      id = name = acc = ""
+      n = split($9, attr, ";")
+      for (i = 1; i <= n; i++) {
+        split(attr[i], kv, "=")
+        if (kv[1] == "ID")    id   = kv[2]
+        if (kv[1] == "Name")  name = kv[2]
+        if (kv[1] == "Alias") acc  = kv[2]
+      }
+      print (name != "" ? name : id), acc
+    }' "$gff" | sort -u
+} > mirna_accessions.tsv
+```
+
+Then join it to a count table, for example in R:
+
+```r
+ids <- read.delim("mirna_accessions.tsv")
+
+# mirtop: one row per miRNA, names in the "miRNA" column
+counts <- read.delim("mirna_quant/mirtop/mirna.tsv", check.names = FALSE)
+counts <- merge(ids, counts, by = "miRNA", all.y = TRUE)
+
+# edgeR: one row per miRNA, names in the row names
+cpm <- read.delim("mirna_quant/edger_qc/mature_normalized_CPM.txt", check.names = FALSE)
+cpm$accession <- ids$accession[match(rownames(cpm), ids$miRNA)]
+```
+
+Keep these points in mind:
+
+- Use the GFF file from the same release as the FASTA files. Names change between miRBase releases (for example, `hsa-miR-375` became `hsa-miR-375-3p`), while the accession (`MIMAT0000728`) stays the same. This makes accessions the safer key when you compare results across releases or pipeline runs.
+- The same mature miRNA can come from several hairpins. For example, `hsa-miR-1-3p` (`MIMAT0000416`) comes from both `hsa-mir-1-1` and `hsa-mir-1-2`. Mature counts are per mature sequence, not per genomic locus. Hairpin-level counts are in `edger_qc/hairpin_*`.
+- MirGeneDB only lists a miRBase accession for miRNAs that are also in miRBase. MirGeneDB-only miRNAs have an empty `accession`.
+- With MirGeneDB, the table keeps the trailing `*` of star arms, which matches the mirtop names. If your FASTA headers do not include the `*`, remove it from the `miRNA` column (for example with `sub("\\*$", "", ids$miRNA)` in R) before you join the table to the edgeR outputs.
 
 ## miRDeep2
 
