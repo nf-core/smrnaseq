@@ -102,7 +102,7 @@ If `--save_reference` is specified, the reference files and indices that the pip
 
 </details>
 
-[UMI-tools](https://github.com/CGATOxford/UMI-tools) `extract` removes the UMI (and, depending on `--umitools_bc_pattern`, the kit anchor sequence) from the read sequence and adds the UMI to the read name. It runs **after** the reads have been deduplicated by sequence with UMIcollapse (see [UMI-collapse deduplicate](#umi-collapse-deduplicate)), so that only the insert sequence is mapped. With the default `--skip_umi_extract_before_dedup true`, UMIs are not extracted before deduplication.
+[UMI-tools](https://github.com/CGATOxford/UMI-tools) `extract` removes the UMI (and, depending on `--umitools_bc_pattern`, the kit anchor sequence) from the read sequence and adds the UMI to the read name. It runs **after** the reads have been deduplicated by sequence with UMICollapse (see [UMI-collapse deduplicate](#umi-collapse-deduplicate)), so that only the insert sequence is mapped. With the default `--skip_umi_extract_before_dedup true`, UMIs are not extracted before deduplication.
 
 ## FastP
 
