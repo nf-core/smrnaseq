@@ -284,6 +284,7 @@ workflow NFCORE_SMRNASEQ {
                         MIRDEEP2_CONSENSUS (
                                 ch_mirdeep2,
                                 params.mirdeep2_consensus_min_samples,
+                                params.mirdeep2_consensus_min_probability,
                         )
                         ch_mirdeep2 = ch_mirdeep2.mix(MIRDEEP2_CONSENSUS.out.bed)
                 }

@@ -6,6 +6,11 @@ nextflow_pipeline {
     tag "pipeline"
     tag "mirdeep2_consensus"
 
+    // miRDeep2 reports one known miRNA per test sample, at two different hairpins. Its estimated
+    // true-positive probability is "0 +/- 0%" in Clone1_N1 and "-" (no estimate, as miRDeep2 found
+    // no novel candidates) in Control_N1.
+    def header = ['#chrom', 'start', 'end', 'name', 'score', 'strand', 'n_samples', 'samples', 'probability', 'mirdeep2_ids'].join('\t')
+
     test("-profile test_mirgenedb --mirdeep2_consensus_min_samples 1") {
 
         when {
@@ -22,11 +27,33 @@ nextflow_pipeline {
                 { assert workflow.success },
                 { assert new File("${outputDir}/mirdeep2/result_Clone1_N1.bed").exists() },
                 { assert consensus.exists() },
-                // miRDeep2 reports one known miRNA per test sample, at two different hairpins
                 { assert lines.size() == 3 },
-                { assert lines[0].startsWith('#chrom\tstart\tend\tname\tscore\tstrand\tn_samples\tsamples\tmirdeep2_ids') },
-                { assert lines[1] == ['hg38_dna', '1259227', '1259294', 'known:consensus_1', '2.4', '+', '1', 'Control_N1', 'Control_N1:known:hg38_dna_6'].join('\t') },
-                { assert lines[2] == ['hg38_dna', '1259964', '1260039', 'known:consensus_2', '1.4', '+', '1', 'Clone1_N1', 'Clone1_N1:known:hg38_dna_6'].join('\t') }
+                { assert lines[0] == header },
+                { assert lines[1] == ['hg38_dna', '1259227', '1259294', 'known:consensus_1', '2.4', '+', '1', 'Control_N1', '-', 'Control_N1:known:hg38_dna_6'].join('\t') },
+                { assert lines[2] == ['hg38_dna', '1259964', '1260039', 'known:consensus_2', '1.4', '+', '1', 'Clone1_N1', '0', 'Clone1_N1:known:hg38_dna_6'].join('\t') }
+            )
+        }
+    }
+
+    test("-profile test_mirgenedb --mirdeep2_consensus_min_samples 1 --mirdeep2_consensus_min_probability 1") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                mirdeep2_consensus_min_samples = 1
+                mirdeep2_consensus_min_probability = 1
+            }
+        }
+
+        then {
+            def consensus = new File("${outputDir}/mirdeep2/mirdeep2_consensus.bed")
+            def lines = consensus.exists() ? consensus.readLines() : []
+            assertAll(
+                { assert workflow.success },
+                // Clone1_N1 (0 %) is removed, Control_N1 (no probability) is kept
+                { assert lines.size() == 2 },
+                { assert lines[0] == header },
+                { assert lines[1] == ['hg38_dna', '1259227', '1259294', 'known:consensus_1', '2.4', '+', '1', 'Control_N1', '-', 'Control_N1:known:hg38_dna_6'].join('\t') }
             )
         }
     }

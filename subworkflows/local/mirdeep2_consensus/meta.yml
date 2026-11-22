@@ -14,18 +14,24 @@ input:
   - ch_mirdeep2:
       type: file
       description: |
-        Channel containing the miRDeep2 results of each sample. Only the BED files are used.
+        Channel containing the miRDeep2 results of each sample. The BED files give the loci,
+        the CSV files the true-positive probabilities (optional, the HTML files are not used).
         Structure: [ val(meta), [ path(bed), path(csv), path(html) ] ]
       pattern: "result_*.{bed,csv,html}"
   - min_samples:
       type: integer
       description: |
         Minimum number of samples that must report an overlapping locus on the same strand.
+  - min_probability:
+      type: integer
+      description: |
+        Minimum miRDeep2 estimated true-positive probability in percent (0 disables the filter).
+        Entries without a probability ("-") are kept.
 output:
   - bed:
       type: file
       description: |
-        Channel containing the consensus BED file (BED6 plus n_samples, samples and mirdeep2_ids columns).
+        Channel containing the consensus BED file (BED6 plus n_samples, samples, probability and mirdeep2_ids columns).
         Structure: [ val(meta), path(bed) ]
       pattern: "mirdeep2_consensus.bed"
 authors:
