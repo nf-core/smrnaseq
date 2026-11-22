@@ -1,3 +1,5 @@
+nextflow.enable.types = true
+
 process FORMAT_FASTA_MIRNA {
     tag "$fasta"
     label 'process_medium'
@@ -8,31 +10,21 @@ process FORMAT_FASTA_MIRNA {
         'community.wave.seqera.io/library/fastx_toolkit:0.0.14--2d5a3f28610ed585' }"
 
     input:
-    tuple val(meta2), path(fasta)
+    tuple(meta2: Map, fasta: Path)
 
     output:
-    tuple val(meta2), path('*_idx.fa') , emit: formatted_fasta
-    path "versions.yml"                , emit: versions
+    formatted_fasta = tuple(meta2, file('*_idx.fa'))
+    // Not emitted via the versions topic: Nextflow 26.04 never closes a topic fed by a
+    // typed process that is included under several aliases (FORMAT_MATURE/FORMAT_HAIRPIN).
+    versions        = tuple(task.process, 'fastx_toolkit', '0.0.14')
 
     script:
-    def version = '0.0.14'
     """
     fasta_formatter -w 0 -i $fasta -o ${fasta}_idx.fa
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        fastx_toolkit:  \$(echo "$version")
-    END_VERSIONS
     """
 
     stub:
-    def version = '0.0.14'
     """
     touch ${fasta}_idx.fa
-
-    cat <<-END_VERSIONS > versions.yml
-    "${task.process}":
-        fastx_toolkit:  \$(echo "$version")
-    END_VERSIONS
     """
 }

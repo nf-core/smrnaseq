@@ -28,10 +28,6 @@ output:
       type: file
       description: Joined wide-format mirtop result table.
       pattern: "*joined_samples_mirtop.tsv"
-  - versions:
-      type: file
-      description: File containing software versions.
-      pattern: "versions.yml"
 authors:
   - "@atrigila"
 maintainers:
