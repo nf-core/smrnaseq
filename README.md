@@ -39,14 +39,13 @@ You can find numerous talks on the nf-core events page from various topics inclu
 
 1. Quality check and triming
    1. Raw read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-   2. UMI extraction and miRNA adapter trimming ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools)) (Optional)
-   3. 3' adapter trimming ([`fastp`](https://github.com/OpenGene/fastp))
-   4. Read quality and length filter ([`fastp`](https://github.com/OpenGene/fastp))
-   5. Trim read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
+   2. 3' adapter trimming ([`fastp`](https://github.com/OpenGene/fastp))
+   3. Read quality and length filter ([`fastp`](https://github.com/OpenGene/fastp))
+   4. Trim read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
 2. UMI deduplication (Optional)
    1. Deduplication on fastq-level ([`UMICollapse`](https://github.com/Daniel-Liu-c0deb0t/UMICollapse))
-   2. Barcode and miRNA adapter extraction ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools))
-   3. Read length filter ([`fastp`](https://github.com/OpenGene/fastp))
+   2. UMI and kit adapter extraction ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools))
+   3. Read clipping and length filter ([`fastp`](https://github.com/OpenGene/fastp))
 3. miRNA QC ([`miRTrace`](https://github.com/friedlanderlab/mirtrace))
 4. Contamination filtering ([`Bowtie2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) (Optional)
    1. rRNA filtration
@@ -55,8 +54,7 @@ You can find numerous talks on the nf-core events page from various topics inclu
    4. ncRNA filtration
    5. piRNA filtration
    6. Others filtration
-5. UMI barcode deduplication ([`UMI-tools`](https://github.com/CGATOxford/UMI-tools))
-6. miRNA quantification
+5. miRNA quantification
    - EdgeR
      1. Reads alignment against miRBase mature miRNA ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
      2. Post-alignment processing of alignment against Mature miRNA ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
@@ -69,13 +67,13 @@ You can find numerous talks on the nf-core events page from various topics inclu
    - Mirtop quantification
      1. Read collapsing ([`seqcluster`](https://github.com/lpantano/seqcluster))
      2. miRNA and isomiR annotation ([`mirtop`](https://github.com/miRTop/mirtop))
-7. Genome Quantification (Optional)
+6. Genome Quantification (Optional)
    1. Reads alignment against host reference genome ([`Bowtie1`](http://bowtie-bio.sourceforge.net/index.shtml))
    2. Post-alignment processing of alignment against host reference genome ([`SAMtools`](https://sourceforge.net/projects/samtools/files/samtools/))
-8. Novel miRNAs and known miRNAs discovery ([`MiRDeep2`](https://www.mdc-berlin.de/content/mirdeep2-documentation)) (Optional)
+7. Novel miRNAs and known miRNAs discovery ([`MiRDeep2`](https://www.mdc-berlin.de/content/mirdeep2-documentation)) (Optional)
    1. Mapping against reference genome with the mapper module
    2. Known and novel miRNA discovery with the mirdeep2 module
-9. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
+8. Present QC for raw read, alignment, and expression results ([`MultiQC`](http://multiqc.info/))
 
 ## Usage
 

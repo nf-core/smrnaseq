@@ -233,6 +233,42 @@ def validateInputParameters() {
             error("You specified to be using MirGeneDB, but the GFF file is not found. Please provide the file using the `--mirgenedb_gff` parameter.")
         }
     }
+
+    // Validate UMI parameters
+    def umi_error = umiParameterError(params.with_umi, params.umitools_bc_pattern, params.skip_umi_extract_before_dedup, params.three_prime_adapter, params.skip_fastp, params.trim_fastq)
+    if (umi_error) {
+        error(umi_error)
+    }
+}
+
+//
+// Check UMI parameter combinations that cannot work. Returns an error message, or null if the
+// combination is valid (or `--with_umi` is not set).
+//
+def umiParameterError(with_umi, bc_pattern, skip_umi_extract_before_dedup, three_prime_adapter, skip_fastp, trim_fastq) {
+    if (!with_umi) {
+        return null
+    }
+    def docs = "See https://nf-co.re/smrnaseq/usage#umi-handling"
+    if (!bc_pattern) {
+        return "'--with_umi' requires '--umitools_bc_pattern' to describe where the UMI is in the read. ${docs}"
+    }
+    if (!skip_umi_extract_before_dedup) {
+        // umi_tools extract would run before fastp and again after UMICollapse with the same
+        // pattern, so the second extraction removes bases from (or drops) reads that no longer contain a UMI
+        return "'--skip_umi_extract_before_dedup false' is not supported with '--with_umi': the UMI would be extracted twice with the same '--umitools_bc_pattern', which drops or truncates reads. Remove the parameter (the default is true). ${docs}"
+    }
+    // fastp trims the 3' adapter before UMI extraction. If the extraction pattern needs the adapter
+    // to find the UMI (e.g. the QIAseq anchor AACTGTAGGCACCATCAAT set by -profile qiaseq),
+    // the pattern no longer matches and almost all reads are lost.
+    def adapter_trimmed = !skip_fastp && trim_fastq && three_prime_adapter && three_prime_adapter != 'auto-detect'
+    if (adapter_trimmed) {
+        def adapter_start = three_prime_adapter.take(10)
+        if (bc_pattern.toUpperCase().contains(adapter_start.toUpperCase())) {
+            return "'--umitools_bc_pattern' contains the 3' adapter given in '--three_prime_adapter' (${three_prime_adapter}). fastp removes this adapter, and the UMI after it, before UMI extraction, so the pattern would not match. Set '--three_prime_adapter' to the adapter that follows the UMI instead (for QIAseq miRNA, do not use -profile qiaseq and set '--three_prime_adapter AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'). ${docs}"
+        }
+    }
+    return null
 }
 
 // Validate channels from input samplesheet

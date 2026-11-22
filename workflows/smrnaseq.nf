@@ -129,8 +129,9 @@ workflow NFCORE_SMRNASEQ {
     ch_fastp_logs        = FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_log
     ch_umi_extract_logs  = FASTQ_FASTQC_UMITOOLS_FASTP.out.umi_log
     ch_umi_extract_reads = FASTQ_FASTQC_UMITOOLS_FASTP.out.umi_reads
-    // Trim 3' end nucleotides after adapter is removed, otherwise they are not really trimmed
-    if ((params.three_prime_clip_r1 ?: 0) > 0){
+    // Trim 3' end nucleotides after adapter is removed, otherwise they are not really trimmed.
+    // With UMIs, the reads still end with the UMI here, so FASTP_LENGTH_FILTER clips them after UMI extraction instead.
+    if ((params.three_prime_clip_r1 ?: 0) > 0 && !params.with_umi){
         FASTP3(
             ch_reads_for_mirna.map { meta, reads -> [meta, reads, []] },
             false,

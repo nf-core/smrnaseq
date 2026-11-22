@@ -1,0 +1,72 @@
+nextflow_pipeline {
+
+    name "Test pipeline UMI parameter handling"
+    script "../main.nf"
+    profile "test_umi,ci"
+    tag "pipeline"
+    tag "umi"
+    tag "umi_params"
+
+    test("-profile test_umi --clip_r1 2 --three_prime_clip_r1 2") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                clip_r1 = 2
+                three_prime_clip_r1 = 2
+            }
+        }
+
+        then {
+            // Scripts of the tasks of each fastp step, found through their .command.run
+            def scripts = [trim: [], fastp3: [], length_filter: []]
+            new File("${workDir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
+                if (file.name == '.command.run') {
+                    def text = file.text
+                    def script = new File(file.parentFile, '.command.sh').text
+                    if (text.contains('FASTQ_FASTQC_UMITOOLS_FASTP:FASTP')) { scripts.trim.add(script) }
+                    if (text.contains('NFCORE_SMRNASEQ:FASTP3')) { scripts.fastp3.add(script) }
+                    if (text.contains('NFCORE_SMRNASEQ:FASTP_LENGTH_FILTER')) { scripts.length_filter.add(script) }
+                }
+            }
+            assert workflow.success
+            assert scripts.trim.size() > 0
+            assert scripts.length_filter.size() > 0
+            // Before UMI extraction the reads still carry the UMI, so they are not clipped there
+            assert scripts.trim.every { script -> !script.contains('--trim_front1') && !script.contains('--trim_tail1') }
+            assert scripts.fastp3.isEmpty()
+            // Clipping is done once, after UMI extraction
+            assert scripts.length_filter.every { script -> script.contains('--trim_front1 2') && script.contains('--trim_tail1 2') }
+        }
+    }
+
+    test("-profile test_umi with the UMI anchor as fastp adapter") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                three_prime_adapter = 'AACTGTAGGCACCATCAAT'
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert (workflow.stdout + workflow.stderr).any { it.contains("'--umitools_bc_pattern' contains the 3' adapter given in '--three_prime_adapter' (AACTGTAGGCACCATCAAT)") }
+        }
+    }
+
+    test("-profile test_umi --skip_umi_extract_before_dedup false") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                skip_umi_extract_before_dedup = false
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert (workflow.stdout + workflow.stderr).any { it.contains("'--skip_umi_extract_before_dedup false' is not supported with '--with_umi'") }
+        }
+    }
+}

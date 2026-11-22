@@ -117,4 +117,158 @@ nextflow_function {
             )
         }
     }
+
+    // umiParameterError inputs: with_umi, bc_pattern, skip_umi_extract_before_dedup,
+    // three_prime_adapter, skip_fastp, trim_fastq
+
+    test("Test Function umiParameterError - without UMI") {
+
+        function "umiParameterError"
+
+        when {
+            function {
+                """
+                input[0] = false
+                input[1] = null
+                input[2] = false
+                input[3] = 'AACTGTAGGCACCATCAAT'
+                input[4] = false
+                input[5] = true
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null }
+            )
+        }
+    }
+
+    test("Test Function umiParameterError - QIAseq pattern with TruSeq adapter") {
+
+        function "umiParameterError"
+
+        when {
+            function {
+                """
+                input[0] = true
+                input[1] = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
+                input[2] = true
+                input[3] = 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'
+                input[4] = false
+                input[5] = true
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null }
+            )
+        }
+    }
+
+    test("Test Function umiParameterError - missing pattern") {
+
+        function "umiParameterError"
+
+        when {
+            function {
+                """
+                input[0] = true
+                input[1] = null
+                input[2] = true
+                input[3] = 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'
+                input[4] = false
+                input[5] = true
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result.contains("'--with_umi' requires '--umitools_bc_pattern'") }
+            )
+        }
+    }
+
+    test("Test Function umiParameterError - extraction before deduplication") {
+
+        function "umiParameterError"
+
+        when {
+            function {
+                """
+                input[0] = true
+                input[1] = 'NNNNNNNN'
+                input[2] = false
+                input[3] = 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'
+                input[4] = false
+                input[5] = true
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result.contains("'--skip_umi_extract_before_dedup false' is not supported") }
+            )
+        }
+    }
+
+    test("Test Function umiParameterError - pattern anchored on the trimmed adapter") {
+
+        function "umiParameterError"
+
+        when {
+            function {
+                """
+                input[0] = true
+                input[1] = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
+                input[2] = true
+                input[3] = 'AACTGTAGGCACCATCAAT'
+                input[4] = false
+                input[5] = true
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result.contains("contains the 3' adapter given in '--three_prime_adapter' (AACTGTAGGCACCATCAAT)") }
+            )
+        }
+    }
+
+    test("Test Function umiParameterError - pattern anchored on the adapter with --skip_fastp") {
+
+        function "umiParameterError"
+
+        when {
+            function {
+                """
+                input[0] = true
+                input[1] = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
+                input[2] = true
+                input[3] = 'AACTGTAGGCACCATCAAT'
+                input[4] = true
+                input[5] = true
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                // fastp does not trim the adapter, so the pattern still finds it
+                { assert function.result == null }
+            )
+        }
+    }
 }

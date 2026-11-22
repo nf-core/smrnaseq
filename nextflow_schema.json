@@ -75,7 +75,7 @@
                 "skip_umi_extract_before_dedup": {
                     "type": "boolean",
                     "fa_icon": "fas fa-compress-alt",
-                    "description": "Skip the UMI extraction from the reads before deduplication. Please note, if this parameter is set to false, the reads will be deduplicated solely on insert sequence. UMIs might be extracted after deduplication depending on the set umitools_bc_pattern nevertheless if with_umi is set to True.",
+                    "description": "Skip the UMI extraction from the reads before deduplication. Keep the default (true): with --with_umi, the UMI is extracted after UMICollapse deduplication, and setting this to false is rejected because the UMI would be extracted twice.",
                     "default": true
                 },
                 "umitools_bc_pattern": {
