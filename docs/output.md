@@ -210,6 +210,28 @@ These files will be saved in this directory if `--save_intermediates` is specifi
 - `mirdeep2/result_{sample.id}.csv` File with an overview of all detected miRNAs (known and novel) in csv format.
 - `mirdeep2/result_{sample.id}.html` A HTML report with an overview of all detected miRNAs (known and novel) in html format.
 
+miRDeep2 runs only when a genome FASTA is given and `--skip_mirdeep` is not set. It runs on each sample separately, and there is no file that combines all samples. See [the usage documentation](https://nf-co.re/smrnaseq/usage#mirdeep2) for its inputs and options.
+
+How to read the results:
+
+- The CSV file is tab-separated, even though its extension is `.csv`. It has these parts:
+  - A table of score cut-offs. For each miRDeep2 score, it lists the number of novel miRNAs reported, the estimated false and true positives among them, the number of known miRNAs detected, and the estimated signal-to-noise ratio. Use this table to choose a score cut-off for novel miRNAs.
+  - `novel miRNAs predicted by miRDeep2`: candidate precursors that do not match a known hairpin.
+  - `mature miRBase miRNAs detected by miRDeep2`: known miRNAs that miRDeep2 also finds in the data.
+  - `#miRBase miRNAs not detected by miRDeep2`: known miRNAs with reads in the sample that miRDeep2 does not report as precursors.
+- Important columns of the novel and detected tables:
+  - `miRDeep2 score`: higher is more likely to be a real miRNA.
+  - `estimated probability that the miRNA candidate is a true positive`: for a candidate with this score or higher.
+  - `rfam alert`: the hairpin is similar to an rRNA or tRNA. The miRDeep2 authors advise that this warning should overrule the probability.
+  - `total read count`, `mature read count`, `loop read count` and `star read count`: the reads on each part of the precursor.
+  - `significant randfold p-value`: whether the hairpin folds more stably than shuffled sequences.
+  - `example miRBase miRNA with the same seed`: a known miRNA with the same seed, if one exists.
+  - `consensus mature sequence`, `consensus star sequence` and `consensus precursor sequence`: the sequences of the candidate.
+  - `precursor coordinate`: the genome position as `chromosome:start..end:strand`.
+- The BED file holds the novel and detected known miRNAs from the CSV. Column 4 is `novel:<provisional id>` or `known:<provisional id>` and column 5 is the miRDeep2 score. The colour is red for the `+` strand and blue for the `-` strand. Scores and provisional IDs are specific to each sample, so you cannot compare them between samples directly ([#176](https://github.com/nf-core/smrnaseq/issues/176) tracks a combined BED file).
+- The HTML report shows the same tables. Its links to the per-miRNA structure PDFs (`pdfs_*/`) do not work, because the pipeline does not publish those PDFs.
+- Novel miRNAs are not added to the miRNA count tables. See [the usage documentation](https://nf-co.re/smrnaseq/usage#mirdeep2) for how to count them in all samples.
+
 ## miRTrace
 
 [miRTrace](https://github.com/friedlanderlab/mirtrace) is a quality control specifically for small RNA sequencing data (smRNA-Seq). Each sample is characterized by profiling sequencing quality, read length, sequencing depth and miRNA complexity and also the amounts of miRNAs versus undesirable sequences (derived from tRNAs, rRNAs and sequencing artifacts). By default, the pipeline sets the PHRED offset to the most common value of +33, so if you need to adjust this, use the `params.phred_offset` option to include this accordingly for your FASTQ files. miRTrace is run on the raw (untrimmed, but concatenated if needed) reads, because it performs its own adapter removal (using `--three_prime_adapter`) and quality and length filtering. The QC-passed reads it writes are named after the sample, for example `qc_passed_reads.all.collapsed/<sample>.fasta`.

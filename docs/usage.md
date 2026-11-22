@@ -82,6 +82,36 @@ Contamination filtering of the sequencing reads is optional and can be invoked u
 
 ## mirDeep2
 
+[miRDeep2](https://github.com/rajewsky-lab/mirdeep2) predicts novel miRNAs from the reads and also reports how well the data supports the known miRNAs. It is the only step of the pipeline that looks for miRNAs that are not in the miRBase or MirGeneDB reference. The pipeline does not detect or quantify other small RNA classes (for example piRNAs) on their own; the `pirna` FASTA is only used to remove reads in [contamination filtering](#contamination-filtering).
+
+### Requirements and inputs
+
+- miRDeep2 runs by default. It needs a genome FASTA, given with `--fasta` or through `--genome` (iGenomes). Without a genome FASTA, the pipeline skips genome mapping and miRDeep2 without a warning. Use `--skip_mirdeep` to turn it off when a genome is given.
+- miRDeep2 maps the reads with the genome Bowtie 1 index. The pipeline builds it from `--fasta`, unless you give `--bowtie_index`, which must be built from the same FASTA (see [Genome](#genome)).
+- Reads: the trimmed reads of each sample, after UMI handling and, with `--filter_contamination`, after contamination filtering. All of these reads go to miRDeep2, including reads that map to known miRNAs. The pipeline converts them to FASTA, then collapses and maps them with `mapper.pl -c -j -m -v`.
+- Known miRNAs: the mature and hairpin sequences of your species, taken from `--mature` and `--hairpin` (or `--mirgenedb_mature` and `--mirgenedb_hairpin`) and filtered by `--mirtrace_species` (or `--mirgenedb_species`). Mature miRNAs of related species are not passed to miRDeep2, so novel candidates get no seed conservation support from other species.
+- miRDeep2 runs on each sample separately, single-threaded (`process_single`). Results are not merged across samples, and novel candidates are not added to the miRNA count tables (`mirna_quant/`). To count novel miRNAs in all samples, add the consensus precursor and mature sequences of the candidates you trust to copies of your `--hairpin` and `--mature` FASTA files and run the pipeline again. Give them names with your species prefix, for example `hsa-novel-1`, because the pipeline keeps only entries that match `<species>-`. They are then counted in the mature and hairpin count tables (`mirna_quant/edger_qc/`). mirtop only annotates miRNAs that are in the `--mirna_gtf` file.
+
+See [the output documentation](https://nf-co.re/smrnaseq/output#mirdeep2) for how to read the results.
+
+### Tuning miRDeep2
+
+You can pass extra `miRDeep2.pl` options with `ext.args` (see [Custom Tool Arguments](#custom-tool-arguments)). The pipeline sets none by default. For example:
+
+```groovy
+process {
+    withName: 'MIRDEEP2_MIRDEEP2' {
+        ext.args = '-P -d'
+    }
+}
+```
+
+- `-P`: the miRDeep2 documentation recommends this when the mature reference uses miRBase v18 or later names (`-5p`/`-3p` suffixes), as current miRBase releases do.
+- `-d`: skips the structure PDFs. The pipeline does not publish them (see [the output documentation](https://nf-co.re/smrnaseq/output#mirdeep2)), so `-d` saves run time.
+- `-b <score>`: only report novel candidates with at least this miRDeep2 score (default 0).
+
+### Exit status 255
+
 If the software encounters an error with exit status 255, it will be ignored, and the pipeline will continue to complete. In such cases, the pipeline will log a note that includes the path to the work directory where the issue occurred. You can inspect this work directory to examine your input data and troubleshoot the issue.
 
 Error 255 is typically related to the core algorithm of miRDeep generating empty output files. This often happens when the reads being processed do not correspond to putative mature miRNA sequences, or if the provided precursors do not meet the criteria for valid miRNA precursors, both of which may stem from the input reads used. A common cause of this error is running the pipeline with a small subset of the input reads.
