@@ -193,7 +193,7 @@ These files will be saved in this directory if `--save_intermediates` is specifi
 
 [mirtop](https://github.com/miRTop/mirtop) is used to parse the BAM files from `bowtie` alignment, and produce a [mirgff3](https://github.com/miRTop/mirGFF3) file with information about miRNAs and isomirs.
 
-**Output directory: `results/mirna_quant/mirtop`**
+**Output directory: `results/mirna_quant/mirtop`** (not created with `--skip_mirtop`)
 
 - `gff/{sample.id}.gff`: [mirgff3](https://github.com/miRTop/mirGFF3) file
 - `joined_samples_mirtop.tsv`: a tabular version of the previous file for easy integration with downstream analysis.

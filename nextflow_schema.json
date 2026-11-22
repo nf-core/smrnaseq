@@ -118,7 +118,7 @@
                 "mirtrace_species": {
                     "type": "string",
                     "description": "Species for miRTrace.",
-                    "help_text": "This is automatically set when using `--genome`. Example values: `hsa`, `mmu`...\n Note that mirTrace relies on miRBase for its species reference. See available references [here](https://www.mirbase.org/help/genome_summary.shtml).",
+                    "help_text": "This is automatically set when using `--genome`. Example values: `hsa`, `mmu`...\n Note that mirTrace relies on miRBase for its species reference. See available references [here](https://www.mirbase.org/help/genome_summary.shtml). The value is also used to select the species' miRNAs from `--mature` and `--hairpin` and to download the miRBase GFF3 file for mirtop.",
                     "fa_icon": "fas fa-journal-whills"
                 },
                 "mirgenedb_species": {
@@ -140,7 +140,7 @@
                 "mirna_gtf": {
                     "type": "string",
                     "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
-                    "help_text": "miRBase `.gff3` file, typically downloaded from [`https://mirbase.org/download/CURRENT/genomes/`](https://mirbase.org/download/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
+                    "help_text": "miRBase `.gff3` file, typically downloaded from [`https://mirbase.org/download/CURRENT/genomes/`](https://mirbase.org/download/CURRENT/genomes/)\n\nIf not set, this file is downloaded from miRBase automatically for `--mirtrace_species` during the pipeline run. miRBase does not provide this file for all species (e.g. sheep, `oar`); in that case provide one here or use `--skip_mirtop`. It is only used by mirtop.\n\n",
                     "fa_icon": "fas fa-address-book"
                 },
                 "mirgenedb_gff": {
@@ -346,6 +346,12 @@
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip miRDeep"
+                },
+                "skip_mirtop": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip the mirtop isomiR annotation.",
+                    "help_text": "mirtop needs a miRNA GFF3 file (`--mirna_gtf` or `--mirgenedb_gff`). With `--skip_mirtop`, no GFF3 file is required or downloaded, which allows running the pipeline for species without a miRBase GFF3 file (e.g. sheep, `oar`). The mature and hairpin miRNA quantification (`mirna_quant/edger_qc/`) is still produced."
                 },
                 "skip_multiqc": {
                     "type": "boolean",
