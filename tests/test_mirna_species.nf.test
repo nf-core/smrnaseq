@@ -13,42 +13,50 @@ nextflow_pipeline {
                 outdir = "$outputDir"
                 mirna_species = 'hsa,mmu'
                 // Only human coordinates: mouse hairpins are aligned to but not annotated by mirtop
-                mirna_gtf = "${params.pipelines_testdata_base_path}reference/hsa.gff3"
+                mirna_gtf = "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3"
             }
         }
 
         then {
-            // Scripts of the tasks of a process, found through their .command.run
-            def scripts_of = { String process_name ->
-                def scripts = []
+            // Task directories of a process, found through their .command.run
+            def task_dirs_of = { String process_name ->
+                def dirs = []
                 new File("${workDir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
-                    if (file.name == '.command.run' && file.text.contains(process_name)) {
-                        scripts.add(new File(file.parentFile, '.command.sh').text)
+                    if (file.name == '.command.run' && file.text.contains("### name: \"${process_name}")) {
+                        dirs.add(file.parentFile)
                     }
                 }
-                scripts
+                dirs
             }
-            def species_of = { File fasta ->
+            def scripts_of = { String process_name ->
+                task_dirs_of(process_name).collect { dir -> new File(dir, '.command.sh').text }
+            }
+            // Species prefixes of the sequences in the parsed FASTA of a PARSE_FASTA_MIRNA task
+            def parsed_species_of = { String process_name ->
+                def dirs = task_dirs_of(process_name)
+                assert dirs.size() == 1
+                def fasta = dirs[0].listFiles().find { file -> file.name.endsWith('_igenome.fa') }
                 fasta.readLines().findAll { line -> line.startsWith('>') }.collect { line -> line.substring(1).tokenize('-')[0] }.toSet()
             }
-            def parse_scripts  = scripts_of('NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_HAIRPIN')
-            def mirtop_scripts = scripts_of('NFCORE_SMRNASEQ:MIRNA_QUANT:BAM_STATS_MIRNA_MIRTOP:MIRTOP_GFF')
+            def parse_scripts    = scripts_of('NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_HAIRPIN')
+            def mirtop_scripts   = scripts_of('NFCORE_SMRNASEQ:MIRNA_QUANT:BAM_STATS_MIRNA_MIRTOP:MIRTOP_GFF')
             def mirtrace_scripts = scripts_of('NFCORE_SMRNASEQ:MIRTRACE_QC')
-            def hairpin = new File("$outputDir/mirna_quant/reference/hairpin.fa_igenome.fa")
-            def mature  = new File("$outputDir/mirna_quant/reference/mature.fa_igenome.fa")
-            def mirna_counts = new File("$outputDir/mirna_quant/mirtop/mirna.tsv")
+            def hairpin_counts   = new File("$outputDir/mirna_quant/edger_qc/hairpin_normalized_CPM.txt").readLines().drop(1)
+            def mirna_counts     = new File("$outputDir/mirna_quant/mirtop/mirna.tsv").readLines().drop(1)
 
             assert workflow.success
             // The references are filtered to both species
             assert parse_scripts.size() == 1
             assert parse_scripts[0].contains('seqkit grep -r --pattern ".*hsa-.*" --pattern ".*mmu-.*"')
-            assert species_of(hairpin) == ['hsa', 'mmu'] as Set
-            assert species_of(mature) == ['hsa', 'mmu'] as Set
-            // mirtop keeps all (already filtered) hairpins and still annotates the human miRNAs
-            assert mirtop_scripts.size() == 1
-            assert mirtop_scripts[0].contains('--sps -')
-            assert mirna_counts.readLines().size() > 1
-            assert mirna_counts.readLines().drop(1).any { line -> line.startsWith('hsa-') }
+            assert parsed_species_of('NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_HAIRPIN') == ['hsa', 'mmu'] as Set
+            assert parsed_species_of('NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_MATURE') == ['hsa', 'mmu'] as Set
+            // Reads are counted on the hairpins of both species
+            assert hairpin_counts.any { line -> line.startsWith('hsa-') }
+            assert hairpin_counts.any { line -> line.startsWith('mmu-') }
+            // mirtop keeps all (already filtered) hairpins and annotates the miRNAs in --mirna_gtf (human only here)
+            assert mirtop_scripts.size() > 0
+            assert mirtop_scripts.every { script -> script.contains('--sps -') }
+            assert mirna_counts.any { line -> line.startsWith('hsa-') }
             // miRTrace still uses --mirtrace_species
             assert mirtrace_scripts.size() > 0
             assert mirtrace_scripts.every { script -> script.contains('--species hsa') }
