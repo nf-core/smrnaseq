@@ -68,6 +68,10 @@
                 "MIRDEEP2_MIRDEEP2": {
                     "mirdeep2": "2.0.1"
                 },
+                "MIRNA_REFERENCE": {
+                    "MirGeneDB": "v2.0",
+                    "genome_build": "hg38"
+                },
                 "MIRTOP_COUNTS": {
                     "mirtop": "0.4.30"
                 },
