@@ -14,7 +14,7 @@ nextflow_process {
                 script "../../umi_to_sequence/main.nf"
                 process {
                     """
-                    input[0] = [ [ id:'test', single_end:true ], file("${projectDir}/modules/local/umi_to_sequence/tests/data/extracted.fastq.gz", checkIfExists: true) ]
+                    input[0] = [ [ id:'test', single_end:true ], file("${projectDir}/modules/local/umi_to_sequence/tests/fixtures/extracted.fastq.gz", checkIfExists: true) ]
                     """
                 }
             }
@@ -29,7 +29,7 @@ nextflow_process {
         }
 
         then {
-            def original = path("${projectDir}/modules/local/umi_to_sequence/tests/data/extracted.fastq.gz").linesGzip
+            def original = path("${projectDir}/modules/local/umi_to_sequence/tests/fixtures/extracted.fastq.gz").linesGzip
             def restored = path(process.out.reads.get(0).get(1)).linesGzip
             def stats = path(process.out.saturation.get(0).get(1)).readLines()
             def header = stats[0].split('\t') as List
@@ -60,7 +60,7 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = [ [ id:'test', single_end:true ], file("${projectDir}/modules/local/umi_to_sequence/tests/data/extracted.fastq.gz", checkIfExists: true) ]
+                input[0] = [ [ id:'test', single_end:true ], file("${projectDir}/modules/local/umi_to_sequence/tests/fixtures/extracted.fastq.gz", checkIfExists: true) ]
                 """
             }
         }

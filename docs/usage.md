@@ -137,7 +137,7 @@ For other kits, set `--umitools_extract_method` and `--umitools_bc_pattern` so t
 
 UMI deduplication has to decide when two reads come from the same molecule. Reads with the same insert and UMI are duplicates. Reads whose UMIs differ by one base can be duplicates with a PCR or sequencing error in the UMI, or two different molecules whose UMIs happen to be similar. The pipeline offers two strategies:
 
-- **One-mismatch clustering (default):** UMICollapse `--algo dir` (directional) merges a read into a more abundant read whose UMI + insert differs by one substitution. This corrects UMI errors, but once a single insert sequence has been seen with a large part of all possible UMIs, distinct molecules have neighbouring UMIs by chance and are merged as well (*saturation*). The counts of the most abundant miRNAs are then underestimated, and more so the deeper the library is sequenced.
+- **One-mismatch clustering (default):** UMICollapse `--algo dir` (directional) merges a read into a more abundant read whose UMI + insert differs by one substitution. This corrects UMI errors, but once a single insert sequence has been seen with a large part of all possible UMIs, distinct molecules have neighbouring UMIs by chance and are merged as well (_saturation_). The counts of the most abundant miRNAs are then underestimated, and more so the deeper the library is sequenced.
 - **Exact UMI matching:** only reads with identical UMI + insert are merged. This is not affected by saturation, but reads with a UMI error are counted as separate molecules: a near-uniform overcount of a few percent, which mostly cancels in library-size normalisation. Set it with a custom config (see [Custom Tool Arguments](#custom-tool-arguments)):
 
   ```groovy
@@ -152,14 +152,14 @@ UMI deduplication has to decide when two reads come from the same molecule. Read
 
 **Benchmark.** The strategies were compared on simulated QIAseq-like libraries with known molecules (500,000–1,000,000 molecules with 40% duplicates, 1% UMI and insert errors per PCR copy, 0.2% sequencing errors per base, and one miRNA with 40–60% of all molecules), and on the `test_umi` sample (1.1M reads) and a 4.5M-read subsample of the same QIAseq plasma library:
 
-| | One mismatch (`dir`, default) | Exact UMI (`-k 0`) | Previous order (UMICollapse before extraction, `dir`) |
-| --- | --- | --- | --- |
-| Count error per miRNA, simulated, all but the most abundant miRNA | 0.6–1.1% | +8–9% (overcount) | 1.1–1.6% |
-| Most abundant simulated miRNA (200,000 / 600,000 molecules) | −7% / −11% | +8% / +8% | −6% / −10% |
-| Real data: most abundant miRNA (miR-16-5p), exact UMI relative to `dir` | | 1.9× (1.1M reads), 2.2× (4.5M reads) | |
-| Real data: other miRNAs, relative to the previous order | −2% to +1% | +4% to +13% | |
-| CPU time and peak memory, 4.5M reads, extraction to deduplicated reads | 720 s, 1.6 GB | 306 s, 1.9 GB | 761 s, 2.5 GB |
-| CPU time of the deduplication step alone, 4.5M reads | 436 s | 21 s | 669 s |
+|                                                                         | One mismatch (`dir`, default) | Exact UMI (`-k 0`)                   | Previous order (UMICollapse before extraction, `dir`) |
+| ----------------------------------------------------------------------- | ----------------------------- | ------------------------------------ | ----------------------------------------------------- |
+| Count error per miRNA, simulated, all but the most abundant miRNA       | 0.6–1.1%                      | +8–9% (overcount)                    | 1.1–1.6%                                              |
+| Most abundant simulated miRNA (200,000 / 600,000 molecules)             | −7% / −11%                    | +8% / +8%                            | −6% / −10%                                            |
+| Real data: most abundant miRNA (miR-16-5p), exact UMI relative to `dir` |                               | 1.9× (1.1M reads), 2.2× (4.5M reads) |                                                       |
+| Real data: other miRNAs, relative to the previous order                 | −2% to +1%                    | +4% to +13%                          |                                                       |
+| CPU time and peak memory, 4.5M reads, extraction to deduplicated reads  | 720 s, 1.6 GB                 | 306 s, 1.9 GB                        | 761 s, 2.5 GB                                         |
+| CPU time of the deduplication step alone, 4.5M reads                    | 436 s                         | 21 s                                 | 669 s                                                 |
 
 How to choose:
 

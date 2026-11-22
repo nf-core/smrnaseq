@@ -12,7 +12,7 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = [ [ id:'test', single_end:true ], file("${moduleDir}/tests/data/extracted.fastq.gz", checkIfExists: true) ]
+                input[0] = [ [ id:'test', single_end:true ], file("${moduleDir}/tests/fixtures/extracted.fastq.gz", checkIfExists: true) ]
                 """
             }
         }
@@ -44,7 +44,7 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = [ [ id:'test', single_end:true ], file("${moduleDir}/tests/data/extracted.fastq.gz", checkIfExists: true) ]
+                input[0] = [ [ id:'test', single_end:true ], file("${moduleDir}/tests/fixtures/extracted.fastq.gz", checkIfExists: true) ]
                 """
             }
         }
