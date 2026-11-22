@@ -193,6 +193,31 @@ workflow PIPELINE_COMPLETION {
     }
 }
 
+//
+// miRNA reference database version for the software versions YAML: read from the miRNA GFF3
+// header, or, when no GFF3 is used (e.g. mirtop is skipped and the GFF channel is empty),
+// derived from the database and the mature/hairpin FASTA files. Never fails the run for a
+// missing GFF3.
+//
+workflow MIRNA_REFERENCE_VERSIONS {
+
+    take:
+    ch_mirna_gff  // channel: [ val(meta), path(gff) ], may be empty
+    val_mirgenedb // boolean: MirGeneDB (true) or miRBase (false)
+    val_mature    //  string: mature miRNA FASTA path or URL
+    val_hairpin   //  string: hairpin miRNA FASTA path or URL
+
+    main:
+    def database = val_mirgenedb ? 'MirGeneDB' : 'miRBase'
+    def ch_versions = ch_mirna_gff
+        .map { _meta, gff -> mirnaReferenceVersions(gff) }
+        .ifEmpty { mirnaReferenceFallbackVersions(database, val_mature, val_hairpin) }
+        .flatMap { versions -> versions }
+
+    emit:
+    versions = ch_versions // channel: [ process, tool, version ]
+}
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -436,6 +461,26 @@ def mirnaReferenceVersions(gff) {
         versions << ['MIRNA_REFERENCE', 'genome_build', genome_build]
     }
     return versions
+}
+
+//
+// miRNA reference entries for the software versions YAML when no miRNA GFF3 is available.
+// The mature/hairpin FASTA headers carry no release, so the version is only known if the
+// directory of the mature or hairpin file is a release number, e.g.
+// https://mirbase.org/download_version_files/22.1/mature.fa. The file names are reported as well.
+//
+def mirnaReferenceFallbackVersions(database, mature, hairpin) {
+    def release = [mature, hairpin].findResult { fasta ->
+        def match = fasta ? (fasta.toString() =~ /(?:^|\/)v?(\d+(?:\.\d+)*)\/[^\/]+$/) : null
+        match?.find() ? match.group(1) : null
+    }
+    def version = release ? "v${release} (from file path)".toString() : 'unknown (no GFF)'
+    def file_names = [mature, hairpin].collect { fasta -> fasta ? fasta.toString().tokenize('/').last() : 'none' }
+    return [
+        ['MIRNA_REFERENCE', database, version],
+        ['MIRNA_REFERENCE', 'mature', file_names[0]],
+        ['MIRNA_REFERENCE', 'hairpin', file_names[1]]
+    ]
 }
 
 //

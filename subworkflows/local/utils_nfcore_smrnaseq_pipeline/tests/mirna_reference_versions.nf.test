@@ -1,0 +1,86 @@
+nextflow_workflow {
+
+    name "Test Workflow MIRNA_REFERENCE_VERSIONS"
+    script "../main.nf"
+    // nf-test sorts the emitted items, so they are compared as sets
+    workflow "MIRNA_REFERENCE_VERSIONS"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "utils_nfcore_smrnaseq_pipeline"
+    tag "subworkflows/utils_nfcore_smrnaseq_pipeline"
+
+    test("miRBase GFF3 given - version from the GFF3 header") {
+
+        when {
+            workflow {
+                """
+                input[0] = channel.of([ [id:'mirbase_hsa_mini'], file('${moduleTestDir}/fixtures/mirbase_hsa_mini.gff3', checkIfExists: true) ])
+                input[1] = false
+                input[2] = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/mature.fa'
+                input[3] = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hairpin.fa'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                // A GFF3 is present: no fallback entries
+                { assert workflow.out.versions.toSet() == [
+                    ['MIRNA_REFERENCE', 'miRBase', 'v22'],
+                    ['MIRNA_REFERENCE', 'genome_build', 'GRCh38']
+                ].toSet() }
+            )
+        }
+    }
+
+    test("no GFF3 (empty channel, e.g. mirtop skipped) - miRBase fallback") {
+
+        when {
+            workflow {
+                """
+                input[0] = channel.empty()
+                input[1] = false
+                input[2] = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/mature.fa'
+                input[3] = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hairpin.fa'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.versions.toSet() == [
+                    ['MIRNA_REFERENCE', 'miRBase', 'unknown (no GFF)'],
+                    ['MIRNA_REFERENCE', 'mature', 'mature.fa'],
+                    ['MIRNA_REFERENCE', 'hairpin', 'hairpin.fa']
+                ].toSet() }
+            )
+        }
+    }
+
+    test("no GFF3 (empty channel) - MirGeneDB fallback") {
+
+        when {
+            workflow {
+                """
+                input[0] = channel.empty()
+                input[1] = true
+                input[2] = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/MirGeneDB/mirgenedb_hsa_mature.fa'
+                input[3] = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/MirGeneDB/mirgenedb_hsa_hairpin.fa'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.versions.toSet() == [
+                    ['MIRNA_REFERENCE', 'MirGeneDB', 'unknown (no GFF)'],
+                    ['MIRNA_REFERENCE', 'mature', 'mirgenedb_hsa_mature.fa'],
+                    ['MIRNA_REFERENCE', 'hairpin', 'mirgenedb_hsa_hairpin.fa']
+                ].toSet() }
+            )
+        }
+    }
+}
