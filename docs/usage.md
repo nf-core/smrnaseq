@@ -104,6 +104,38 @@ The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire r
 >
 > In these cases where UMI trimming relies on the adapter sequence for the location of the UMIs, you can prevent `fastp` from initial adapter-trimming the reads before UMI extraction with `--skip_fastp`. Note that `--skip_fastp` does not disable `fastp` entirely: the length-only `fastp` pass after UMI extraction is still executed (with adapter and quality trimming disabled). When using with `--with_umi`, the pipeline still runs a separate `fastp` length-filtering step after `umi_tools extract`.
 
+#### How UMI deduplication works
+
+With `--with_umi`, reads are deduplicated **before** alignment, by sequence:
+
+1. `fastp` removes the 3' sequencing adapter given with `--three_prime_adapter`. The read still contains the insert, the kit anchor (e.g. `AACTGTAGGCACCATCAAT` for QIAseq) and the UMI.
+2. UMIcollapse runs in `fastq` mode, which treats the whole read as the "UMI". It compares a read only with reads of the same length. Reads that are identical, or that differ by one substitution and pass the clustering rule set with `--umitools_method` (`dir` by default), are collapsed into one read.
+3. `umi_tools extract` removes the anchor and the UMI from the collapsed reads, so that only the insert is mapped. The UMI is kept at the end of the read name.
+
+Two reads are therefore treated as PCR duplicates when they have the same insert sequence **and** the same UMI. Reads with the same UMI but a different isomiR sequence count as different molecules, and so do reads with the same sequence but UMIs that differ by more than one substitution. If the anchor or the UMI is trimmed before UMIcollapse (for example with `-profile qiaseq`, which sets `--three_prime_adapter` to the QIAseq anchor), UMIcollapse compares insert sequences only and keeps a single read per insert sequence, and `umi_tools extract` cannot find the UMI afterwards (see the warning above).
+
+#### Memory use of UMI deduplication
+
+In `fastq` mode, UMIcollapse reads the whole FASTQ file of a sample into memory before it collapses reads. The `--two-pass` option that the pipeline passes to UMIcollapse only lowers memory use in UMIcollapse's BAM mode and has no effect in `fastq` mode. As the UMI makes most reads distinct, memory use and run time grow with the sequencing depth of a sample. The `UMICOLLAPSE_FASTQ` process requests 200 GB of memory by default (within your [maximum resources](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#set-max-resources)), and the Java heap is set to 90% of the memory of the task. A Java `OutOfMemoryError` is not retried automatically. For very deep samples, give this process more memory and time in a custom config passed with `-c`:
+
+```groovy
+process {
+    withName: '.*:UMICOLLAPSE_FASTQ' {
+        memory = 300.GB
+        time   = 48.h
+    }
+}
+```
+
+#### Sequence-based and alignment-based UMI deduplication
+
+Many UMI workflows for mRNA deduplicate after alignment instead: reads are grouped by alignment position (reference, strand and 5' start), and only the UMIs of reads at the same position are compared (e.g. `umi_tools dedup` or UMIcollapse BAM mode). The pipeline does not offer this mode. Neither approach is wrong for small RNA, but they define a duplicate differently:
+
+- **Sequence-based (pipeline default)**: needs no reference and keeps isomiRs apart. Because each length and sequence is its own group, abundant miRNAs are split over several groups, which reduces UMI saturation (distinct molecules wrongly merged because their UMIs are identical or one substitution apart). On the other hand, the one allowed substitution covers the whole read, so a read with a sequencing error in the insert or the anchor is not collapsed with its duplicate, and reads of different length are never compared.
+- **Alignment-based**: sequencing errors in the insert do not matter, and memory use is lower because only the reads at one position are compared. However, almost all reads of a miRNA start at the same position, so all its 3' isomiRs are pooled and told apart by their UMI alone. For highly expressed miRNAs this increases UMI saturation and can compress their counts. The pipeline maps with `-k 50`, so reads that align to several miRNAs or loci are deduplicated separately at each position, and the same read can be kept at one locus and removed at another.
+
+To deduplicate by alignment position instead, you can extract the UMIs before running the pipeline (with `umi_tools extract` and the same `--bc-pattern`, which moves the UMI to the read name and removes the anchor), run the pipeline without `--with_umi` and with `--save_intermediates`, and then deduplicate the `*.sorted.bam` files in `mirna_quant/bam/` and `genome_quant/bam/` with `umi_tools dedup` or `umicollapse bam`, followed by `samtools idxstats` for counts. Note that the mirtop, edgeR and miRDeep2 results of such a run are not deduplicated.
+
 ## Samplesheet input
 
 You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 2 columns ("sample" and "fastq_1"), and a header row as shown in the examples below.
