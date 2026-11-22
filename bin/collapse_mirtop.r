@@ -8,7 +8,8 @@ args = commandArgs(trailingOnly=TRUE)
 
 input <- as.character(args[1:length(args)])
 
-df = read.delim(input[1], sep = "\t")
+# check.names = FALSE keeps sample names such as "2-treated" unchanged (R would rename it to "X2.treated").
+df = read.delim(input[1], sep = "\t", check.names = FALSE)
 dt = as.data.table(df)
 # Columns 1-12 are the mirtop annotation (UID, Read, miRNA, Variant, iso_*); sample counts follow.
 sample_cols = colnames(dt)[13:ncol(dt)]

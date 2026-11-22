@@ -70,7 +70,7 @@ nextflow_process {
         }
     }
 
-    test("Sums split rows of the same isomiR and counts multi-miRNA UIDs once") {
+    test("Sums split rows of the same isomiR, counts multi-miRNA UIDs once, keeps sample names") {
 
         when {
             params {
@@ -88,7 +88,8 @@ nextflow_process {
 
             def lines = path(process.out.mirna_tsv.get(0)).readLines()
             assert lines == [
-                "miRNA\tS1\tS2",
+                // Sample names with "-" and a leading digit are kept as is (no R make.names mangling)
+                "miRNA\tctrl-1\t2-treated",
                 // iso-20-AAAA is reported in two rows (different iso_3p_nt) holding counts for different samples: both are summed (#174)
                 "hsa-miR-X\t6\t4",
                 // iso-22-CCCC is assigned to both hsa-miR-Y-a and hsa-miR-Y-b: counted once, for the first miRNA
