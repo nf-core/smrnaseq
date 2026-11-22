@@ -40,7 +40,7 @@ nextflow_process {
         }
     }
 
-    test("Does not contain hsa-miR-107, hsa-miR-365a-3p") {
+    test("Splits isomiRs shared by hsa-miR-103a-3p/hsa-miR-107 and hsa-miR-365a-3p/hsa-miR-365b-3p") {
 
         when {
             params {
@@ -57,20 +57,19 @@ nextflow_process {
             assert process.success
             assert snapshot(process.out).match()
 
-            with(process.out.mirna_tsv) {
-                with(get(0)) {
-                    assert get(0).endsWith(".tsv")
-
-                    // Check for the absence of specific miRNAs
-                    def lines = path(get(0)).readLines()
-                    assert !lines.any { it.contains("hsa-miR-107") }
-                    assert !lines.any { it.contains("hsa-miR-365a-3p") }
-                }
-            }
+            def rows = path(process.out.mirna_tsv.get(0)).readLines().drop(1).collect { it.split('\t') }
+            def counts = rows.collectEntries { [(it[0]): it[1..-1].collect { it as Integer }] }
+            // miRNAs that share all their isomiRs with another miRNA are no longer dropped
+            assert counts["hsa-miR-107"] == [276, 332, 695, 229, 495, 424]
+            assert counts["hsa-miR-365a-3p"] == [117, 206, 304, 160, 266, 286]
+            // Each isomiR is counted once per sample: column totals equal the reads per sample,
+            // counting every UID once (computed independently from small_mirtop_dataset.txt)
+            def totals = (0..<6).collect { j -> counts.values().sum { it[j] } }
+            assert totals == [36171, 23446, 44566, 25432, 63820, 59069]
         }
     }
 
-    test("Sums split rows of the same isomiR, counts multi-miRNA UIDs once, keeps sample names") {
+    test("Synthetic table: split rows, proportional and equal split of shared isomiRs, totals, sample names") {
 
         when {
             params {
@@ -87,15 +86,34 @@ nextflow_process {
             assert process.success
 
             def lines = path(process.out.mirna_tsv.get(0)).readLines()
-            assert lines == [
-                // Sample names with "-" and a leading digit are kept as is (no R make.names mangling)
-                "miRNA\tctrl-1\t2-treated",
-                // iso-20-AAAA is reported in two rows (different iso_3p_nt) holding counts for different samples: both are summed (#174)
-                "hsa-miR-X\t6\t4",
-                // iso-22-CCCC is assigned to both hsa-miR-Y-a and hsa-miR-Y-b: counted once, for the first miRNA
-                "hsa-miR-Y-a\t10\t10",
-                "hsa-miR-Y-b\t2\t0"
-            ]
+            // Sample names with "-" and a leading digit are kept as is (no R make.names mangling)
+            assert lines[0] == "miRNA\tctrl-1\t2-treated\t3-treated"
+
+            def counts = lines.drop(1).collect { it.split('\t') }.collectEntries { [(it[0]): it[1..-1].collect { it as Integer }] }
+            // miRNAs are listed in order of first appearance
+            assert counts.keySet() as List == ["hsa-miR-X", "hsa-miR-Y-a", "hsa-miR-Y-b", "hsa-miR-Z-a", "hsa-miR-Z-b"]
+
+            // Unaffected single-miRNA UIDs: iso-20-AAAA (two rows with different iso_3p_nt, counts in
+            // different samples, both summed, #174) + iso-23-BBBB
+            assert counts["hsa-miR-X"] == [6, 4, 1]
+
+            // iso-22-CCCC is shared by hsa-miR-Y-a and hsa-miR-Y-b (12, 10, 1 reads). Unambiguous counts:
+            // Y-a = iso-22-EEEE (6, 0, 2), Y-b = iso-23-DDDD (2, 0, 1).
+            //   ctrl-1:    proportional 6:2 -> 9 / 3            => Y-a 6+9 = 15, Y-b 2+3 = 5
+            //   2-treated: no unambiguous counts -> equal 5 / 5 => Y-a 5,       Y-b 5
+            //   3-treated: proportional 2:1 -> 0.67 / 0.33      => Y-a 2.67,    Y-b 1.33,
+            //              largest remainder rounding           => Y-a 3,       Y-b 1
+            assert counts["hsa-miR-Y-a"] == [15, 5, 3]
+            assert counts["hsa-miR-Y-b"] == [5, 5, 1]
+
+            // iso-21-FFFF is the only isomiR of hsa-miR-Z-a and hsa-miR-Z-b (4, 4, 0 reads): equal split
+            assert counts["hsa-miR-Z-a"] == [2, 2, 0]
+            assert counts["hsa-miR-Z-b"] == [2, 2, 0]
+
+            // Totals preserved: every UID counted once per sample
+            //   ctrl-1: 5+1+6+2+12+4 = 30, 2-treated: 3+1+10+4 = 18, 3-treated: 1+2+1+1 = 5
+            def totals = (0..<3).collect { j -> counts.values().sum { it[j] } }
+            assert totals == [30, 18, 5]
         }
     }
 
