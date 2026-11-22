@@ -409,6 +409,7 @@ workflow NFCORE_SMRNASEQ {
     mirna_seqcluster      = MIRNA_QUANT.out.seqcluster
     mirna_edger_qc        = MIRNA_QUANT.out.edger_qc
     mirna_mirtop          = MIRNA_QUANT.out.mirtop
+    mirna_ids             = MIRNA_QUANT.out.mirna_ids
     genome_quant_stats    = ch_genome_quant_stats
     genome_quant_bam      = ch_genome_quant_bam
     mirdeep2              = ch_mirdeep2
