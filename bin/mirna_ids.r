@@ -29,11 +29,13 @@ read_lines <- function(path) {
     readLines(con, warn = FALSE)
 }
 
-# Same species filter as PARSE_FASTA_MIRNA (`.*<species>-.*`)
-species <- opt$species
+# Same species filter as PARSE_FASTA_MIRNA (`.*<species>-.*`). Also accepts a comma-separated
+# list of species (kept if any matches) and 'all' (no filter).
+species <- trimws(strsplit(opt$species, ",", fixed = TRUE)[[1]])
+species <- species[nzchar(species)]
 keep_species <- function(names) {
-    if (!nzchar(species) || species == "unknown") return(rep(TRUE, length(names)))
-    grepl(paste0(species, "-"), names, fixed = TRUE)
+    if (length(species) == 0 || any(tolower(species) %in% c("unknown", "all"))) return(rep(TRUE, length(names)))
+    Reduce(`|`, lapply(species, function(sp) grepl(paste0(sp, "-"), names, fixed = TRUE)), rep(FALSE, length(names)))
 }
 
 join_unique <- function(x) {

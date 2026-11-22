@@ -41,6 +41,34 @@ nextflow_process {
         }
     }
 
+    test("miRBase GFF3, several species") {
+
+        when {
+            process {
+                """
+                input[0] = [[id:'hsa', species:'hsa'], file(params.pipelines_testdata_base_path + 'reference/hsa.gff3', checkIfExists: true)]
+                input[1] = [[id:'mature'], file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)]
+                input[2] = [[id:'hairpin'], file(params.pipelines_testdata_base_path + 'reference/hairpin.fa', checkIfExists: true)]
+                input[3] = 'mmu,hsa'
+                input[4] = 'miRBase'
+                """
+            }
+        }
+
+        then {
+            def rows = path(process.out.mirna_ids[0]).readLines()*.split('\t', -1)
+            def by_name = rows.drop(1).collectEntries { row -> [("${row[2]}:${row[0]}".toString()): row] }
+            assertAll(
+                { assert process.success },
+                // A comma-separated list (as passed by --mirna_species) keeps the names of every listed species,
+                // like PARSE_FASTA_MIRNA. The test data only has hsa, so the table is the same as for 'hsa'.
+                { assert rows.size() > 1000 },
+                { assert rows.drop(1).every { row -> row[0].startsWith('hsa-') || row[0].startsWith('mmu-') } },
+                { assert by_name['mature:hsa-let-7a-5p'] == ['hsa-let-7a-5p', 'MIMAT0000062', 'mature', 'hsa-let-7a-1,hsa-let-7a-2,hsa-let-7a-3', 'MI0000060,MI0000061,MI0000062', 'miRBase'] }
+            )
+        }
+    }
+
     test("MirGeneDB GFF") {
 
         when {
