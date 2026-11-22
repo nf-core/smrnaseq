@@ -67,6 +67,36 @@ See examples in: [the test-datasets repository of nf-core](https://github.com/nf
 
 If no `bowtie_index` is given, the pipeline builds one from `fasta`. Add `--save_reference` to save it, together with the cleaned FASTA it was built from, to `<outdir>/genome/` and reuse the index in future runs with `--bowtie_index <outdir>/genome/index/bowtie`, together with the same `--fasta` (or the saved `_clean.fa`). `--save_reference` also saves the other indices the pipeline builds (mature and hairpin miRNA Bowtie indices and, with `--filter_contamination`, the contaminant Bowtie2 indices); see [the output documentation](https://nf-co.re/smrnaseq/output#reference-genome-files).
 
+#### Genome quantification and miRDeep2
+
+Genome quantification and miRDeep2 are optional steps. There is no separate parameter to switch genome quantification on: it runs whenever the pipeline has a genome FASTA, which you can provide in either of two ways:
+
+- `--fasta /path/to/genome.fa`, or
+- `--genome <ID>` with an iGenomes reference (for example `--genome GRCh38`), which sets `fasta` from [`conf/igenomes.config`](../conf/igenomes.config). An explicit `--fasta` takes precedence.
+
+Without a genome FASTA, both steps are skipped without an error. This also applies when only `--bowtie_index` is given: the genome Bowtie index is used only together with `fasta`, and is otherwise ignored. With `--igenomes_ignore`, `--genome` does not set a FASTA, so you have to pass `--fasta`.
+
+The genome Bowtie 1 index comes from `--bowtie_index` (a directory or a `.tar.gz` archive) if given, and is otherwise built from the FASTA. The iGenomes references used by this pipeline do not provide a Bowtie 1 index, so with `--genome` the index is built at the start of every run, which takes time for large genomes. Build it once with `--save_reference` and pass it back with `--bowtie_index` in later runs, as described above.
+
+When a genome FASTA is available, the pipeline runs:
+
+1. **Genome quantification** (`GENOME_QUANT`): the reads that did not align to the mature miRNA or hairpin references are aligned to the genome with Bowtie 1 (see `bowtie_align_args` above for the default and extra options), then sorted, indexed and summarised with SAMtools (`stats`, `flagstat` and `idxstats`). The alignment statistics are added to the MultiQC report. This step does not produce a gene- or feature-level count table: `idxstats` reports the number of reads per genome sequence (chromosome or contig). miRNA counts come from the [miRNA quantification](https://nf-co.re/smrnaseq/output#edger) steps.
+2. **miRDeep2** for known and novel miRNA discovery, using the same genome FASTA and Bowtie 1 index. miRDeep2 runs on all trimmed (and, with `--filter_contamination`, filtered) reads, not only on those left after miRNA alignment. Add `--skip_mirdeep` to run genome quantification without miRDeep2.
+
+For example:
+
+```bash
+nextflow run nf-core/smrnaseq \
+    -profile docker,illumina \
+    --input samplesheet.csv \
+    --outdir results \
+    --mirtrace_species hsa \
+    --fasta /path/to/genome.fa \
+    --bowtie_index /path/to/bowtie_index/
+```
+
+The SAMtools statistics are always saved to `<outdir>/genome_quant/bam/`. The genome alignments (BAM files), the Bowtie logs and the reads that did not align to the genome are saved there only with `--save_intermediates`. See [the output documentation](https://nf-co.re/smrnaseq/output#bowtie) for the full list of files, and [miRDeep2](https://nf-co.re/smrnaseq/output#mirdeep2) for its results.
+
 ### Contamination filtering
 
 This step has, until now, only been tested for human data. Unexpected behaviour can occur when using it with a different species.
