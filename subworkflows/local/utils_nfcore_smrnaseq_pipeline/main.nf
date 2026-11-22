@@ -117,9 +117,9 @@ workflow PIPELINE_INITIALISATION {
     validateBowtieGenomeArgs()
 
     //
-    // Warn if a genome Bowtie index is given without a genome FASTA (it is then ignored)
+    // Warn if there is no genome FASTA, so genome quantification (and miRDeep2) are skipped
     //
-    warnBowtieIndexWithoutFasta(params.bowtie_index, params.fasta)
+    warnMissingGenomeFasta(params.bowtie_index, params.fasta, params.skip_mirdeep)
 
     //
     // Create channel from input file provided through params.input
@@ -383,19 +383,24 @@ def mirtraceAdapterWarning(adapter, mirtrace_species) {
 }
 
 //
-// Warn when a genome Bowtie index is given without a genome FASTA. Genome quantification and
-// miRDeep2 only run with a FASTA (`--fasta`, or `--genome` with an iGenomes entry), so the index
-// is ignored and both steps are skipped. Returns the warning message, or null if there is none.
+// Warn when there is no genome FASTA. Genome quantification and miRDeep2 only run with a FASTA
+// (`--fasta`, or `--genome` with an iGenomes entry), so without one they are skipped. A given
+// genome Bowtie index is then ignored, which gets its own message. miRDeep2 is only mentioned
+// when it would otherwise run. Logs at most one warning and returns it, or null if there is none.
 //
-def warnBowtieIndexWithoutFasta(bowtie_index, fasta) {
-    if (!bowtie_index || fasta) {
+def warnMissingGenomeFasta(bowtie_index, fasta, skip_mirdeep) {
+    if (fasta) {
         return null
     }
-    def message = "A genome Bowtie index was given with '--bowtie_index', but no genome FASTA. The index is ignored, " +
-        "and genome quantification and miRDeep2 are skipped. To run them, also provide the FASTA the index was " +
-        "built from with '--fasta', or use '--genome' with an iGenomes reference that provides a FASTA."
-    log.warn(message)
-    return message
+    def skipped = skip_mirdeep ? 'genome quantification is skipped' : 'genome quantification and miRDeep2 are skipped'
+    def pronoun = skip_mirdeep ? 'it' : 'them'
+    def how     = "use '--genome' with an iGenomes reference that provides a FASTA."
+    def message = bowtie_index
+        ? "A genome Bowtie index was given with '--bowtie_index', but no genome FASTA. The index is ignored, and ${skipped}. " +
+            "To run ${pronoun}, also provide the FASTA the index was built from with '--fasta', or ${how}"
+        : "No genome FASTA was given, so ${skipped}. To run ${pronoun}, provide a genome FASTA with '--fasta', or ${how}"
+    log.warn(message.toString())
+    return message.toString()
 }
 
 //

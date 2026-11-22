@@ -118,69 +118,158 @@ nextflow_function {
         }
     }
 
-    test("Test Function warnBowtieIndexWithoutFasta - bowtie_index without fasta") {
+    test("Test Function warnMissingGenomeFasta - bowtie_index without fasta") {
 
-        function "warnBowtieIndexWithoutFasta"
+        function "warnMissingGenomeFasta"
 
         when {
             function {
                 """
                 input[0] = '/path/to/bowtie_index'
                 input[1] = null
+                input[2] = false
                 """
             }
         }
 
         then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            def warnings = log_text.readLines().findAll { line -> line.contains('WARN  nextflow.Nextflow - ') }
             assertAll(
                 { assert function.success },
-                { assert function.result.contains("The index is ignored, and genome quantification and miRDeep2 are skipped") },
+                { assert function.result == "A genome Bowtie index was given with '--bowtie_index', but no genome FASTA. The index is ignored, and genome quantification and miRDeep2 are skipped. To run them, also provide the FASTA the index was built from with '--fasta', or use '--genome' with an iGenomes reference that provides a FASTA." },
                 // log.warn always goes to .nextflow.log; the console only shows it outside agent log mode
-                { assert new File("${launchDir}/meta/nextflow.log").text.contains("WARN  nextflow.Nextflow - A genome Bowtie index was given with '--bowtie_index', but no genome FASTA") }
+                { assert warnings.size() == 1 },
+                { assert warnings[0].contains(function.result) }
             )
         }
     }
 
-    test("Test Function warnBowtieIndexWithoutFasta - bowtie_index with fasta") {
+    test("Test Function warnMissingGenomeFasta - bowtie_index without fasta, skip_mirdeep") {
 
-        function "warnBowtieIndexWithoutFasta"
+        function "warnMissingGenomeFasta"
 
         when {
             function {
                 """
                 input[0] = '/path/to/bowtie_index'
-                input[1] = '/path/to/genome.fa'
+                input[1] = null
+                input[2] = true
                 """
             }
         }
 
         then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            def warnings = log_text.readLines().findAll { line -> line.contains('WARN  nextflow.Nextflow - ') }
             assertAll(
                 { assert function.success },
-                { assert function.result == null },
-                { assert !new File("${launchDir}/meta/nextflow.log").text.contains("A genome Bowtie index was given") }
+                { assert function.result.startsWith("A genome Bowtie index was given with '--bowtie_index', but no genome FASTA. The index is ignored, and genome quantification is skipped. To run it,") },
+                { assert !function.result.contains('miRDeep2') },
+                { assert warnings.size() == 1 },
+                { assert warnings[0].contains(function.result) }
             )
         }
     }
 
-    test("Test Function warnBowtieIndexWithoutFasta - no bowtie_index") {
+    test("Test Function warnMissingGenomeFasta - no fasta and no bowtie_index") {
 
-        function "warnBowtieIndexWithoutFasta"
+        function "warnMissingGenomeFasta"
 
         when {
             function {
                 """
                 input[0] = null
                 input[1] = null
+                input[2] = false
                 """
             }
         }
 
         then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            def warnings = log_text.readLines().findAll { line -> line.contains('WARN  nextflow.Nextflow - ') }
+            assertAll(
+                { assert function.success },
+                { assert function.result == "No genome FASTA was given, so genome quantification and miRDeep2 are skipped. To run them, provide a genome FASTA with '--fasta', or use '--genome' with an iGenomes reference that provides a FASTA." },
+                { assert warnings.size() == 1 },
+                { assert warnings[0].contains(function.result) }
+            )
+        }
+    }
+
+    test("Test Function warnMissingGenomeFasta - no fasta and no bowtie_index, skip_mirdeep") {
+
+        function "warnMissingGenomeFasta"
+
+        when {
+            function {
+                """
+                input[0] = null
+                input[1] = null
+                input[2] = true
+                """
+            }
+        }
+
+        then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            def warnings = log_text.readLines().findAll { line -> line.contains('WARN  nextflow.Nextflow - ') }
+            assertAll(
+                { assert function.success },
+                { assert function.result == "No genome FASTA was given, so genome quantification is skipped. To run it, provide a genome FASTA with '--fasta', or use '--genome' with an iGenomes reference that provides a FASTA." },
+                { assert warnings.size() == 1 },
+                { assert warnings[0].contains(function.result) }
+            )
+        }
+    }
+
+    test("Test Function warnMissingGenomeFasta - fasta with bowtie_index") {
+
+        function "warnMissingGenomeFasta"
+
+        when {
+            function {
+                """
+                input[0] = '/path/to/bowtie_index'
+                input[1] = '/path/to/genome.fa'
+                input[2] = false
+                """
+            }
+        }
+
+        then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            def warnings = log_text.readLines().findAll { line -> line.contains('WARN  nextflow.Nextflow - ') }
             assertAll(
                 { assert function.success },
                 { assert function.result == null },
-                { assert !new File("${launchDir}/meta/nextflow.log").text.contains("A genome Bowtie index was given") }
+                { assert warnings.isEmpty() }
+            )
+        }
+    }
+
+    test("Test Function warnMissingGenomeFasta - fasta without bowtie_index") {
+
+        function "warnMissingGenomeFasta"
+
+        when {
+            function {
+                """
+                input[0] = null
+                input[1] = '/path/to/genome.fa'
+                input[2] = false
+                """
+            }
+        }
+
+        then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            def warnings = log_text.readLines().findAll { line -> line.contains('WARN  nextflow.Nextflow - ') }
+            assertAll(
+                { assert function.success },
+                { assert function.result == null },
+                { assert warnings.isEmpty() }
             )
         }
     }

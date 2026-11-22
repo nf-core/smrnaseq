@@ -74,7 +74,7 @@ Genome quantification and miRDeep2 are optional steps. There is no separate para
 - `--fasta /path/to/genome.fa`, or
 - `--genome <ID>` with an iGenomes reference (for example `--genome GRCh38`), which sets `fasta` from [`conf/igenomes.config`](../conf/igenomes.config). An explicit `--fasta` takes precedence.
 
-Without a genome FASTA, both steps are skipped without an error. This also applies when only `--bowtie_index` is given: the genome Bowtie index is used only together with `fasta`, and is otherwise ignored. In that case the pipeline prints a warning at start-up. With `--igenomes_ignore`, `--genome` does not set a FASTA, so you have to pass `--fasta`.
+Without a genome FASTA, both steps are skipped without an error, and the pipeline prints a warning at start-up (which only mentions genome quantification when `--skip_mirdeep` is set). This also applies when only `--bowtie_index` is given: the genome Bowtie index is used only together with `fasta`, and is otherwise ignored, which the warning then points out. With `--igenomes_ignore`, `--genome` does not set a FASTA, so you have to pass `--fasta`.
 
 The genome Bowtie 1 index comes from `--bowtie_index` (a directory or a `.tar.gz` archive) if given, and is otherwise built from the FASTA. The iGenomes references used by this pipeline do not provide a Bowtie 1 index, so with `--genome` the index is built at the start of every run, which takes time for large genomes. Build it once with `--save_reference` and pass it back with `--bowtie_index` in later runs, as described above.
 

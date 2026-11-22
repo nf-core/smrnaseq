@@ -250,7 +250,7 @@ workflow NFCORE_SMRNASEQ {
     //
     genome_stats = channel.empty()
     // Check the FASTA param itself: has_fasta arrives here as a channel, so an `if` on it is always true.
-    // Without a genome FASTA, a given --bowtie_index is ignored (see warnBowtieIndexWithoutFasta).
+    // Without a genome FASTA, a given --bowtie_index is ignored (see warnMissingGenomeFasta).
     if (params.fasta){
         GENOME_QUANT (
             ch_bowtie_index,
