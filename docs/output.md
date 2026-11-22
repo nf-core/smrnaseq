@@ -102,7 +102,7 @@ If `--save_reference` is specified, the reference files and indices that the pip
 
 </details>
 
-With `--with_umi`, [UMI-tools](https://github.com/CGATOxford/UMI-tools) `extract` runs after [UMICollapse deduplication](#umi-collapse-deduplicate). It uses `--umitools_bc_pattern` to move the UMI from the read sequence into the read name and removes the kit anchor and adapter remnants, so that only the insert remains. A final `fastp` pass then applies `--clip_r1`, `--three_prime_clip_r1` and the minimum length filter to the extracted reads; its reports are saved in `fastp/on_umi_extracted/`. See the [UMI handling section of the usage documentation](https://nf-co.re/smrnaseq/usage#umi-handling) for the order of the steps and the recommended parameters.
+With `--with_umi`, [UMI-tools](https://github.com/CGATOxford/UMI-tools) `extract` is the first step after read QC. It runs on the raw reads and uses `--umitools_bc_pattern` to move the UMI from the read sequence into the read name and to remove the kit sequences around it, so that only the insert remains. `fastp` then filters and clips the inserts (see [FastP](#fastp)), and they are deduplicated (see [UMI-collapse deduplicate](#umi-collapse-deduplicate)). The log reports how many reads matched the pattern. See the [UMI handling section of the usage documentation](https://nf-co.re/smrnaseq/usage#umi-handling) for the order of the steps and the recommended parameters.
 
 ## FastP
 
@@ -120,17 +120,23 @@ Contains FastQ files with quality and adapter-trimmed reads for each sample, alo
 
 FastP can automatically detect adapter sequences when not specified directly by the user - the pipeline also comes with a feature and a supplied miRNA adapters file to ensure adapters auto-detected are more accurate. If there are needs to add more known miRNA adapters to this list, please open a pull request.
 
+With `--with_umi`, FastP runs on the inserts after [UMI-tools extract](#umi-tools-extract), before deduplication, so its reports describe the extracted inserts. With `--umitools_extract_method regex`, it does not trim adapters (the UMI pattern removes them).
+
 ## UMI-collapse deduplicate
 
 <details markdown="1">
 <summary>Output files</summary>
 
-- `umi_dedup/bam_deduplicated`
-  - `*.umi_dedup.sorted.fastq.gz`: If `--save_umi_intermeds` is specified, the FastQ files **after** UMICollapse deduplication and **before** UMI extraction will be placed in this directory. Despite the directory name, these are FastQ files, not BAM files.
+- `umi_dedup/fastq_deduplicated/`
+  - `*.umi_dedup.fastq.gz`: If `--save_umi_intermeds` is specified, the deduplicated reads (inserts, with the UMI in the read name) will be placed in this directory. These are the reads used for miRNA quantification.
+- `umi_dedup/saturation/`
+  - `*.umi_saturation.tsv`: UMI saturation statistics for each sample, computed on the deduplicated reads: UMI length, number of reads, number of distinct insert sequences, the most frequent insert sequence and its number of reads, the number of possible UMIs (4^UMI length) and the fraction of them that the most frequent sequence uses (`top_sequence_umi_fraction`).
 
 </details>
 
-With `--with_umi`, [UMICollapse](https://github.com/Daniel-Liu-c0deb0t/UMICollapse) deduplicates the adapter-trimmed reads directly on the FastQ files, before UMI extraction and without mapping the reads first. It treats each whole read sequence (insert, kit anchor and UMI) as the UMI, so reads with the same insert and UMI, up to one substitution by default, are collapsed into one read. The deduplication algorithm is set with `--umitools_method`. MultiQC reports the number of reads before and after deduplication from the UMICollapse log.
+With `--with_umi`, [UMICollapse](https://github.com/Daniel-Liu-c0deb0t/UMICollapse) deduplicates the extracted inserts directly on the FastQ files, without mapping the reads first. The UMI is moved from the read name to the start of the sequence for this step, so that reads with the same UMI and insert sequence, up to one substitution by default, are collapsed into one read; it is removed from the sequence again afterwards. The deduplication algorithm is set with `--umitools_method`. MultiQC reports the number of reads before and after deduplication from the UMICollapse log.
+
+If `top_sequence_umi_fraction` is above 0.005 (0.5% of all possible UMIs), the pipeline prints a UMI saturation warning: one-mismatch deduplication then merges distinct molecules of the most abundant sequences. See [Choosing a UMI strategy](https://nf-co.re/smrnaseq/usage#choosing-a-umi-strategy).
 
 ## Bowtie2
 

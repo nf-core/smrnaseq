@@ -13,7 +13,7 @@ This option indicates the experimental protocol used for the sample preparation.
 - 'illumina': three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`0`), three_prime_clip_r1 (`0`)
 - 'nextflex': NEXTFLEX Small RNA-Seq Kit v3; three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`4`), three_prime_clip_r1 (`4`)
 - 'nextflex_v4': NEXTFLEX Small RNA-Seq Kit v4; three_prime_adapter (`TGGAATTCTCGGGTGCCAAGG`), clip_r1 (`0`), three_prime_clip_r1 (`0`), fastp_min_length (`16`)
-- 'qiaseq': three_prime_adapter (`AACTGTAGGCACCATCAAT`), clip_r1 (`0`), three_prime_clip_r1 (`0`)
+- 'qiaseq': three_prime_adapter (`AACTGTAGGCACCATCAAT`), clip_r1 (`0`), three_prime_clip_r1 (`0`); with `--with_umi`, also the QIAseq UMI pattern (see [UMI handling](#umi-handling))
 - 'cats': three_prime_adapter (`AAAAAAAA`), clip_r1(`3`), three_prime_clip_r1 (`0`)
 
 This option is not chosen as a parameter but as an additional profile that sets the corresponding `three_prime_adapter`, `clip_r1` and `three_prime_clip_r1` parameters and, where applicable, `fastp_min_length` accordingly. You can choose to either use any of the provided profiles by running the pipeline with e.g. `illumina` to set the defaults as described above in a more convenient way.
@@ -90,62 +90,86 @@ Error 255 is typically related to the core algorithm of miRDeep generating empty
 
 With `--with_umi`, the pipeline removes PCR duplicates using unique molecular identifiers (UMIs) before any alignment. The steps run in this order:
 
-1. `fastp` trims the 3' adapter given in `--three_prime_adapter` and filters reads by quality and length. With `--with_umi`, the pipeline's list of known miRNA adapters is not passed to `fastp`, so that kit-specific sequences next to the UMI are kept.
-2. [UMICollapse](https://github.com/Daniel-Liu-c0deb0t/UMICollapse) (`fastq` mode) deduplicates the reads. It treats the **whole remaining read sequence** as the UMI, so it compares the insert, the kit anchor and the UMI together, and allows one substitution by default. Reads of different lengths are never merged.
-3. `umi_tools extract` uses `--umitools_bc_pattern` to move the UMI into the read name and removes the kit anchor and anything after the UMI, so that only the insert remains.
-4. A second `fastp` pass applies `--clip_r1`, `--three_prime_clip_r1` and `--fastp_min_length` to the extracted inserts. It does not trim adapters or filter on quality.
+1. `umi_tools extract` runs on the raw reads. It uses `--umitools_extract_method` and `--umitools_bc_pattern` to move the UMI into the read name and to remove the sequences around it, so that only the insert of the RNA molecule remains. Reads that do not match the pattern are discarded and counted in the `umi_tools extract` log.
+2. `fastp` filters the inserts by quality and length (`--fastp_min_length`, `--fastp_max_length`) and clips `--clip_r1` bases from the 5' end; `--three_prime_clip_r1` bases are then clipped from the 3' end. With `--umitools_extract_method regex`, the pattern is expected to remove the kit adapter, so `fastp` does not trim adapters. With `string`, `fastp` trims `--three_prime_adapter` as without UMIs. The pipeline's list of known miRNA adapters is not used with UMIs.
+3. The reads are deduplicated on **UMI + insert sequence** with [UMICollapse](https://github.com/Daniel-Liu-c0deb0t/UMICollapse) in FastQ mode. UMICollapse cannot read the UMI from the read name, so the pipeline moves the UMI to the start of the read sequence, runs UMICollapse, and removes the UMI from the sequence again. By default, reads whose UMI + insert sequences differ by one substitution are merged (see [Choosing a UMI strategy](#choosing-a-umi-strategy)). Reads of different lengths are never merged.
 
-The deduplicated inserts are then used for all later steps. There is no further UMI-aware deduplication after alignment: the UMI in the read name is kept only for reference.
+The deduplicated inserts are then used for all later steps; the UMI stays in the read name. miRTrace QC runs on the raw reads as without UMIs.
+
+> [!NOTE]
+> Before nf-core/smrnaseq 2.5.0, UMICollapse ran on the adapter-trimmed reads before UMI extraction, so it compared insert, kit adapter and UMI together, and `umi_tools extract` ran afterwards. Extracting the UMI first removes sequencing errors in the kit adapter and in sequence after the UMI from the comparison ([#560](https://github.com/nf-core/smrnaseq/issues/560)). `-profile qiaseq` now also works with `--with_umi`.
 
 #### QIAseq miRNA
 
-QIAseq miRNA reads have the structure `<insert><AACTGTAGGCACCATCAAT><12 nt UMI><AGATCGGAAGAGCACACGTCT...>`: the miRNA insert is followed by the kit's 3' adapter (here used as an anchor to find the UMI), the UMI and the Illumina TruSeq adapter. Use these parameters:
+QIAseq miRNA reads have the structure `<insert><AACTGTAGGCACCATCAAT><12 nt UMI><Illumina adapter>`. `-profile qiaseq` sets the matching UMI pattern, so `--with_umi` is all that is needed:
 
 ```bash
 nextflow run nf-core/smrnaseq \
-    -profile docker \
+    -profile docker,qiaseq \
     --input samplesheet.csv \
     --outdir results \
     --genome GRCh38 \
     --mirtrace_species hsa \
-    --with_umi \
-    --umitools_extract_method regex \
-    --umitools_bc_pattern '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)' \
-    --three_prime_adapter AGATCGGAAGAGCACACGTCTGAACTCCAGTCA \
-    --clip_r1 0 \
-    --three_prime_clip_r1 0
+    --with_umi
 ```
 
-> [!WARNING]
-> Do not combine `--with_umi` with `-profile qiaseq`. That profile sets `--three_prime_adapter` to the QIAseq anchor `AACTGTAGGCACCATCAAT`, so `fastp` would remove the anchor and the UMI after it before `umi_tools extract` runs, and the pattern above would no longer match (almost all reads would be lost, with `regex does not match` in the `umi_tools extract` log). The pipeline prints a warning at the start of the run if `--umitools_bc_pattern` contains the adapter that `fastp` trims. Instead, set `--three_prime_adapter` to the TruSeq adapter that follows the UMI, as shown above. For the same reason, do not use `--three_prime_adapter auto-detect` with UMIs, because `fastp` may detect the kit anchor as the adapter.
-
-Earlier versions of this documentation recommended `--skip_fastp` as a workaround. This still works, but UMICollapse then compares the untrimmed reads, including the TruSeq adapter and any bases sequenced past it, so sequencing errors in these regions stop reads from being merged. Reads are also not filtered on quality. Setting the TruSeq adapter as shown above is preferred.
-
-miRTrace QC runs on the raw reads and trims the adapter given in `--three_prime_adapter`. With the settings above, it trims only the TruSeq adapter, so its read length and RNA type statistics are computed on `<insert><anchor><UMI>` sequences and are not representative of the inserts. The quantification results are not affected.
+The profile sets `--umitools_extract_method regex` and `--umitools_bc_pattern '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'`: the UMI is the 12 nt after the kit adapter (allowing up to two mismatches in the adapter), and the adapter, the UMI and everything after it are removed. The profile's `--three_prime_adapter` (the kit adapter) is used by miRTrace on the raw reads.
 
 #### Other UMI read structures
 
-For other kits, set `--umitools_extract_method` and `--umitools_bc_pattern` so that only the insert of the RNA molecule remains after extraction (see the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method) and your kit's documentation for its read structure). For example, `--umitools_extract_method string --umitools_bc_pattern NNNNNNNN` extracts an 8 nt UMI from the 5' end of each read. Set `--three_prime_adapter` to the adapter that `fastp` should remove before deduplication, and make sure that it does not remove sequences that `--umitools_bc_pattern` needs. `--clip_r1` and `--three_prime_clip_r1` are applied after UMI extraction, so they count bases of the insert, not of the UMI.
+For other kits, set `--umitools_extract_method` and `--umitools_bc_pattern` so that only the insert remains after extraction (see the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method) and your kit's documentation for its read structure):
+
+- **UMI at a fixed position at the 5' end** of the read: for example, `--umitools_extract_method string --umitools_bc_pattern NNNNNNNN` extracts an 8 nt UMI. Set `--three_prime_adapter` to your kit's 3' adapter: `fastp` removes it after extraction.
+- **UMI next to an adapter or other kit sequence** (as for QIAseq): use `--umitools_extract_method regex` with a pattern that finds the UMI relative to the kit sequence and discards everything after the insert, as in the QIAseq pattern above. With `regex`, `fastp` does not trim adapters, so anything the pattern leaves in the read stays there.
+
+`--clip_r1` and `--three_prime_clip_r1` are applied after UMI extraction, so they count bases of the insert, not of the UMI.
 
 #### UMI parameters
 
-- `--with_umi`: enable UMI deduplication. Requires `--umitools_bc_pattern`.
+- `--with_umi`: enable UMI deduplication. Requires `--umitools_bc_pattern` (set by `-profile qiaseq`).
 - `--umitools_extract_method`: `string` (default) or `regex`, passed to `umi_tools extract --extract-method`.
 - `--umitools_bc_pattern`: the UMI pattern, passed to `umi_tools extract --bc-pattern`.
-- `--umitools_method`: despite its name, this sets the UMICollapse deduplication algorithm (`--algo`): `dir` (directional, default), `adj` (adjacency) or `cc` (connected components).
-- `--save_umi_intermeds`: save the UMICollapse output and the `umi_tools extract` reads (see the [output documentation](https://nf-co.re/smrnaseq/output#umi-tools-extract)).
-- `--skip_umi_extract_before_dedup`: keep the default (`true`). Setting it to `false` would extract the UMI twice and is rejected with `--with_umi`.
-- `--umi_discard_read`: has no effect, because the pipeline only uses read 1.
+- `--umitools_method`: despite its name, this sets the UMICollapse deduplication algorithm (`--algo`): `dir` (directional, default), `adj` (adjacency) or `cc` (connected components). All three merge UMIs that differ by one substitution.
+- `--save_umi_intermeds`: save the reads after `umi_tools extract` and after deduplication (see the [output documentation](https://nf-co.re/smrnaseq/output#umi-tools-extract)).
+- `--skip_umi_extract_before_dedup` and `--umi_discard_read`: deprecated and ignored. The UMI is always extracted before deduplication, and only read 1 is used. The pipeline prints a warning if they are set.
 
-Other UMICollapse options, for example the number of substitutions allowed between two reads (`-k`, default 1), can be set with a custom config (see [Custom Tool Arguments](#custom-tool-arguments)). Keep the `--algo` option, because `ext.args` replaces the pipeline's arguments:
+### Choosing a UMI strategy
 
-```groovy
-process {
-    withName: '.*:UMICOLLAPSE_FASTQ' {
-        ext.args = '--algo dir -k 2'
-    }
-}
-```
+UMI deduplication has to decide when two reads come from the same molecule. Reads with the same insert and UMI are duplicates. Reads whose UMIs differ by one base can be duplicates with a PCR or sequencing error in the UMI, or two different molecules whose UMIs happen to be similar. The pipeline offers two strategies:
+
+- **One-mismatch clustering (default):** UMICollapse `--algo dir` (directional) merges a read into a more abundant read whose UMI + insert differs by one substitution. This corrects UMI errors, but once a single insert sequence has been seen with a large part of all possible UMIs, distinct molecules have neighbouring UMIs by chance and are merged as well (*saturation*). The counts of the most abundant miRNAs are then underestimated, and more so the deeper the library is sequenced.
+- **Exact UMI matching:** only reads with identical UMI + insert are merged. This is not affected by saturation, but reads with a UMI error are counted as separate molecules: a near-uniform overcount of a few percent, which mostly cancels in library-size normalisation. Set it with a custom config (see [Custom Tool Arguments](#custom-tool-arguments)):
+
+  ```groovy
+  process {
+      withName: '.*:UMICOLLAPSE_FASTQ' {
+          ext.args = '--algo dir -k 0'
+      }
+  }
+  ```
+
+  Keep the `--algo` option: `ext.args` replaces the pipeline's arguments. Exact matching is also much faster (see below).
+
+**Benchmark.** The strategies were compared on simulated QIAseq-like libraries with known molecules (500,000–1,000,000 molecules with 40% duplicates, 1% UMI and insert errors per PCR copy, 0.2% sequencing errors per base, and one miRNA with 40–60% of all molecules), and on the `test_umi` sample (1.1M reads) and a 4.5M-read subsample of the same QIAseq plasma library:
+
+| | One mismatch (`dir`, default) | Exact UMI (`-k 0`) | Previous order (UMICollapse before extraction, `dir`) |
+| --- | --- | --- | --- |
+| Count error per miRNA, simulated, all but the most abundant miRNA | 0.6–1.1% | +8–9% (overcount) | 1.1–1.6% |
+| Most abundant simulated miRNA (200,000 / 600,000 molecules) | −7% / −11% | +8% / +8% | −6% / −10% |
+| Real data: most abundant miRNA (miR-16-5p), exact UMI relative to `dir` | | 1.9× (1.1M reads), 2.2× (4.5M reads) | |
+| Real data: other miRNAs, relative to the previous order | −2% to +1% | +4% to +13% | |
+| CPU time and peak memory, 4.5M reads, extraction to deduplicated reads | 720 s, 1.6 GB | 306 s, 1.9 GB | 761 s, 2.5 GB |
+| CPU time of the deduplication step alone, 4.5M reads | 436 s | 21 s | 669 s |
+
+How to choose:
+
+- The default (`dir`) is the most accurate for typical miRNAs as long as no insert sequence uses more than about **0.5% of all possible UMIs** (4^UMI length; 84,000 molecules for a 12 nt UMI).
+- The pipeline checks this after deduplication: if the most frequent insert sequence of a sample has more deduplicated reads than 0.5% of the UMI space, it prints a **UMI saturation warning**. The statistics for each sample are saved in `umi_dedup/saturation/` (see the [output documentation](https://nf-co.re/smrnaseq/output#umi-collapse-deduplicate)). The warning appears for the `test_umi` sample, where miR-16-5p alone accounts for about 2% of the 12 nt UMI space.
+- If you see the warning and the abundance of the most abundant miRNAs matters for your analysis (for example for differential expression), consider exact UMI matching. Its overcount is roughly uniform across miRNAs, whereas the undercount from saturation affects only the most abundant ones and grows with depth.
+
+**Runtime and memory.** UMICollapse holds all reads of a sample in memory and its one-mismatch search slows down at saturated sequences, so it is the slowest step of the UMI path; give `UMICOLLAPSE_FASTQ` more memory for deep libraries. `umi_tools extract` is single-threaded (about 270 s CPU per 4.5M reads).
+
+**Planned.** A position-based deduplication backend using [fgumi](https://github.com/fulcrumgenomics/fgumi) after alignment, with [chelae](https://github.com/fulcrumgenomics/chelae) as an optional fast UMI extractor, is planned for nf-core/smrnaseq 2.6 ([#535](https://github.com/nf-core/smrnaseq/issues/535), [#530](https://github.com/nf-core/smrnaseq/issues/530)).
 
 ## Samplesheet input
 

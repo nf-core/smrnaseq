@@ -235,13 +235,12 @@ def validateInputParameters() {
     }
 
     // Validate UMI parameters
-    def umi_error = umiParameterError(params.with_umi, params.umitools_bc_pattern, params.skip_umi_extract_before_dedup)
+    def umi_error = umiParameterError(params.with_umi, params.umitools_bc_pattern)
     if (umi_error) {
         error(umi_error)
     }
-    def umi_warning = umiAdapterWarning(params.with_umi, params.umitools_bc_pattern, params.three_prime_adapter, params.skip_fastp, params.trim_fastq)
-    if (umi_warning) {
-        log.warn(umi_warning)
+    umiDeprecationWarnings(params.skip_umi_extract_before_dedup, params.umi_discard_read).each { message ->
+        log.warn(message)
     }
 }
 
@@ -249,37 +248,48 @@ def validateInputParameters() {
 // Check UMI parameter combinations that cannot work. Returns an error message, or null if the
 // combination is valid (or `--with_umi` is not set).
 //
-def umiParameterError(with_umi, bc_pattern, skip_umi_extract_before_dedup) {
-    if (!with_umi) {
-        return null
-    }
-    def docs = "See https://nf-co.re/smrnaseq/usage#umi-handling"
-    if (!bc_pattern) {
-        return "'--with_umi' requires '--umitools_bc_pattern' to describe where the UMI is in the read. ${docs}"
-    }
-    if (!skip_umi_extract_before_dedup) {
-        // umi_tools extract would run before fastp and again after UMICollapse with the same
-        // pattern, so the second extraction removes bases from (or drops) reads that no longer contain a UMI
-        return "'--skip_umi_extract_before_dedup false' is not supported with '--with_umi': the UMI would be extracted twice with the same '--umitools_bc_pattern', which drops or truncates reads. Remove the parameter (the default is true). ${docs}"
+def umiParameterError(with_umi, bc_pattern) {
+    if (with_umi && !bc_pattern) {
+        return "'--with_umi' requires '--umitools_bc_pattern' to describe where the UMI is in the read (-profile qiaseq sets it for QIAseq miRNA libraries). See https://nf-co.re/smrnaseq/usage#umi-handling"
     }
     return null
 }
 
 //
-// Warn if the UMI pattern needs the 3' adapter that fastp trims before UMI extraction (e.g. the
-// QIAseq anchor AACTGTAGGCACCATCAAT set by -profile qiaseq): the pattern then no longer matches
-// and almost all reads are lost. Returns a warning message, or null.
+// Warnings for deprecated UMI parameters that are set (they are ignored). Returns a list of messages.
 //
-def umiAdapterWarning(with_umi, bc_pattern, three_prime_adapter, skip_fastp, trim_fastq) {
-    def adapter_trimmed = !skip_fastp && trim_fastq && three_prime_adapter && three_prime_adapter != 'auto-detect'
-    if (!with_umi || !bc_pattern || !adapter_trimmed) {
+def umiDeprecationWarnings(skip_umi_extract_before_dedup, umi_discard_read) {
+    def messages = []
+    if (skip_umi_extract_before_dedup != null) {
+        messages << "'--skip_umi_extract_before_dedup' is deprecated and ignored: with '--with_umi', the UMI is always extracted before deduplication. It will be removed in a future release."
+    }
+    if (umi_discard_read != null) {
+        messages << "'--umi_discard_read' is deprecated and ignored: the pipeline only uses read 1. It will be removed in a future release."
+    }
+    return messages
+}
+
+//
+// Warning for UMI saturation, from the statistics TSV written by UMI_FROM_SEQUENCE (header line and
+// one line per sample). One-mismatch UMI clustering (UMICollapse `dir`, `adj` or `cc`) merges distinct
+// molecules once one insert sequence uses more than about 0.5% of all possible UMIs (4^UMI length),
+// so its count is underestimated. Returns a warning message, or null.
+//
+def umiSaturationWarning(stats_text) {
+    def threshold = 0.005
+    def lines = stats_text.readLines().findAll { line -> line.trim() }
+    if (lines.size() < 2) {
         return null
     }
-    def adapter_start = three_prime_adapter.take(10)
-    if (!bc_pattern.toUpperCase().contains(adapter_start.toUpperCase())) {
+    def header = lines[0].split('\t') as List
+    def values = lines[1].split('\t') as List
+    def row = [header, values].transpose().collectEntries()
+    def fraction = row.top_sequence_umi_fraction as BigDecimal
+    if (fraction <= threshold) {
         return null
     }
-    return "'--umitools_bc_pattern' contains the 3' adapter given in '--three_prime_adapter' (${three_prime_adapter}). fastp removes this adapter, and the UMI after it, before UMI extraction, so the pattern will likely not match and most reads will be lost. Set '--three_prime_adapter' to the adapter that follows the UMI instead (for QIAseq miRNA, do not use -profile qiaseq and set '--three_prime_adapter AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'). See https://nf-co.re/smrnaseq/usage#umi-handling"
+    def percent = String.format('%.2f', fraction * 100)
+    return "UMI saturation in sample '${row.sample}': after deduplication, the most frequent sequence (${row.top_sequence}) has ${row.top_sequence_reads} reads, ${percent}% of all ${row.umi_space} possible ${row.umi_length} nt UMIs (warning threshold 0.5%). One-mismatch UMI clustering then merges distinct molecules, so the counts of the most abundant miRNAs are underestimated. Consider exact UMI matching (UMICollapse '-k 0'). See https://nf-co.re/smrnaseq/usage#choosing-a-umi-strategy"
 }
 
 // Validate channels from input samplesheet

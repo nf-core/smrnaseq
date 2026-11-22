@@ -118,7 +118,7 @@ nextflow_function {
         }
     }
 
-    // umiParameterError inputs: with_umi, bc_pattern, skip_umi_extract_before_dedup
+    // umiParameterError inputs: with_umi, bc_pattern
 
     test("Test Function umiParameterError - without UMI") {
 
@@ -129,7 +129,6 @@ nextflow_function {
                 """
                 input[0] = false
                 input[1] = null
-                input[2] = false
                 """
             }
         }
@@ -142,7 +141,7 @@ nextflow_function {
         }
     }
 
-    test("Test Function umiParameterError - valid") {
+    test("Test Function umiParameterError - QIAseq pattern") {
 
         function "umiParameterError"
 
@@ -151,7 +150,6 @@ nextflow_function {
                 """
                 input[0] = true
                 input[1] = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
-                input[2] = true
                 """
             }
         }
@@ -173,7 +171,6 @@ nextflow_function {
                 """
                 input[0] = true
                 input[1] = null
-                input[2] = true
                 """
             }
         }
@@ -186,115 +183,105 @@ nextflow_function {
         }
     }
 
-    test("Test Function umiParameterError - extraction before deduplication") {
+    // umiDeprecationWarnings inputs: skip_umi_extract_before_dedup, umi_discard_read
 
-        function "umiParameterError"
+    test("Test Function umiDeprecationWarnings - not set") {
 
-        when {
-            function {
-                """
-                input[0] = true
-                input[1] = 'NNNNNNNN'
-                input[2] = false
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert function.success },
-                { assert function.result.contains("'--skip_umi_extract_before_dedup false' is not supported") }
-            )
-        }
-    }
-
-    // umiAdapterWarning inputs: with_umi, bc_pattern, three_prime_adapter, skip_fastp, trim_fastq
-
-    test("Test Function umiAdapterWarning - QIAseq pattern with TruSeq adapter") {
-
-        function "umiAdapterWarning"
+        function "umiDeprecationWarnings"
 
         when {
             function {
                 """
-                input[0] = true
-                input[1] = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
-                input[2] = 'AGATCGGAAGAGCACACGTCTGAACTCCAGTCA'
-                input[3] = false
-                input[4] = true
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert function.success },
-                { assert function.result == null }
-            )
-        }
-    }
-
-    test("Test Function umiAdapterWarning - pattern anchored on the trimmed adapter") {
-
-        function "umiAdapterWarning"
-
-        when {
-            function {
-                """
-                input[0] = true
-                input[1] = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
-                input[2] = 'AACTGTAGGCACCATCAAT'
-                input[3] = false
-                input[4] = true
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert function.success },
-                { assert function.result.contains("contains the 3' adapter given in '--three_prime_adapter' (AACTGTAGGCACCATCAAT)") }
-            )
-        }
-    }
-
-    test("Test Function umiAdapterWarning - pattern anchored on the adapter with --skip_fastp") {
-
-        function "umiAdapterWarning"
-
-        when {
-            function {
-                """
-                input[0] = true
-                input[1] = '.+(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)'
-                input[2] = 'AACTGTAGGCACCATCAAT'
-                input[3] = true
-                input[4] = true
-                """
-            }
-        }
-
-        then {
-            assertAll(
-                { assert function.success },
-                // fastp does not trim the adapter, so the pattern still finds it
-                { assert function.result == null }
-            )
-        }
-    }
-
-    test("Test Function umiAdapterWarning - without UMI") {
-
-        function "umiAdapterWarning"
-
-        when {
-            function {
-                """
-                input[0] = false
+                input[0] = null
                 input[1] = null
-                input[2] = 'AACTGTAGGCACCATCAAT'
-                input[3] = false
-                input[4] = true
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == [] }
+            )
+        }
+    }
+
+    test("Test Function umiDeprecationWarnings - both set") {
+
+        function "umiDeprecationWarnings"
+
+        when {
+            function {
+                """
+                input[0] = true
+                input[1] = 0
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result.size() == 2 },
+                { assert function.result[0].contains("'--skip_umi_extract_before_dedup' is deprecated and ignored") },
+                { assert function.result[1].contains("'--umi_discard_read' is deprecated and ignored") }
+            )
+        }
+    }
+
+    // umiSaturationWarning input: the UMI_FROM_SEQUENCE statistics TSV as text
+
+    test("Test Function umiSaturationWarning - saturated") {
+
+        function "umiSaturationWarning"
+
+        when {
+            function {
+                """
+                input[0] = 'sample\\tumi_length\\treads\\tdistinct_sequences\\ttop_sequence\\ttop_sequence_reads\\tumi_space\\ttop_sequence_umi_fraction\\n' +
+                    'S1\\t12\\t575696\\t120000\\tTAGCAGCACGTAAATATTGGCG\\t180000\\t16777216\\t0.010729\\n'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result.contains("UMI saturation in sample 'S1'") },
+                { assert function.result.contains("(TAGCAGCACGTAAATATTGGCG) has 180000 reads, 1.07% of all 16777216 possible 12 nt UMIs") }
+            )
+        }
+    }
+
+    test("Test Function umiSaturationWarning - below threshold") {
+
+        function "umiSaturationWarning"
+
+        when {
+            function {
+                """
+                input[0] = 'sample\\tumi_length\\treads\\tdistinct_sequences\\ttop_sequence\\ttop_sequence_reads\\tumi_space\\ttop_sequence_umi_fraction\\n' +
+                    'S1\\t12\\t100000\\t20000\\tTAGCAGCACGTAAATATTGGCG\\t80000\\t16777216\\t0.004768\\n'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null }
+            )
+        }
+    }
+
+    test("Test Function umiSaturationWarning - stub output without data") {
+
+        function "umiSaturationWarning"
+
+        when {
+            function {
+                """
+                input[0] = 'sample\\tumi_length\\treads\\tdistinct_sequences\\ttop_sequence\\ttop_sequence_reads\\tumi_space\\ttop_sequence_umi_fraction\\n'
                 """
             }
         }
