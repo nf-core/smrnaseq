@@ -117,4 +117,73 @@ nextflow_function {
             )
         }
     }
+
+    test("Test Function mirnaReferenceVersions - miRBase GFF3") {
+
+        function "mirnaReferenceVersions"
+
+        when {
+            function {
+                """
+                input[0] = file(params.pipelines_testdata_base_path + 'reference/hsa.gff3', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == [
+                    ['MIRNA_REFERENCE', 'miRBase', 'v22'],
+                    ['MIRNA_REFERENCE', 'genome_build', 'GRCh38']
+                ] }
+            )
+        }
+    }
+
+    test("Test Function mirnaReferenceVersions - MirGeneDB GFF") {
+
+        function "mirnaReferenceVersions"
+
+        when {
+            function {
+                """
+                input[0] = file(params.pipelines_testdata_base_path + 'MirGeneDB/mirgenedb_hsa.gff', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == [
+                    ['MIRNA_REFERENCE', 'MirGeneDB', 'v2.0'],
+                    ['MIRNA_REFERENCE', 'genome_build', 'hg38']
+                ] }
+            )
+        }
+    }
+
+    test("Test Function mirnaReferenceVersions - no version header") {
+
+        function "mirnaReferenceVersions"
+
+        when {
+            function {
+                """
+                // A file without a GFF comment header (FASTA)
+                input[0] = file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == [
+                    ['MIRNA_REFERENCE', 'mirna_gff', 'unknown (mature.fa)']
+                ] }
+            )
+        }
+    }
 }

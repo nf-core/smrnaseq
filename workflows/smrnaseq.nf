@@ -23,6 +23,7 @@ include { GENOME_QUANT                     } from '../subworkflows/local/genome_
 include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant/main'
 include { mirtraceConfigLine               } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { mirtraceAdapterWarning           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
+include { mirnaReferenceVersions           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { methodsDescriptionText           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 // plugins
 include { paramsSummaryMap                 } from 'plugin/nf-schema'
@@ -291,8 +292,13 @@ workflow NFCORE_SMRNASEQ {
             versions_tuple: true
         }
 
+    // miRBase/MirGeneDB version and genome build from the miRNA GFF3 header
+    def ch_mirna_reference_versions = ch_mirna_gtf
+        .flatMap { _meta, gff -> mirnaReferenceVersions(gff) }
+
     def topic_versions_string = topic_versions.versions_tuple
         .mix(MIRNA_QUANT.out.versions_tuples)
+        .mix(ch_mirna_reference_versions)
         .map { process, tool, version ->
             [ process[process.lastIndexOf(':')+1..-1], "  ${tool}: ${version}" ]
         }

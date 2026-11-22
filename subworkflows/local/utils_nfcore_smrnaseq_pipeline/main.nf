@@ -378,6 +378,36 @@ def mirtraceAdapterWarning(adapter, mirtrace_species) {
 }
 
 //
+// Version of the miRNA reference database and its genome build, read from the comment header
+// of the miRNA GFF3 (--mirna_gtf, --mirgenedb_gff or the GFF3 downloaded for --mirtrace_species).
+// miRBase and MirGeneDB GFF3 files start with lines such as:
+//   # microRNAs:               miRBase v22
+//   # genome-build-id:         GRCh38
+// Returns [ process, tool, version ] tuples for the software versions YAML. The database
+// version is "unknown" when the header has no "microRNAs:" line.
+//
+def mirnaReferenceVersions(gff) {
+    def header = gff.withReader { reader ->
+        reader.iterator().takeWhile { line -> line.startsWith('#') }.toList()
+    }
+    def database = header.findResult { line ->
+        def match = line =~ /^#+\s*microRNAs:\s*(\S+)\s+(\S+)/
+        match.find() ? [match.group(1), match.group(2)] : null
+    }
+    def genome_build = header.findResult { line ->
+        def match = line =~ /^#+\s*genome-build-id:\s*(\S+)/
+        match.find() ? match.group(1) : null
+    }
+    def versions = database
+        ? [['MIRNA_REFERENCE', database[0], database[1]]]
+        : [['MIRNA_REFERENCE', 'mirna_gff', "unknown (${gff.name})".toString()]]
+    if (genome_build) {
+        versions << ['MIRNA_REFERENCE', 'genome_build', genome_build]
+    }
+    return versions
+}
+
+//
 // Exit pipeline if incorrect --genome key provided
 //
 def genomeExistsError() {
