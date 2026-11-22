@@ -46,7 +46,7 @@ With more than one species or `all`, provide a GFF3 file with the miRNA coordina
 
 ```bash
 for species in dre ola ssa; do
-    curl -fsSL "https://mirbase.org/download/CURRENT/genomes/${species}.gff3"
+    curl -fsSL "https://mirbase.org/download/${species}.gff3"
 done > mirbase_dre_ola_ssa.gff3
 ```
 
