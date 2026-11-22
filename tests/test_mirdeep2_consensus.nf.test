@@ -1,0 +1,33 @@
+nextflow_pipeline {
+
+    name "Test pipeline with --mirdeep2_consensus_min_samples"
+    script "../main.nf"
+    profile "test_mirgenedb,ci"
+    tag "pipeline"
+    tag "mirdeep2_consensus"
+
+    test("-profile test_mirgenedb --mirdeep2_consensus_min_samples 1") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                mirdeep2_consensus_min_samples = 1
+            }
+        }
+
+        then {
+            def consensus = new File("${outputDir}/mirdeep2/mirdeep2_consensus.bed")
+            def lines = consensus.exists() ? consensus.readLines() : []
+            assertAll(
+                { assert workflow.success },
+                { assert new File("${outputDir}/mirdeep2/result_Clone1_N1.bed").exists() },
+                { assert consensus.exists() },
+                // miRDeep2 reports one known miRNA per test sample, at two different hairpins
+                { assert lines.size() == 3 },
+                { assert lines[0].startsWith('#chrom\tstart\tend\tname\tscore\tstrand\tn_samples\tsamples\tmirdeep2_ids') },
+                { assert lines[1] == ['hg38_dna', '1259227', '1259294', 'known:consensus_1', '2.4', '+', '1', 'Control_N1', 'Control_N1:known:hg38_dna_6'].join('\t') },
+                { assert lines[2] == ['hg38_dna', '1259964', '1260039', 'known:consensus_2', '1.4', '+', '1', 'Clone1_N1', 'Clone1_N1:known:hg38_dna_6'].join('\t') }
+            )
+        }
+    }
+}

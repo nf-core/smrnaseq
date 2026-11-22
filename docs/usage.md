@@ -86,6 +86,8 @@ If the software encounters an error with exit status 255, it will be ignored, an
 
 Error 255 is typically related to the core algorithm of miRDeep generating empty output files. This often happens when the reads being processed do not correspond to putative mature miRNA sequences, or if the provided precursors do not meet the criteria for valid miRNA precursors, both of which may stem from the input reads used. A common cause of this error is running the pipeline with a small subset of the input reads.
 
+miRDeep2 reports known and novel miRNAs for each sample separately, and the provisional IDs of novel miRNAs differ between samples. To get one set of loci across samples, use `--mirdeep2_consensus_min_samples <N>`: the per-sample BED files are merged into `mirdeep2/mirdeep2_consensus.bed`, keeping loci reported by at least `N` samples (for example `1` for the union, or the number of samples for loci found in all of them). The default `0` disables this step. Filtering by the miRDeep2 true-positive probability is not applied; use the `score` column or the `result_{sample.id}.csv` files for that.
+
 ### UMI handling
 
 The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire read sequence after 3'adapter removal. Followed by Umitools-extract to extract the miRNA adapter and UMI. This can be achieved by using the parameters for UMI handling as follows (in this case for QIAseq miRNA Library Kit):

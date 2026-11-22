@@ -1,0 +1,34 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "mirdeep2_consensus"
+description: Merge the per-sample miRDeep2 BED files into a consensus BED of the loci found in a minimum number of samples.
+keywords:
+  - mirdeep2
+  - mirna
+  - consensus
+  - bed
+components:
+  - gawk
+  - bedtools/sort
+  - bedtools/merge
+input:
+  - ch_mirdeep2:
+      type: file
+      description: |
+        Channel containing the miRDeep2 results of each sample. Only the BED files are used.
+        Structure: [ val(meta), [ path(bed), path(csv), path(html) ] ]
+      pattern: "result_*.{bed,csv,html}"
+  - min_samples:
+      type: integer
+      description: |
+        Minimum number of samples that must report an overlapping locus on the same strand.
+output:
+  - bed:
+      type: file
+      description: |
+        Channel containing the consensus BED file (BED6 plus n_samples, samples and mirdeep2_ids columns).
+        Structure: [ val(meta), path(bed) ]
+      pattern: "mirdeep2_consensus.bed"
+authors:
+  - "@apeltzer"
+maintainers:
+  - "@apeltzer"

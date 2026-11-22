@@ -91,6 +91,7 @@ params {
     // Skipping pipeline steps
     skip_fastqc:                   Boolean
     skip_mirdeep:                  Boolean
+    mirdeep2_consensus_min_samples: Integer
     skip_multiqc:                  Boolean
     skip_fastp:                    Boolean
 

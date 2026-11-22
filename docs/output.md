@@ -209,6 +209,7 @@ These files will be saved in this directory if `--save_intermediates` is specifi
 - `mirdeep2/result_{sample.id}.bed` File with the known and novel miRNAs in bed format.
 - `mirdeep2/result_{sample.id}.csv` File with an overview of all detected miRNAs (known and novel) in csv format.
 - `mirdeep2/result_{sample.id}.html` A HTML report with an overview of all detected miRNAs (known and novel) in html format.
+- `mirdeep2/mirdeep2_consensus.bed` (only with `--mirdeep2_consensus_min_samples` of 1 or more): Cross-sample consensus of the per-sample BED files. Overlapping loci on the same strand are merged, and loci found in fewer than `--mirdeep2_consensus_min_samples` samples are removed. The file has a `#` header line and the columns `chrom`, `start`, `end`, `name` (`known:consensus_<n>` if any sample reported a known miRBase miRNA at the locus, otherwise `novel:consensus_<n>`), `score` (highest miRDeep2 score), `strand`, `n_samples`, `samples` and `mirdeep2_ids` (the per-sample miRDeep2 IDs as `<sample>:<known|novel>:<id>`, which link back to the `result_{sample.id}.csv` files). Coordinates are taken from the miRDeep2 BED files unchanged.
 
 ## miRTrace
 

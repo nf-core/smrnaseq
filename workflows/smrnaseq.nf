@@ -21,6 +21,7 @@ include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils
 include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/main'
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant/main'
 include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant/main'
+include { MIRDEEP2_CONSENSUS               } from '../subworkflows/local/mirdeep2_consensus/main'
 include { mirtraceConfigLine               } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { mirtraceAdapterWarning           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { methodsDescriptionText           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
@@ -278,6 +279,14 @@ workflow NFCORE_SMRNASEQ {
                         ch_mature_hairpin,
                 )
                 ch_mirdeep2 = FASTQ_FIND_MIRNA_MIRDEEP2.out.outputs
+
+                if (params.mirdeep2_consensus_min_samples > 0) {
+                        MIRDEEP2_CONSENSUS (
+                                ch_mirdeep2,
+                                params.mirdeep2_consensus_min_samples,
+                        )
+                        ch_mirdeep2 = ch_mirdeep2.mix(MIRDEEP2_CONSENSUS.out.bed)
+                }
         }
     }
 

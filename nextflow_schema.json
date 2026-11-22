@@ -359,6 +359,22 @@
                 }
             }
         },
+        "mirdeep2_options": {
+            "title": "miRDeep2 options",
+            "type": "object",
+            "description": "Options for the miRDeep2 known and novel miRNA detection.",
+            "fa_icon": "fas fa-search",
+            "properties": {
+                "mirdeep2_consensus_min_samples": {
+                    "type": "integer",
+                    "default": 0,
+                    "minimum": 0,
+                    "description": "Write a cross-sample consensus BED of the miRDeep2 miRNAs found in at least this many samples. 0 disables it.",
+                    "help_text": "When set to 1 or more, the per-sample miRDeep2 BED files (known and novel miRNAs) are merged into `mirdeep2/mirdeep2_consensus.bed`. Overlapping loci on the same strand are merged with `bedtools merge`, and only loci reported by at least this many samples are kept. Use 1 for the union of all samples, or the number of samples for loci found in every sample. Samples where miRDeep2 failed (exit status 255) do not count. miRDeep2 must not be skipped (`--skip_mirdeep false`).",
+                    "fa_icon": "fas fa-object-group"
+                }
+            }
+        },
         "institutional_config_options": {
             "title": "Institutional config options",
             "type": "object",
@@ -528,6 +544,9 @@
         },
         {
             "$ref": "#/$defs/skipping_pipeline_steps"
+        },
+        {
+            "$ref": "#/$defs/mirdeep2_options"
         },
         {
             "$ref": "#/$defs/institutional_config_options"

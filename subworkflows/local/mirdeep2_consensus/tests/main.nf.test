@@ -1,0 +1,107 @@
+nextflow_workflow {
+
+    name "Test Workflow MIRDEEP2_CONSENSUS"
+    script "../main.nf"
+    workflow "MIRDEEP2_CONSENSUS"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/mirdeep2_consensus"
+    tag "mirdeep2_consensus"
+
+    // Small miRDeep2-like BED files: A, B and C share a novel locus on chr1 (+), A and B share
+    // a known locus on chr1 (-), B has a locus overlapping it on the opposite strand, A has a
+    // locus on chr2 and D has no miRNAs at all
+    def input_channel = """
+        channel.of('A', 'B', 'C', 'D').map { id ->
+            [ [ id: id, single_end: true ], [ file("${baseDir}/subworkflows/local/mirdeep2_consensus/tests/data/result_\${id}.bed", checkIfExists: true) ] ]
+        }
+    """
+
+    test("min_samples = 2") {
+
+        when {
+            workflow {
+                """
+                input[0] = ${input_channel}
+                input[1] = 2
+                """
+            }
+        }
+
+        then {
+            def lines = path(workflow.out.bed.get(0).get(1)).readLines()
+            assertAll(
+                { assert workflow.success },
+                { assert lines.size() == 3 },
+                { assert lines[0] == ['#chrom', 'start', 'end', 'name', 'score', 'strand', 'n_samples', 'samples', 'mirdeep2_ids'].join('\t') },
+                { assert lines[1] == ['chr1', '100', '180', 'novel:consensus_1', '7.7', '+', '3', 'A,B,C', 'A:novel:chr1_1,B:novel:chr1_2,C:novel:chr1_4'].join('\t') },
+                { assert lines[2] == ['chr1', '1000', '1075', 'known:consensus_2', '10.1', '-', '2', 'A,B', 'A:known:chr1_5,B:known:chr1_9'].join('\t') }
+            )
+        }
+    }
+
+    test("min_samples = 1") {
+
+        when {
+            workflow {
+                """
+                input[0] = ${input_channel}
+                input[1] = 1
+                """
+            }
+        }
+
+        then {
+            def lines = path(workflow.out.bed.get(0).get(1)).readLines()
+            assertAll(
+                { assert workflow.success },
+                { assert lines.size() == 5 },
+                { assert lines.findAll { line -> line.startsWith('chr1\t1010\t1060\tnovel:') && line.endsWith('\t+\t1\tB\tB:novel:chr1_7') }.size() == 1 },
+                { assert lines.findAll { line -> line.startsWith('chr2\t500\t560\tnovel:') && line.endsWith('\t+\t1\tA\tA:novel:chr2_3') }.size() == 1 }
+            )
+        }
+    }
+
+    test("min_samples above the number of samples") {
+
+        when {
+            workflow {
+                """
+                input[0] = ${input_channel}
+                input[1] = 5
+                """
+            }
+        }
+
+        then {
+            def lines = path(workflow.out.bed.get(0).get(1)).readLines()
+            assertAll(
+                { assert workflow.success },
+                { assert lines.size() == 1 },
+                { assert lines[0].startsWith('#chrom') }
+            )
+        }
+    }
+
+    test("stub") {
+
+        options "-stub"
+
+        when {
+            workflow {
+                """
+                input[0] = ${input_channel}
+                input[1] = 2
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.out.bed.size() == 1 },
+                { assert file(workflow.out.bed.get(0).get(1)).name == 'mirdeep2_consensus.bed' }
+            )
+        }
+    }
+}
