@@ -49,11 +49,13 @@ nextflow_process {
         when {
             process {
                 """
-                input[0] = [[id:'hsa', species:'hsa'], file(params.pipelines_testdata_base_path + 'reference/hsa.gff3', checkIfExists: true)]
+                input[0] = [file(params.pipelines_testdata_base_path + 'reference/hsa.gff3', checkIfExists: true)]
                 input[1] = [[id:'mature'], file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)]
                 input[2] = [[id:'hairpin'], file(params.pipelines_testdata_base_path + 'reference/hairpin.fa', checkIfExists: true)]
-                input[3] = 'mmu,hsa'
-                input[4] = 'miRBase'
+                input[3] = [file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)]
+                input[4] = file(params.pipelines_testdata_base_path + 'reference/hairpin.fa', checkIfExists: true)
+                input[5] = 'mmu,hsa'
+                input[6] = 'miRBase'
                 """
             }
         }
@@ -67,7 +69,7 @@ nextflow_process {
                 // like PARSE_FASTA_MIRNA. The test data only has hsa, so the table is the same as for 'hsa'.
                 { assert rows.size() > 1000 },
                 { assert rows.drop(1).every { row -> row[0].startsWith('hsa-') || row[0].startsWith('mmu-') } },
-                { assert by_name['mature:hsa-let-7a-5p'] == ['hsa-let-7a-5p', 'MIMAT0000062', 'mature', 'hsa-let-7a-1,hsa-let-7a-2,hsa-let-7a-3', 'MI0000060,MI0000061,MI0000062', 'miRBase'] }
+                { assert by_name['mature:hsa-let-7a-5p'] == ['hsa-let-7a-5p', 'MIMAT0000062', 'mature', 'hsa-let-7a-1,hsa-let-7a-2,hsa-let-7a-3', 'MI0000060,MI0000061,MI0000062', 'miRBase', 'gff'] }
             )
         }
     }
