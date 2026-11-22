@@ -1,0 +1,113 @@
+nextflow_pipeline {
+
+    name "Test pipeline miRDeep2 options and outputs"
+    script "../main.nf"
+    profile "+ci"
+    tag "pipeline"
+    tag "mirdeep2"
+
+    test("-profile test --skip_mirdeep false (miRBase: -P -d, no PDFs)") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                input = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/samplesheet/v2.0/samplesheet_test_short.csv'
+                skip_mirdeep = false
+            }
+        }
+
+        then {
+            // Scripts of the MIRDEEP2_MIRDEEP2 tasks, found through their .command.run
+            def mirdeep2_scripts = []
+            new File("${workDir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
+                if (file.name == '.command.run' && file.text.contains('NFCORE_SMRNASEQ:FASTQ_FIND_MIRNA_MIRDEEP2:MIRDEEP2_MIRDEEP2')) {
+                    // Keep only the miRDeep2.pl command line (the script also contains `[ -d ... ]` tests)
+                    def script = new File(file.parentFile, '.command.sh').text
+                    mirdeep2_scripts.add(script.substring(script.indexOf('miRDeep2.pl'), script.indexOf('mv result_')))
+                }
+            }
+            def mirdeep2_files = new File("${params.outdir}/mirdeep2").listFiles().collect { file -> file.name }
+
+            assert workflow.success
+            assert mirdeep2_scripts.size() > 0
+            // miRBase mature IDs use -5p/-3p, so -P is passed; -d skips the structure PDFs
+            assert mirdeep2_scripts.every { script -> script.contains('miRDeep2.pl') && script =~ /\s-P\s/ && script =~ /\s-d\s/ }
+            assert mirdeep2_files.any { name -> name ==~ /result_.+\.html/ }
+            assert !mirdeep2_files.any { name -> name.startsWith('pdfs_') }
+        }
+    }
+
+    test("-profile test --skip_mirdeep false, PDFs enabled (published and linked)") {
+
+        config "./config/mirdeep2_pdfs.config"
+
+        when {
+            params {
+                outdir = "$outputDir"
+                input = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/samplesheet/v2.0/samplesheet_test_short.csv'
+                skip_mirdeep = false
+            }
+        }
+
+        then {
+            def mirdeep2_scripts = []
+            new File("${workDir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
+                if (file.name == '.command.run' && file.text.contains('NFCORE_SMRNASEQ:FASTQ_FIND_MIRNA_MIRDEEP2:MIRDEEP2_MIRDEEP2')) {
+                    // Keep only the miRDeep2.pl command line (the script also contains `[ -d ... ]` tests)
+                    def script = new File(file.parentFile, '.command.sh').text
+                    mirdeep2_scripts.add(script.substring(script.indexOf('miRDeep2.pl'), script.indexOf('mv result_')))
+                }
+            }
+            def mirdeep2_dir = new File("${params.outdir}/mirdeep2")
+            def reports      = mirdeep2_dir.listFiles().findAll { file -> file.name ==~ /result_.+\.html/ }
+            def pdf_links    = reports.collectMany { report -> (report.text =~ /href="(pdfs_[^"]+\.pdf)"/).collect { match -> match[1] } }
+
+            assert workflow.success
+            assert mirdeep2_scripts.size() > 0
+            assert mirdeep2_scripts.every { script -> script.contains('miRDeep2.pl') && !(script =~ /\s-d\s/) }
+            // Each sample has its report next to its structure PDFs, under a stable name
+            assert reports.size() > 0
+            reports.each { report ->
+                def sample = report.name.replaceAll(/^result_|\.html$/, '')
+                def pdf_dir = new File(mirdeep2_dir, "pdfs_${sample}")
+                assert pdf_dir.isDirectory()
+                assert pdf_dir.listFiles().any { file -> file.name.endsWith('.pdf') }
+            }
+            // The report links point to the published PDFs
+            assert pdf_links.size() > 0
+            assert pdf_links.every { link -> new File(mirdeep2_dir, link).isFile() }
+        }
+    }
+
+    test("-profile test with MirGeneDB references (no -P)") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                input = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/samplesheet/v2.0/samplesheet_test_short.csv'
+                mirgenedb = true
+                mirgenedb_mature = "https://github.com/nf-core/test-datasets/raw/smrnaseq/MirGeneDB/mirgenedb_hsa_mature.fa"
+                mirgenedb_hairpin = "https://github.com/nf-core/test-datasets/raw/smrnaseq/MirGeneDB/mirgenedb_hsa_hairpin.fa"
+                mirgenedb_gff = "https://github.com/nf-core/test-datasets/raw/smrnaseq/MirGeneDB/mirgenedb_hsa.gff"
+                mirgenedb_species = "Hsa"
+                skip_mirdeep = false
+            }
+        }
+
+        then {
+            def mirdeep2_scripts = []
+            new File("${workDir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
+                if (file.name == '.command.run' && file.text.contains('NFCORE_SMRNASEQ:FASTQ_FIND_MIRNA_MIRDEEP2:MIRDEEP2_MIRDEEP2')) {
+                    // Keep only the miRDeep2.pl command line (the script also contains `[ -d ... ]` tests)
+                    def script = new File(file.parentFile, '.command.sh').text
+                    mirdeep2_scripts.add(script.substring(script.indexOf('miRDeep2.pl'), script.indexOf('mv result_')))
+                }
+            }
+
+            assert workflow.success
+            assert mirdeep2_scripts.size() > 0
+            // MirGeneDB mature IDs use _5p/_3p, which -P does not handle, so only -d is passed
+            assert mirdeep2_scripts.every { script -> script.contains('miRDeep2.pl') && !(script =~ /\s-P\s/) && script =~ /\s-d\s/ }
+        }
+    }
+}

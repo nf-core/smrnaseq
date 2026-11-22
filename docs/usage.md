@@ -96,18 +96,23 @@ See [the output documentation](https://nf-co.re/smrnaseq/output#mirdeep2) for ho
 
 ### Tuning miRDeep2
 
-You can pass extra `miRDeep2.pl` options with `ext.args` (see [Custom Tool Arguments](#custom-tool-arguments)). The pipeline sets none by default. For example:
+By default, the pipeline passes these options to `miRDeep2.pl`:
+
+- `-P` (only with miRBase references, not with `--mirgenedb`): current miRBase releases (v18 and later) name mature miRNAs with `-5p`/`-3p` suffixes, and the miRDeep2 documentation asks for `-P` with such names. MirGeneDB names end in `_5p`/`_3p`, which `-P` does not recognise, so the pipeline leaves it out in MirGeneDB mode. `-P` only changes how miRDeep2 splits known miRNAs into 5p and 3p arms in its internal quantification report, which the pipeline does not publish. The `result_*` files are the same with or without it.
+- `-d`: skips the per-miRNA structure PDFs. miRDeep2 draws one PDF of about 0.3 MB for every reported miRNA and every known miRNA with reads, which can add up to hundreds of MB per sample. Because of `-d`, the miRNA IDs in the HTML report link to PDFs that do not exist.
+
+You can change the options with `ext.args` (see [Custom Tool Arguments](#custom-tool-arguments)). Setting `ext.args` replaces the defaults, so keep `-P` when you use miRBase references. For example, to get the structure PDFs, leave out `-d`:
 
 ```groovy
 process {
     withName: 'MIRDEEP2_MIRDEEP2' {
-        ext.args = '-P -d'
+        ext.args = '-P'
     }
 }
 ```
 
-- `-P`: the miRDeep2 documentation recommends this when the mature reference uses miRBase v18 or later names (`-5p`/`-3p` suffixes), as current miRBase releases do.
-- `-d`: skips the structure PDFs. The pipeline does not publish them (see [the output documentation](https://nf-co.re/smrnaseq/output#mirdeep2)), so `-d` saves run time.
+The pipeline then publishes the PDFs to `mirdeep2/pdfs_<sample>/`, and the links in the HTML report work. Other useful options:
+
 - `-b <score>`: only report novel candidates with at least this miRDeep2 score (default 0).
 
 ### Exit status 255

@@ -209,6 +209,7 @@ These files will be saved in this directory if `--save_intermediates` is specifi
 - `mirdeep2/result_{sample.id}.bed` File with the known and novel miRNAs in bed format.
 - `mirdeep2/result_{sample.id}.csv` File with an overview of all detected miRNAs (known and novel) in csv format.
 - `mirdeep2/result_{sample.id}.html` A HTML report with an overview of all detected miRNAs (known and novel) in html format.
+- `mirdeep2/pdfs_{sample.id}/` Only if you turn the PDFs on (see below): one PDF per miRNA, with its hairpin structure and the reads on it. The HTML report links to these files, so keep the folder next to the report.
 
 miRDeep2 runs only when a genome FASTA is given and `--skip_mirdeep` is not set. It runs on each sample separately, and there is no file that combines all samples. See [the usage documentation](https://nf-co.re/smrnaseq/usage#mirdeep2) for its inputs and options.
 
@@ -229,7 +230,7 @@ How to read the results:
   - `consensus mature sequence`, `consensus star sequence` and `consensus precursor sequence`: the sequences of the candidate.
   - `precursor coordinate`: the genome position as `chromosome:start..end:strand`.
 - The BED file holds the novel and detected known miRNAs from the CSV. Column 4 is `novel:<provisional id>` or `known:<provisional id>` and column 5 is the miRDeep2 score. The colour is red for the `+` strand and blue for the `-` strand. Scores and provisional IDs are specific to each sample, so you cannot compare them between samples directly ([#176](https://github.com/nf-core/smrnaseq/issues/176) tracks a combined BED file).
-- The HTML report shows the same tables. Its links to the per-miRNA structure PDFs (`pdfs_*/`) do not work, because the pipeline does not publish those PDFs.
+- The HTML report shows the same tables. The ID in its first column links to the structure PDF of that miRNA in `pdfs_{sample.id}/`. By default, the pipeline runs miRDeep2 with `-d`, which skips the PDFs, so these links do not work. The PDFs are about 0.3 MB each, and there is one for every reported miRNA and every known miRNA with reads, which can add up to hundreds of MB per sample. To get them, leave out `-d` as described in [the usage documentation](https://nf-co.re/smrnaseq/usage#tuning-mirdeep2).
 - Novel miRNAs are not added to the miRNA count tables. See [the usage documentation](https://nf-co.re/smrnaseq/usage#mirdeep2) for how to count them in all samples.
 
 ## miRTrace

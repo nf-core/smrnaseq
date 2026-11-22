@@ -63,7 +63,8 @@
                     "mirdeep2/mirdeep2": {
                         "branch": "master",
                         "git_sha": "afe839404088f994640f34680ffc8d29e963206f",
-                        "installed_by": ["fastq_find_mirna_mirdeep2"]
+                        "installed_by": ["fastq_find_mirna_mirdeep2"],
+                        "patch": "modules/nf-core/mirdeep2/mirdeep2/mirdeep2-mirdeep2.diff"
                     },
                     "mirtop/counts": {
                         "branch": "master",
