@@ -1,0 +1,53 @@
+{
+    "miRBase GFF3": {
+        "content": [
+            {
+                "0": [
+                    "mirna_ids.tsv:md5,be6b3233179477389f3b756e50f9cbe8"
+                ],
+                "mirna_ids": [
+                    "mirna_ids.tsv:md5,be6b3233179477389f3b756e50f9cbe8"
+                ]
+            }
+        ],
+        "timestamp": "2026-11-22T12:30:02.688228",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.6"
+        }
+    },
+    "stub": {
+        "content": [
+            {
+                "0": [
+                    "mirna_ids.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "mirna_ids": [
+                    "mirna_ids.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ]
+            }
+        ],
+        "timestamp": "2026-11-22T12:30:42.078341",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.6"
+        }
+    },
+    "MirGeneDB GFF": {
+        "content": [
+            {
+                "0": [
+                    "mirna_ids.tsv:md5,f92d8ef5d38745c2dae053e0882b7437"
+                ],
+                "mirna_ids": [
+                    "mirna_ids.tsv:md5,f92d8ef5d38745c2dae053e0882b7437"
+                ]
+            }
+        ],
+        "timestamp": "2026-11-22T12:30:24.309914",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.6"
+        }
+    }
+}

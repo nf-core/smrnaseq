@@ -1,7 +1,7 @@
 {
     "-profile test_umi": {
         "content": [
-            76,
+            77,
             {
                 "BOWTIE_MAP_GENOME": {
                     "bowtie": "1.3.1",
@@ -61,6 +61,9 @@
                 },
                 "INDEX_MATURE": {
                     "bowtie": "1.3.1"
+                },
+                "MIRNA_IDS": {
+                    "r-base": "3.6.2"
                 },
                 "MIRTOP_COUNTS": {
                     "mirtop": "0.4.30"
@@ -245,6 +248,7 @@
                 "mirna_quant/edger_qc/mature_logtpm.txt",
                 "mirna_quant/edger_qc/mature_normalized_CPM.txt",
                 "mirna_quant/edger_qc/mature_unmapped_read_counts.txt",
+                "mirna_quant/mirna_ids.tsv",
                 "mirna_quant/mirtop",
                 "mirna_quant/mirtop/export",
                 "mirna_quant/mirtop/export/SRX8195117_SRR11631013_mirtop_rawData.tsv",
@@ -532,6 +536,7 @@
                 "SRX8195118_SRR11631014_mature.sorted.flagstat:md5,3360f9b88d0f4f14f741a48aaedd37d9",
                 "SRX8195118_SRR11631014_mature.sorted.idxstats:md5,46d2ea68a97ba95ea8f5411ecaf13253",
                 "SRX8195118_SRR11631014_mature.sorted.stats:md5,cd5b60619967f8518131aa556c4d29d1",
+                "mirna_ids.tsv:md5,0cd17afbaa7b1c40634051e88e05664a",
                 "hairpin.fa_igenome.fa:md5,5fb538f60d5288846600dba31010251e",
                 "hairpin.fa_igenome.fa_idx.fa:md5,482b0327b0c1e36748c1ee3d3be9be77",
                 "mature.fa_igenome.fa:md5,ef4cabcbea05adf334ba6891a50c951a",
