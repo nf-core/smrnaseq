@@ -60,7 +60,8 @@ See examples in: [the test-datasets repository of nf-core](https://github.com/nf
 - `bowtie_index`: points to the folder containing the `bowtie` indices for the genome reference specified by `fasta`.
 - `bowtie_align_args`: Optional flags to pass to Bowtie 1 for the genome mapping, e.g. `--bowtie_align_args '-v 1 --best'`. Only a subset of Bowtie 1 flags are allowed to keep compatibility with the pipeline. If invalid or disallowed values are included, the pipeline will exit with an error message. A value holding a single flag needs the `=` form, for example `--bowtie_align_args=--best`, because `--bowtie_align_args --best` is parsed as the boolean `true` and is rejected. Short flags take their value as a separate word (`-v 1`, not `-v=1`).
   - These flags are appended after the pipeline's defaults for genome mapping (`-t -k 50 --best --strata -e 99999 --chunkmbs 2048`). When a flag is repeated, Bowtie uses the last value, so for example `--bowtie_align_args '-k 10'` replaces `-k 50`.
-  - `-k` must be at least 2, because the defaults include `--strata`, which Bowtie only accepts with `-k` above 1. To report a single alignment per read, override `ext.args` for `NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME` instead (see [Custom Tool Arguments](#custom-tool-arguments)).
+  - `-k` must be at least 2, because the defaults include `--strata`, which Bowtie only accepts with `-k` above 1. To report a single alignment per read, use `-M 1` instead.
+  - `-M <n>` (at least 1) reports a read that has more than `n` alignments in the best stratum once, at a random one of them, with a MAPQ of 0. Reads with up to `n` alignments keep all of them (up to the `-k` limit), so `-M 1` gives exactly one alignment per aligned read. `-M` cannot be combined with `-m`, which drops such reads instead.
 
 > [!NOTE]
 > if the FASTA file in `fasta` is not the same file used to generate the `bowtie` indices, then the pipeline will fail.
@@ -78,15 +79,7 @@ The pipeline quantifies miRNAs only. It does not count genome-aligned reads agai
 To count reads against a GTF with [featureCounts](https://subread.sourceforge.net/featureCounts.html), use one of these approaches. The first two also change the genome alignment statistics in the MultiQC report.
 
 - **Uniquely aligned reads only:** run the pipeline with `--bowtie_align_args '-m 1'`. Bowtie then drops reads that have more than one alignment in the best stratum.
-- **One random best alignment per read:** override the genome mapping arguments with `-M 1` (see [Custom Tool Arguments](#custom-tool-arguments); `-M` is not accepted by `--bowtie_align_args`). Bowtie gives the randomly placed alignments of multi-mapping reads a MAPQ of 0, so you can still count uniquely aligned reads only with featureCounts `-Q 1`.
-
-  ```nextflow
-  process {
-      withName: 'NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME' {
-          ext.args = '-t -M 1 --best --strata -e 99999 --chunkmbs 2048'
-      }
-  }
-  ```
+- **One random best alignment per read:** run the pipeline with `--bowtie_align_args '-M 1'`. Bowtie gives the randomly placed alignments of multi-mapping reads a MAPQ of 0, so you can still count uniquely aligned reads only with featureCounts `-Q 1`.
 
 - **All alignments, counted fractionally:** keep the default settings and add an `NH` tag before counting. Bowtie 1 writes the number of alignments it reported for a read in the `XM` tag, so you can rename it, for example with `samtools view -h sample.sorted.bam | perl -pe 's/\tXM:i:/\tNH:i:/' | samtools view -b -o sample.nh.bam -`, and then count with featureCounts `-M --fraction`. A read with exactly 50 alignments may have more that Bowtie did not report.
 
