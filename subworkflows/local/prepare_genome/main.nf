@@ -61,12 +61,27 @@ workflow PREPARE_GENOME {
     bool_has_fasta            = val_fasta                     ? true : false
 
     ch_mirtrace_species       = val_mirtrace_species          ? channel.value(val_mirtrace_species) : channel.empty()
-    mirna_gtf_from_species    = val_mirtrace_species          ? (val_mirtrace_species == 'hsa' ? "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${val_mirtrace_species}.gff3") : false
+
+    // Species used to filter the miRBase references: --mirna_species (comma-separated list) if set, else --mirtrace_species.
+    // --mirna_species is not used with --mirgenedb, which filters by --mirgenedb_species.
+    if (params.mirgenedb && params.mirna_species) {
+        log.warn("--mirna_species is ignored with --mirgenedb. The MirGeneDB references are filtered by --mirgenedb_species.")
+    }
+    val_mirna_species         = (!params.mirgenedb && params.mirna_species) ? params.mirna_species : val_mirtrace_species
+    mirna_species_list        = val_mirna_species ? val_mirna_species.tokenize(',')*.trim() : []
+    // Value passed to `mirtop --sps`, which keeps hairpins whose name contains it. The hairpins are already
+    // filtered by species in MIRNA_QUANT, so with several species pass '-', which every miRNA name contains.
+    val_mirtop_species        = mirna_species_list.size() > 1 ? '-' : (mirna_species_list ? mirna_species_list[0] : 'unknown')
+    if (!params.mirgenedb && mirna_species_list.size() > 1 && !val_mirna_gtf) {
+        error("Several species were given with --mirna_species (${val_mirna_species}). Please provide a GFF3 file with the miRNA coordinates of these species via --mirna_gtf, e.g. the miRBase GFF3 files of the species concatenated into one file.")
+    }
+
+    mirna_gtf_from_species    = mirna_species_list.size() == 1 ? (mirna_species_list[0] == 'hsa' ? "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${mirna_species_list[0]}.gff3") : false
     ch_mirna_gtf              = val_mirna_gtf                 ? channel.fromPath(val_mirna_gtf, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : ( mirna_gtf_from_species ? channel.fromPath(mirna_gtf_from_species, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() :  channel.empty() )
 
     // Add species of the gtf in the meta
     ch_mirna_gtf = ch_mirna_gtf
-        .combine(ch_mirtrace_species.ifEmpty('unknown'))
+        .combine(channel.value(val_mirtop_species))
         .map { meta, gtf, species ->
             def new_meta = meta.clone() + [species: species]
             [new_meta, gtf]
@@ -121,8 +136,8 @@ workflow PREPARE_GENOME {
 
     //Config checks
     // Check optional parameters
-    if (!params.mirgenedb && !val_mirtrace_species && !(params.help || params.help_full)) {
-            error("Reference species for miRTrace is not defined via the --mirtrace_species parameter.")
+    if (!params.mirgenedb && !val_mirtrace_species && !params.mirna_species && !(params.help || params.help_full)) {
+            error("Reference species for miRTrace is not defined via the --mirtrace_species parameter (or --mirna_species for the miRNA references).")
         }
 
     // Genome options

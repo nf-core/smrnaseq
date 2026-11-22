@@ -36,7 +36,8 @@ workflow MIRNA_QUANT {
 
     main:
     ch_versions = channel.empty()
-    ch_parse_species_input = params.mirgenedb ? channel.value(params.mirgenedb_species) : ch_mirtrace_species
+    // miRBase references are filtered by --mirna_species (one or more comma-separated species) if set, else by --mirtrace_species
+    ch_parse_species_input = params.mirgenedb ? channel.value(params.mirgenedb_species) : (params.mirna_species ? channel.value(params.mirna_species) : ch_mirtrace_species)
 
     PARSE_MATURE ( ch_reference_mature, ch_parse_species_input )
     ch_mirna_parsed = PARSE_MATURE.out.parsed_fasta

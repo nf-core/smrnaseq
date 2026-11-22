@@ -54,6 +54,7 @@ params {
     fasta:                         String?
     mirtrace_species:              String?
     mirgenedb_species:             String?
+    mirna_species:                 String?
     mirna_gtf:                     String?
     mirgenedb_gff:                 String?
     mature:                        String?

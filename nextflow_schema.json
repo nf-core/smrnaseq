@@ -127,6 +127,13 @@
                     "help_text": "This replaces the value of `--mirtrace_species` if `--mirgenedb` is used. \n Note the difference in case for species names used in MirGeneDB and miRBase. See https://www.mirgenedb.org/browse for more information.",
                     "fa_icon": "fas fa-microscope"
                 },
+                "mirna_species": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9]+(,[A-Za-z0-9]+)*$",
+                    "description": "miRBase species used to filter the mature and hairpin references, as a comma-separated list (e.g. `dre,ola,ssa`). Defaults to `--mirtrace_species`.",
+                    "help_text": "By default the miRBase mature and hairpin references are filtered to the species given with `--mirtrace_species`. Use this parameter to quantify against one or more other species, e.g. related species for a non-model organism, without changing the species used by miRTrace. With more than one species, `--mirna_gtf` is required and must contain the miRBase coordinates of the species (e.g. their miRBase GFF3 files concatenated into one file). Not used with `--mirgenedb`. See the usage documentation for details and caveats.",
+                    "fa_icon": "fas fa-microscope"
+                },
                 "fasta": {
                     "type": "string",
                     "format": "file-path",

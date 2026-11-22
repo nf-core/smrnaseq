@@ -19,6 +19,8 @@ process PARSE_FASTA_MIRNA {
     versions     = tuple(task.process, 'seqkit', eval("seqkit version | sed 's/^seqkit v//'"))
 
     script:
+    // filter_species may be a comma-separated list (--mirna_species): one seqkit pattern per species
+    def species_patterns = filter_species.tokenize(',').collect { species -> "--pattern \".*${species.trim()}-.*\"" }.join(' ')
     """
     # Uncompress FASTA reference files if necessary
     FASTA="$fasta"
@@ -31,7 +33,7 @@ process PARSE_FASTA_MIRNA {
     sed '#^[^>]#s#[^AUGCaugc]#N#g' \${FASTA}_html_cleaned.fa > \${FASTA}_parsed.fa
 
     sed -i 's#\s.*##' \${FASTA}_parsed.fa
-    seqkit grep -r --pattern \".*${filter_species}-.*\" \${FASTA}_parsed.fa > \${FASTA}_sps.fa
+    seqkit grep -r ${species_patterns} \${FASTA}_parsed.fa > \${FASTA}_sps.fa
     seqkit seq --rna2dna \${FASTA}_sps.fa > \${FASTA}_igenome.fa
     """
 
