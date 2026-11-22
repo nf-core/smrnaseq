@@ -33,6 +33,8 @@ nextflow_process {
                     assert lines.any { it.contains("hsa-miR-365b-3p") }
                     assert lines.any { it.contains("hsa-miR-7-5p") }
                     assert lines.any { it.contains("hsa-miR-103a-3p") }
+                    // All rows of iso-24-9BOX7EZWKE (split across samples) are summed (#174)
+                    assert lines.contains("hsa-miR-7-5p\t35385\t22370\t42567\t24653\t62297\t57649")
                 }
             }
         }
@@ -65,6 +67,34 @@ nextflow_process {
                     assert !lines.any { it.contains("hsa-miR-365a-3p") }
                 }
             }
+        }
+    }
+
+    test("Sums split rows of the same isomiR and counts multi-miRNA UIDs once") {
+
+        when {
+            params {
+                outdir = "${outputDir}"
+            }
+            process {
+                """
+                input[0] = [[:],file("${moduleDir}/tests/mirtop_split_isomirs.tsv", checkIfExists: true)]
+                """
+            }
+        }
+
+        then {
+            assert process.success
+
+            def lines = path(process.out.mirna_tsv.get(0)).readLines()
+            assert lines == [
+                "miRNA\tS1\tS2",
+                // iso-20-AAAA is reported in two rows (different iso_3p_nt) holding counts for different samples: both are summed (#174)
+                "hsa-miR-X\t6\t4",
+                // iso-22-CCCC is assigned to both hsa-miR-Y-a and hsa-miR-Y-b: counted once, for the first miRNA
+                "hsa-miR-Y-a\t10\t10",
+                "hsa-miR-Y-b\t2\t0"
+            ]
         }
     }
 

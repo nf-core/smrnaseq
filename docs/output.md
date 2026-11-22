@@ -198,7 +198,10 @@ These files will be saved in this directory if `--save_intermediates` is specifi
 - `gff/{sample.id}.gff`: [mirgff3](https://github.com/miRTop/mirGFF3) file
 - `joined_samples_mirtop.tsv`: a tabular version of the previous file for easy integration with downstream analysis.
 - `export/{sample.id}_mirtop_rawData.tsv`: File compatible with [isomiRs](http://lpantano.github.io/isomiRs/reference/IsomirDataSeqFromMirtop.html) Bioconductor package to perform isomiRs analysis.
-- `mirna.tsv`: tabular file with miRNA counts after summarizing unique isomiRs for each miRNA
+- `mirna.tsv`: tabular file with miRNA counts after summarizing unique isomiRs for each miRNA. It is derived from `joined_samples_mirtop.tsv` as follows:
+  1. All rows with the same isomiR `UID` and `miRNA` are summed. The same sequence can appear in several rows of `joined_samples_mirtop.tsv` that differ only in precursor-dependent annotation columns (e.g. `iso_3p_nt`, `iso_snp_nt`), typically holding counts for different samples.
+  2. An isomiR `UID` that is assigned to more than one miRNA (e.g. miRNAs with identical or overlapping mature sequences such as `hsa-miR-365a-3p`/`hsa-miR-365b-3p`, or `hsa-miR-103a-3p`/`hsa-miR-107`) is counted only once, for the first miRNA it is listed with, so that the same reads are not counted twice. As a consequence, the totals in `mirna.tsv` can be lower than the sum of all counts in `joined_samples_mirtop.tsv`, and a miRNA whose isomiRs are all shared with another miRNA can be missing from `mirna.tsv`. Use `joined_samples_mirtop.tsv` if you want to handle such ambiguous isomiRs differently.
+  3. The isomiR counts are summed per miRNA.
 
 ## miRDeep2
 
