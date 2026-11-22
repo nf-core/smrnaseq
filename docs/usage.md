@@ -67,6 +67,39 @@ See examples in: [the test-datasets repository of nf-core](https://github.com/nf
 
 If no `bowtie_index` is given, the pipeline builds one from `fasta`. Add `--save_reference` to save it, together with the cleaned FASTA it was built from, to `<outdir>/genome/` and reuse the index in future runs with `--bowtie_index <outdir>/genome/index/bowtie`, together with the same `--fasta` (or the saved `_clean.fa`). `--save_reference` also saves the other indices the pipeline builds (mature and hairpin miRNA Bowtie indices and, with `--filter_contamination`, the contaminant Bowtie2 indices); see [the output documentation](https://nf-co.re/smrnaseq/output#reference-genome-files).
 
+### Other small RNAs: genome-wide quantification
+
+The pipeline quantifies miRNAs only. It does not count genome-aligned reads against a genome annotation (GTF) or call small RNA clusters (see [#409](https://github.com/nf-core/smrnaseq/issues/409)). You can use the genome alignment as a starting point for this outside the pipeline. Run with `--save_intermediates` so that the BAM files are saved to `genome_quant/bam/` (see [the output documentation](https://nf-co.re/smrnaseq/output#bowtie)). Keep the following in mind:
+
+- Only reads that did not align to the mature or hairpin miRNA references are aligned to the genome. These are mostly non-miRNA reads, such as tRNA, rRNA, snoRNA, piRNA, repeat-derived and unannotated small RNAs. With `--filter_contamination`, the classes you filter out are removed before this step, so do not filter a class you want to quantify.
+- The reads are not collapsed: each alignment record comes from one sequenced read (after UMI deduplication, if used).
+- Bowtie reports up to 50 alignments per read (`-k 50 --best --strata`). Bowtie 1 does not set the secondary alignment flag or the `NH` tag, and gives every alignment a MAPQ of 255. featureCounts and HTSeq use the `NH` tag to detect multi-mapping reads, so they count each alignment of a multi-mapping read as a separate, uniquely mapped read. Counting these BAM files directly against a GTF therefore inflates the counts of multi-copy classes, such as tRNAs, rRNAs and repeat-derived piRNAs.
+
+To count reads against a GTF with [featureCounts](https://subread.sourceforge.net/featureCounts.html), use one of these approaches. The first two also change the genome alignment statistics in the MultiQC report.
+
+- **Uniquely aligned reads only:** run the pipeline with `--bowtie_align_args '-m 1'`. Bowtie then drops reads that have more than one alignment in the best stratum.
+- **One random best alignment per read:** override the genome mapping arguments with `-M 1` (see [Custom Tool Arguments](#custom-tool-arguments); `-M` is not accepted by `--bowtie_align_args`). Bowtie gives the randomly placed alignments of multi-mapping reads a MAPQ of 0, so you can still count uniquely aligned reads only with featureCounts `-Q 1`.
+
+  ```nextflow
+  process {
+      withName: 'NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME' {
+          ext.args = '-t -M 1 --best --strata -e 99999 --chunkmbs 2048'
+      }
+  }
+  ```
+
+- **All alignments, counted fractionally:** keep the default settings and add an `NH` tag before counting. Bowtie 1 writes the number of alignments it reported for a read in the `XM` tag, so you can rename it, for example with `samtools view -h sample.sorted.bam | perl -pe 's/\tXM:i:/\tNH:i:/' | samtools view -b -o sample.nh.bam -`, and then count with featureCounts `-M --fraction`. A read with exactly 50 alignments may have more that Bowtie did not report.
+
+For example, to summarise the reads by gene biotype:
+
+```bash
+featureCounts -s 1 -t exon -g gene_biotype -a annotation.gtf -o biotype_counts.tsv results/genome_quant/bam/*.sorted.bam
+```
+
+Use `-g gene_type` for GENCODE annotations, or `-g gene_id` for counts per gene. `-s 1` counts reads on the annotated strand only, which suits most small RNA library protocols.
+
+To find small RNA loci without relying on an annotation, use a cluster caller that handles multi-mapping reads itself. Examples are [seqcluster](https://seqcluster.readthedocs.io/) (`seqcluster prepare` and `seqcluster cluster`), which can start from the collapsed reads that the pipeline saves to `mirna_quant/seqcluster/` with `--save_intermediates`, and [ShortStack](https://github.com/MikeAxtell/ShortStack), which can start from the trimmed reads that the pipeline saves to `fastp/fastq/` with `--save_merged`.
+
 ### Contamination filtering
 
 This step has, until now, only been tested for human data. Unexpected behaviour can occur when using it with a different species.

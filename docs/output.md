@@ -149,7 +149,7 @@ MultiQC reports the number of reads that were removed by each of the contaminant
   - `mirna_hairpin/bowtie`: hairpin.fa bowtie index files (saved to `genome/index/mirna_hairpin/bowtie` instead with `--save_reference`).
   - `mirna_mature/bowtie`: mature.fa bowtie index files (saved to `genome/index/mirna_mature/bowtie` instead with `--save_reference`).
 - `genome_quant/`
-  - `genome_quant/bam/.*bam`: The aligned BAM file results.
+  - `genome_quant/bam/.*bam`: The aligned BAM file results: `<sample>.bam` as written by Bowtie, `<sample>.sorted.bam` sorted and indexed (`.csi`). Only reads that did not align to the mature or hairpin miRNA references are aligned to the genome, and up to 50 alignments are reported per read. The pipeline does not count these reads against a genome annotation; see [the usage documentation](https://nf-co.re/smrnaseq/usage#other-small-rnas-genome-wide-quantification) for how to do this.
   - `genome_quant/bam/.*unmapped.fastq.gz`: Unmapped reads results.
 - `mirna_quant/`
   - `mirna_quant/bam/{hairpin,mature,seqcluster}/.*bam`: The aligned BAM file results against hairpin, mature or seqcluster.
