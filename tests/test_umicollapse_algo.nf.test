@@ -1,0 +1,46 @@
+nextflow_pipeline {
+
+    name "Test pipeline with --umitools_method (UMICollapse algorithm)"
+    script "../main.nf"
+    profile "test_umi,ci"
+    tag "pipeline"
+    tag "umicollapse_algo"
+
+    test("-profile test_umi --umitools_method cc") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                umitools_method = 'cc'
+            }
+        }
+
+        then {
+            // Scripts of the UMICOLLAPSE_FASTQ tasks, found through their .command.run
+            def umicollapse_scripts = []
+            new File("${workDir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
+                if (file.name == '.command.run' && file.text.contains(':UMICOLLAPSE_FASTQ')) {
+                    umicollapse_scripts.add(new File(file.parentFile, '.command.sh').text)
+                }
+            }
+            assert workflow.success
+            assert umicollapse_scripts.size() > 0
+            assert umicollapse_scripts.every { script -> script.contains('--algo cc --two-pass') }
+        }
+    }
+
+    test("-profile test_umi --umitools_method invalid") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                umitools_method = 'directional'
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert (workflow.stdout + workflow.stderr).any { it.contains('--umitools_method') && it.contains('directional') }
+        }
+    }
+}

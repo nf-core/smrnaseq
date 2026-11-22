@@ -68,9 +68,10 @@
                 "umitools_method": {
                     "type": "string",
                     "default": "dir",
-                    "description": "UMI grouping method",
+                    "description": "UMI deduplication algorithm used by UMICollapse (passed as `--algo`).",
                     "fa_icon": "fas fa-layer-group",
-                    "help_text": "Available options are dir, cc, adj"
+                    "enum": ["dir", "adj", "cc"],
+                    "help_text": "Despite its name, this parameter only sets the deduplication algorithm of [UMICollapse](https://github.com/Daniel-Liu-c0deb0t/UMICollapse), which deduplicates the reads when `--with_umi` is set. Available options are `dir` (directional, the default), `adj` (adjacency) and `cc` (connected components). The algorithms are the same as the UMI-tools [grouping methods](https://umi-tools.readthedocs.io/en/latest/reference/dedup.html) of the same name. See the [usage documentation](https://nf-co.re/smrnaseq/usage#umi-deduplication-algorithm) for other UMICollapse options."
                 },
                 "skip_umi_extract_before_dedup": {
                     "type": "boolean",

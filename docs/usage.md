@@ -104,6 +104,32 @@ The pipeline handles UMIs with two tools. Umicollapse to deduplicate on entire r
 >
 > In these cases where UMI trimming relies on the adapter sequence for the location of the UMIs, you can prevent `fastp` from initial adapter-trimming the reads before UMI extraction with `--skip_fastp`. Note that `--skip_fastp` does not disable `fastp` entirely: the length-only `fastp` pass after UMI extraction is still executed (with adapter and quality trimming disabled). When using with `--with_umi`, the pipeline still runs a separate `fastp` length-filtering step after `umi_tools extract`.
 
+#### UMI deduplication algorithm
+
+UMICollapse groups reads whose sequences differ by at most one mismatch and keeps one read per group. How the groups are formed is set by `--umitools_method`. Despite its name, this parameter is passed to UMICollapse as `--algo`; it does not affect UMI-tools. The available algorithms match the UMI-tools grouping methods of the same name:
+
+- `dir` (default): directional. Two sequences are grouped when the more abundant one has at least twice the count of the other (minus one). This is the most conservative choice against merging distinct molecules.
+- `adj`: adjacency. Each cluster of connected sequences is resolved into groups around the most abundant sequences.
+- `cc`: connected components. All sequences connected by single mismatches form one group. This collapses the most reads.
+
+For example:
+
+```bash
+--with_umi --umitools_method adj
+```
+
+Other UMICollapse options, such as the mismatch threshold (`-k`, default 1) or the directional threshold (`-p`, default 0.5), are not exposed as pipeline parameters. You can set them in a custom config file passed with `-c`. Note that this replaces the arguments set by the pipeline (`--algo <umitools_method> --two-pass`), so include them in your arguments:
+
+```groovy
+process {
+    withName: '.*:UMICOLLAPSE_FASTQ' {
+        ext.args = '--algo dir --two-pass -k 2'
+    }
+}
+```
+
+See the [UMICollapse documentation](https://github.com/Daniel-Liu-c0deb0t/UMICollapse#command-line-arguments) for all options.
+
 ## Samplesheet input
 
 You will need to create a samplesheet with information about the samples you would like to analyse before running the pipeline. Use this parameter to specify its location. It has to be a comma-separated file with 2 columns ("sample" and "fastq_1"), and a header row as shown in the examples below.
