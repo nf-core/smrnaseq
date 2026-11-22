@@ -33,6 +33,28 @@ def extractFirstIndexPrefix(files_path) {
     return index_file_name.substring(0, index_file_name.lastIndexOf(".1.ebwt"))
 }
 
+//
+// Split a species parameter (one species code, a comma-separated list, or 'all') into a list of species codes
+//
+def splitMirnaSpecies(value, param_name) {
+    def species = value ? value.toString().tokenize(',')*.trim().findAll { sp -> sp } : []
+    if (species.size() > 1 && species.any { sp -> sp.equalsIgnoreCase('all') }) {
+        error("--${param_name} 'all' cannot be combined with other species: '${value}'")
+    }
+    return species
+}
+
+//
+// Value passed to `mirtop --sps`, which keeps the hairpins whose name contains it. The hairpins are already
+// filtered by species in MIRNA_QUANT, so for several species or 'all' pass '-', which every miRNA name contains.
+//
+def mirtopSpecies(species) {
+    if (!species) {
+        return 'unknown'
+    }
+    return (species.size() == 1 && !species[0].equalsIgnoreCase('all')) ? species[0] : '-'
+}
+
 
 workflow PREPARE_GENOME {
     take:
@@ -62,21 +84,20 @@ workflow PREPARE_GENOME {
 
     ch_mirtrace_species       = val_mirtrace_species          ? channel.value(val_mirtrace_species) : channel.empty()
 
-    // Species used to filter the miRBase references: --mirna_species (comma-separated list) if set, else --mirtrace_species.
+    // Species used to filter the miRBase references: --mirna_species (comma-separated list or 'all') if set, else --mirtrace_species.
     // --mirna_species is not used with --mirgenedb, which filters by --mirgenedb_species.
     if (params.mirgenedb && params.mirna_species) {
         log.warn("--mirna_species is ignored with --mirgenedb. The MirGeneDB references are filtered by --mirgenedb_species.")
     }
     val_mirna_species         = (!params.mirgenedb && params.mirna_species) ? params.mirna_species : val_mirtrace_species
-    mirna_species_list        = val_mirna_species ? val_mirna_species.tokenize(',')*.trim() : []
-    // Value passed to `mirtop --sps`, which keeps hairpins whose name contains it. The hairpins are already
-    // filtered by species in MIRNA_QUANT, so with several species pass '-', which every miRNA name contains.
-    val_mirtop_species        = mirna_species_list.size() > 1 ? '-' : (mirna_species_list ? mirna_species_list[0] : 'unknown')
-    if (!params.mirgenedb && mirna_species_list.size() > 1 && !val_mirna_gtf) {
-        error("Several species were given with --mirna_species (${val_mirna_species}). Please provide a GFF3 file with the miRNA coordinates of these species via --mirna_gtf, e.g. the miRBase GFF3 files of the species concatenated into one file.")
+    mirna_species_list        = splitMirnaSpecies(val_mirna_species, 'mirna_species')
+    val_mirtop_species        = mirtopSpecies(mirna_species_list)
+    // miRBase provides one GFF3 file per species, so several species or 'all' need a user-provided GFF3
+    if (!params.mirgenedb && val_mirtop_species == '-' && !val_mirna_gtf) {
+        error("--mirna_species '${val_mirna_species}' selects several miRBase species. Please provide a GFF3 file with the miRNA coordinates of these species via --mirna_gtf, e.g. the miRBase GFF3 files of the species concatenated into one file.")
     }
 
-    mirna_gtf_from_species    = mirna_species_list.size() == 1 ? (mirna_species_list[0] == 'hsa' ? "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${mirna_species_list[0]}.gff3") : false
+    mirna_gtf_from_species    = (mirna_species_list.size() == 1 && val_mirtop_species != '-') ? (mirna_species_list[0] == 'hsa' ? "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${mirna_species_list[0]}.gff3") : false
     ch_mirna_gtf              = val_mirna_gtf                 ? channel.fromPath(val_mirna_gtf, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : ( mirna_gtf_from_species ? channel.fromPath(mirna_gtf_from_species, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() :  channel.empty() )
 
     // Add species of the gtf in the meta
@@ -152,8 +173,8 @@ workflow PREPARE_GENOME {
         ch_reference_hairpin = params.mirgenedb_hairpin ? channel.fromPath(params.mirgenedb_hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : error("Specify a mirgenedb Hairpin miRNA fasta file via '--mirgenedb_hairpin'")
         ch_mirna_gtf         = params.mirgenedb_gff     ? channel.fromPath(params.mirgenedb_gff, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()     : error("Specify a MirGeneDB gff file via '--mirgenedb_gff'")
 
-        // Create a channel for mirgenedb_species
-        ch_mirgenedb_species = channel.value(params.mirgenedb_species)
+        // Create a channel for mirgenedb_species (one species, a comma-separated list or 'all')
+        ch_mirgenedb_species = channel.value(mirtopSpecies(splitMirnaSpecies(params.mirgenedb_species, 'mirgenedb_species')))
 
         // Add species of the gtf
         // When mirgenedb workflow is not indicated, species defaults to val_mirtrace_species.
