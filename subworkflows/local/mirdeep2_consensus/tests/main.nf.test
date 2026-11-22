@@ -15,7 +15,7 @@ nextflow_workflow {
     // novel locus on chr2 (40 %). D has an empty BED file and no CSV file.
     def input_channel = { base_dir -> """
         channel.of('A', 'B', 'C', 'D').map { id ->
-            [ [ id: id, single_end: true ], files("${base_dir}/subworkflows/local/mirdeep2_consensus/tests/data/result_\${id}.{bed,csv}") ]
+            [ [ id: id, single_end: true ], files("${base_dir}/subworkflows/local/mirdeep2_consensus/tests/fixtures/result_\${id}.{bed,csv}") ]
         }
     """ }
     def header = ['#chrom', 'start', 'end', 'name', 'score', 'strand', 'n_samples', 'samples', 'probability', 'mirdeep2_ids'].join('\t')
