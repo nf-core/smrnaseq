@@ -40,14 +40,14 @@ By default, `mirtrace_species` sets both the species used by miRTrace and the sp
 
 ### Quantify against several species or all species (`mirna_species`, `mirgenedb_species`)
 
-Use `--mirna_species` to filter the miRBase references to other species than `--mirtrace_species`, for example to annotate a non-model organism against several related species. It takes one species code, a comma-separated list of codes without spaces (e.g. `--mirna_species 'dre,ola,ssa'`) or `all` to keep the references of all miRBase species. When it is not set, the references are filtered by `--mirtrace_species` as before. miRTrace still uses `--mirtrace_species`, which takes a single species. If `--mirtrace_species` is not set, miRTrace QC is skipped.
+Use `--mirna_species` to filter the miRBase references to other species than `--mirtrace_species`, for example to annotate a non-model organism against several related species. It takes one species code, a comma-separated list of codes without spaces (e.g. `--mirna_species 'dre,fru,tni'`) or `all` to keep the references of all miRBase species. When it is not set, the references are filtered by `--mirtrace_species` as before. miRTrace still uses `--mirtrace_species`, which takes a single species. If `--mirtrace_species` is not set, miRTrace QC is skipped.
 
 With more than one species or `all`, provide a GFF3 file with the miRNA coordinates of these species via `--mirna_gtf`, since miRBase provides one GFF3 file per species. The miRBase GFF3 files of the species can be concatenated into one file:
 
 ```bash
-for species in dre ola ssa; do
+for species in dre fru tni; do
     curl -fsSL "https://mirbase.org/download/${species}.gff3"
-done > mirbase_dre_ola_ssa.gff3
+done > mirbase_dre_fru_tni.gff3
 ```
 
 ```bash
@@ -56,8 +56,8 @@ nextflow run nf-core/smrnaseq \
     --input samplesheet.csv \
     --fasta <genome.fa> \
     --mirtrace_species dre \
-    --mirna_species 'dre,ola,ssa' \
-    --mirna_gtf mirbase_dre_ola_ssa.gff3 \
+    --mirna_species 'dre,fru,tni' \
+    --mirna_gtf mirbase_dre_fru_tni.gff3 \
     --outdir <OUTDIR>
 ```
 
@@ -81,7 +81,7 @@ When concatenating GFF files, the header lines of each file can be kept: `mirtop
 Please note:
 
 - miRBase only provides GFF3 files for species with genome coordinates. Hairpins of species without entries in the GFF file are still used for the Bowtie alignments and the edgeR counts, but `mirtop` does not annotate reads on them.
-- Conserved miRNAs often have identical sequences in several species. Reads of such miRNAs align equally well to the entry of each species and are reported for each of them, so the mature and hairpin counts (edgeR) and the `mirtop` isomiR tables (`joined_samples_mirtop.tsv`, `export/`) contain the same reads under several names (e.g. `dre-miR-1` and `ola-miR-1`). The `mirtop/mirna.tsv` table counts each read sequence only once, under one of these names. Sum or pick these entries in downstream analyses as needed.
+- Conserved miRNAs often have identical sequences in several species. Reads of such miRNAs align equally well to the entry of each species and are reported for each of them, so the mature and hairpin counts (edgeR) and the `mirtop` isomiR tables (`joined_samples_mirtop.tsv`, `export/`) contain the same reads under several names (e.g. `dre-miR-1` and `fru-miR-1`). The `mirtop/mirna.tsv` table counts each read sequence only once, under one of these names. Sum or pick these entries in downstream analyses as needed.
 - With `all`, this affects most reads of conserved miRNAs: in miRBase 22, the let-7a sequence is identical in 65 mature entries and contained in 173 hairpins. The miRNA alignments report at most 50 hits per read (`-k 50`), so for such reads only an arbitrary subset of the matching entries is counted. Prefer a list of related species over `all` where possible. The references themselves stay small (miRBase 22: about 38,600 hairpins and 48,900 mature sequences, a few MB), and building their Bowtie indices takes well under a minute. On the pipeline's test data, `all` made the hairpin alignments and `mirtop` about 2-3 times slower than a single species, raised the peak memory of `mirtop gff` to about 450 MB and of the edgeR step to about 1 GB, because of the many more multi-mapping hits and the larger count tables. The default resources cover this, but expect longer run times on full-size data.
 - miRDeep2 receives the filtered mature and hairpin sequences of all selected species as known miRNAs.
 
