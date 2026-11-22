@@ -1,7 +1,7 @@
 nextflow.enable.types = true
 
 process MIRNA_IDS {
-    tag "$gff"
+    tag "${gff ? gff[0].name : 'fasta'}"
     label 'process_single'
 
     conda "${moduleDir}/environment.yml"
@@ -10,9 +10,15 @@ process MIRNA_IDS {
         'community.wave.seqera.io/library/r-base_r-data.table:409a65bae991099c' }"
 
     input:
-    tuple(meta: Map, gff: Path)
+    // GFF used for the run: a list with one file, or empty to build the table from the FASTA files only
+    gff: List<Path>
+    // Formatted FASTA files used for quantification (their names are the ones reported by edgeR)
     tuple(meta2: Map, mature: Path)
     tuple(meta3: Map, hairpin: Path)
+    // Raw reference FASTA files given to the pipeline (mature plus optional MirGeneDB star FASTA,
+    // and hairpin). Their miRBase headers carry the accessions used when there is no GFF.
+    mature_reference: List<Path>
+    hairpin_reference: Path
     species: String
     database: String
 
@@ -23,11 +29,14 @@ process MIRNA_IDS {
     tuple(task.process, 'r-base', eval("Rscript -e 'cat(as.character(getRversion()))'")) >> 'versions'
 
     script:
+    def gff_arg = gff ? "--gff ${gff[0]}" : ''
     """
     mirna_ids.r \\
-        --gff ${gff} \\
+        ${gff_arg} \\
         --mature ${mature} \\
         --hairpin ${hairpin} \\
+        --mature_reference ${mature_reference.join(',')} \\
+        --hairpin_reference ${hairpin_reference} \\
         --species '${species}' \\
         --database '${database}' \\
         --output mirna_ids.tsv

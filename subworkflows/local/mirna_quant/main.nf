@@ -116,10 +116,20 @@ workflow MIRNA_QUANT {
     //
     // Table of the miRNA names used in the edgeR and mirtop outputs, with their accessions
     //
+    // Without a GFF (empty channel), the table is built from the FASTA headers instead
+    ch_mirna_ids_gff = ch_mirna_gtf
+        .map { _meta, gff -> gff }
+        .collect()
+        .ifEmpty([])
+    ch_mature_reference = ch_reference_mature
+        .map { _meta, fasta -> val_mature_star ? [ fasta, val_mature_star ] : [ fasta ] }
+
     MIRNA_IDS (
-        ch_mirna_gtf,
+        ch_mirna_ids_gff,
         FORMAT_MATURE.out.formatted_fasta,
         FORMAT_HAIRPIN.out.formatted_fasta,
+        ch_mature_reference,
+        ch_reference_hairpin.map { _meta, fasta -> fasta },
         ch_parse_species_input,
         params.mirgenedb ? 'MirGeneDB' : 'miRBase'
     )

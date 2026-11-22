@@ -6,6 +6,7 @@ nextflow_pipeline {
     tag "mirgenedb"
     tag "pipeline"
 
+    // The test_mirgenedb profile includes the MirGeneDB star FASTA (`--mirgenedb_star`)
     test("-profile test_mirgenedb") {
         tag "cpu_conda"
 
@@ -16,6 +17,8 @@ nextflow_pipeline {
         }
 
         then {
+            def edger_mature = MirnaIds.edgerNames(params.outdir, 'mature')
+            def mirtop_stars = MirnaIds.mirtopNames(params.outdir).findAll { name -> name.endsWith('*') }
             assert workflow.success
             assertAll(
                 { assert snapshot(
@@ -29,36 +32,10 @@ nextflow_pipeline {
                 { assert MirnaIds.missing(params.outdir) == [] },
                 // Star arms keep the MirGeneDB `*` and their miRBase accession
                 { assert MirnaIds.table(params.outdir).find { row -> row[0] == 'Hsa-Mir-3613_3p*' && row[2] == 'mature' }[1] == 'MIMAT0017991' },
-                // Without --mirgenedb_star, the edgeR mature tables only contain the dominant arms
-                { assert !MirnaIds.edgerNames(params.outdir, 'mature').any { name -> name.endsWith('*') } }
-            )
-        }
-    }
-
-    test("-profile test_mirgenedb --mirgenedb_star") {
-        tag "cpu_conda"
-
-        when {
-            params {
-                outdir = "${outputDir}"
-                // Star arms of the test-datasets MirGeneDB v2.0 files (see MirGeneDB/README.md there),
-                // referenced like the other files in conf/test_mirgenedb.config: config params such as
-                // `pipelines_testdata_base_path` are not visible in this nf-test `params` block
-                mirgenedb_star = "https://github.com/nf-core/test-datasets/raw/smrnaseq/MirGeneDB/mirgenedb_hsa_star.fa"
-                skip_mirdeep = true
-            }
-        }
-
-        then {
-            def edger_mature = MirnaIds.edgerNames(params.outdir, 'mature')
-            def mirtop_stars = MirnaIds.mirtopNames(params.outdir).findAll { name -> name.endsWith('*') }
-            assert workflow.success
-            assertAll(
-                // Star arms are now counted by edgeR, under the same names as in mirtop
+                // With --mirgenedb_star, star arms are counted by edgeR under the same names as in mirtop
                 // (edgeR drops miRNAs without reads, so compare the star arms found by both)
                 { assert edger_mature.any { name -> name.endsWith('*') } },
-                { assert !edger_mature.intersect(mirtop_stars).isEmpty() },
-                { assert MirnaIds.missing(params.outdir) == [] }
+                { assert !edger_mature.intersect(mirtop_stars).isEmpty() }
             )
         }
     }

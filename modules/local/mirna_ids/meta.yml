@@ -14,14 +14,11 @@ tools:
       homepage: "https://www.r-project.org/"
       licence: ["GPL-2.0-or-later"]
 input:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing reference information.
-        e.g. [ id:'hsa', species:'hsa' ]
   - gff:
-      type: file
-      description: miRBase GFF3 or MirGeneDB GFF file used for the run.
+      type: list
+      description: |
+        miRBase GFF3 or MirGeneDB GFF file used for the run, as a list with one file.
+        An empty list builds the table from the FASTA files only (precursor columns empty).
       pattern: "*.{gff,gff3,gff.gz,gff3.gz}"
   - meta2:
       type: map
@@ -37,6 +34,16 @@ input:
       type: file
       description: Hairpin (precursor) miRNA FASTA file used for quantification.
       pattern: "*.{fa,fasta}"
+  - mature_reference:
+      type: list
+      description: |
+        Raw mature reference FASTA file(s) given to the pipeline (plus the MirGeneDB star FASTA, if any).
+        Accessions are read from their headers when there is no GFF.
+      pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
+  - hairpin_reference:
+      type: file
+      description: Raw hairpin reference FASTA file given to the pipeline.
+      pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
   - species:
       type: string
       description: Species prefix used to filter records, e.g. 'hsa' (miRBase) or 'Hsa' (MirGeneDB).
@@ -48,7 +55,7 @@ output:
       type: file
       description: |
         Tab-separated table with the columns name, accession, type (mature or hairpin),
-        precursor, precursor_accession and database.
+        precursor, precursor_accession, database and source (gff or fasta).
       pattern: "mirna_ids.tsv"
 authors:
   - "@apeltzer"

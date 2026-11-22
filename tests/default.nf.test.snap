@@ -548,7 +548,7 @@
                 "Control_N3_mature_hairpin_genome.sorted.flagstat:md5,2237d5d72b938e87ab5acc4834aabd3c",
                 "Control_N3_mature_hairpin_genome.sorted.idxstats:md5,53a7f74a83bc0fc72d4e0d67ed00fbef",
                 "Control_N3_mature_hairpin_genome.sorted.stats:md5,667a6a365924b9c7f8706b2d7a260339",
-                "mirna_ids.tsv:md5,0cd17afbaa7b1c40634051e88e05664a",
+                "mirna_ids.tsv:md5,cf556ee2b687e10a64a5463a803d78be",
                 "mirtrace-stats-contamination_basic.tsv:md5,34005177b3038da76236b5d8fb468825",
                 "mirtrace-stats-contamination_detailed.tsv:md5,141f6f46a4f9fcfac91303c125a2fc75",
                 "mirtrace-stats-length.tsv:md5,0de85b62a6c3853e3d57bcfa7ed19ec5",

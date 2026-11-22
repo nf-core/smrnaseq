@@ -4,7 +4,12 @@
 # GFF used for the run, plus the mature and hairpin FASTA files used for quantification.
 # Released under the MIT license. See LICENSE https://github.com/nf-core/smrnaseq/blob/master/LICENSE for details.
 #
-# Usage: mirna_ids.r --gff <gff> --mature <fa> --hairpin <fa> --species <sps> --database <db> --output <tsv>
+# Usage: mirna_ids.r [--gff <gff>] --mature <fa> --hairpin <fa> --mature_reference <fa[,fa]>
+#                    --hairpin_reference <fa> --species <sps> --database <db> --output <tsv>
+#
+# --mature/--hairpin: formatted FASTA files used for quantification (their names are the edgeR names)
+# --mature_reference/--hairpin_reference: the raw reference FASTA files given to the pipeline (mature
+#   plus optional MirGeneDB star FASTA, comma-separated), whose miRBase headers carry the accession
 #
 # Names are the identifiers the pipeline reports:
 #   - miRBase GFF3: `Name` attribute (mirtop) == first word of the FASTA headers (edgeR)
@@ -13,12 +18,18 @@
 # (miRBase) or, when absent (MirGeneDB), from the hairpin whose coordinates contain the mature.
 # FASTA names that are not in the GFF are added with empty annotation, so that every
 # identifier in the edgeR and mirtop outputs is listed.
+#
+# Without a GFF (e.g. when no GFF is used for the run), the table is built from the FASTA names
+# only, with the accession taken from the raw reference FASTA headers when they carry one
+# (miRBase: `>hsa-let-7a-5p MIMAT0000062 Homo sapiens let-7a-5p`; MirGeneDB headers have none).
+# Precursor columns are then empty. The `source` column says where each row comes from
+# (`gff` or `fasta`).
 
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) %% 2 != 0) stop("Arguments must be given as --key value pairs")
 opt <- list()
 for (i in seq(1, length(args), by = 2)) opt[[sub("^--", "", args[i])]] <- args[i + 1]
-for (key in c("gff", "mature", "hairpin", "species", "database", "output")) {
+for (key in c("mature", "hairpin", "mature_reference", "hairpin_reference", "species", "database", "output")) {
     if (is.null(opt[[key]])) stop(paste0("Missing argument --", key))
 }
 
@@ -44,7 +55,8 @@ join_unique <- function(x) {
 }
 
 # --- GFF ---------------------------------------------------------------------
-lines <- read_lines(opt$gff)
+has_gff <- !is.null(opt$gff) && nzchar(opt$gff)
+lines <- if (has_gff) read_lines(opt$gff) else character()
 lines <- lines[nzchar(lines) & !startsWith(lines, "#")]
 fields <- strsplit(lines, "\t", fixed = TRUE)
 fields <- fields[lengths(fields) >= 9]
@@ -117,29 +129,55 @@ if (nrow(gff)) {
             stringsAsFactors    = FALSE
         )
     }))
+    table$source <- rep("gff", nrow(table))
 } else {
     table <- data.frame(name = character(), accession = character(), type = character(),
                         precursor = character(), precursor_accession = character(),
-                        stringsAsFactors = FALSE)
+                        source = character(), stringsAsFactors = FALSE)
 }
 
 # --- FASTA names that are not in the GFF -------------------------------------
+fasta_headers <- function(path) {
+    lines <- read_lines(path)
+    # Same HTML clean-up as PARSE_FASTA_MIRNA (some miRBase downloads contain HTML)
+    lines <- gsub("&gt;", ">", lines, fixed = TRUE)
+    lines <- unlist(strsplit(gsub("</?p>", "", lines), "<br>", fixed = TRUE))
+    substring(grep("^>", lines, value = TRUE), 2)
+}
 fasta_names <- function(path) {
-    headers <- grep("^>", read_lines(path), value = TRUE)
-    names <- sub("[[:space:]].*$", "", substring(headers, 2))
+    names <- sub("[[:space:]].*$", "", fasta_headers(path))
     unique(names[nzchar(names) & keep_species(names)])
 }
+# name -> accession from the raw reference FASTA headers (second word, if it is a miRBase accession)
+fasta_accessions <- function(paths) {
+    words <- strsplit(trimws(unlist(lapply(paths, fasta_headers))), "[[:space:]]+")
+    names <- vapply(words, function(w) if (length(w)) w[1] else "", character(1))
+    accessions <- vapply(words, function(w) if (length(w) > 1 && grepl("^MI(MAT)?[0-9]+$", w[2])) w[2] else "", character(1))
+    keep <- !duplicated(names)
+    setNames(accessions[keep], names[keep])
+}
+reference <- list(
+    mature  = strsplit(opt$mature_reference, ",", fixed = TRUE)[[1]],
+    hairpin = strsplit(opt$hairpin_reference, ",", fixed = TRUE)[[1]]
+)
 for (type in c("mature", "hairpin")) {
     names <- fasta_names(opt[[type]])
     missing <- setdiff(names, table$name[table$type == type])
     if (length(missing)) {
+        # With a GFF, its annotation is authoritative and FASTA-only names stay unannotated
+        accession <- ""
+        if (!has_gff) {
+            accession <- unname(fasta_accessions(reference[[type]])[missing])
+            accession[is.na(accession)] <- ""
+        }
         table <- rbind(table, data.frame(
-            name = missing, accession = "", type = type, precursor = "", precursor_accession = "",
-            stringsAsFactors = FALSE
+            name = missing, accession = accession, type = type, precursor = "", precursor_accession = "",
+            source = "fasta", stringsAsFactors = FALSE
         ))
     }
 }
 
 table$database <- rep(opt$database, nrow(table))
+table <- table[, c("name", "accession", "type", "precursor", "precursor_accession", "database", "source")]
 table <- table[order(table$type, table$name, method = "radix"), , drop = FALSE]
 write.table(table, opt$output, sep = "\t", quote = FALSE, row.names = FALSE, na = "")

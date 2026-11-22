@@ -236,13 +236,16 @@ The pipeline keeps only the first word of each FASTA header, which is why the ac
 | `precursor`           | For mature miRNAs, the hairpin(s) they come from, comma-separated. Empty for hairpins                                         |
 | `precursor_accession` | Accessions of the hairpins in `precursor`, in the same order                                                                  |
 | `database`            | `miRBase` or `MirGeneDB`                                                                                                      |
+| `source`              | `gff` if the row comes from the GFF, `fasta` if the name is only in the FASTA files                                           |
 
 For example:
 
 ```tsv
-name           accession     type     precursor                                precursor_accession            database
-hsa-let-7a-5p  MIMAT0000062  mature   hsa-let-7a-1,hsa-let-7a-2,hsa-let-7a-3   MI0000060,MI0000061,MI0000062  miRBase
+name           accession     type     precursor                                precursor_accession            database  source
+hsa-let-7a-5p  MIMAT0000062  mature   hsa-let-7a-1,hsa-let-7a-2,hsa-let-7a-3   MI0000060,MI0000061,MI0000062  miRBase   gff
 ```
+
+If no GFF is used for the run, `mirna_ids.tsv` is built from the FASTA files instead. Every name used in the edgeR outputs is still listed, with `source` set to `fasta`. The accession is then read from the reference FASTA headers given to the pipeline (miRBase headers carry it, e.g. `>hsa-let-7a-5p MIMAT0000062 Homo sapiens let-7a-5p`), and the `precursor` and `precursor_accession` columns are empty. MirGeneDB FASTA headers have no accession, so `accession` is empty too. This applies, for example, with `--skip_mirtop`, which does not use a GFF.
 
 To add accessions to a count table, join it with `mirna_ids.tsv`, for example in R:
 
