@@ -61,6 +61,7 @@ See examples in: [the test-datasets repository of nf-core](https://github.com/nf
 - `bowtie_align_args`: Optional flags to pass to Bowtie 1 for the genome mapping, e.g. `--bowtie_align_args '-v 1 --best'`. Only a subset of Bowtie 1 flags are allowed to keep compatibility with the pipeline. If invalid or disallowed values are included, the pipeline will exit with an error message. A value holding a single flag needs the `=` form, for example `--bowtie_align_args=--best`, because `--bowtie_align_args --best` is parsed as the boolean `true` and is rejected. Short flags take their value as a separate word (`-v 1`, not `-v=1`).
   - These flags are appended after the pipeline's defaults for genome mapping (`-t -k 50 --best --strata -e 99999 --chunkmbs 2048`). When a flag is repeated, Bowtie uses the last value, so for example `--bowtie_align_args '-k 10'` replaces `-k 50`.
   - `-k` must be at least 2, because the defaults include `--strata`, which Bowtie only accepts with `-k` above 1. To report a single alignment per read, override `ext.args` for `NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME` instead (see [Custom Tool Arguments](#custom-tool-arguments)).
+  - `bowtie_align_args` only changes genome mapping. To change Bowtie options, such as the number of allowed mismatches, for the mature miRNA, hairpin or seqcluster alignments, use `ext.args` in a custom config instead (see [Custom Tool Arguments](#custom-tool-arguments)).
 
 > [!NOTE]
 > if the FASTA file in `fasta` is not the same file used to generate the `bowtie` indices, then the pipeline will fail.
@@ -301,15 +302,28 @@ A pipeline might not expose every command-line option of every tool as a pipelin
 
 For this pipeline, the alignment module is named `BOWTIE_ALIGN`. It runs both Bowtie and `samtools view`: set `ext.args` for Bowtie options and `ext.args2` for `samtools view` options. For the separate sorting step, use `ext.args` on `SAMTOOLS_SORT`.
 
-Genome mapping runs this module as `BOWTIE_MAP_GENOME`, and the pipeline configures it with a fully qualified selector, so a shorter selector such as `BOWTIE_ALIGN` has no effect on that step. Setting `ext.args` replaces the pipeline's defaults, so repeat any you want to keep.
+The pipeline runs this module in four Bowtie alignment steps. Each is configured with a fully qualified selector, so a shorter selector such as `BOWTIE_ALIGN` has no effect on them; use the selector of the step you want to change:
 
-For example, create `tool_args.config`:
+| Step                                                                          | Selector                                            |
+| ----------------------------------------------------------------------------- | --------------------------------------------------- |
+| Mature miRNA alignment                                                        | `NFCORE_SMRNASEQ:MIRNA_QUANT:BOWTIE_MAP_MATURE`     |
+| Hairpin alignment of the reads that did not align to mature miRNAs            | `NFCORE_SMRNASEQ:MIRNA_QUANT:BOWTIE_MAP_HAIRPIN`    |
+| Hairpin alignment of the collapsed reads, used by mirtop                      | `NFCORE_SMRNASEQ:MIRNA_QUANT:BOWTIE_MAP_SEQCLUSTER` |
+| Genome alignment of the reads that did not align to mature miRNAs or hairpins | `NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME`    |
+
+All four steps use the same Bowtie defaults: `-t -k 50 --best --strata -e 99999 --chunkmbs 2048`. For genome mapping only, you can append options with the [`bowtie_align_args`](#genome) parameter instead of a custom config. Setting `ext.args` replaces the pipeline's defaults for that step, including any options added there by pipeline parameters, so repeat any you want to keep.
+
+For example, to allow at most one mismatch in the mature miRNA and hairpin alignments and add example options for SAMtools, create `tool_args.config`:
 
 ```nextflow
 process {
-    withName: 'NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME' {
-        ext.args  = '-t -k 50 --best --strata -e 99999 --chunkmbs 2048 -n 0' // Bowtie: pipeline defaults, plus zero mismatches in the seed
+    withName: 'NFCORE_SMRNASEQ:MIRNA_QUANT:BOWTIE_MAP_MATURE' {
+        ext.args  = '-t -k 50 --best --strata --chunkmbs 2048 -v 1' // Bowtie: pipeline defaults, but at most 1 mismatch in the whole read
         ext.args2 = '--no-PG'    // samtools view: example additional option
+    }
+
+    withName: 'NFCORE_SMRNASEQ:MIRNA_QUANT:BOWTIE_MAP_HAIRPIN' {
+        ext.args  = '-t -k 50 --best --strata --chunkmbs 2048 -v 1'
     }
 
     withName: SAMTOOLS_SORT {
@@ -329,7 +343,7 @@ nextflow run nf-core/smrnaseq \
     --genome GRCh37
 ```
 
-The Bowtie example sets its seed mismatch limit to zero; choose options that match your analysis and the tool's own documentation. `ext.args` values are inserted into the module command, so check the module's command and tool help before adding options that duplicate settings the pipeline already supplies. The applicable process names and argument slots can be checked in the module code; for modules running multiple tools, `ext.args`, `ext.args2`, etc. correspond to the tools in command order. See nf-core's documentation on [ext arguments](https://nf-co.re/docs/contributing/components/ext_args) and [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) for more details.
+Bowtie 1 has two alignment modes. In the default [`-n` mode](https://bowtie-bio.sourceforge.net/manual.shtml#the--n-alignment-mode), `-n` limits the mismatches in the seed at the start of the read (default 2 in the first `-l` 28 bases), and `-e` caps the sum of the base qualities at all mismatched positions. The pipeline sets `-e 99999`, so mismatches after the seed are effectively unlimited. In [`-v` mode](https://bowtie-bio.sourceforge.net/manual.shtml#the--v-alignment-mode), Bowtie allows at most that many mismatches over the whole read and ignores `-l`, `-e` and base qualities, so the example leaves out `-e 99999`. `-v` cannot be combined with `-n`. Stricter settings in an earlier step pass more reads on to the next one (mature, then hairpin, then genome), so they can change downstream counts too. Choose options that match your analysis and the tool's own documentation. `ext.args` values are inserted into the module command, so check the module's command and tool help before adding options that duplicate settings the pipeline already supplies. The applicable process names and argument slots can be checked in the module code; for modules running multiple tools, `ext.args`, `ext.args2`, etc. correspond to the tools in command order. See nf-core's documentation on [ext arguments](https://nf-co.re/docs/contributing/components/ext_args) and [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) for more details.
 
 ### nf-core/configs
 
