@@ -291,6 +291,7 @@
                 "filter_contamination": {
                     "type": "boolean",
                     "description": "Enables the contamination filtering.",
+                    "help_text": "Reads are aligned with Bowtie2 to the given databases in the order rRNA, tRNA, cDNA, ncRNA, piRNA, other, and reads that align are removed before miRNA quantification and genome mapping. Only the number of removed reads per database is reported (MultiQC \"Contamination Filtering\" plot); this is not a per-sequence quantification of these small RNA classes. See the usage documentation section 'Small RNA biotypes other than miRNAs'.",
                     "fa_icon": "fas fa-filter"
                 },
                 "rrna": {

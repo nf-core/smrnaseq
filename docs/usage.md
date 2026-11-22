@@ -77,8 +77,47 @@ Contamination filtering of the sequencing reads is optional and can be invoked u
 - `trna`: Used to supply a FASTA file containing tRNA contamination sequence. e.g. `http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/hg38-tRNAs.fa`
 - `cdna`: Used to supply a FASTA file containing cDNA contamination sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 - `ncrna`: Used to supply a FASTA file containing ncRNA contamination sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
-- `pirna`: Used to supply a FASTA file containing piRNA contamination sequence. e.g. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `pirna`: Used to supply a FASTA file containing piRNA contamination sequence, e.g. from [piRBase](http://bigdata.ibp.ac.cn/piRBase/) or [piRNAdb](https://www.pirnadb.org/). The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 - `other_contamination`: Used to supply an additional filtering set. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+
+How the filter works:
+
+- The adapter-trimmed reads are aligned with Bowtie2 (`--very-sensitive-local -k 1`) to each database in turn, in the fixed order rRNA, tRNA, cDNA, ncRNA, piRNA, other. Only the reads that do not align are passed on to the next database, so each read is counted for the first class it aligns to. The order matters when databases overlap (for example, rRNA and tRNA sequences are also part of the Ensembl ncRNA FASTA).
+- Before aligning, the cDNA, ncRNA, piRNA and other databases are compared to the miRNA hairpins with BLAT, and every entry with a significant hit (e-value < 1e-5) is removed from the database, so that miRNA reads are not filtered out. The rRNA and tRNA databases are used as given.
+- The reads that align to a database are removed from the analysis, and only their number is kept: their alignments and sequences are not saved to the output directory. The remaining reads are used for miRNA quantification, genome mapping and miRDeep2.
+- The number of reads removed per class is shown in the "Contamination Filtering" plot of the MultiQC report. With `--save_intermediates`, the per-sample numbers (`*.contamination_mqc.yaml`) and the filtered reads (`*.filtered.fastq.gz`) are also saved to `contaminant_filter/filter/` (see [the output documentation](https://nf-co.re/smrnaseq/output#bowtie2)).
+
+### Small RNA biotypes other than miRNAs
+
+nf-core/smrnaseq quantifies miRNAs: it produces count tables per mature miRNA, per hairpin and per isomiR. It does not produce count tables per tRNA, tRNA fragment, piRNA, rRNA, snoRNA or other small RNA. Data for these biotypes is available at the following levels:
+
+| What                                                                           | Where                                                                                                                                      | Parameters                                                       |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| Fraction of reads that are miRNA, rRNA, tRNA, artifacts or unknown (QC)        | miRTrace "RNA type" plot in MultiQC, `mirtrace/<sample>/`                                                                                  | `--mirtrace_species` (species supported by miRTrace)             |
+| Number of reads per database (rRNA, tRNA, cDNA, ncRNA, piRNA, other)           | "Contamination Filtering" plot in MultiQC, `contaminant_filter/filter/*.contamination_mqc.yaml`                                            | `--filter_contamination` plus one or more of the databases above |
+| Genome alignments of all reads that did not align to a mature miRNA or hairpin | `genome_quant/bam/*.sorted.bam` (BAM files only with `--save_intermediates`); samtools `stats`, `flagstat` and `idxstats` are always saved | `--fasta` (and optionally `--bowtie_index`)                      |
+
+The contamination filter reports one total per database, not counts per sequence. The `idxstats` files of the genome mapping count reads per chromosome, not per gene.
+
+To get counts per small RNA (for example per tRNA gene or per piRNA locus), count the genome alignments against an annotation of your choice:
+
+1. Run the pipeline with `--fasta` (or `--genome`) and `--save_intermediates`. Do not set `--filter_contamination`, or at least do not set the databases of the biotypes you want to count: reads removed by the filter are not mapped to the genome.
+2. Count `genome_quant/bam/*.sorted.bam` against an annotation that matches your genome assembly, for example the [GENCODE](https://www.gencodegenes.org/) or [Ensembl](https://www.ensembl.org/) GTF (snoRNA, snRNA, rRNA, misc_RNA and more, see the `gene_type`/`gene_biotype` attribute), [GtRNAdb](http://gtrnadb.ucsc.edu/) (tRNA genes), [piRBase](http://bigdata.ibp.ac.cn/piRBase/) (piRNAs) or [RNAcentral](https://rnacentral.org/) (genome coordinates of many ncRNA databases). For example, with [featureCounts](https://subread.sourceforge.net/featureCounts.html):
+
+   ```bash
+   featureCounts -s 1 -M -O --fraction -a annotation.gtf -t exon -g gene_id -o counts.txt genome_quant/bam/*.sorted.bam
+   ```
+
+   `-g gene_type` (GENCODE) or `-g gene_biotype` (Ensembl) gives one count per biotype instead of per gene. featureCounts reads GTF/GFF or its own SAF format, so convert BED annotations (as offered by GtRNAdb) to SAF first.
+
+Things to consider when counting:
+
+- Reads that align to a mature miRNA or hairpin are not part of the genome BAM files: take miRNA counts from `mirna_quant/`.
+- Most small RNA library kits sequence the RNA in sense orientation, hence `-s 1`. Check your kit.
+- The genome mapping reports up to 50 alignments per read (`-k 50 --best --strata`), and many small RNAs come from multi-copy loci (tRNA, rRNA, piRNA clusters). Bowtie 1 does not write the `NH` tag that featureCounts uses to recognise multi-mapping reads, so a read with several alignments can be counted at each of its loci. To get one alignment per read, override `ext.args` of `NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME` (see [Genome](#genome)), keeping in mind that the reported locus of a multi-mapping read is then arbitrary.
+- Mature tRNAs carry a non-templated 3' `CCA` and lack their introns, and tRNA-derived fragments are short. Genome alignment misses many of these reads. Dedicated tools that align against mature tRNA sequences give better tRNA and tRNA fragment counts.
+
+If you need full annotation and quantification of all small RNA classes, consider using a dedicated tool on the adapter-trimmed reads (saved to `fastp/fastq/` with `--save_merged`), such as [unitas](https://www.smallrnagroup.uni-mainz.de/software.html), [SPORTS](https://github.com/junchaoshi/sports1.1), [exceRpt](https://github.com/gersteinlab/exceRpt) or, for tRNA fragments, [MINTmap](https://github.com/TJU-CMC-Org/MINTmap). Support for further biotypes in the pipeline is discussed in [#548](https://github.com/nf-core/smrnaseq/issues/548).
 
 ## mirDeep2
 
