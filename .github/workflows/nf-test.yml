@@ -80,7 +80,7 @@ jobs:
         NXF_VER:
           # Minimum supported version (manifest.nextflowVersion) and current stable; both required.
           # latest-everything moves and is continue-on-error.
-          - "26.04.0"
+          - "26.10.0"
           - "26.10.5"
           - "latest-everything"
     env:
