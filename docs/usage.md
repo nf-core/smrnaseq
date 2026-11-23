@@ -339,6 +339,77 @@ See the main [Nextflow documentation](https://www.nextflow.io/docs/latest/config
 
 If you have any questions or issues please send us a message on [Slack](https://nf-co.re/join/slack) on the [`#configs` channel](https://nfcore.slack.com/channels/configs).
 
+## Nextflow plugins
+
+The pipeline loads these Nextflow plugins (versions are pinned in `nextflow.config`). Nextflow downloads them from the [Nextflow plugin registry](https://registry.nextflow.io) at start-up; on systems without internet access, install them beforehand, for example with `nextflow plugin install nf-co2footprint@1.4.1`.
+
+| Plugin                                                            | What it does in this pipeline                                                                                                         |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| [nf-schema](https://github.com/nextflow-io/nf-schema)             | Validates parameters and the samplesheet, and prints `--help`.                                                                        |
+| [nf-core-utils](https://github.com/nf-core/nf-core-utils)         | Start-up checks, the software versions file, the methods description with citations in the MultiQC report and the completion email.   |
+| [nf-prov](https://github.com/nextflow-io/nf-prov)                 | Writes a [BioCompute Object](https://biocomputeobject.org/) provenance report to `pipeline_info/`.                                    |
+| [nf-co2footprint](https://github.com/nextflow-io/nf-co2footprint) | Estimates the energy use and CO₂-equivalent emissions of the run and writes a report, a summary and a trace file to `pipeline_info/`. |
+
+### CO₂ footprint estimates
+
+[nf-co2footprint](https://nextflow-io.github.io/nf-co2footprint) estimates the energy use of every task from its resource usage and converts it to CO₂-equivalent emissions with the carbon intensity of the electricity, following the [Green Algorithms](https://www.green-algorithms.org) method. By default the pipeline uses a global average carbon intensity and makes no network requests. For estimates that match where you run the pipeline, set your [Electricity Maps zone](https://portal.electricitymaps.com/docs/getting-started#geographical-coverage) in a custom config (`-c`):
+
+```groovy title="co2footprint.config"
+co2footprint {
+    location = 'DE' // your zone code
+}
+```
+
+This uses the 2024 yearly average carbon intensity for that zone. For real-time values, also give an [Electricity Maps](https://www.electricitymaps.com/) API key. Store it as a [Nextflow secret](https://www.nextflow.io/docs/latest/secrets.html) (`nextflow secrets set EM_API_KEY <key>`) rather than in the config file:
+
+```groovy title="co2footprint.config"
+co2footprint {
+    location = 'DE'
+    emApiKey = secrets.EM_API_KEY
+}
+```
+
+The plugin documentation lists further options, such as the power usage effectiveness (PUE) of your data centre and the power draw of your CPUs.
+
+### Provenance reports
+
+[nf-prov](https://github.com/nextflow-io/nf-prov) writes a BioCompute Object (`pipeline_info/manifest_<timestamp>.bco.json`) at the end of every run. It can also write a [Workflow Run RO-Crate](https://www.researchobject.org/workflow-run-crate/), which describes the run together with its inputs and published results. The crate is not written by default:
+
+- it copies the pipeline's `README.md`, `main.nf` and `nextflow_schema.json`, local input files and the **fully resolved Nextflow configuration** into the crate directory. The resolved configuration contains every value from your config files, including credentials or tokens set there (also Nextflow secrets that a config file reads). Check your configuration before you enable the crate, and do not enable it if the results are shared and your configuration holds secrets.
+- to describe the published results, the crate must be the output directory itself, so these files are written to the top of `--outdir`.
+
+To write the crate, add it with a custom config:
+
+```groovy title="ro-crate.config"
+prov {
+    formats {
+        wrroc {
+            file      = "${params.outdir}/ro-crate-metadata.json"
+            overwrite = true
+            license   = 'https://spdx.org/licenses/CC-BY-4.0' // the licence of your results
+        }
+    }
+}
+```
+
+The [WRROC options](https://github.com/nextflow-io/nf-prov/blob/master/docs/WRROC.md) also let you name the person and organisation that ran the pipeline.
+
+### Turning plugin reports off
+
+The reports are configured in `nextflow.config` and can be switched off with a custom config:
+
+```groovy title="no_plugin_reports.config"
+prov.enabled = false // no BioCompute Object
+co2footprint {
+    trace.enabled      = false
+    summary.enabled    = false
+    report.enabled     = false
+    provenance.enabled = false
+}
+```
+
+The completion email is sent by nf-core-utils with Nextflow's [mail settings](https://www.nextflow.io/docs/latest/notifications.html#mail-configuration). For runs launched from Seqera Platform, which has its own notifications, the email is only sent with `--force_completion_email`.
+
 ## Running in the background
 
 Nextflow handles job submissions and supervises the running jobs. The Nextflow process must run until the pipeline is finished.
