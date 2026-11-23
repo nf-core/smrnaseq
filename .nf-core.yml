@@ -1,4 +1,9 @@
 lint:
+  # nf-core-utils sends the completion email through Nextflow's sendMail(); the template is unused
+  files_exist:
+    - assets/sendmail_template.txt
+  files_unchanged:
+    - assets/sendmail_template.txt
   merge_markers: false
   nextflow_config:
     - config_defaults:

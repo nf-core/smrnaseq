@@ -15,16 +15,17 @@ include { MIRTRACE_QC                      } from '../modules/nf-core/mirtrace/q
 // nf-core subworkflows
 include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
 include { FASTQ_FIND_MIRNA_MIRDEEP2        } from '../subworkflows/nf-core/fastq_find_mirna_mirdeep2/main'
-include { paramsSummaryMultiqc             } from '../subworkflows/nf-core/utils_nfcore_pipeline'
-include { softwareVersionsToYAML           } from '../subworkflows/nf-core/utils_nfcore_pipeline'
 // local subworkflows
 include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/main'
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant/main'
 include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant/main'
 include { mirtraceConfigLine               } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { mirtraceAdapterWarning           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
-include { methodsDescriptionText           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 // plugins
+include { citationsOnTheFly                } from 'plugin/nf-core-utils'
+include { collectVersions                  } from 'plugin/nf-core-utils'
+include { methodsDescriptionText           } from 'plugin/nf-core-utils'
+include { paramsSummaryMultiqc             } from 'plugin/nf-core-utils'
 include { paramsSummaryMap                 } from 'plugin/nf-schema'
 
 /*
@@ -284,26 +285,15 @@ workflow NFCORE_SMRNASEQ {
     //
     // Collate and save software versions
     //
-    def topic_versions = channel.topic("versions")
-        .distinct()
-        .branch { entry ->
-            versions_file: entry instanceof Path
-            versions_tuple: true
-        }
+    // All versions arrive as [process, tool, version] tuples: from the `versions` topic, and from the
+    // aliased miRNA FASTA modules that report outside the topic (see MIRNA_QUANT). collectVersions()
+    // merges them by process and adds the workflow and Nextflow versions.
+    def ch_versions_list = channel.topic("versions")
+        .mix(MIRNA_QUANT.out.versions_tuples, ch_versions)
+        .toList()
 
-    def topic_versions_string = topic_versions.versions_tuple
-        .mix(MIRNA_QUANT.out.versions_tuples)
-        .map { process, tool, version ->
-            [ process[process.lastIndexOf(':')+1..-1], "  ${tool}: ${version}" ]
-        }
-        .groupTuple(by:0)
-        .map { process, tool_versions ->
-            tool_versions.unique().sort()
-            "${process}:\n${tool_versions.join('\n')}"
-        }
-
-    def ch_collated_versions = softwareVersionsToYAML(ch_versions.mix(topic_versions.versions_file))
-        .mix(topic_versions_string)
+    def ch_collated_versions = ch_versions_list
+        .map { versions -> collectVersions(versions) }
         .collectFile(
             storeDir: "${params.outdir}/pipeline_info",
             name: 'nf_core_'  +  'smrnaseq_software_'  + 'mqc_'  + 'versions.yml',
@@ -319,19 +309,38 @@ workflow NFCORE_SMRNASEQ {
         summary_params      = paramsSummaryMap(
             workflow, parameters_schema: "nextflow_schema.json")
         ch_workflow_summary = channel.value(paramsSummaryMultiqc(summary_params))
-        // ch_methods_description                = channel.value(
-        //     methodsDescriptionText(ch_multiqc_custom_methods_description))
+
+        //
+        // Methods description with citations for the tools that ran, read from the modules' meta.yml
+        // `tools:` entries (assets/tool_citations.yml adds the ones the modules do not cite).
+        // MultiQC runs after this collect, so it is cited explicitly.
+        //
+        def methods_description_template = params.multiqc_methods_description ?
+            file(params.multiqc_methods_description, checkIfExists: true) :
+            file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
+        def citation_files = files("${projectDir}/modules/**/meta.yml").collect { meta_yml -> meta_yml.toString() } +
+            [ "${projectDir}/assets/tool_citations.yml".toString() ]
+        // Shell utilities and base R packages that report a version but are not cited
+        def uncited_tools = ['cat', 'gawk', 'GNU coreutils', 'gzip', 'methods', 'pigz', 'untar']
+        def ch_methods_description = ch_versions_list
+            .map { versions ->
+                def cited_versions = versions.findAll { entry -> !(entry instanceof List && entry[1].toString() in uncited_tools) }
+                methodsDescriptionText(
+                    methods_description_template.toString(),
+                    citationsOnTheFly(cited_versions, citation_files, ['multiqc'])
+                )
+            }
 
         ch_multiqc_files = channel.empty()
         ch_multiqc_files = ch_multiqc_files.mix(
             ch_workflow_summary.collectFile(name: "workflow_summary_mqc.yaml"))
         ch_multiqc_files = ch_multiqc_files.mix(ch_collated_versions)
-        // ch_multiqc_files = ch_multiqc_files.mix(
-        //     ch_methods_description.collectFile(
-        //         name: "methods_description_mqc.yaml",
-        //         sort: true
-        //     )
-        // )
+        ch_multiqc_files = ch_multiqc_files.mix(
+            ch_methods_description.collectFile(
+                name: "methods_description_mqc.yaml",
+                sort: true
+            )
+        )
 
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip.collect { item -> item[1] }.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_zip.collect { item -> item[1] }.ifEmpty([]))
