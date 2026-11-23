@@ -95,12 +95,14 @@ nextflow_pipeline {
         }
     }
 
-    test("--help prints the help and exits") {
+    // `help` is a typed String param (`--help` or `--help <param>` on the command line), so the
+    // Boolean `--help_full` is used here; the params file nf-test writes cannot pass a bare flag.
+    test("--help_full prints the help and exits") {
 
         when {
             params {
-                outdir = "$outputDir"
-                help   = true
+                outdir    = "$outputDir"
+                help_full = true
             }
         }
 
@@ -119,16 +121,18 @@ nextflow_pipeline {
 
         when {
             params {
-                outdir          = "$outputDir"
-                umitools_method = 'not_an_algorithm'
+                outdir = "$outputDir"
+                email  = 'not-an-email-address'
             }
         }
 
         then {
+            def output = workflow.stdout + workflow.stderr + new File("${launchDir}/meta/nextflow.log").readLines()
             assertAll(
                 { assert workflow.failed },
                 { assert workflow.trace.tasks().size() == 0 },
-                { assert (workflow.stdout + workflow.stderr + new File("${launchDir}/meta/nextflow.log").readLines()).any { line -> line.contains('umitools_method') } }
+                { assert output.any { line -> line.contains('Validation of pipeline parameters failed') } },
+                { assert output.any { line -> line.contains('--email (not-an-email-address)') } }
             )
         }
     }
