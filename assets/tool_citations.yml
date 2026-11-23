@@ -1,0 +1,16 @@
+# Citation metadata for tools that report a version through the `versions` topic but are not
+# cited under that name in their module's meta.yml. citationsOnTheFly() (nf-core-utils) reads
+# this file together with modules/**/meta.yml to build the MultiQC methods description.
+# Same format as the `tools:` section of a module meta.yml.
+tools:
+  # nf-core/umitools/extract reports its version as `umitools`; its meta.yml cites `umi_tools`
+  - umitools:
+      description: "UMI-tools: tools for dealing with Unique Molecular Identifiers."
+      homepage: "https://github.com/CGATOxford/UMI-tools"
+      doi: "10.1101/gr.209601.116"
+      publication:
+        author: "Smith, T., Heger, A. & Sudbery, I."
+        year: 2017
+        title: "UMI-tools: modeling sequencing errors in Unique Molecular Identifiers to improve quantification accuracy"
+        source: "Genome Research"
+      licence: ["MIT"]
