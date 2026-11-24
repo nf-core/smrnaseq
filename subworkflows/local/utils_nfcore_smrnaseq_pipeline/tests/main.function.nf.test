@@ -293,7 +293,7 @@ nextflow_function {
             )
         }
     }
- 
+
     test("Test Function mirnaReferenceVersions - miRBase GFF3") {
 
         function "mirnaReferenceVersions"
