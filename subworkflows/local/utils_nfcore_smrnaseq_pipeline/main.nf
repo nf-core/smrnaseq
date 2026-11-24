@@ -426,7 +426,8 @@ def warnMissingGenomeFasta(bowtie_index, fasta, skip_mirdeep) {
         : "No genome FASTA was given, so ${skipped}. To run ${pronoun}, provide a genome FASTA with '--fasta', or ${how}"
     log.warn(message.toString())
     return message.toString()
-    
+}
+
 //
 // First lines of a text file, transparently decompressing gzip (detected by its magic bytes)
 //
