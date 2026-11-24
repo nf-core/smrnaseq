@@ -1,0 +1,10 @@
+##gff-version 3
+##date 2018-3-5
+#
+# Chromosomal coordinates of Homo sapiens microRNAs
+# microRNAs:               miRBase v22
+# genome-build-id:         GRCh38
+# genome-build-accession:  NCBI_Assembly:GCA_000001405.15
+#
+chr1	.	miRNA_primary_transcript	17369	17436	.	-	.	ID=MI0022705;Alias=MI0022705;Name=hsa-mir-6859-1
+chr1	.	miRNA	17409	17431	.	-	.	ID=MIMAT0027618;Alias=MIMAT0027618;Name=hsa-miR-6859-5p;Derives_from=MI0022705

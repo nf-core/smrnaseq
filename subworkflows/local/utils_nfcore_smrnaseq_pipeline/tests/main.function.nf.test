@@ -293,4 +293,403 @@ nextflow_function {
             )
         }
     }
+ 
+    test("Test Function mirnaReferenceVersions - miRBase GFF3") {
+
+        function "mirnaReferenceVersions"
+
+        when {
+            function {
+                """
+                input[0] = file(params.pipelines_testdata_base_path + 'reference/hsa.gff3', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == [
+                    ['MIRNA_REFERENCE', 'miRBase', 'v22'],
+                    ['MIRNA_REFERENCE', 'genome_build', 'GRCh38']
+                ] }
+            )
+        }
+    }
+
+    test("Test Function mirnaReferenceVersions - MirGeneDB GFF") {
+
+        function "mirnaReferenceVersions"
+
+        when {
+            function {
+                """
+                input[0] = file(params.pipelines_testdata_base_path + 'MirGeneDB/mirgenedb_hsa.gff', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == [
+                    ['MIRNA_REFERENCE', 'MirGeneDB', 'v2.0'],
+                    ['MIRNA_REFERENCE', 'genome_build', 'hg38']
+                ] }
+            )
+        }
+    }
+
+    test("Test Function mirnaReferenceVersions - no version header") {
+
+        function "mirnaReferenceVersions"
+
+        when {
+            function {
+                """
+                // A file without a GFF comment header (FASTA)
+                input[0] = file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == [
+                    ['MIRNA_REFERENCE', 'mirna_gff', 'unknown (mature.fa)']
+                ] }
+            )
+        }
+    }
+
+    test("Test Function mirnaReferenceVersions - local plain GFF3") {
+
+        function "mirnaReferenceVersions"
+
+        when {
+            function {
+                """
+                input[0] = file('${moduleTestDir}/fixtures/mirbase_hsa_mini.gff3', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == [
+                    ['MIRNA_REFERENCE', 'miRBase', 'v22'],
+                    ['MIRNA_REFERENCE', 'genome_build', 'GRCh38']
+                ] },
+                { assert !path("${outputDir}/../meta/nextflow.log").text.contains("does not start with a '##gff-version' line") }
+            )
+        }
+    }
+
+    test("Test Function mirnaReferenceVersions - gzipped GFF3") {
+
+        function "mirnaReferenceVersions"
+
+        when {
+            function {
+                """
+                input[0] = file('${moduleTestDir}/fixtures/mirbase_hsa_mini.gff3.gz', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                // gzip is decompressed, not mistaken for HTML or a file without header
+                { assert function.success },
+                { assert function.result == [
+                    ['MIRNA_REFERENCE', 'miRBase', 'v22'],
+                    ['MIRNA_REFERENCE', 'genome_build', 'GRCh38']
+                ] },
+                { assert !path("${outputDir}/../meta/nextflow.log").text.contains("does not start with a '##gff-version' line") }
+            )
+        }
+    }
+
+    test("Test Function mirnaReferenceVersions - GFF without gff-version pragma") {
+
+        function "mirnaReferenceVersions"
+
+        when {
+            function {
+                """
+                input[0] = file('${moduleTestDir}/fixtures/no_pragma.gff3', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                // Custom GFFs may lack the pragma: warn only
+                { assert function.success },
+                { assert function.result == [
+                    ['MIRNA_REFERENCE', 'mirna_gff', 'unknown (no_pragma.gff3)']
+                ] },
+                { assert path("${outputDir}/../meta/nextflow.log").text.contains("no_pragma.gff3' does not start with a '##gff-version' line") }
+            )
+        }
+    }
+
+    test("Test Function mirnaReferenceVersions - HTML-wrapped GFF3") {
+
+        function "mirnaReferenceVersions"
+
+        when {
+            function {
+                """
+                // Shape of the miRBase website response: <p>##gff-version 3<br>...
+                input[0] = file('${moduleTestDir}/fixtures/mirbase_html.gff3', checkIfExists: true)
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.failed },
+                { assert (function.stdout + function.stderr).any { line -> line.contains("mirbase_html.gff3' is an HTML page, not a GFF3 file") } },
+                { assert (function.stdout + function.stderr).any { line -> line.contains('https://mirbase.org/download/<species>.gff3') } }
+            )
+        }
+    }
+
+    test("Test Function mirnaReferenceFallbackVersions - miRBase without release in path") {
+
+        function "mirnaReferenceFallbackVersions"
+
+        when {
+            function {
+                """
+                input[0] = 'miRBase'
+                input[1] = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/mature.fa'
+                input[2] = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/miRBase/hairpin.fa'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == [
+                    ['MIRNA_REFERENCE', 'miRBase', 'unknown (no GFF)'],
+                    ['MIRNA_REFERENCE', 'mature', 'mature.fa'],
+                    ['MIRNA_REFERENCE', 'hairpin', 'hairpin.fa']
+                ] }
+            )
+        }
+    }
+
+    test("Test Function mirnaReferenceFallbackVersions - miRBase release in path") {
+
+        function "mirnaReferenceFallbackVersions"
+
+        when {
+            function {
+                """
+                input[0] = 'miRBase'
+                input[1] = 'https://mirbase.org/download_version_files/22.1/mature.fa'
+                input[2] = '/refs/mirbase/22.1/hairpin.fa'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == [
+                    ['MIRNA_REFERENCE', 'miRBase', 'v22.1 (from file path)'],
+                    ['MIRNA_REFERENCE', 'mature', 'mature.fa'],
+                    ['MIRNA_REFERENCE', 'hairpin', 'hairpin.fa']
+                ] }
+            )
+        }
+    }
+
+    test("Test Function mirnaReferenceFallbackVersions - MirGeneDB, missing hairpin") {
+
+        function "mirnaReferenceFallbackVersions"
+
+        when {
+            function {
+                """
+                input[0] = 'MirGeneDB'
+                input[1] = 'mirgenedb_hsa_mature.fa'
+                input[2] = null
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                // Never fails: unknown values are reported as such
+                { assert function.success },
+                { assert function.result == [
+                    ['MIRNA_REFERENCE', 'MirGeneDB', 'unknown (no GFF)'],
+                    ['MIRNA_REFERENCE', 'mature', 'mirgenedb_hsa_mature.fa'],
+                    ['MIRNA_REFERENCE', 'hairpin', 'none']
+                ] }
+            )
+        }
+    }
+
+    test("Test Function warnMissingGenomeFasta - bowtie_index without fasta") {
+
+        function "warnMissingGenomeFasta"
+
+        when {
+            function {
+                """
+                input[0] = '/path/to/bowtie_index'
+                input[1] = null
+                input[2] = false
+                """
+            }
+        }
+
+        then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            def warnings = log_text.readLines().findAll { line -> line.contains('WARN  nextflow.Nextflow - ') }
+            assertAll(
+                { assert function.success },
+                { assert function.result == "A genome Bowtie index was given with '--bowtie_index', but no genome FASTA. The index is ignored, and genome quantification and miRDeep2 are skipped. To run them, also provide the FASTA the index was built from with '--fasta', or use '--genome' with an iGenomes reference that provides a FASTA." },
+                // log.warn always goes to .nextflow.log; the console only shows it outside agent log mode
+                { assert warnings.size() == 1 },
+                { assert warnings[0].contains(function.result) }
+            )
+        }
+    }
+
+    test("Test Function warnMissingGenomeFasta - bowtie_index without fasta, skip_mirdeep") {
+
+        function "warnMissingGenomeFasta"
+
+        when {
+            function {
+                """
+                input[0] = '/path/to/bowtie_index'
+                input[1] = null
+                input[2] = true
+                """
+            }
+        }
+
+        then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            def warnings = log_text.readLines().findAll { line -> line.contains('WARN  nextflow.Nextflow - ') }
+            assertAll(
+                { assert function.success },
+                { assert function.result.startsWith("A genome Bowtie index was given with '--bowtie_index', but no genome FASTA. The index is ignored, and genome quantification is skipped. To run it,") },
+                { assert !function.result.contains('miRDeep2') },
+                { assert warnings.size() == 1 },
+                { assert warnings[0].contains(function.result) }
+            )
+        }
+    }
+
+    test("Test Function warnMissingGenomeFasta - no fasta and no bowtie_index") {
+
+        function "warnMissingGenomeFasta"
+
+        when {
+            function {
+                """
+                input[0] = null
+                input[1] = null
+                input[2] = false
+                """
+            }
+        }
+
+        then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            def warnings = log_text.readLines().findAll { line -> line.contains('WARN  nextflow.Nextflow - ') }
+            assertAll(
+                { assert function.success },
+                { assert function.result == "No genome FASTA was given, so genome quantification and miRDeep2 are skipped. To run them, provide a genome FASTA with '--fasta', or use '--genome' with an iGenomes reference that provides a FASTA." },
+                { assert warnings.size() == 1 },
+                { assert warnings[0].contains(function.result) }
+            )
+        }
+    }
+
+    test("Test Function warnMissingGenomeFasta - no fasta and no bowtie_index, skip_mirdeep") {
+
+        function "warnMissingGenomeFasta"
+
+        when {
+            function {
+                """
+                input[0] = null
+                input[1] = null
+                input[2] = true
+                """
+            }
+        }
+
+        then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            def warnings = log_text.readLines().findAll { line -> line.contains('WARN  nextflow.Nextflow - ') }
+            assertAll(
+                { assert function.success },
+                { assert function.result == "No genome FASTA was given, so genome quantification is skipped. To run it, provide a genome FASTA with '--fasta', or use '--genome' with an iGenomes reference that provides a FASTA." },
+                { assert warnings.size() == 1 },
+                { assert warnings[0].contains(function.result) }
+            )
+        }
+    }
+
+    test("Test Function warnMissingGenomeFasta - fasta with bowtie_index") {
+
+        function "warnMissingGenomeFasta"
+
+        when {
+            function {
+                """
+                input[0] = '/path/to/bowtie_index'
+                input[1] = '/path/to/genome.fa'
+                input[2] = false
+                """
+            }
+        }
+
+        then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            def warnings = log_text.readLines().findAll { line -> line.contains('WARN  nextflow.Nextflow - ') }
+            assertAll(
+                { assert function.success },
+                { assert function.result == null },
+                { assert warnings.isEmpty() }
+            )
+        }
+    }
+
+    test("Test Function warnMissingGenomeFasta - fasta without bowtie_index") {
+
+        function "warnMissingGenomeFasta"
+
+        when {
+            function {
+                """
+                input[0] = null
+                input[1] = '/path/to/genome.fa'
+                input[2] = false
+                """
+            }
+        }
+
+        then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            def warnings = log_text.readLines().findAll { line -> line.contains('WARN  nextflow.Nextflow - ') }
+            assertAll(
+                { assert function.success },
+                { assert function.result == null },
+                { assert warnings.isEmpty() }
+            )
+        }
+    }
 }

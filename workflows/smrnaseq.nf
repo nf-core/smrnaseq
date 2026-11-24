@@ -25,6 +25,7 @@ include { UMI_FROM_SEQUENCE                } from '../modules/local/umi_from_seq
 include { mirtraceConfigLine               } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { mirtraceAdapterWarning           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { umiSaturationWarning             } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
+include { MIRNA_REFERENCE_VERSIONS         } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { methodsDescriptionText           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 // plugins
 include { paramsSummaryMap                 } from 'plugin/nf-schema'
@@ -249,7 +250,9 @@ workflow NFCORE_SMRNASEQ {
     // GENOME
     //
     genome_stats = channel.empty()
-    if (has_fasta){
+    // Check the FASTA param itself: has_fasta arrives here as a channel, so an `if` on it is always true.
+    // Without a genome FASTA, a given --bowtie_index is ignored (see warnMissingGenomeFasta).
+    if (params.fasta){
         GENOME_QUANT (
             ch_bowtie_index,
             ch_fasta,
@@ -291,8 +294,18 @@ workflow NFCORE_SMRNASEQ {
             versions_tuple: true
         }
 
+    // miRBase/MirGeneDB version and genome build from the miRNA GFF3 header
+    // (or, without a GFF3, from the database and the mature/hairpin FASTA files)
+    MIRNA_REFERENCE_VERSIONS (
+        ch_mirna_gtf,
+        params.mirgenedb,
+        params.mirgenedb ? params.mirgenedb_mature  : params.mature,
+        params.mirgenedb ? params.mirgenedb_hairpin : params.hairpin
+    )
+
     def topic_versions_string = topic_versions.versions_tuple
         .mix(MIRNA_QUANT.out.versions_tuples)
+        .mix(MIRNA_REFERENCE_VERSIONS.out.versions)
         .map { process, tool, version ->
             [ process[process.lastIndexOf(':')+1..-1], "  ${tool}: ${version}" ]
         }

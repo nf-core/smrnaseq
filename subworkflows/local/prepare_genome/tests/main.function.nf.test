@@ -1,0 +1,99 @@
+nextflow_function {
+
+    name "Test Functions"
+    script "../main.nf"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "prepare_genome"
+    tag "subworkflows/prepare_genome"
+
+    test("Test Function getMirbaseGffUrl - no species") {
+
+        function "getMirbaseGffUrl"
+
+        when {
+            function {
+                """
+                input[0] = null
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null }
+            )
+        }
+    }
+
+    test("Test Function getMirbaseGffUrl - hsa uses test-datasets GFF3") {
+
+        function "getMirbaseGffUrl"
+
+        when {
+            function {
+                """
+                input[0] = 'hsa'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3" }
+            )
+        }
+    }
+
+    // Regression test for https://github.com/nf-core/smrnaseq/issues/284:
+    // https://mirbase.org/download/CURRENT/genomes/<species>.gff3 serves the GFF3 wrapped in HTML,
+    // which makes mirtop fail with "Database not found in --mirna <species>.gff3".
+    test("Test Function getMirbaseGffUrl - other species use raw miRBase download (#284)") {
+
+        function "getMirbaseGffUrl"
+
+        when {
+            function {
+                """
+                input[0] = 'mmu'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == "https://mirbase.org/download/mmu.gff3" },
+                { assert !function.result.contains("CURRENT/genomes") }
+            )
+        }
+    }
+
+    test("Test Function getMirbaseGffUrl - downloaded GFF3 has a header mirtop can parse (#284)") {
+
+        function "getMirbaseGffUrl"
+
+        when {
+            function {
+                """
+                input[0] = 'ath'
+                """
+            }
+        }
+
+        then {
+            // Mirror mirtop's mapper._guess_database_file(): it only scans leading lines
+            // starting with '#' and needs one of them to mention the database (miRBase).
+            def lines = new URL(function.result).getText('UTF-8').readLines()
+            def header = lines.takeWhile { line -> line.startsWith('#') }
+            assertAll(
+                { assert function.success },
+                { assert lines[0] == '##gff-version 3' },
+                { assert header.any { line -> line.contains('miRBase') } },
+                { assert lines.any { line -> line.contains('\tmiRNA_primary_transcript\t') } }
+            )
+        }
+    }
+}

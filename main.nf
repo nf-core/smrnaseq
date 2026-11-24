@@ -62,6 +62,7 @@ params {
     mirgenedb_hairpin:             String?
     bowtie_index:                  String?
     bowtie_align_args:             String?
+    mirna_forward_only:            Boolean
     save_reference:                Boolean
     igenomes_base:                 String
     igenomes_ignore:               Boolean
