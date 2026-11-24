@@ -40,7 +40,7 @@ It should point to the 3-letter species name used by [miRBase](https://www.mirba
 
 Different parameters can be set for the two supported databases. By default `miRBase` will be used with the parameters below.
 
-- `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRbase: `https://mirbase.org/download/CURRENT/genomes/${params.mirtrace_species}.gff3`
+- `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRBase: `https://mirbase.org/download/${params.mirtrace_species}.gff3`
 - `mature`: points to the FASTA file of mature miRNA sequences. Default: `https://mirbase.org/download/mature.fa`
 - `hairpin`: points to the FASTA file of precursor miRNA sequences. Default: `https://mirbase.org/download/hairpin.fa`
 
@@ -51,6 +51,22 @@ If MirGeneDB should be used instead it needs to be specified using `--mirgenedb`
 - `mirgenedb_hairpin`: This parameter should point to the FASTA file containing precursor miRNA sequences. Note that MirGeneDB does not offer a dedicated hairpin file, but the precursor sequences can be downloaded from [MirGeneDB](https://mirgenedb.org/download) and used instead.
 
 See examples in: [the test-datasets repository of nf-core](https://github.com/nf-core/test-datasets/tree/smrnaseq/MirGeneDB).
+
+> [!NOTE]
+> `mirtop` reads the name of the miRNA database from the header of the GFF3 file, so the GFF3 passed via `--mirna_gtf` must be a plain-text file that starts with the miRBase header comments (e.g. `# microRNAs: miRBase v22.1`). Otherwise `MIRTOP_GFF` fails with `Database not found in --mirna <species>.gff3. Use --database argument to add a custom source.`
+>
+> - When downloading the file yourself, use `https://mirbase.org/download/<species>.gff3` (e.g. `wget https://mirbase.org/download/mmu.gff3`). The `https://mirbase.org/download/CURRENT/genomes/<species>.gff3` URL serves the file wrapped in HTML (the first line looks like `<p>##gff-version 3<br>...`), which `mirtop` cannot parse.
+> - For a custom miRBase-style GFF3 without these header lines, either add a comment line such as `# microRNAs: miRBase v22.1` to the top of the file, or pass the database name to `mirtop` with a custom config (`-c custom.config`):
+>
+> ```groovy
+> process {
+>     withName: '.*:BAM_STATS_MIRNA_MIRTOP:MIRTOP_GFF' {
+>         ext.args = '--database miRBase'
+>     }
+> }
+> ```
+>
+> The database name must contain `miRBase` for coordinates of `miRNA_primary_transcript` features to be recognised. With `--mirgenedb`, the pipeline already passes `--database MirGeneDB` automatically.
 
 > [!NOTE] > `mirtop` is hard-coded to use the `pre` sequences, which originate from the hairpin FASTA, rather than the `pri` sequences, which come from the mature FASTA. Users must provide `pre` files from the start to ensure consistency between the FASTA and GFF files, as the coordinates in the GFF file are referenced to `pre` sequences. This also ensures that names in the BAM file will match those in the GFF.
 

@@ -140,7 +140,7 @@
                 "mirna_gtf": {
                     "type": "string",
                     "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
-                    "help_text": "miRBase `.gff3` file, typically downloaded from [`https://mirbase.org/download/CURRENT/genomes/`](https://mirbase.org/download/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
+                    "help_text": "miRBase `.gff3` file, typically downloaded from `https://mirbase.org/download/<species>.gff3` (e.g. `https://mirbase.org/download/mmu.gff3`). Do not use the `https://mirbase.org/download/CURRENT/genomes/` URLs to download the file, as they serve it wrapped in HTML, which mirtop cannot parse. The file must keep the miRBase header comments (e.g. `# microRNAs: miRBase v22.1`), from which mirtop reads the database name.\n\nIf `--mirtrace_species` is set (e.g. via `--genome`) and this parameter is not provided, the file will be downloaded from miRBase automatically during the pipeline run.\n\n",
                     "fa_icon": "fas fa-address-book"
                 },
                 "mirgenedb_gff": {
