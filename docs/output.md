@@ -22,7 +22,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
 - [SAMtools](#samtools) - alignment result processing and feature counting
 - [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
-- [Bowtie](#bowtie) - alignment against reference genome for QC purpose
+- [Bowtie](#bowtie) - alignment against reference genome for QC purpose (genome quantification, only with `--fasta` or `--genome`)
 - [mirtop](#mirtop) - miRNA and isomiR annotation
 - [miRDeep2](#mirdeep2) - known and novel miRNA annotation
 - [miRTrace](#mirtrace) - a comprehensive tool for QC purpose
@@ -148,9 +148,11 @@ MultiQC reports the number of reads that were removed by each of the contaminant
 - `bowtie_index/`
   - `mirna_hairpin/bowtie`: hairpin.fa bowtie index files (saved to `genome/index/mirna_hairpin/bowtie` instead with `--save_reference`).
   - `mirna_mature/bowtie`: mature.fa bowtie index files (saved to `genome/index/mirna_mature/bowtie` instead with `--save_reference`).
-- `genome_quant/`
-  - `genome_quant/bam/.*bam`: The aligned BAM file results.
-  - `genome_quant/bam/.*unmapped.fastq.gz`: Unmapped reads results.
+- `genome_quant/bam/` (only when a genome FASTA is given with `--fasta` or `--genome`; see [genome quantification](https://nf-co.re/smrnaseq/usage#genome-quantification-and-mirdeep2)): alignment against the genome of the reads that did not align to the mature miRNAs or hairpins. Only with `--save_intermediates`:
+  - `{sample.id}_mature_hairpin_genome.bam`: Unsorted Bowtie alignment against the genome.
+  - `{sample.id}_mature_hairpin_genome.sorted.bam` and `.sorted.bam.csi`: Sorted and indexed alignment.
+  - `{sample.id}_mature_hairpin_genome.out`: Bowtie log.
+  - `{sample.id}_mature_hairpin_genome.unmapped.fastq.gz`: Reads that did not align to the genome.
 - `mirna_quant/`
   - `mirna_quant/bam/{hairpin,mature,seqcluster}/.*bam`: The aligned BAM file results against hairpin, mature or seqcluster.
   - `mirna_quant/bam/{hairpin,mature,seqcluster}/.*unmapped.fastq.gz`: Unmapped reads for hairpin, mature or seqcluster.
@@ -163,9 +165,10 @@ If `--save_intermediates` is specified, these files will be placed in this direc
 
 **Output directory: `results/{genome_quant,mirna_quant}/bam`**
 
-These files will be saved in this directory if `--save_intermediates` is specified. In any case, these stats will always be available in the MultiQC report.
+The statistics for the miRNA alignments (`mirna_quant/bam`) are saved only with `--save_intermediates`. The statistics for the genome alignments (`genome_quant/bam`) are always saved when genome quantification runs. In any case, these stats will always be available in the MultiQC report.
 
 - `.*stats|.*idxstats|.*flagstat`: BAM stats for each of the files listed above.
+  - For the genome alignments, `{sample.id}_mature_hairpin_genome.sorted.idxstats` gives the number of reads aligned to each genome sequence (chromosome or contig). The pipeline does not count reads per gene or other genomic feature.
 
 ![samtools](images/samtools_alignment_plot.png)
 
@@ -208,6 +211,8 @@ These files will be saved in this directory if `--save_intermediates` is specifi
 ## miRDeep2
 
 [miRDeep2](https://www.mdc-berlin.de/content/mirdeep2-documentation) is used for the identification of novel and known miRNAs in deep sequencing data.
+
+miRDeep2 runs only when a genome FASTA is given (`--fasta` or `--genome`), and can be turned off with `--skip_mirdeep`.
 
 **Output directory: `results/mirdeep2`**
 

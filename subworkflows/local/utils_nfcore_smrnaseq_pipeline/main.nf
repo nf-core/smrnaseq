@@ -117,6 +117,11 @@ workflow PIPELINE_INITIALISATION {
     validateBowtieGenomeArgs()
 
     //
+    // Warn if there is no genome FASTA, so genome quantification (and miRDeep2) are skipped
+    //
+    warnMissingGenomeFasta(params.bowtie_index, params.fasta, params.skip_mirdeep)
+
+    //
     // Create channel from input file provided through params.input
     //
 
@@ -400,6 +405,27 @@ def mirtraceAdapterWarning(adapter, mirtrace_species) {
         return null
     }
     return "miRTrace cannot auto-detect adapters, so with '--three_prime_adapter auto-detect' it runs without adapter trimming. Set '--three_prime_adapter' to the adapter sequence for adapter-trimmed miRTrace QC."
+}
+
+//
+// Warn when there is no genome FASTA. Genome quantification and miRDeep2 only run with a FASTA
+// (`--fasta`, or `--genome` with an iGenomes entry), so without one they are skipped. A given
+// genome Bowtie index is then ignored, which gets its own message. miRDeep2 is only mentioned
+// when it would otherwise run. Logs at most one warning and returns it, or null if there is none.
+//
+def warnMissingGenomeFasta(bowtie_index, fasta, skip_mirdeep) {
+    if (fasta) {
+        return null
+    }
+    def skipped = skip_mirdeep ? 'genome quantification is skipped' : 'genome quantification and miRDeep2 are skipped'
+    def pronoun = skip_mirdeep ? 'it' : 'them'
+    def how     = "use '--genome' with an iGenomes reference that provides a FASTA."
+    def message = bowtie_index
+        ? "A genome Bowtie index was given with '--bowtie_index', but no genome FASTA. The index is ignored, and ${skipped}. " +
+            "To run ${pronoun}, also provide the FASTA the index was built from with '--fasta', or ${how}"
+        : "No genome FASTA was given, so ${skipped}. To run ${pronoun}, provide a genome FASTA with '--fasta', or ${how}"
+    log.warn(message.toString())
+    return message.toString()
 }
 
 //
