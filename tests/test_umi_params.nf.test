@@ -26,7 +26,8 @@ nextflow_pipeline {
             def task_dirs = [:].withDefault { [] }
             new File("${workDir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
                 if (file.name == '.command.run') {
-                    def process = (file.text =~ /(?m)^### name: "([^ "]+)/)
+                    // The task name is in single quotes with Nextflow 26.04 and in double quotes with 26.10
+                    def process = (file.text =~ /(?m)^### name: ["']([^ "']+)/)
                     if (process.find()) {
                         def name = process.group(1).tokenize(':').last()
                         def script = new File(file.parentFile, '.command.sh').text
