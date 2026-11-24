@@ -140,7 +140,7 @@
                 "mirna_gtf": {
                     "type": "string",
                     "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
-                    "help_text": "miRBase `.gff3` file, typically downloaded from [`https://mirbase.org/download/CURRENT/genomes/`](https://mirbase.org/download/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
+                    "help_text": "miRBase `.gff3` file, typically downloaded from `https://mirbase.org/download/<species>.gff3` (e.g. `https://mirbase.org/download/mmu.gff3`). Do not use the `https://mirbase.org/download/CURRENT/genomes/` URLs to download the file, as they serve it wrapped in HTML, which mirtop cannot parse. The file must keep the miRBase header comments (e.g. `# microRNAs: miRBase v22.1`), from which mirtop reads the database name.\n\nIf `--mirtrace_species` is set (e.g. via `--genome`) and this parameter is not provided, the file will be downloaded from miRBase automatically during the pipeline run.\n\n",
                     "fa_icon": "fas fa-address-book"
                 },
                 "mirgenedb_gff": {
@@ -186,6 +186,12 @@
                     "description": "Additional arguments to pass to Bowtie alignment.",
                     "help_text": "These flags are passed to Bowtie 1 for the genome mapping, e.g. `--bowtie_align_args '-v 1 --best'`. Use with caution as some flags may conflict with pipeline-managed options.",
                     "fa_icon": "fas fa-terminal"
+                },
+                "mirna_forward_only": {
+                    "type": "boolean",
+                    "description": "Align reads only to the forward strand of mature and hairpin miRNA references.",
+                    "help_text": "Adds Bowtie 1 `--norc` to the mature, hairpin and seqcluster-to-hairpin alignments, so that reads are not assigned to the reverse complement of a miRNA reference. Use it for libraries whose trimmed reads have the same 5' to 3' orientation as the miRNA, which is the case for all built-in protocols (`illumina`, `nextflex`, `nextflex_v4`, `qiaseq`, `cats`). Enabled by the `qiaseq` profile; set `--mirna_forward_only false` to restore both-strand miRNA alignment. Genome, miRDeep2 and contaminant alignments are not affected.",
+                    "fa_icon": "fas fa-directions"
                 },
                 "save_reference": {
                     "type": "boolean",
