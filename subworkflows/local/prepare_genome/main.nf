@@ -33,6 +33,23 @@ def extractFirstIndexPrefix(files_path) {
     return index_file_name.substring(0, index_file_name.lastIndexOf(".1.ebwt"))
 }
 
+//
+// URL of the miRBase GFF3 file used when `--mirna_gtf` is not provided.
+// Uses the raw `https://mirbase.org/download/<species>.gff3` endpoint: the
+// `https://mirbase.org/download/CURRENT/genomes/<species>.gff3` page serves the file
+// wrapped in HTML (`<p>##gff-version 3<br>...`), so mirtop cannot find the
+// `# microRNAs: miRBase vXX` header line and fails with "Database not found" (#284).
+//
+def getMirbaseGffUrl(species) {
+    if (!species) {
+        return null
+    }
+    if (species == 'hsa') {
+        return "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3"
+    }
+    return "https://mirbase.org/download/${species}.gff3"
+}
+
 
 workflow PREPARE_GENOME {
     take:
@@ -61,7 +78,7 @@ workflow PREPARE_GENOME {
     bool_has_fasta            = val_fasta                     ? true : false
 
     ch_mirtrace_species       = val_mirtrace_species          ? channel.value(val_mirtrace_species) : channel.empty()
-    mirna_gtf_from_species    = val_mirtrace_species          ? (val_mirtrace_species == 'hsa' ? "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${val_mirtrace_species}.gff3") : false
+    mirna_gtf_from_species    = getMirbaseGffUrl(val_mirtrace_species)
     ch_mirna_gtf              = val_mirna_gtf                 ? channel.fromPath(val_mirna_gtf, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : ( mirna_gtf_from_species ? channel.fromPath(mirna_gtf_from_species, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() :  channel.empty() )
 
     // Add species of the gtf in the meta

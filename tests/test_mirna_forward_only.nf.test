@@ -1,0 +1,31 @@
+nextflow_pipeline {
+    name 'Test miRNA reference orientation'
+    script './strand_orientation/main.nf'
+    tag 'pipeline'
+    tag 'mirna_forward_only'
+
+    test('Legacy default permits both orientations') {
+        when {
+            params {
+                outdir = "${outputDir}"
+            }
+        }
+        then {
+            assert workflow.success
+            STRAND.assertAlignments(workDir, outputDir, false)
+        }
+    }
+
+    test('CLI true retains forward candidates and rejects reverse-only RNA alignments') {
+        options '--mirna_forward_only true'
+        when {
+            params {
+                outdir = "${outputDir}"
+            }
+        }
+        then {
+            assert workflow.success
+            STRAND.assertAlignments(workDir, outputDir, true)
+        }
+    }
+}
