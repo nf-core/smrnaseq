@@ -89,6 +89,10 @@
                 "INDEX_TRNA": {
                     "bowtie2": "2.5.5"
                 },
+                "MIRNA_REFERENCE": {
+                    "genome_build": "GRCh38",
+                    "miRBase": "v22"
+                },
                 "MIRTOP_COUNTS": {
                     "mirtop": "0.4.30"
                 },
