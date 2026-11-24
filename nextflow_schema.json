@@ -187,6 +187,12 @@
                     "help_text": "These flags are passed to Bowtie 1 for the genome mapping, e.g. `--bowtie_align_args '-v 1 --best'`. Use with caution as some flags may conflict with pipeline-managed options.",
                     "fa_icon": "fas fa-terminal"
                 },
+                "mirna_forward_only": {
+                    "type": "boolean",
+                    "description": "Align reads only to the forward strand of mature and hairpin miRNA references.",
+                    "help_text": "Adds Bowtie 1 `--norc` to the mature, hairpin and seqcluster-to-hairpin alignments, so that reads are not assigned to the reverse complement of a miRNA reference. Use it for libraries whose trimmed reads have the same 5' to 3' orientation as the miRNA, which is the case for all built-in protocols (`illumina`, `nextflex`, `nextflex_v4`, `qiaseq`, `cats`). Enabled by the `qiaseq` profile; set `--mirna_forward_only false` to restore both-strand miRNA alignment. Genome, miRDeep2 and contaminant alignments are not affected.",
+                    "fa_icon": "fas fa-directions"
+                },
                 "save_reference": {
                     "type": "boolean",
                     "description": "Save generated reference genome files to results.",
