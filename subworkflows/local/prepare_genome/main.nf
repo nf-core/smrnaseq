@@ -44,6 +44,23 @@ def mirbaseGffMissingMessage(species, url) {
         "and keep the mature and hairpin miRNA quantification. See https://nf-co.re/smrnaseq/usage#species-without-a-mirbase-gff3-file"
 }
 
+//
+// URL of the miRBase GFF3 file used when `--mirna_gtf` is not provided.
+// Uses the raw `https://mirbase.org/download/<species>.gff3` endpoint: the
+// `https://mirbase.org/download/CURRENT/genomes/<species>.gff3` page serves the file
+// wrapped in HTML (`<p>##gff-version 3<br>...`), so mirtop cannot find the
+// `# microRNAs: miRBase vXX` header line and fails with "Database not found" (#284).
+//
+def getMirbaseGffUrl(species) {
+    if (!species) {
+        return null
+    }
+    if (species == 'hsa') {
+        return "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3"
+    }
+    return "https://mirbase.org/download/${species}.gff3"
+}
+
 
 workflow PREPARE_GENOME {
     take:
@@ -73,11 +90,11 @@ workflow PREPARE_GENOME {
 
     ch_mirtrace_species       = val_mirtrace_species          ? channel.value(val_mirtrace_species) : channel.empty()
     // The miRNA GFF3 is only used by mirtop: it is not downloaded from miRBase with --skip_mirtop, --mirna_gtf or --mirgenedb
-    mirna_gtf_from_species    = (val_mirtrace_species && !val_mirna_gtf && !params.skip_mirtop && !params.mirgenedb) ? (val_mirtrace_species == 'hsa' ? "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${val_mirtrace_species}.gff3") : false
+    mirna_gtf_from_species    = (!val_mirna_gtf && !params.skip_mirtop && !params.mirgenedb) ? getMirbaseGffUrl(val_mirtrace_species) : null
     if (mirna_gtf_from_species && !file(mirna_gtf_from_species).exists()) {
         error(mirbaseGffMissingMessage(val_mirtrace_species, mirna_gtf_from_species))
     }
-    ch_mirna_gtf              = params.skip_mirtop            ? channel.empty() : ( val_mirna_gtf ? channel.fromPath(val_mirna_gtf, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : ( mirna_gtf_from_species ? channel.fromPath(mirna_gtf_from_species).map{ it -> [ [id:it.baseName], it ] }.collect() :  channel.empty() ) )
+    ch_mirna_gtf              = params.skip_mirtop            ? channel.empty() : ( val_mirna_gtf ? channel.fromPath(val_mirna_gtf, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : ( mirna_gtf_from_species ? channel.fromPath(mirna_gtf_from_species, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() :  channel.empty() ) )
 
     // Add species of the gtf in the meta
     ch_mirna_gtf = ch_mirna_gtf
