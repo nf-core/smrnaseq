@@ -263,6 +263,64 @@ def validateInputParameters() {
             error("You specified to be using MirGeneDB, but the GFF file is not found. Please provide the file using the `--mirgenedb_gff` parameter.")
         }
     }
+
+    // Validate UMI parameters
+    def umi_error = umiParameterError(params.with_umi, params.umitools_bc_pattern)
+    if (umi_error) {
+        error(umi_error)
+    }
+    umiDeprecationWarnings(params.skip_umi_extract_before_dedup, params.umi_discard_read).each { message ->
+        log.warn(message)
+    }
+}
+
+//
+// Check UMI parameter combinations that cannot work. Returns an error message, or null if the
+// combination is valid (or `--with_umi` is not set).
+//
+def umiParameterError(with_umi, bc_pattern) {
+    if (with_umi && !bc_pattern) {
+        return "'--with_umi' requires '--umitools_bc_pattern' to describe where the UMI is in the read (-profile qiaseq sets it for QIAseq miRNA libraries). See https://nf-co.re/smrnaseq/usage#umi-handling"
+    }
+    return null
+}
+
+//
+// Warnings for deprecated UMI parameters that are set (they are ignored). Returns a list of messages.
+//
+def umiDeprecationWarnings(skip_umi_extract_before_dedup, umi_discard_read) {
+    def messages = []
+    if (skip_umi_extract_before_dedup != null) {
+        messages << "'--skip_umi_extract_before_dedup' is deprecated and ignored: with '--with_umi', the UMI is always extracted before deduplication. It will be removed in a future release."
+    }
+    if (umi_discard_read != null) {
+        messages << "'--umi_discard_read' is deprecated and ignored: the pipeline only uses read 1. It will be removed in a future release."
+    }
+    return messages
+}
+
+//
+// Warning for UMI saturation, from the statistics TSV written by UMI_FROM_SEQUENCE (header line and
+// one line per sample). One-mismatch UMI clustering (UMICollapse `dir`, `adj` or `cc`) merges distinct
+// molecules once one insert sequence uses more than about 0.5% of all possible UMIs (4^UMI length),
+// so its count is underestimated. Returns a warning message, or null.
+//
+def umiSaturationWarning(stats_text) {
+    def threshold = 0.005
+    def lines = stats_text.readLines().findAll { line -> line.trim() }
+    if (lines.size() < 2) {
+        return null
+    }
+    def header = lines[0].split('\t') as List
+    def values = lines[1].split('\t') as List
+    def row = [header, values].transpose().collectEntries()
+    def fraction = row.top_sequence_umi_fraction as BigDecimal
+    if (fraction <= threshold) {
+        return null
+    }
+    // Not String.format: its decimal separator depends on the locale
+    def percent = (fraction * 100).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString()
+    return "UMI saturation in sample '${row.sample}': after deduplication, the most frequent sequence (${row.top_sequence}) has ${row.top_sequence_reads} reads, ${percent}% of all ${row.umi_space} possible ${row.umi_length} nt UMIs (warning threshold 0.5%). One-mismatch UMI clustering then merges distinct molecules, so the counts of the most abundant miRNAs are underestimated. Consider exact UMI matching (UMICollapse '-k 0'). See https://nf-co.re/smrnaseq/usage#choosing-a-umi-strategy"
 }
 
 // Validate channels from input samplesheet

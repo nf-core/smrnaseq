@@ -56,43 +56,47 @@
                 "with_umi": {
                     "type": "boolean",
                     "fa_icon": "fas fa-barcode",
-                    "description": "Enable UMI-based read deduplication."
+                    "description": "Enable UMI-based read deduplication.",
+                    "help_text": "The UMI is extracted from the raw reads with UMI-tools (see `--umitools_bc_pattern`), fastp filters and clips the inserts, and UMICollapse removes reads with the same UMI and insert sequence. `-profile qiaseq` sets the UMI pattern for QIAseq miRNA libraries."
                 },
                 "umitools_extract_method": {
                     "type": "string",
                     "default": "string",
                     "fa_icon": "fas fa-barcode",
                     "description": "UMI pattern to use. Can be either 'string' (default) or 'regex'.",
-                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).\n"
+                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).\n",
+                    "enum": ["string", "regex"]
                 },
                 "umitools_method": {
                     "type": "string",
                     "default": "dir",
-                    "description": "UMI grouping method",
+                    "description": "UMICollapse deduplication algorithm: dir (directional), adj (adjacency) or cc (connected components).",
                     "fa_icon": "fas fa-layer-group",
-                    "help_text": "Available options are dir, cc, adj"
+                    "help_text": "Passed to UMICollapse as `--algo`. All three merge UMIs that differ by one substitution; for exact UMI matching, see the UMI section of the usage documentation.",
+                    "enum": ["dir", "adj", "cc"]
                 },
                 "skip_umi_extract_before_dedup": {
                     "type": "boolean",
                     "fa_icon": "fas fa-compress-alt",
-                    "description": "Skip the UMI extraction from the reads before deduplication. Please note, if this parameter is set to false, the reads will be deduplicated solely on insert sequence. UMIs might be extracted after deduplication depending on the set umitools_bc_pattern nevertheless if with_umi is set to True.",
-                    "default": true
+                    "description": "Deprecated and ignored: with --with_umi, the UMI is always extracted before deduplication.",
+                    "hidden": true
                 },
                 "umitools_bc_pattern": {
                     "type": "string",
                     "fa_icon": "fas fa-barcode",
                     "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).",
-                    "description": "The UMI barcode pattern to use e.g. 'NNNNNN' indicates that the first 6 nucleotides of the read are from the UMI."
+                    "description": "The UMI barcode pattern for UMI-tools extract, e.g. 'NNNNNN' for a 6 nt UMI at the start of the read. Set by -profile qiaseq."
                 },
                 "umi_discard_read": {
                     "type": "integer",
                     "fa_icon": "fas fa-barcode",
-                    "description": "After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively."
+                    "description": "Deprecated and ignored: the pipeline only uses read 1.",
+                    "hidden": true
                 },
                 "save_umi_intermeds": {
                     "type": "boolean",
                     "fa_icon": "fas fa-save",
-                    "description": "If this option is specified, intermediate FastQ and BAM files produced by UMI-tools are also saved in the results directory."
+                    "description": "Save the reads after UMI extraction and after UMI deduplication to the results directory."
                 }
             },
             "fa_icon": "fas fa-barcode"
