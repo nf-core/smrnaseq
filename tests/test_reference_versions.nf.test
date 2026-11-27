@@ -1,0 +1,49 @@
+nextflow_pipeline {
+
+    name "Test miRNA reference database version in the software versions YAML"
+    script "../main.nf"
+    profile "+ci"
+    tag "pipeline"
+    tag "reference_versions"
+
+    // `-stub` is enough: the version is read from the miRNA GFF3 header on the head node
+
+    test("-profile test -stub - miRBase") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            def versions = path("$outputDir/pipeline_info/nf_core_smrnaseq_software_mqc_versions.yml").yaml
+            assert workflow.success
+            assert versions.MIRNA_REFERENCE == [ miRBase: 'v22', genome_build: 'GRCh38' ]
+        }
+    }
+
+    test("-profile test -stub - MirGeneDB") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir            = "$outputDir"
+                mirgenedb         = true
+                mirgenedb_mature  = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/MirGeneDB/mirgenedb_hsa_mature.fa'
+                mirgenedb_hairpin = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/MirGeneDB/mirgenedb_hsa_hairpin.fa'
+                mirgenedb_gff     = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/MirGeneDB/mirgenedb_hsa.gff'
+                mirgenedb_species = 'Hsa'
+            }
+        }
+
+        then {
+            def versions = path("$outputDir/pipeline_info/nf_core_smrnaseq_software_mqc_versions.yml").yaml
+            assert workflow.success
+            assert versions.MIRNA_REFERENCE == [ MirGeneDB: 'v2.0', genome_build: 'hg38' ]
+        }
+    }
+}

@@ -1,0 +1,202 @@
+nextflow_process {
+
+    name "Test Process MIRNA_IDS"
+    script "../main.nf"
+    process "MIRNA_IDS"
+    tag "modules"
+    tag "modules_local"
+    tag "mirna_ids"
+
+    test("miRBase GFF3") {
+
+        when {
+            process {
+                """
+                input[0] = [file(params.pipelines_testdata_base_path + 'reference/hsa.gff3', checkIfExists: true)]
+                input[1] = [[id:'mature'], file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)]
+                input[2] = [[id:'hairpin'], file(params.pipelines_testdata_base_path + 'reference/hairpin.fa', checkIfExists: true)]
+                input[3] = [file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)]
+                input[4] = file(params.pipelines_testdata_base_path + 'reference/hairpin.fa', checkIfExists: true)
+                input[5] = 'hsa'
+                input[6] = 'miRBase'
+                """
+            }
+        }
+
+        then {
+            def rows = path(process.out.mirna_ids[0]).readLines()*.split('\t', -1)
+            def by_name = rows.drop(1).collectEntries { row -> [("${row[2]}:${row[0]}".toString()): row] }
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() },
+                { assert rows[0] == ['name', 'accession', 'type', 'precursor', 'precursor_accession', 'database', 'source'] },
+                // Mature names map to MIMAT accessions and to all their precursors, in matching order
+                { assert by_name['mature:hsa-let-7a-5p'] == ['hsa-let-7a-5p', 'MIMAT0000062', 'mature', 'hsa-let-7a-1,hsa-let-7a-2,hsa-let-7a-3', 'MI0000060,MI0000061,MI0000062', 'miRBase', 'gff'] },
+                { assert by_name['mature:hsa-miR-1-3p'] == ['hsa-miR-1-3p', 'MIMAT0000416', 'mature', 'hsa-mir-1-1,hsa-mir-1-2', 'MI0000651,MI0000437', 'miRBase', 'gff'] },
+                { assert by_name['hairpin:hsa-let-7a-1'] == ['hsa-let-7a-1', 'MI0000060', 'hairpin', '', '', 'miRBase', 'gff'] },
+                // FASTA names that are not in the GFF (older release, or a species the GFF does not cover) are kept,
+                // with the accession from the reference FASTA header and without precursors
+                { assert by_name['mature:hsa-miR-375'] == ['hsa-miR-375', 'MIMAT0000728', 'mature', '', '', 'miRBase', 'fasta'] },
+                { assert rows.drop(1).findAll { row -> row[6] == 'fasta' }.every { row -> row[1] ==~ /MI(MAT)?[0-9]+/ } },
+                // Only the requested species, one row per name and type
+                { assert rows.drop(1).every { row -> row[0].startsWith('hsa-') } },
+                { assert by_name.size() == rows.size() - 1 }
+            )
+        }
+    }
+
+    test("miRBase GFF3, several species") {
+
+        when {
+            process {
+                """
+                input[0] = [file(params.pipelines_testdata_base_path + 'reference/hsa.gff3', checkIfExists: true)]
+                input[1] = [[id:'mature'], file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)]
+                input[2] = [[id:'hairpin'], file(params.pipelines_testdata_base_path + 'reference/hairpin.fa', checkIfExists: true)]
+                input[3] = [file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)]
+                input[4] = file(params.pipelines_testdata_base_path + 'reference/hairpin.fa', checkIfExists: true)
+                input[5] = 'mmu,hsa'
+                input[6] = 'miRBase'
+                """
+            }
+        }
+
+        then {
+            def rows = path(process.out.mirna_ids[0]).readLines()*.split('\t', -1)
+            def by_name = rows.drop(1).collectEntries { row -> [("${row[2]}:${row[0]}".toString()): row] }
+            assertAll(
+                { assert process.success },
+                // A comma-separated list (as passed by --mirna_species) keeps the names of every listed species,
+                // like PARSE_FASTA_MIRNA. The test data only has hsa, so the table is the same as for 'hsa'.
+                { assert rows.size() > 1000 },
+                { assert rows.drop(1).every { row -> row[0].startsWith('hsa-') || row[0].startsWith('mmu-') } },
+                { assert by_name['mature:hsa-let-7a-5p'] == ['hsa-let-7a-5p', 'MIMAT0000062', 'mature', 'hsa-let-7a-1,hsa-let-7a-2,hsa-let-7a-3', 'MI0000060,MI0000061,MI0000062', 'miRBase', 'gff'] }
+            )
+        }
+    }
+
+    test("MirGeneDB GFF") {
+
+        when {
+            process {
+                """
+                input[0] = [file(params.pipelines_testdata_base_path + 'MirGeneDB/mirgenedb_hsa.gff', checkIfExists: true)]
+                input[1] = [[id:'mature'], file(params.pipelines_testdata_base_path + 'MirGeneDB/mirgenedb_hsa_mature.fa', checkIfExists: true)]
+                input[2] = [[id:'hairpin'], file(params.pipelines_testdata_base_path + 'MirGeneDB/mirgenedb_hsa_hairpin.fa', checkIfExists: true)]
+                input[3] = [file(params.pipelines_testdata_base_path + 'MirGeneDB/mirgenedb_hsa_mature.fa', checkIfExists: true)]
+                input[4] = file(params.pipelines_testdata_base_path + 'MirGeneDB/mirgenedb_hsa_hairpin.fa', checkIfExists: true)
+                input[5] = 'Hsa'
+                input[6] = 'MirGeneDB'
+                """
+            }
+        }
+
+        then {
+            def rows = path(process.out.mirna_ids[0]).readLines()*.split('\t', -1)
+            def by_name = rows.drop(1).collectEntries { row -> [("${row[2]}:${row[0]}".toString()): row] }
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() },
+                // Names are the MirGeneDB IDs; star arms keep their `*`; precursors come from coordinates
+                { assert by_name['mature:Hsa-Mir-3613_5p'] == ['Hsa-Mir-3613_5p', 'MIMAT0017990', 'mature', 'Hsa-Mir-3613_pre', 'MI0016003', 'MirGeneDB', 'gff'] },
+                { assert by_name['mature:Hsa-Mir-3613_3p*'] == ['Hsa-Mir-3613_3p*', 'MIMAT0017991', 'mature', 'Hsa-Mir-3613_pre', 'MI0016003', 'MirGeneDB', 'gff'] },
+                { assert by_name['hairpin:Hsa-Mir-3613_pre'] == ['Hsa-Mir-3613_pre', 'MI0016003', 'hairpin', '', '', 'MirGeneDB', 'gff'] },
+                // MirGeneDB-only miRNAs have no miRBase accession, but still a precursor
+                { assert rows.drop(1).any { row -> row[2] == 'mature' && row[1] == '' && row[3] != '' } },
+                { assert rows.drop(1).every { row -> row[2] == 'hairpin' || row[3] != '' } },
+                { assert by_name.size() == rows.size() - 1 }
+            )
+        }
+    }
+
+    test("miRBase without GFF") {
+
+        when {
+            process {
+                """
+                input[0] = []
+                input[1] = [[id:'mature'], file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)]
+                input[2] = [[id:'hairpin'], file(params.pipelines_testdata_base_path + 'reference/hairpin.fa', checkIfExists: true)]
+                input[3] = [file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)]
+                input[4] = file(params.pipelines_testdata_base_path + 'reference/hairpin.fa', checkIfExists: true)
+                input[5] = 'hsa'
+                input[6] = 'miRBase'
+                """
+            }
+        }
+
+        then {
+            def rows = path(process.out.mirna_ids[0]).readLines()*.split('\t', -1)
+            def by_name = rows.drop(1).collectEntries { row -> [("${row[2]}:${row[0]}".toString()): row] }
+            // Config params are not visible in this block, so the test data URL is spelled out
+            def base = 'https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/'
+            def fasta_names = { url -> new URL(url).text.readLines().findAll { line -> line.startsWith('>') }.collect { line -> line.substring(1).split(/\s+/)[0] }.findAll { name -> name.contains('hsa-') } as Set }
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() },
+                // Accessions come from the miRBase FASTA headers; no precursor information without a GFF
+                { assert by_name['mature:hsa-let-7a-5p'] == ['hsa-let-7a-5p', 'MIMAT0000062', 'mature', '', '', 'miRBase', 'fasta'] },
+                { assert by_name['hairpin:hsa-mir-1-1'] == ['hsa-mir-1-1', 'MI0000651', 'hairpin', '', '', 'miRBase', 'fasta'] },
+                { assert rows.drop(1).every { row -> row[6] == 'fasta' && row[1] ==~ /MI(MAT)?[0-9]+/ } },
+                // Every FASTA name (the names used by edgeR) is listed
+                { assert by_name.keySet() == (fasta_names(base + 'reference/mature.fa').collect { "mature:${it}".toString() } + fasta_names(base + 'reference/hairpin.fa').collect { "hairpin:${it}".toString() }) as Set }
+            )
+        }
+    }
+
+    test("MirGeneDB without GFF") {
+
+        when {
+            process {
+                """
+                input[0] = []
+                input[1] = [[id:'mature'], file(params.pipelines_testdata_base_path + 'MirGeneDB/mirgenedb_hsa_mature.fa', checkIfExists: true)]
+                input[2] = [[id:'hairpin'], file(params.pipelines_testdata_base_path + 'MirGeneDB/mirgenedb_hsa_hairpin.fa', checkIfExists: true)]
+                input[3] = [file(params.pipelines_testdata_base_path + 'MirGeneDB/mirgenedb_hsa_mature.fa', checkIfExists: true)]
+                input[4] = file(params.pipelines_testdata_base_path + 'MirGeneDB/mirgenedb_hsa_hairpin.fa', checkIfExists: true)
+                input[5] = 'Hsa'
+                input[6] = 'MirGeneDB'
+                """
+            }
+        }
+
+        then {
+            def rows = path(process.out.mirna_ids[0]).readLines()*.split('\t', -1)
+            def by_name = rows.drop(1).collectEntries { row -> [("${row[2]}:${row[0]}".toString()): row] }
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() },
+                // MirGeneDB FASTA headers have no accession
+                { assert by_name['mature:Hsa-Mir-3613_5p'] == ['Hsa-Mir-3613_5p', '', 'mature', '', '', 'MirGeneDB', 'fasta'] },
+                { assert by_name['hairpin:Hsa-Mir-3613_pre'] == ['Hsa-Mir-3613_pre', '', 'hairpin', '', '', 'MirGeneDB', 'fasta'] },
+                { assert rows.size() - 1 == 630 + 567 }
+            )
+        }
+    }
+
+    test("stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [file(params.pipelines_testdata_base_path + 'reference/hsa.gff3', checkIfExists: true)]
+                input[1] = [[id:'mature'], file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)]
+                input[2] = [[id:'hairpin'], file(params.pipelines_testdata_base_path + 'reference/hairpin.fa', checkIfExists: true)]
+                input[3] = [file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)]
+                input[4] = file(params.pipelines_testdata_base_path + 'reference/hairpin.fa', checkIfExists: true)
+                input[5] = 'hsa'
+                input[6] = 'miRBase'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

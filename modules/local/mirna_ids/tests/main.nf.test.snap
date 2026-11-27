@@ -1,0 +1,87 @@
+{
+    "MirGeneDB without GFF": {
+        "content": [
+            {
+                "0": [
+                    "mirna_ids.tsv:md5,a5293ebde3f81a0e6ab7cddc8da8a29f"
+                ],
+                "mirna_ids": [
+                    "mirna_ids.tsv:md5,a5293ebde3f81a0e6ab7cddc8da8a29f"
+                ]
+            }
+        ],
+        "timestamp": "2026-11-22T19:19:51.205973",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.6"
+        }
+    },
+    "miRBase GFF3": {
+        "content": [
+            {
+                "0": [
+                    "mirna_ids.tsv:md5,32bf1542eeb5d31134c48031b90b391c"
+                ],
+                "mirna_ids": [
+                    "mirna_ids.tsv:md5,32bf1542eeb5d31134c48031b90b391c"
+                ]
+            }
+        ],
+        "timestamp": "2026-11-27T21:08:57.939341",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.7"
+        }
+    },
+    "stub": {
+        "content": [
+            {
+                "0": [
+                    "mirna_ids.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ],
+                "mirna_ids": [
+                    "mirna_ids.tsv:md5,d41d8cd98f00b204e9800998ecf8427e"
+                ]
+            }
+        ],
+        "timestamp": "2026-11-22T12:30:42.078341",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.6"
+        }
+    },
+    "MirGeneDB GFF": {
+        "content": [
+            {
+                "0": [
+                    "mirna_ids.tsv:md5,8ecd80bdecdc1fa0d86f14a7780274cc"
+                ],
+                "mirna_ids": [
+                    "mirna_ids.tsv:md5,8ecd80bdecdc1fa0d86f14a7780274cc"
+                ]
+            }
+        ],
+        "timestamp": "2026-11-22T19:19:01.809685",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.6"
+        }
+    },
+    "miRBase without GFF": {
+        "content": [
+            {
+                "0": [
+                    "mirna_ids.tsv:md5,831b5a64cfd4d503f15974bf16d16395"
+                ],
+                "mirna_ids": [
+                    "mirna_ids.tsv:md5,831b5a64cfd4d503f15974bf16d16395"
+                ]
+            }
+        ],
+        "timestamp": "2026-11-22T19:19:23.911844",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.6"
+        }
+    }
+}

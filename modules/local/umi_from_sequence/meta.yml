@@ -1,0 +1,40 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "umi/from_sequence"
+description: Remove the UMI that UMI_TO_SEQUENCE prepended to the read sequence and quality string, and report UMI saturation statistics.
+keywords:
+  - umi
+  - deduplication
+  - saturation
+tools:
+  - "gawk":
+      description: "GNU awk is a utility for text processing and data extraction."
+      homepage: "https://www.gnu.org/software/gawk/"
+      documentation: "https://www.gnu.org/software/gawk/manual/"
+      tool_dev_url: "https://git.savannah.gnu.org/cgit/gawk.git"
+      licence: ["GPL-3.0-or-later"]
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information.
+        e.g. [ id:'test', single_end:true ]
+  - reads:
+      type: file
+      description: Deduplicated reads with the UMI at the start of the sequence and at the end of the read name.
+      pattern: "*.{fastq.gz,fq.gz}"
+output:
+  - reads:
+      type: file
+      description: Deduplicated reads with the UMI removed from the sequence (it stays in the read name).
+      pattern: "*.umi_dedup.fastq.gz"
+  - saturation:
+      type: file
+      description: |
+        Tab-separated UMI saturation statistics: UMI length, deduplicated reads, distinct insert sequences,
+        the most frequent insert sequence, its number of deduplicated reads, the UMI space (4^UMI length)
+        and the fraction of the UMI space that this sequence uses.
+      pattern: "*.umi_saturation.tsv"
+authors:
+  - "apeltzer"
+maintainers:
+  - "apeltzer"
