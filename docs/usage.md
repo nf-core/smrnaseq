@@ -228,9 +228,35 @@ For other kits, set `--umitools_extract_method` and `--umitools_bc_pattern` so t
 - `--with_umi`: enable UMI deduplication. Requires `--umitools_bc_pattern` (set by `-profile qiaseq`).
 - `--umitools_extract_method`: `string` (default) or `regex`, passed to `umi_tools extract --extract-method`.
 - `--umitools_bc_pattern`: the UMI pattern, passed to `umi_tools extract --bc-pattern`.
-- `--umitools_method`: despite its name, this sets the UMICollapse deduplication algorithm (`--algo`): `dir` (directional, default), `adj` (adjacency) or `cc` (connected components). All three merge UMIs that differ by one substitution.
+- `--umitools_method`: despite its name, this sets the UMICollapse deduplication algorithm (`--algo`): `dir` (directional, default), `adj` (adjacency) or `cc` (connected components). All three merge UMIs that differ by one substitution. See [UMI deduplication algorithm](#umi-deduplication-algorithm).
 - `--save_umi_intermeds`: save the reads after `umi_tools extract` and after deduplication (see the [output documentation](https://nf-co.re/smrnaseq/output#umi-tools-extract)).
 - `--skip_umi_extract_before_dedup` and `--umi_discard_read`: deprecated and ignored. The UMI is always extracted before deduplication, and only read 1 is used. The pipeline prints a warning if they are set.
+
+#### UMI deduplication algorithm
+
+UMICollapse groups reads whose UMI + insert sequences differ by at most one substitution (by default) and keeps one read per group. How the groups are formed is set by `--umitools_method`. Despite its name, this parameter is passed to UMICollapse as `--algo`; it does not affect UMI-tools. The available algorithms match the UMI-tools grouping methods of the same name:
+
+- `dir` (default): directional. Two sequences are grouped when the more abundant one has at least twice the count of the other (minus one). This is the most conservative choice against merging distinct molecules.
+- `adj`: adjacency. Each cluster of connected sequences is resolved into groups around the most abundant sequences.
+- `cc`: connected components. All sequences connected by single mismatches form one group. This collapses the most reads.
+
+For example:
+
+```bash
+--with_umi --umitools_method adj
+```
+
+Other UMICollapse options, such as the mismatch threshold (`-k`, default 1) or the directional threshold (`-p`, default 0.5), are not exposed as pipeline parameters. You can set them in a custom config file passed with `-c`. Note that `ext.args` replaces the arguments set by the pipeline, so keep the `--algo` option. For example, to allow two mismatches (for exact UMI matching with `-k 0`, see [Choosing a UMI strategy](#choosing-a-umi-strategy)):
+
+```groovy
+process {
+    withName: '.*:UMICOLLAPSE_FASTQ' {
+        ext.args = '--algo dir -k 2'
+    }
+}
+```
+
+See the [UMICollapse documentation](https://github.com/Daniel-Liu-c0deb0t/UMICollapse#command-line-arguments) for all options.
 
 ### Choosing a UMI strategy
 
