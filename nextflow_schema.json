@@ -56,44 +56,47 @@
                 "with_umi": {
                     "type": "boolean",
                     "fa_icon": "fas fa-barcode",
-                    "description": "Enable UMI-based read deduplication."
+                    "description": "Enable UMI-based read deduplication.",
+                    "help_text": "The UMI is extracted from the raw reads with UMI-tools (see `--umitools_bc_pattern`), fastp filters and clips the inserts, and UMICollapse removes reads with the same UMI and insert sequence. `-profile qiaseq` sets the UMI pattern for QIAseq miRNA libraries."
                 },
                 "umitools_extract_method": {
                     "type": "string",
                     "default": "string",
                     "fa_icon": "fas fa-barcode",
                     "description": "UMI pattern to use. Can be either 'string' (default) or 'regex'.",
-                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).\n"
+                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).\n",
+                    "enum": ["string", "regex"]
                 },
                 "umitools_method": {
                     "type": "string",
                     "default": "dir",
-                    "description": "UMI deduplication algorithm used by UMICollapse (passed as `--algo`).",
+                    "description": "UMICollapse deduplication algorithm: dir (directional), adj (adjacency) or cc (connected components).",
                     "fa_icon": "fas fa-layer-group",
-                    "enum": ["dir", "adj", "cc"],
-                    "help_text": "Despite its name, this parameter only sets the deduplication algorithm of [UMICollapse](https://github.com/Daniel-Liu-c0deb0t/UMICollapse), which deduplicates the reads when `--with_umi` is set. Available options are `dir` (directional, the default), `adj` (adjacency) and `cc` (connected components). The algorithms are the same as the UMI-tools [grouping methods](https://umi-tools.readthedocs.io/en/latest/reference/dedup.html) of the same name. See the [usage documentation](https://nf-co.re/smrnaseq/usage#umi-deduplication-algorithm) for other UMICollapse options."
+                    "help_text": "Passed to UMICollapse as `--algo`. All three merge UMIs that differ by one substitution; for exact UMI matching, see the UMI section of the usage documentation.",
+                    "enum": ["dir", "adj", "cc"]
                 },
                 "skip_umi_extract_before_dedup": {
                     "type": "boolean",
                     "fa_icon": "fas fa-compress-alt",
-                    "description": "Skip the UMI extraction from the reads before deduplication. Please note, if this parameter is set to false, the reads will be deduplicated solely on insert sequence. UMIs might be extracted after deduplication depending on the set umitools_bc_pattern nevertheless if with_umi is set to True.",
-                    "default": true
+                    "description": "Deprecated and ignored: with --with_umi, the UMI is always extracted before deduplication.",
+                    "hidden": true
                 },
                 "umitools_bc_pattern": {
                     "type": "string",
                     "fa_icon": "fas fa-barcode",
                     "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).",
-                    "description": "The UMI barcode pattern to use e.g. 'NNNNNN' indicates that the first 6 nucleotides of the read are from the UMI."
+                    "description": "The UMI barcode pattern for UMI-tools extract, e.g. 'NNNNNN' for a 6 nt UMI at the start of the read. Set by -profile qiaseq."
                 },
                 "umi_discard_read": {
                     "type": "integer",
                     "fa_icon": "fas fa-barcode",
-                    "description": "After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively."
+                    "description": "Deprecated and ignored: the pipeline only uses read 1.",
+                    "hidden": true
                 },
                 "save_umi_intermeds": {
                     "type": "boolean",
                     "fa_icon": "fas fa-save",
-                    "description": "If this option is specified, intermediate FastQ and BAM files produced by UMI-tools are also saved in the results directory."
+                    "description": "Save the reads after UMI extraction and after UMI deduplication to the results directory."
                 }
             },
             "fa_icon": "fas fa-barcode"
@@ -119,7 +122,7 @@
                 "mirtrace_species": {
                     "type": "string",
                     "description": "Species for miRTrace.",
-                    "help_text": "This is automatically set when using `--genome`. Example values: `hsa`, `mmu`...\n Note that mirTrace relies on miRBase for its species reference. See available references [here](https://www.mirbase.org/help/genome_summary.shtml).",
+                    "help_text": "This is automatically set when using `--genome`. Example values: `hsa`, `mmu`...\n Note that mirTrace relies on miRBase for its species reference. See available references [here](https://www.mirbase.org/help/genome_summary.shtml). The value is also used to select the species' miRNAs from `--mature` and `--hairpin` and to download the miRBase GFF3 file for mirtop.",
                     "fa_icon": "fas fa-journal-whills"
                 },
                 "mirgenedb_species": {
@@ -141,7 +144,7 @@
                 "mirna_gtf": {
                     "type": "string",
                     "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
-                    "help_text": "miRBase `.gff3` file, typically downloaded from [`https://mirbase.org/download/CURRENT/genomes/`](https://mirbase.org/download/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
+                    "help_text": "miRBase `.gff3` file, typically downloaded from `https://mirbase.org/download/<species>.gff3` (e.g. `https://mirbase.org/download/mmu.gff3`). Do not use the `https://mirbase.org/download/CURRENT/genomes/` URLs to download the file, as they serve it wrapped in HTML, which mirtop cannot parse. The file must keep the miRBase header comments (e.g. `# microRNAs: miRBase v22.1`), from which mirtop reads the database name.\n\nIf `--mirtrace_species` is set (e.g. via `--genome`) and this parameter is not provided, the file will be downloaded from miRBase automatically during the pipeline run. miRBase does not provide this file for all species (e.g. sheep, `oar`); in that case provide one here or use `--skip_mirtop`. It is only used by mirtop.\n\n",
                     "fa_icon": "fas fa-address-book"
                 },
                 "mirgenedb_gff": {
@@ -187,6 +190,12 @@
                     "description": "Additional arguments to pass to Bowtie alignment.",
                     "help_text": "These flags are passed to Bowtie 1 for the genome mapping, e.g. `--bowtie_align_args '-v 1 --best'`. Use with caution as some flags may conflict with pipeline-managed options.",
                     "fa_icon": "fas fa-terminal"
+                },
+                "mirna_forward_only": {
+                    "type": "boolean",
+                    "description": "Align reads only to the forward strand of mature and hairpin miRNA references.",
+                    "help_text": "Adds Bowtie 1 `--norc` to the mature, hairpin and seqcluster-to-hairpin alignments, so that reads are not assigned to the reverse complement of a miRNA reference. Use it for libraries whose trimmed reads have the same 5' to 3' orientation as the miRNA, which is the case for all built-in protocols (`illumina`, `nextflex`, `nextflex_v4`, `qiaseq`, `cats`). Enabled by the `qiaseq` profile; set `--mirna_forward_only false` to restore both-strand miRNA alignment. Genome, miRDeep2 and contaminant alignments are not affected.",
+                    "fa_icon": "fas fa-directions"
                 },
                 "save_reference": {
                     "type": "boolean",
@@ -347,6 +356,12 @@
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip miRDeep"
+                },
+                "skip_mirtop": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip the mirtop isomiR annotation.",
+                    "help_text": "mirtop needs a miRNA GFF3 file (`--mirna_gtf` or `--mirgenedb_gff`). With `--skip_mirtop`, no GFF3 file is required or downloaded, which allows running the pipeline for species without a miRBase GFF3 file (e.g. sheep, `oar`). The mature and hairpin miRNA quantification (`mirna_quant/edger_qc/`) is still produced."
                 },
                 "skip_multiqc": {
                     "type": "boolean",
