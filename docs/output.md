@@ -154,7 +154,7 @@ MultiQC reports the number of reads that were removed by each of the contaminant
 - `bowtie_index/`
   - `mirna_hairpin/bowtie`: hairpin.fa bowtie index files (saved to `genome/index/mirna_hairpin/bowtie` instead with `--save_reference`).
   - `mirna_mature/bowtie`: mature.fa bowtie index files (saved to `genome/index/mirna_mature/bowtie` instead with `--save_reference`).
-- `genome_quant/bam/` (only when a genome FASTA is given with `--fasta` or `--genome`; see [genome quantification](https://nf-co.re/smrnaseq/usage#genome-quantification-and-mirdeep2)): alignment against the genome of the reads that did not align to the mature miRNAs or hairpins. Only with `--save_intermediates`:
+- `genome_quant/bam/` (only when a genome FASTA is given with `--fasta` or `--genome`; see [genome quantification](https://nf-co.re/smrnaseq/usage#genome-quantification-and-mirdeep2)): alignment against the genome of the reads that did not align to the mature miRNAs or hairpins. Up to 50 alignments are reported per read. The pipeline does not count these reads against a genome annotation; see [the usage documentation](https://nf-co.re/smrnaseq/usage#other-small-rnas-genome-wide-quantification) for how to do this. Only with `--save_intermediates`:
   - `{sample.id}_mature_hairpin_genome.bam`: Unsorted Bowtie alignment against the genome.
   - `{sample.id}_mature_hairpin_genome.sorted.bam` and `.sorted.bam.csi`: Sorted and indexed alignment.
   - `{sample.id}_mature_hairpin_genome.out`: Bowtie log.

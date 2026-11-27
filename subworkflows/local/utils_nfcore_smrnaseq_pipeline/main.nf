@@ -367,7 +367,8 @@ def validateBowtieGenomeArgs() {
         '-l'           : 'int',
         '--seedlen'    : 'int',
         '-k'           : 'int_min_2',
-        '-m'           : 'int',
+        '-m'           : 'int_min_1',
+        '-M'           : 'int_min_1',
         '--maxbts'     : 'int',
         '--chunkmbs'   : 'int',
         '--seed'       : 'int',
@@ -417,6 +418,10 @@ def validateBowtieGenomeArgs() {
     if (seen.contains('-v') && (seen.contains('-n') || seen.contains('--seedmms'))) {
         error("[bowtie_align_args] '-v' and '-n'/'--seedmms' are mutually exclusive.")
     }
+    // Bowtie accepts both, but '-M' then wins and the last value of either sets the ceiling
+    if (seen.contains('-m') && seen.contains('-M')) {
+        error("[bowtie_align_args] '-m' and '-M' are mutually exclusive.")
+    }
 }
 //
 // Check the value given to a bowtie flag that takes an integer
@@ -428,8 +433,11 @@ def validateBowtieArgValue(flag, expectedType, value) {
     if (expectedType == 'int_0_3' && !(value ==~ /0*[0-3]/)) {
         error("[bowtie_align_args] Argument '${flag}' must be between 0 and 3, got '${value}'.")
     }
+    if (expectedType == 'int_min_1' && !(value ==~ /0*[1-9]\d*/)) {
+        error("[bowtie_align_args] Argument '${flag}' must be at least 1, got '${value}'.")
+    }
     if (expectedType == 'int_min_2' && !(value ==~ /0*([2-9]|[1-9]\d+)/)) {
-        error("[bowtie_align_args] Argument '${flag}' must be at least 2, got '${value}'. The default genome mapping arguments include '--strata', which Bowtie only accepts with '-k' above 1. To report a single alignment per read, override ext.args for 'NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME' instead: https://nf-co.re/smrnaseq/dev/docs/usage#custom-tool-arguments")
+        error("[bowtie_align_args] Argument '${flag}' must be at least 2, got '${value}'. The default genome mapping arguments include '--strata', which Bowtie only accepts with '-k' above 1. To report a single alignment per read, use '-M 1' instead, which reports one random best alignment for reads with more than one.")
     }
 }
 //
