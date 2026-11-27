@@ -299,7 +299,7 @@ miRDeep2 runs only when a genome FASTA is given (`--fasta` or `--genome`), and c
 - `mirdeep2/pdfs_{sample.id}/` Only if you turn the PDFs on (see below): one PDF per miRNA, with its hairpin structure and the reads on it. The HTML report links to these files, so keep the folder next to the report.
 - `mirdeep2/mirdeep2_consensus.bed` and `mirdeep2/mirdeep2_consensus.tsv` (only with `--mirdeep2_consensus_min_samples` of 1 or more): Cross-sample consensus of the per-sample BED files, see [below](#cross-sample-consensus-of-mirdeep2-loci).
 
-miRDeep2 runs only when a genome FASTA is given and `--skip_mirdeep` is not set. It runs on each sample separately, and there is no file that combines all samples. See [the usage documentation](https://nf-co.re/smrnaseq/usage#mirdeep2) for its inputs and options.
+miRDeep2 runs on each sample separately. The only files that combine samples are the optional [cross-sample consensus](#cross-sample-consensus-of-mirdeep2-loci) files. See [the usage documentation](https://nf-co.re/smrnaseq/usage#mirdeep2) for the inputs and options of miRDeep2.
 
 How to read the results:
 
@@ -317,7 +317,7 @@ How to read the results:
   - `example miRBase miRNA with the same seed`: a known miRNA with the same seed, if one exists.
   - `consensus mature sequence`, `consensus star sequence` and `consensus precursor sequence`: the sequences of the candidate.
   - `precursor coordinate`: the genome position as `chromosome:start..end:strand`.
-- The BED file holds the novel and detected known miRNAs from the CSV. Column 4 is `novel:<provisional id>` or `known:<provisional id>` and column 5 is the miRDeep2 score. The colour is red for the `+` strand and blue for the `-` strand. Scores and provisional IDs are specific to each sample, so you cannot compare them between samples directly ([#176](https://github.com/nf-core/smrnaseq/issues/176) tracks a combined BED file).
+- The BED file holds the novel and detected known miRNAs from the CSV. Column 4 is `novel:<provisional id>` or `known:<provisional id>` and column 5 is the miRDeep2 score. The colour is red for the `+` strand and blue for the `-` strand. Scores and provisional IDs are specific to each sample, so you cannot compare them between samples directly. To get one set of loci for all samples, use the [cross-sample consensus](#cross-sample-consensus-of-mirdeep2-loci).
 - The HTML report shows the same tables. The ID in its first column links to the structure PDF of that miRNA in `pdfs_{sample.id}/`. By default, the pipeline runs miRDeep2 with `-d`, which skips the PDFs, so these links do not work. The PDFs are about 0.3 MB each, and there is one for every reported miRNA and every known miRNA with reads, which can add up to hundreds of MB per sample. To get them, leave out `-d` as described in [the usage documentation](https://nf-co.re/smrnaseq/usage#tuning-mirdeep2).
 - Novel miRNAs are not added to the miRNA count tables. See [the usage documentation](https://nf-co.re/smrnaseq/usage#mirdeep2) for how to count them in all samples.
 
