@@ -166,6 +166,12 @@
                     "help_text": "This file needs to be downloaded from [`https://mirgenedb.org/download`]. Can be given either as a plain text `.fa` file or a compressed `.gz` file.",
                     "fa_icon": "fas fa-file-alt"
                 },
+                "mirgenedb_star": {
+                    "type": "string",
+                    "description": "Optional path to FASTA file with MirGeneDB star miRNAs, added to `--mirgenedb_mature`.",
+                    "help_text": "MirGeneDB mature FASTA files only contain the dominant arm of each miRNA. The star arms (named with a trailing `*`, e.g. `Hsa-Mir-3613_3p*`) are a separate 'Star sequences' download from [`https://mirgenedb.org/download`]. mirtop always reports star arms, because it uses the hairpin FASTA and the GFF. Provide this file so that star arms are also counted in the edgeR mature tables, under the same names as in mirtop. Only used with `--mirgenedb`. Can be given either as a plain text `.fa` file or a compressed `.gz` file.",
+                    "fa_icon": "fas fa-file-alt"
+                },
                 "hairpin": {
                     "type": "string",
                     "description": "Path to FASTA file with miRNAs precursors.",

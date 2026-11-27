@@ -58,6 +58,7 @@ params {
     mirgenedb_gff:                 String?
     mature:                        String?
     mirgenedb_mature:              String?
+    mirgenedb_star:                String?
     hairpin:                       String?
     mirgenedb_hairpin:             String?
     bowtie_index:                  String?
@@ -228,6 +229,7 @@ workflow {
     mirna_seqcluster     = NFCORE_SMRNASEQ.out.mirna_seqcluster
     mirna_edger_qc       = NFCORE_SMRNASEQ.out.mirna_edger_qc
     mirna_mirtop         = NFCORE_SMRNASEQ.out.mirna_mirtop
+    mirna_ids            = NFCORE_SMRNASEQ.out.mirna_ids
     genome_quant_stats   = NFCORE_SMRNASEQ.out.genome_quant_stats
     genome_quant_bam     = NFCORE_SMRNASEQ.out.genome_quant_bam
     mirdeep2             = NFCORE_SMRNASEQ.out.mirdeep2
@@ -357,6 +359,9 @@ output {
     }
     mirna_mirtop {
         path 'mirna_quant/mirtop'
+    }
+    mirna_ids {
+        path 'mirna_quant'
     }
 
     // Genome quantification
