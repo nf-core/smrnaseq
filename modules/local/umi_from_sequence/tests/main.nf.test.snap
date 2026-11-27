@@ -1,0 +1,96 @@
+{
+    "Round trip with UMI_TO_SEQUENCE restores reads and qualities": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": true
+                        },
+                        "test.umi_dedup.fastq.gz:md5,75670855653a8b4ce928a8b1ba8d77b6"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": true
+                        },
+                        "test.umi_saturation.tsv:md5,8208d5c598c27f7644d68c4f6bbdf31a"
+                    ]
+                ],
+                "reads": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": true
+                        },
+                        "test.umi_dedup.fastq.gz:md5,75670855653a8b4ce928a8b1ba8d77b6"
+                    ]
+                ],
+                "saturation": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": true
+                        },
+                        "test.umi_saturation.tsv:md5,8208d5c598c27f7644d68c4f6bbdf31a"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-11-22T17:22:14.980384",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.6"
+        }
+    },
+    "Round trip - stub": {
+        "content": [
+            {
+                "0": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": true
+                        },
+                        "test.umi_dedup.fastq.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "1": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": true
+                        },
+                        "test.umi_saturation.tsv:md5,9161d29099abfce7ae02ba8ee19cf5fb"
+                    ]
+                ],
+                "reads": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": true
+                        },
+                        "test.umi_dedup.fastq.gz:md5,d41d8cd98f00b204e9800998ecf8427e"
+                    ]
+                ],
+                "saturation": [
+                    [
+                        {
+                            "id": "test",
+                            "single_end": true
+                        },
+                        "test.umi_saturation.tsv:md5,9161d29099abfce7ae02ba8ee19cf5fb"
+                    ]
+                ]
+            }
+        ],
+        "timestamp": "2026-11-22T17:22:22.834033",
+        "meta": {
+            "nf-test": "0.9.5",
+            "nextflow": "26.10.6"
+        }
+    }
+}

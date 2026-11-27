@@ -57,6 +57,10 @@
                 "MIRNA_IDS": {
                     "r-base": "3.6.2"
                 },
+                "MIRNA_REFERENCE": {
+                    "genome_build": "GRCh38",
+                    "miRBase": "v22"
+                },
                 "MIRTOP_COUNTS": {
                     "mirtop": "0.4.30"
                 },
@@ -533,7 +537,7 @@
                 "sample3_mature.sorted.flagstat:md5,6ee3697338446fad0473ce882adaaa6d",
                 "sample3_mature.sorted.idxstats:md5,a8a621a9652b077cbe11520f6e6f8e3b",
                 "sample3_mature.sorted.stats:md5,b178a084fef5e88e9aa3b649dc6986ab",
-                "mirna_ids.tsv:md5,56595ba639d1860427f09e6c7a4019cd",
+                "mirna_ids.tsv:md5,32bf1542eeb5d31134c48031b90b391c",
                 "hairpin.fa_igenome.fa:md5,cddcc379892cb43e807ff54feafafbc1",
                 "hairpin.fa_igenome.fa_idx.fa:md5,f7ee61ca4537300386fdb85c7dec24d2",
                 "mature.fa_igenome.fa:md5,48215f56ca0bfbdbb1a28482457283e3",

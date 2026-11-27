@@ -71,6 +71,10 @@
                 "MIRNA_IDS": {
                     "r-base": "3.6.2"
                 },
+                "MIRNA_REFERENCE": {
+                    "MirGeneDB": "v2.0",
+                    "genome_build": "hg38"
+                },
                 "MIRTOP_COUNTS": {
                     "mirtop": "0.4.30"
                 },

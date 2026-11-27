@@ -34,9 +34,10 @@ nextflow_process {
                 { assert by_name['mature:hsa-let-7a-5p'] == ['hsa-let-7a-5p', 'MIMAT0000062', 'mature', 'hsa-let-7a-1,hsa-let-7a-2,hsa-let-7a-3', 'MI0000060,MI0000061,MI0000062', 'miRBase', 'gff'] },
                 { assert by_name['mature:hsa-miR-1-3p'] == ['hsa-miR-1-3p', 'MIMAT0000416', 'mature', 'hsa-mir-1-1,hsa-mir-1-2', 'MI0000651,MI0000437', 'miRBase', 'gff'] },
                 { assert by_name['hairpin:hsa-let-7a-1'] == ['hsa-let-7a-1', 'MI0000060', 'hairpin', '', '', 'miRBase', 'gff'] },
-                // FASTA names that are not in the GFF (older release) are kept, without accession
-                { assert by_name['mature:hsa-miR-375'][1] == '' },
-                { assert by_name['mature:hsa-miR-375'][6] == 'fasta' },
+                // FASTA names that are not in the GFF (older release, or a species the GFF does not cover) are kept,
+                // with the accession from the reference FASTA header and without precursors
+                { assert by_name['mature:hsa-miR-375'] == ['hsa-miR-375', 'MIMAT0000728', 'mature', '', '', 'miRBase', 'fasta'] },
+                { assert rows.drop(1).findAll { row -> row[6] == 'fasta' }.every { row -> row[1] ==~ /MI(MAT)?[0-9]+/ } },
                 // Only the requested species, one row per name and type
                 { assert rows.drop(1).every { row -> row[0].startsWith('hsa-') } },
                 { assert by_name.size() == rows.size() - 1 }

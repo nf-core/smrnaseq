@@ -16,13 +16,11 @@
 #   - MirGeneDB GFF: `ID` attribute (mirtop) == FASTA headers (edgeR); star arms end in `*`
 # Accessions come from the `Alias` attribute (MIMAT/MI). Precursors come from `Derives_from`
 # (miRBase) or, when absent (MirGeneDB), from the hairpin whose coordinates contain the mature.
-# FASTA names that are not in the GFF are added with empty annotation, so that every
-# identifier in the edgeR and mirtop outputs is listed.
-#
-# Without a GFF (e.g. when no GFF is used for the run), the table is built from the FASTA names
-# only, with the accession taken from the raw reference FASTA headers when they carry one
-# (miRBase: `>hsa-let-7a-5p MIMAT0000062 Homo sapiens let-7a-5p`; MirGeneDB headers have none).
-# Precursor columns are then empty. The `source` column says where each row comes from
+# FASTA names that are not in the GFF (other release, a species the GFF does not cover, or no
+# GFF for the run) are added as well, so that every identifier in the edgeR and mirtop outputs
+# is listed. Their accession is taken from the raw reference FASTA headers when they carry one
+# (miRBase: `>hsa-let-7a-5p MIMAT0000062 Homo sapiens let-7a-5p`; MirGeneDB headers have none),
+# and their precursor columns are empty. The `source` column says where each row comes from
 # (`gff` or `fasta`).
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -164,12 +162,10 @@ for (type in c("mature", "hairpin")) {
     names <- fasta_names(opt[[type]])
     missing <- setdiff(names, table$name[table$type == type])
     if (length(missing)) {
-        # With a GFF, its annotation is authoritative and FASTA-only names stay unannotated
-        accession <- ""
-        if (!has_gff) {
-            accession <- unname(fasta_accessions(reference[[type]])[missing])
-            accession[is.na(accession)] <- ""
-        }
+        # Names that are not in the GFF (other release, or a species the GFF does not cover) still
+        # get the accession from the raw reference FASTA headers, when these carry one
+        accession <- unname(fasta_accessions(reference[[type]])[missing])
+        accession[is.na(accession)] <- ""
         table <- rbind(table, data.frame(
             name = missing, accession = accession, type = type, precursor = "", precursor_accession = "",
             source = "fasta", stringsAsFactors = FALSE

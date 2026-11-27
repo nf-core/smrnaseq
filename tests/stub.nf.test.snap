@@ -62,6 +62,10 @@
                 "MIRNA_IDS": {
                     "r-base": "3.6.2"
                 },
+                "MIRNA_REFERENCE": {
+                    "genome_build": "GRCh38",
+                    "miRBase": "v22"
+                },
                 "MIRTOP_COUNTS": {
                     "mirtop": "0.4.30"
                 },
