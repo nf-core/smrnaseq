@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
 name: "mirdeep2_consensus"
-description: Merge the per-sample miRDeep2 BED files into a consensus BED of the loci found in a minimum number of samples.
+description: Merge the per-sample miRDeep2 BED files into a consensus BED6 file and a support table (TSV) of the loci found in a minimum number of samples.
 keywords:
   - mirdeep2
   - mirna
@@ -21,7 +21,8 @@ input:
   - min_samples:
       type: integer
       description: |
-        Minimum number of samples that must report an overlapping locus on the same strand.
+        Minimum number of samples that must report a locus. Loci of different samples count as the
+        same locus when they overlap by at least 1 bp on the same strand (book-ended loci do not).
   - min_probability:
       type: integer
       description: |
@@ -31,9 +32,19 @@ output:
   - bed:
       type: file
       description: |
-        Channel containing the consensus BED file (BED6 plus n_samples, samples, probability and mirdeep2_ids columns).
+        Channel containing the consensus BED file: standard BED6 without a header
+        (chrom, start, end, name, score, strand), with the number of supporting samples as score.
+        Empty if no locus is left.
         Structure: [ val(meta), path(bed) ]
       pattern: "mirdeep2_consensus.bed"
+  - tsv:
+      type: file
+      description: |
+        Channel containing the support table of the consensus loci, with a header line and the columns
+        name, chrom, start, end, strand, n_samples, samples, score (highest miRDeep2 score),
+        probability and mirdeep2_ids. The name column links it to the BED file.
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "mirdeep2_consensus.tsv"
 authors:
   - "@apeltzer"
 maintainers:

@@ -391,8 +391,8 @@
                     "type": "integer",
                     "default": 0,
                     "minimum": 0,
-                    "description": "Write a cross-sample consensus BED of the miRDeep2 miRNAs found in at least this many samples. 0 disables it.",
-                    "help_text": "When set to 1 or more, the per-sample miRDeep2 BED files (known and novel miRNAs) are merged into `mirdeep2/mirdeep2_consensus.bed`. Overlapping loci on the same strand are merged with `bedtools merge`, and only loci reported by at least this many samples are kept. Use 1 for the union of all samples, or the number of samples for loci found in every sample. Samples where miRDeep2 failed (exit status 255) do not count. miRDeep2 must not be skipped (`--skip_mirdeep false`).",
+                    "description": "Write a cross-sample consensus (BED and TSV) of the miRDeep2 miRNAs found in at least this many samples. 0 disables it.",
+                    "help_text": "When set to 1 or more, the per-sample miRDeep2 BED files (known and novel miRNAs) are merged into `mirdeep2/mirdeep2_consensus.bed` (standard six-column BED, with the number of supporting samples as score) and `mirdeep2/mirdeep2_consensus.tsv` (samples, highest miRDeep2 score and probability, and per-sample miRDeep2 IDs of each locus). Loci that overlap by at least one base on the same strand are merged with `bedtools merge -s -d -1` (loci that only touch are not merged), and only loci reported by at least this many samples are kept. Use 1 for the union of all samples, or the number of samples for loci found in every sample. Samples where miRDeep2 failed (exit status 255) do not count. miRDeep2 must not be skipped (`--skip_mirdeep false`).",
                     "fa_icon": "fas fa-object-group"
                 },
                 "mirdeep2_consensus_min_probability": {
@@ -400,7 +400,7 @@
                     "default": 0,
                     "minimum": 0,
                     "maximum": 100,
-                    "description": "Only use miRDeep2 miRNAs with an estimated true-positive probability of at least this many percent for the consensus BED. 0 disables the filter.",
+                    "description": "Only use miRDeep2 miRNAs with an estimated true-positive probability of at least this many percent for the consensus files. 0 disables the filter.",
                     "help_text": "Only used when `--mirdeep2_consensus_min_samples` is 1 or more. The probability is the column 'estimated probability that the miRNA (candidate) is a true positive' of the per-sample `result_{sample.id}.csv` (for example `91 +/- 2%` counts as 91). Entries below the threshold are removed in each sample before the samples are merged, so they do not count towards `--mirdeep2_consensus_min_samples`. miRDeep2 gives no probability (`-`) for known miRBase miRNAs in a sample in which it found no novel miRNA candidates; such entries are removed as well when this is above 0. The per-sample miRDeep2 output files are not changed.",
                     "fa_icon": "fas fa-percent"
                 }

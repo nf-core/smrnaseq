@@ -12,13 +12,16 @@ nextflow_workflow {
     // mirdeep2bed.pl). Samples A, B and C share a novel locus on chr1 (+), with true-positive
     // probabilities 91, 75 and 88 %. A (95 %) and B (no probability, "-") share a known locus
     // on chr1 (-). B has a novel locus overlapping it on the opposite strand (60 %), A has a
-    // novel locus on chr2 (40 %). D has an empty BED file and no CSV file.
+    // novel locus on chr2 (40 %). A (chr3:200-260, 85 %) and C (chr3:260-320, 90 %) have book-ended
+    // novel loci on the same strand, which share no base. D has an empty BED file and no CSV file.
+    // The chr3 rows were added by hand in the same format.
     def input_channel = { base_dir -> """
         channel.of('A', 'B', 'C', 'D').map { id ->
             [ [ id: id, single_end: true ], files("${base_dir}/subworkflows/local/mirdeep2_consensus/tests/fixtures/result_\${id}.{bed,csv}") ]
         }
     """ }
-    def header = ['#chrom', 'start', 'end', 'name', 'score', 'strand', 'n_samples', 'samples', 'probability', 'mirdeep2_ids'].join('\t')
+    // The BED file is plain BED6 without a header (score = number of samples), the TSV has the support columns
+    def header = ['name', 'chrom', 'start', 'end', 'strand', 'n_samples', 'samples', 'score', 'probability', 'mirdeep2_ids'].join('\t')
 
     test("min_samples = 2, no probability filter") {
 
@@ -33,14 +36,22 @@ nextflow_workflow {
         }
 
         then {
-            def lines = path(workflow.out.bed.get(0).get(1)).readLines()
+            def bed   = path(workflow.out.bed.get(0).get(1)).readLines()
+            def lines = path(workflow.out.tsv.get(0).get(1)).readLines()
             assertAll(
                 { assert workflow.success },
                 { assert lines.size() == 3 },
                 { assert lines[0] == header },
-                { assert lines[1] == ['chr1', '100', '180', 'novel:consensus_1', '7.7', '+', '3', 'A,B,C', '91', 'A:novel:chr1_1,B:novel:chr1_2,C:novel:chr1_4'].join('\t') },
+                { assert lines[1] == ['novel:consensus_1', 'chr1', '100', '180', '+', '3', 'A,B,C', '7.7', '91', 'A:novel:chr1_1,B:novel:chr1_2,C:novel:chr1_4'].join('\t') },
                 // B's known entry has no probability ("-") and is kept without a filter
-                { assert lines[2] == ['chr1', '1000', '1075', 'known:consensus_2', '10.1', '-', '2', 'A,B', '95', 'A:known:chr1_5,B:known:chr1_9'].join('\t') }
+                { assert lines[2] == ['known:consensus_2', 'chr1', '1000', '1075', '-', '2', 'A,B', '10.1', '95', 'A:known:chr1_5,B:known:chr1_9'].join('\t') },
+                // The book-ended chr3 loci of A and C are not merged, so neither reaches 2 samples
+                { assert !lines.any { line -> line.contains('chr3') } },
+                // Standard BED6: no header, six columns, integer score (number of samples)
+                { assert bed == [
+                    ['chr1', '100', '180', 'novel:consensus_1', '3', '+'].join('\t'),
+                    ['chr1', '1000', '1075', 'known:consensus_2', '2', '-'].join('\t')
+                ] }
             )
         }
     }
@@ -58,12 +69,23 @@ nextflow_workflow {
         }
 
         then {
-            def lines = path(workflow.out.bed.get(0).get(1)).readLines()
+            def bed   = path(workflow.out.bed.get(0).get(1)).readLines()
+            def lines = path(workflow.out.tsv.get(0).get(1)).readLines()
             assertAll(
                 { assert workflow.success },
-                { assert lines.size() == 5 },
-                { assert lines.findAll { line -> line.startsWith('chr1\t1010\t1060\tnovel:') && line.endsWith('\t+\t1\tB\t60\tB:novel:chr1_7') }.size() == 1 },
-                { assert lines.findAll { line -> line.startsWith('chr2\t500\t560\tnovel:') && line.endsWith('\t+\t1\tA\t40\tA:novel:chr2_3') }.size() == 1 }
+                { assert lines.size() == 7 },
+                { assert lines[0] == header },
+                { assert lines.count { line -> line ==~ /novel:consensus_\d+\tchr1\t1010\t1060\t\+\t1\tB\t2\t60\tB:novel:chr1_7/ } == 1 },
+                { assert lines.count { line -> line ==~ /novel:consensus_\d+\tchr2\t500\t560\t\+\t1\tA\t1\.1\t40\tA:novel:chr2_3/ } == 1 },
+                // Book-ended loci (A ends at 260, C starts at 260) stay separate
+                { assert lines.count { line -> line ==~ /novel:consensus_\d+\tchr3\t200\t260\t\+\t1\tA\t4\t85\tA:novel:chr3_6/ } == 1 },
+                { assert lines.count { line -> line ==~ /novel:consensus_\d+\tchr3\t260\t320\t\+\t1\tC\t3\t90\tC:novel:chr3_8/ } == 1 },
+                { assert bed.size() == 6 },
+                { assert bed.every { line -> line ==~ /chr\d\t\d+\t\d+\t(known|novel):consensus_\d+\t\d+\t[+-]/ } },
+                // Each BED line is the TSV row of the same name
+                { assert bed == lines.drop(1).collect { line -> def f = line.split('\t'); [f[1], f[2], f[3], f[0], f[5], f[4]].join('\t') } },
+                { assert bed.count { line -> line ==~ /chr3\t200\t260\tnovel:consensus_\d+\t1\t\+/ } == 1 },
+                { assert bed.count { line -> line ==~ /chr3\t260\t320\tnovel:consensus_\d+\t1\t\+/ } == 1 }
             )
         }
     }
@@ -81,10 +103,12 @@ nextflow_workflow {
         }
 
         then {
-            def lines = path(workflow.out.bed.get(0).get(1)).readLines()
+            def bed   = path(workflow.out.bed.get(0).get(1)).readLines()
+            def lines = path(workflow.out.tsv.get(0).get(1)).readLines()
             assertAll(
                 { assert workflow.success },
-                { assert lines == [ header ] }
+                { assert lines == [ header ] },
+                { assert bed.isEmpty() }
             )
         }
     }
@@ -102,7 +126,8 @@ nextflow_workflow {
         }
 
         then {
-            def lines = path(workflow.out.bed.get(0).get(1)).readLines()
+            def bed   = path(workflow.out.bed.get(0).get(1)).readLines()
+            def lines = path(workflow.out.tsv.get(0).get(1)).readLines()
             assertAll(
                 { assert workflow.success },
                 // B's novel chr1 locus (75 %) is removed, so the locus is supported by A and C only
@@ -110,7 +135,8 @@ nextflow_workflow {
                 // removed, so the known locus is only found in A and does not reach min_samples.
                 { assert lines.size() == 2 },
                 { assert lines[0] == header },
-                { assert lines[1] == ['chr1', '100', '175', 'novel:consensus_1', '7.7', '+', '2', 'A,C', '91', 'A:novel:chr1_1,C:novel:chr1_4'].join('\t') }
+                { assert lines[1] == ['novel:consensus_1', 'chr1', '100', '175', '+', '2', 'A,C', '7.7', '91', 'A:novel:chr1_1,C:novel:chr1_4'].join('\t') },
+                { assert bed == [ ['chr1', '100', '175', 'novel:consensus_1', '2', '+'].join('\t') ] }
             )
         }
     }
@@ -128,12 +154,14 @@ nextflow_workflow {
         }
 
         then {
-            def lines = path(workflow.out.bed.get(0).get(1)).readLines()
+            def bed   = path(workflow.out.bed.get(0).get(1)).readLines()
+            def lines = path(workflow.out.tsv.get(0).get(1)).readLines()
             assertAll(
                 { assert workflow.success },
-                { assert lines.size() == 5 },
+                { assert lines.size() == 7 },
+                { assert bed.size() == 6 },
                 { assert !lines.any { line -> line.contains('B:known:chr1_9') } },
-                { assert lines.findAll { line -> line.startsWith('chr1\t1000\t1075\tknown:') && line.endsWith('\t-\t1\tA\t95\tA:known:chr1_5') }.size() == 1 }
+                { assert lines.count { line -> line ==~ /known:consensus_\d+\tchr1\t1000\t1075\t-\t1\tA\t10\.1\t95\tA:known:chr1_5/ } == 1 }
             )
         }
     }
@@ -151,10 +179,12 @@ nextflow_workflow {
         }
 
         then {
-            def lines = path(workflow.out.bed.get(0).get(1)).readLines()
+            def bed   = path(workflow.out.bed.get(0).get(1)).readLines()
+            def lines = path(workflow.out.tsv.get(0).get(1)).readLines()
             assertAll(
                 { assert workflow.success },
-                { assert lines == [ header ] }
+                { assert lines == [ header ] },
+                { assert bed.isEmpty() }
             )
         }
     }
@@ -177,7 +207,9 @@ nextflow_workflow {
             assertAll(
                 { assert workflow.success },
                 { assert workflow.out.bed.size() == 1 },
-                { assert file(workflow.out.bed.get(0).get(1)).name == 'mirdeep2_consensus.bed' }
+                { assert file(workflow.out.bed.get(0).get(1)).name == 'mirdeep2_consensus.bed' },
+                { assert workflow.out.tsv.size() == 1 },
+                { assert file(workflow.out.tsv.get(0).get(1)).name == 'mirdeep2_consensus.tsv' }
             )
         }
     }

@@ -8,6 +8,7 @@ novel miRNAs predicted by miRDeep2
 provisional id	miRDeep2 score	estimated probability that the miRNA candidate is a true positive	rfam alert	total read count	mature read count	loop read count	star read count	significant randfold p-value	miRBase miRNA	example miRBase miRNA with the same seed	UCSC browser	NCBI blastn	consensus mature sequence	consensus star sequence	consensus precursor sequence	precursor coordinate
 chr1_1	5.2	91 +/- 2%	-	20	18	0	2	yes	-	-	-	-	ugagguaguagguuguauagu	cuauacaaccuacugccuucc	ugagguaguagguuguauaguuuagggucacacccaccacugggagauaacuauacaaccuacugccuucc	chr1:100..175:+
 chr2_3	1.1	40 +/- 5%	-	20	18	0	2	yes	-	-	-	-	ugagguaguagguuguauagu	cuauacaaccuacugccuucc	ugagguaguagguuguauaguuuagggucacacccaccacugggagauaacuauacaaccuacugccuucc	chr2:500..560:+
+chr3_6	4	85 +/- 2%	-	20	18	0	2	yes	-	-	-	-	ugagguaguagguuguauagu	cuauacaaccuacugccuucc	ugagguaguagguuguauaguuuagggucacacccaccacugggagauaacuauacaaccuacugccuucc	chr3:200..260:+
 
 
 

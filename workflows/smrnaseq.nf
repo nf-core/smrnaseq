@@ -289,7 +289,7 @@ workflow NFCORE_SMRNASEQ {
                                 params.mirdeep2_consensus_min_samples,
                                 params.mirdeep2_consensus_min_probability,
                         )
-                        ch_mirdeep2 = ch_mirdeep2.mix(MIRDEEP2_CONSENSUS.out.bed)
+                        ch_mirdeep2 = ch_mirdeep2.mix(MIRDEEP2_CONSENSUS.out.bed, MIRDEEP2_CONSENSUS.out.tsv)
                 }
         }
     }
