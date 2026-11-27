@@ -117,6 +117,11 @@ workflow PIPELINE_INITIALISATION {
     validateBowtieGenomeArgs()
 
     //
+    // Warn if there is no genome FASTA, so genome quantification (and miRDeep2) are skipped
+    //
+    warnMissingGenomeFasta(params.bowtie_index, params.fasta, params.skip_mirdeep)
+
+    //
     // Create channel from input file provided through params.input
     //
 
@@ -193,6 +198,31 @@ workflow PIPELINE_COMPLETION {
     }
 }
 
+//
+// miRNA reference database version for the software versions YAML: read from the miRNA GFF3
+// header, or, when no GFF3 is used (e.g. mirtop is skipped and the GFF channel is empty),
+// derived from the database and the mature/hairpin FASTA files. Never fails the run for a
+// missing GFF3.
+//
+workflow MIRNA_REFERENCE_VERSIONS {
+
+    take:
+    ch_mirna_gff  // channel: [ val(meta), path(gff) ], may be empty
+    val_mirgenedb // boolean: MirGeneDB (true) or miRBase (false)
+    val_mature    //  string: mature miRNA FASTA path or URL
+    val_hairpin   //  string: hairpin miRNA FASTA path or URL
+
+    main:
+    def database = val_mirgenedb ? 'MirGeneDB' : 'miRBase'
+    def ch_versions = ch_mirna_gff
+        .map { _meta, gff -> mirnaReferenceVersions(gff) }
+        .ifEmpty { mirnaReferenceFallbackVersions(database, val_mature, val_hairpin) }
+        .flatMap { versions -> versions }
+
+    emit:
+    versions = ch_versions // channel: [ process, tool, version ]
+}
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -233,6 +263,64 @@ def validateInputParameters() {
             error("You specified to be using MirGeneDB, but the GFF file is not found. Please provide the file using the `--mirgenedb_gff` parameter.")
         }
     }
+
+    // Validate UMI parameters
+    def umi_error = umiParameterError(params.with_umi, params.umitools_bc_pattern)
+    if (umi_error) {
+        error(umi_error)
+    }
+    umiDeprecationWarnings(params.skip_umi_extract_before_dedup, params.umi_discard_read).each { message ->
+        log.warn(message)
+    }
+}
+
+//
+// Check UMI parameter combinations that cannot work. Returns an error message, or null if the
+// combination is valid (or `--with_umi` is not set).
+//
+def umiParameterError(with_umi, bc_pattern) {
+    if (with_umi && !bc_pattern) {
+        return "'--with_umi' requires '--umitools_bc_pattern' to describe where the UMI is in the read (-profile qiaseq sets it for QIAseq miRNA libraries). See https://nf-co.re/smrnaseq/usage#umi-handling"
+    }
+    return null
+}
+
+//
+// Warnings for deprecated UMI parameters that are set (they are ignored). Returns a list of messages.
+//
+def umiDeprecationWarnings(skip_umi_extract_before_dedup, umi_discard_read) {
+    def messages = []
+    if (skip_umi_extract_before_dedup != null) {
+        messages << "'--skip_umi_extract_before_dedup' is deprecated and ignored: with '--with_umi', the UMI is always extracted before deduplication. It will be removed in a future release."
+    }
+    if (umi_discard_read != null) {
+        messages << "'--umi_discard_read' is deprecated and ignored: the pipeline only uses read 1. It will be removed in a future release."
+    }
+    return messages
+}
+
+//
+// Warning for UMI saturation, from the statistics TSV written by UMI_FROM_SEQUENCE (header line and
+// one line per sample). One-mismatch UMI clustering (UMICollapse `dir`, `adj` or `cc`) merges distinct
+// molecules once one insert sequence uses more than about 0.5% of all possible UMIs (4^UMI length),
+// so its count is underestimated. Returns a warning message, or null.
+//
+def umiSaturationWarning(stats_text) {
+    def threshold = 0.005
+    def lines = stats_text.readLines().findAll { line -> line.trim() }
+    if (lines.size() < 2) {
+        return null
+    }
+    def header = lines[0].split('\t') as List
+    def values = lines[1].split('\t') as List
+    def row = [header, values].transpose().collectEntries()
+    def fraction = row.top_sequence_umi_fraction as BigDecimal
+    if (fraction <= threshold) {
+        return null
+    }
+    // Not String.format: its decimal separator depends on the locale
+    def percent = (fraction * 100).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString()
+    return "UMI saturation in sample '${row.sample}': after deduplication, the most frequent sequence (${row.top_sequence}) has ${row.top_sequence_reads} reads, ${percent}% of all ${row.umi_space} possible ${row.umi_length} nt UMIs (warning threshold 0.5%). One-mismatch UMI clustering then merges distinct molecules, so the counts of the most abundant miRNAs are underestimated. Consider exact UMI matching (UMICollapse '-k 0'). See https://nf-co.re/smrnaseq/usage#choosing-a-umi-strategy"
 }
 
 // Validate channels from input samplesheet
@@ -386,6 +474,108 @@ def mirtraceAdapterWarning(adapter, mirtrace_species) {
 }
 
 //
+// Warn when there is no genome FASTA. Genome quantification and miRDeep2 only run with a FASTA
+// (`--fasta`, or `--genome` with an iGenomes entry), so without one they are skipped. A given
+// genome Bowtie index is then ignored, which gets its own message. miRDeep2 is only mentioned
+// when it would otherwise run. Logs at most one warning and returns it, or null if there is none.
+//
+def warnMissingGenomeFasta(bowtie_index, fasta, skip_mirdeep) {
+    if (fasta) {
+        return null
+    }
+    def skipped = skip_mirdeep ? 'genome quantification is skipped' : 'genome quantification and miRDeep2 are skipped'
+    def pronoun = skip_mirdeep ? 'it' : 'them'
+    def how     = "use '--genome' with an iGenomes reference that provides a FASTA."
+    def message = bowtie_index
+        ? "A genome Bowtie index was given with '--bowtie_index', but no genome FASTA. The index is ignored, and ${skipped}. " +
+            "To run ${pronoun}, also provide the FASTA the index was built from with '--fasta', or ${how}"
+        : "No genome FASTA was given, so ${skipped}. To run ${pronoun}, provide a genome FASTA with '--fasta', or ${how}"
+    log.warn(message.toString())
+    return message.toString()
+}
+
+//
+// First lines of a text file, transparently decompressing gzip (detected by its magic bytes)
+//
+def readFirstLines(file_path, n_lines) {
+    return file_path.withInputStream { raw ->
+        def input = new java.io.BufferedInputStream(raw)
+        input.mark(2)
+        def is_gzip = input.read() == 0x1f && input.read() == 0x8b
+        input.reset()
+        def stream = is_gzip ? new java.util.zip.GZIPInputStream(input) : input
+        def reader = new java.io.BufferedReader(new java.io.InputStreamReader(stream, 'UTF-8'))
+        reader.iterator().take(n_lines).toList()
+    }
+}
+
+//
+// Version of the miRNA reference database and its genome build, read from the comment header
+// of the miRNA GFF3 (--mirna_gtf, --mirgenedb_gff or the GFF3 downloaded for --mirtrace_species).
+// miRBase and MirGeneDB GFF3 files start with lines such as:
+//   # microRNAs:               miRBase v22
+//   # genome-build-id:         GRCh38
+// Returns [ process, tool, version ] tuples for the software versions YAML. The database
+// version is "unknown" when the header has no "microRNAs:" line.
+//
+// Also checks the file: a GFF that is an HTML page (e.g. the miRBase website serving
+// <p>##gff-version 3<br>... instead of the plain file) stops the run, since mirtop cannot read
+// it. A file that does not start with the "##gff-version" pragma only gives a warning, as
+// custom GFF files may lack it. Gzipped files are decompressed before these checks.
+//
+def mirnaReferenceVersions(gff) {
+    def lines = readFirstLines(gff, 200)
+    def first_line = lines.find { line -> line.trim() }?.trim() ?: ''
+    def first_line_lower = first_line.toLowerCase()
+    def is_html = first_line.startsWith('<') ||
+        ['<html', '<!doctype', '<p>', '<br'].any { tag -> first_line_lower.contains(tag) }
+    if (is_html) {
+        error("The miRNA GFF file '${gff.toUriString()}' is an HTML page, not a GFF3 file (it starts with '${first_line.take(40)}'). " +
+            "If it was downloaded from the miRBase website, download the plain GFF3 from https://mirbase.org/download/<species>.gff3 " +
+            "(e.g. https://mirbase.org/download/mmu.gff3) and pass the local file with '--mirna_gtf' (or '--mirgenedb_gff' with '--mirgenedb').")
+    }
+    if (!first_line.startsWith('##gff-version')) {
+        log.warn "The miRNA GFF file '${gff.toUriString()}' does not start with a '##gff-version' line. Please check that it is a GFF3 file with miRNA coordinates."
+    }
+    def header = lines.takeWhile { line -> line.startsWith('#') }
+    def database = header.findResult { line ->
+        def match = line =~ /^#+\s*microRNAs:\s*(\S+)\s+(\S+)/
+        match.find() ? [match.group(1), match.group(2)] : null
+    }
+    def genome_build = header.findResult { line ->
+        def match = line =~ /^#+\s*genome-build-id:\s*(\S+)/
+        match.find() ? match.group(1) : null
+    }
+    def versions = database
+        ? [['MIRNA_REFERENCE', database[0], database[1]]]
+        : [['MIRNA_REFERENCE', 'mirna_gff', "unknown (${gff.name})".toString()]]
+    if (genome_build) {
+        versions << ['MIRNA_REFERENCE', 'genome_build', genome_build]
+    }
+    return versions
+}
+
+//
+// miRNA reference entries for the software versions YAML when no miRNA GFF3 is available.
+// The mature/hairpin FASTA headers carry no release, so the version is only known if the
+// directory of the mature or hairpin file is a release number, e.g.
+// https://mirbase.org/download_version_files/22.1/mature.fa. The file names are reported as well.
+//
+def mirnaReferenceFallbackVersions(database, mature, hairpin) {
+    def release = [mature, hairpin].findResult { fasta ->
+        def match = fasta ? (fasta.toString() =~ /(?:^|\/)v?(\d+(?:\.\d+)*)\/[^\/]+$/) : null
+        match?.find() ? match.group(1) : null
+    }
+    def version = release ? "v${release} (from file path)".toString() : 'unknown (no GFF)'
+    def file_names = [mature, hairpin].collect { fasta -> fasta ? fasta.toString().tokenize('/').last() : 'none' }
+    return [
+        ['MIRNA_REFERENCE', database, version],
+        ['MIRNA_REFERENCE', 'mature', file_names[0]],
+        ['MIRNA_REFERENCE', 'hairpin', file_names[1]]
+    ]
+}
+
+//
 // Exit pipeline if incorrect --genome key provided
 //
 def genomeExistsError() {
@@ -416,7 +606,7 @@ def toolCitationText() {
             "Bowtie (Langmead et al. 2009),",
             "SAMtools (Li et al. 2009),",
             "EdgeR (Robinson et al. 2010),",
-            "Mirtop (Desvignes et al. 2019),",
+            !params.skip_mirtop          ? "Mirtop (Desvignes et al. 2019)," : "",
             "SeqKit (Shen et al. 2016),",
             "UMICollapse (Liu 2020),",
             "Seqcluster (Pantano et al. 2011)",

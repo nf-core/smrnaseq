@@ -12,6 +12,10 @@ report_section_order:
 
 export_plots: true
 
+# UMICollapse logs name the sample after its input file (<sample>.umi_in_sequence.fastq.gz)
+extra_fn_clean_exts:
+  - ".umi_in_sequence"
+
 disable_version_detection: true
 
 module_order:

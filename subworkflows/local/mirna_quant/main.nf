@@ -21,6 +21,7 @@ include {   BAM_SORT_STATS_SAMTOOLS as BAM_STATS_MATURE
 include { SEQCLUSTER_COLLAPSE    } from '../../../modules/nf-core/seqcluster/collapse/main'
 include { DATATABLE_MERGE        } from '../../../modules/local/datatable_merge/main'
 include { EDGER_QC               } from '../../../modules/local/edger_qc/main'
+include { MIRNA_IDS              } from '../../../modules/local/mirna_ids/main'
 include { BAM_STATS_MIRNA_MIRTOP } from '../../../subworkflows/nf-core/bam_stats_mirna_mirtop/main'
 
 include { PIVOT_LONGER           } from '../../../modules/local/pivot/longer/main'
@@ -38,7 +39,11 @@ workflow MIRNA_QUANT {
     ch_versions = channel.empty()
     ch_parse_species_input = params.mirgenedb ? channel.value(params.mirgenedb_species) : ch_mirtrace_species
 
-    PARSE_MATURE ( ch_reference_mature, ch_parse_species_input )
+    // MirGeneDB mature FASTA files only contain the dominant arm; star arms (named with a
+    // trailing `*`, as in the MirGeneDB GFF used by mirtop) come from a separate download.
+    val_mature_star = params.mirgenedb && params.mirgenedb_star ? file(params.mirgenedb_star, checkIfExists: true) : null
+
+    PARSE_MATURE ( ch_reference_mature, ch_parse_species_input, val_mature_star )
     ch_mirna_parsed = PARSE_MATURE.out.parsed_fasta
 
     FORMAT_MATURE ( ch_mirna_parsed )
@@ -59,7 +64,7 @@ workflow MIRNA_QUANT {
 
     BAM_STATS_MATURE ( BOWTIE_MAP_MATURE.out.bam, ch_mature_fasta_fai )
 
-    PARSE_HAIRPIN ( ch_reference_hairpin, ch_parse_species_input )
+    PARSE_HAIRPIN ( ch_reference_hairpin, ch_parse_species_input, null )
     ch_hairpin_parsed = PARSE_HAIRPIN.out.parsed_fasta
 
     FORMAT_HAIRPIN ( ch_hairpin_parsed )
@@ -88,25 +93,55 @@ workflow MIRNA_QUANT {
     BOWTIE_MAP_SEQCLUSTER ( ch_reads_collapsed, hairpin_bowtie, true )
 
     ch_mirtop_logs = channel.empty()
+    ch_mirtop      = channel.empty()
 
-    ch_mirna_gtf_species = ch_mirna_gtf.map{ meta, gtf-> [ meta, gtf, meta.species ] }.collect()
+    // mirtop needs a miRNA GFF3 file, which is not available for all species: skip it with --skip_mirtop
+    if (!params.skip_mirtop) {
+        ch_mirna_gtf_species = ch_mirna_gtf.map{ meta, gtf-> [ meta, gtf, meta.species ] }.collect()
 
-    BAM_STATS_MIRNA_MIRTOP(BOWTIE_MAP_SEQCLUSTER.out.bam, FORMAT_HAIRPIN.out.formatted_fasta, ch_mirna_gtf_species )
+        BAM_STATS_MIRNA_MIRTOP(BOWTIE_MAP_SEQCLUSTER.out.bam, FORMAT_HAIRPIN.out.formatted_fasta, ch_mirna_gtf_species )
 
-    ch_mirtop_logs = BAM_STATS_MIRNA_MIRTOP.out.stats_log
+        ch_mirtop_logs = BAM_STATS_MIRNA_MIRTOP.out.stats_log
 
-    PIVOT_LONGER( BAM_STATS_MIRNA_MIRTOP.out.counts )
+        PIVOT_LONGER( BAM_STATS_MIRNA_MIRTOP.out.counts )
 
-    ch_long_files = PIVOT_LONGER.out.csv
-        .map { _meta, file -> file }
+        ch_long_files = PIVOT_LONGER.out.csv
+            .map { _meta, file -> file }
+            .collect()
+            .map { files ->
+                return [[id: "Long_Files"], files]
+            }
+
+        PIVOT_WIDER( ch_long_files )
+
+        DATATABLE_MERGE ( PIVOT_WIDER.out.csv )
+
+        ch_mirtop = BAM_STATS_MIRNA_MIRTOP.out.isomirs.map { _meta, tsv -> tsv }.mix(
+            PIVOT_WIDER.out.csv.map { _meta, tsv -> tsv },
+            DATATABLE_MERGE.out.mirna_tsv
+        )
+    }
+
+    //
+    // Table of the miRNA names used in the edgeR and mirtop outputs, with their accessions
+    //
+    // Without a GFF (empty channel), the table is built from the FASTA headers instead
+    ch_mirna_ids_gff = ch_mirna_gtf
+        .map { _meta, gff -> gff }
         .collect()
-        .map { files ->
-            return [[id: "Long_Files"], files]
-        }
+        .ifEmpty([])
+    ch_mature_reference = ch_reference_mature
+        .map { _meta, fasta -> val_mature_star ? [ fasta, val_mature_star ] : [ fasta ] }
 
-    PIVOT_WIDER( ch_long_files )
-
-    DATATABLE_MERGE ( PIVOT_WIDER.out.csv )
+    MIRNA_IDS (
+        ch_mirna_ids_gff,
+        FORMAT_MATURE.out.formatted_fasta,
+        FORMAT_HAIRPIN.out.formatted_fasta,
+        ch_mature_reference,
+        ch_reference_hairpin.map { _meta, fasta -> fasta },
+        ch_parse_species_input,
+        params.mirgenedb ? 'MirGeneDB' : 'miRBase'
+    )
 
     ch_reads_genome = BOWTIE_MAP_HAIRPIN.out.fastq
         .map { row -> add_suffix(row, "genome") }
@@ -157,10 +192,8 @@ workflow MIRNA_QUANT {
     )                                                        // channel: [ val(meta), path(file) ]
     seqcluster          = SEQCLUSTER_COLLAPSE.out.fastq      // channel: [ val(meta), path(fastq.gz) ]
     edger_qc            = EDGER_QC.out.edger_files           // channel: [ path(txt|pdf|csv) ]
-    mirtop              = BAM_STATS_MIRNA_MIRTOP.out.isomirs.map { _meta, tsv -> tsv }.mix(
-        PIVOT_WIDER.out.csv.map { _meta, tsv -> tsv },
-        DATATABLE_MERGE.out.mirna_tsv
-    )                                                        // channel: [ path(tsv) ]
+    mirna_ids           = MIRNA_IDS.out.mirna_ids            // channel: [ path(tsv) ]
+    mirtop              = ch_mirtop                          // channel: [ path(tsv) ]
 }
 
 def add_suffix(row, suffix) {

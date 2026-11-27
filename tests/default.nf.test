@@ -33,7 +33,10 @@ nextflow_pipeline {
                     def mirtrace_reads = new File(dir, 'mirtrace-stats-qcstatus.tsv').readLines().drop(1).sum { line -> line.split('\t')[1] as long }
                     def fastp_json     = new groovy.json.JsonSlurper().parse(new File("$outputDir/fastp/on_raw/${dir.name}.fastp.json"))
                     assert mirtrace_reads == fastp_json.summary.before_filtering.total_reads
-                } }
+                } },
+                // mirna_ids.tsv lists every miRNA name used in the edgeR and mirtop outputs, with its accession (#357)
+                { assert MirnaIds.missing(params.outdir) == [] },
+                { assert MirnaIds.table(params.outdir).find { row -> row[0] == 'hsa-let-7a-5p' && row[2] == 'mature' }[1] == 'MIMAT0000062' }
             )
         }
     }

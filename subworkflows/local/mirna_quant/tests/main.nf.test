@@ -1,0 +1,45 @@
+nextflow_workflow {
+
+    name "Test Workflow MIRNA_QUANT"
+    script "../main.nf"
+    workflow "MIRNA_QUANT"
+    tag "subworkflows"
+    tag "subworkflows_local"
+    tag "subworkflows/mirna_quant"
+    tag "mirna_quant"
+
+    // No GFF (empty GFF channel, e.g. when no GFF is used for the run): mirna_ids.tsv is still
+    // produced, from the FASTA files (#357)
+    test("miRBase without GFF - stub") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir = "${outputDir}"
+            }
+            workflow {
+                """
+                input[0] = channel.value([[id:'mature'], file(params.pipelines_testdata_base_path + 'reference/mature.fa', checkIfExists: true)])
+                input[1] = channel.value([[id:'hairpin'], file(params.pipelines_testdata_base_path + 'reference/hairpin.fa', checkIfExists: true)])
+                input[2] = channel.empty()
+                input[3] = channel.of([[id:'Clone1_N1', single_end:true], file(params.pipelines_testdata_base_path + 'nf-test_data/contaminant_filter/small_Clone1_N1.tRNA.filter.unmapped.contaminant.fastq', checkIfExists: true)])
+                input[4] = channel.value('hsa')
+                """
+            }
+        }
+
+        then {
+            def mirna_ids_tasks = workflow.trace.succeeded().findAll { task -> task.name.startsWith('MIRNA_QUANT:MIRNA_IDS') }
+            def mirtop_tasks = workflow.trace.tasks().findAll { task -> task.name.contains('MIRTOP') }
+            assertAll(
+                { assert workflow.success },
+                { assert mirna_ids_tasks.size() == 1 },
+                { assert workflow.out.mirna_ids.size() == 1 },
+                { assert workflow.out.mirna_ids[0].toString().endsWith('/mirna_ids.tsv') },
+                // without a GFF, mirtop does not run
+                { assert mirtop_tasks.isEmpty() }
+            )
+        }
+    }
+}
