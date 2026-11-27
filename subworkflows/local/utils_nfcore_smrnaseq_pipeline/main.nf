@@ -598,7 +598,7 @@ def toolCitationText() {
             "Bowtie (Langmead et al. 2009),",
             "SAMtools (Li et al. 2009),",
             "EdgeR (Robinson et al. 2010),",
-            "Mirtop (Desvignes et al. 2019),",
+            !params.skip_mirtop          ? "Mirtop (Desvignes et al. 2019)," : "",
             "SeqKit (Shen et al. 2016),",
             "UMICollapse (Liu 2020),",
             "Seqcluster (Pantano et al. 2011)",

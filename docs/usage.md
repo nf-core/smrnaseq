@@ -36,6 +36,8 @@ miRTrace cannot auto-detect adapters. With `--three_prime_adapter auto-detect`, 
 
 It should point to the 3-letter species name used by [miRBase](https://www.mirbase.org/browse) or [MirGeneDB](https://www.mirgenedb.org/browse). Note the difference in case for the two databases.
 
+`mirtrace_species` is required when using miRBase (the default). Besides selecting the miRTrace species, it is used to select the miRNAs of your species from the `mature` and `hairpin` FASTA files and, unless `mirna_gtf` is given, to download the miRBase GFF3 file for mirtop (see below). Use the miRBase species code, e.g. `hsa`, `mmu` or `oar` for sheep. It cannot be set to a placeholder such as `none` to skip miRTrace, because the miRNA quantification would then find no miRNAs.
+
 ### miRNA related files
 
 Different parameters can be set for the two supported databases. By default `miRBase` will be used with the parameters below.
@@ -43,6 +45,30 @@ Different parameters can be set for the two supported databases. By default `miR
 - `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRBase: `https://mirbase.org/download/${params.mirtrace_species}.gff3`
 - `mature`: points to the FASTA file of mature miRNA sequences. Default: `https://mirbase.org/download/mature.fa`
 - `hairpin`: points to the FASTA file of precursor miRNA sequences. Default: `https://mirbase.org/download/hairpin.fa`
+
+#### Species without a miRBase GFF3 file
+
+miRBase only provides GFF3 files for species whose miRNAs are mapped to a genome assembly. For many species in miRBase, such as sheep (`oar`) or rabbit (`ocu`), the file `https://mirbase.org/download/${params.mirtrace_species}.gff3` does not exist and the pipeline stops with an error that the miRBase GFF3 file could not be found. These species can still be analysed: their miRNAs are in the miRBase `mature` and `hairpin` FASTA files, and miRTrace supports them (`mirtrace --list-species` lists the supported species codes).
+
+The GFF3 file is only used by mirtop for the isomiR annotation (`mirna_quant/mirtop/`). You can either:
+
+- skip mirtop with `--skip_mirtop`. No GFF3 file is required or downloaded, and miRTrace QC, the mature and hairpin miRNA quantification (`mirna_quant/edger_qc/`), the genome alignment and miRDeep2 still run. For example, for sheep:
+
+  ```bash
+  nextflow run nf-core/smrnaseq \
+      -profile docker,illumina \
+      --input samplesheet.csv \
+      --outdir results \
+      --mirtrace_species oar \
+      --fasta Ovis_aries.ARS-UI_Ramb_v2.0.dna.toplevel.fa.gz \
+      --skip_mirtop
+  ```
+
+- or provide a GFF3 file with `--mirna_gtf`. It must be in the miRBase GFF3 format (`miRNA_primary_transcript` and `miRNA` features with `ID`, `Name` and `Derives_from` attributes, and `Name` values matching the miRNA names in the `hairpin` and `mature` FASTA files), as written by miRBase for other species. A gene annotation GTF, e.g. from Ensembl, does not work.
+
+If your species is in [MirGeneDB](https://mirgenedb.org/browse), you can also use MirGeneDB, which provides a GFF file for every species it contains (see below).
+
+Without `--genome`, set `--fasta` (or `--bowtie_index`) to a genome of your species for the genome alignment and miRDeep2. The `mature` and `hairpin` defaults already contain all miRBase species, so they do not need to be changed.
 
 If MirGeneDB should be used instead it needs to be specified using `--mirgenedb` and use the parameters below.
 
