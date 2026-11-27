@@ -1,0 +1,20 @@
+miRDeep2 score	novel miRNAs reported by miRDeep2	novel miRNAs, estimated false positives	novel miRNAs, estimated true positives	known miRNAs in species	known miRNAs in data	known miRNAs detected by miRDeep2	estimated signal-to-noise	excision gearing
+10	2	0 +/- 0	2 +/- 0 (100 +/- 0%)	630	3	1 (33%)	9.9	1
+0	4	1 +/- 1	3 +/- 1 (75 +/- 3%)	630	3	2 (66%)	2.1	1
+
+
+
+novel miRNAs predicted by miRDeep2
+provisional id	miRDeep2 score	estimated probability that the miRNA candidate is a true positive	rfam alert	total read count	mature read count	loop read count	star read count	significant randfold p-value	miRBase miRNA	example miRBase miRNA with the same seed	UCSC browser	NCBI blastn	consensus mature sequence	consensus star sequence	consensus precursor sequence	precursor coordinate
+chr1_2	3.4	75 +/- 3%	-	20	18	0	2	yes	-	-	-	-	ugagguaguagguuguauagu	cuauacaaccuacugccuucc	ugagguaguagguuguauaguuuagggucacacccaccacugggagauaacuauacaaccuacugccuucc	chr1:105..180:+
+chr1_7	2	60 +/- 4%	-	20	18	0	2	yes	-	-	-	-	ugagguaguagguuguauagu	cuauacaaccuacugccuucc	ugagguaguagguuguauaguuuagggucacacccaccacugggagauaacuauacaaccuacugccuucc	chr1:1010..1060:+
+
+
+
+mature miRBase miRNAs detected by miRDeep2
+tag id	miRDeep2 score	estimated probability that the miRNA is a true positive	rfam alert	total read count	mature read count	loop read count	star read count	significant randfold p-value	mature miRBase miRNA	example miRBase miRNA with the same seed	UCSC browser	NCBI blastn	consensus mature sequence	consensus star sequence	consensus precursor sequence	precursor coordinate
+chr1_9	8	-	-	20	18	0	2	yes	hsa-mir-1	-	-	-	ugagguaguagguuguauagu	cuauacaaccuacugccuucc	ugagguaguagguuguauaguuuagggucacacccaccacugggagauaacuauacaaccuacugccuucc	chr1:1000..1075:-
+
+#miRBase miRNAs not detected by miRDeep2
+miRBase precursor id	total read count	mature read count(s)	star read count	remaining reads	UCSC browser	NCBI blastn	miRBase mature sequence(s)	miRBase star sequence(s)	miRBase precursor sequence
+chr1_1	3	3	0	0	-	-	uga	cag	ugacag

@@ -1,0 +1,127 @@
+nextflow_pipeline {
+
+    name "Test pipeline UMI handling"
+    script "../main.nf"
+    // test_umi already includes the QIAseq protocol config; the qiaseq profile is named here as well
+    // so that these tests document that '-profile qiaseq --with_umi' works without other UMI parameters
+    profile "test_umi,qiaseq,ci"
+    tag "pipeline"
+    tag "umi"
+    tag "umi_params"
+
+    test("-profile test_umi,qiaseq --clip_r1 2 --three_prime_clip_r1 2: step order and saturation warning") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                clip_r1 = 2
+                three_prime_clip_r1 = 2
+            }
+        }
+
+        then {
+            def sample = 'SRX8195117_SRR11631013'
+            // Task scripts by process name (last part), for the tasks of one sample
+            def scripts = [:].withDefault { [] }
+            def task_dirs = [:].withDefault { [] }
+            new File("${workDir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
+                if (file.name == '.command.run') {
+                    // The task name is in single quotes with Nextflow 26.04 and in double quotes with 26.10
+                    def process = (file.text =~ /(?m)^### name: ["']([^ "']+)/)
+                    if (process.find()) {
+                        def name = process.group(1).tokenize(':').last()
+                        def script = new File(file.parentFile, '.command.sh').text
+                        if (script.contains(sample)) {
+                            scripts[name] << script
+                            task_dirs[name] << file.parentFile
+                        }
+                    }
+                }
+            }
+            def single = { name ->
+                assert scripts[name].size() == 1 : "expected one ${name} task for ${sample}, found ${scripts[name].size()}"
+                scripts[name][0]
+            }
+            def nextflow_log = new File("${metaDir}/nextflow.log").text
+
+            assert workflow.success
+
+            // 1. umi_tools extract runs first, on the raw reads, with the QIAseq pattern from -profile qiaseq
+            def extract = single('UMITOOLS_EXTRACT')
+            assert extract.contains("-I ${sample}_1.subsamp.fastq.gz")
+            assert extract.contains("--extract-method=regex")
+            assert extract.contains("(?P<discard_1>AACTGTAGGCACCATCAAT){s<=2}(?P<umi_1>.{12})(?P<discard_2>.*)")
+
+            // 2. fastp filters and clips the extracted inserts, without adapter trimming
+            def fastp = single('FASTP')
+            assert fastp.contains("ln -sf ${sample}.umi_extract.fastq.gz ${sample}.fastq.gz")
+            assert fastp.contains('--disable_adapter_trimming')
+            assert !fastp.contains('--adapter_sequence')
+            assert fastp.contains('--trim_front1 2')
+
+            // 3. 3' clipping of the inserts
+            def fastp3 = single('FASTP3')
+            assert fastp3.contains("ln -sf ${sample}.fastp.fastq.gz ${sample}.fastp3.fastq.gz")
+            assert fastp3.contains('--trim_tail1 2')
+
+            // 4. UMI + insert deduplication: UMI into the sequence, UMICollapse, UMI out of the sequence
+            assert single('UMI_TO_SEQUENCE').contains("gzip -cd ${sample}.fastp3.fastp.fastq.gz")
+            def umicollapse = single('UMICOLLAPSE_FASTQ')
+            assert umicollapse.contains("-i ${sample}.umi_in_sequence.fastq.gz")
+            assert umicollapse.contains('--algo dir')
+            assert single('UMI_FROM_SEQUENCE').contains("gzip -cd ${sample}.umi_dedup.sorted.fastq.gz")
+
+            // 5. miRNA quantification uses the deduplicated inserts
+            assert scripts['BOWTIE_MAP_MATURE'].any { script -> script.contains("${sample}.umi_dedup.fastq.gz") }
+
+            // The old order (UMICollapse on untrimmed reads, extraction afterwards) is gone
+            assert scripts['FASTP_LENGTH_FILTER'].isEmpty()
+
+            // miRTrace runs on the raw reads and keeps the QIAseq adapter from -profile qiaseq
+            assert task_dirs['MIRTRACE_QC'].size() == 1
+            def mirtrace_config = new File(task_dirs['MIRTRACE_QC'][0], "${sample}.data").text
+            assert mirtrace_config.contains(",${sample},AACTGTAGGCACCATCAAT,")
+
+            // The most frequent insert (miR-16-5p, TAGCAGCACGTAAATATTGGCG, here clipped by 2 nt at each end)
+            // uses more than 0.5% of the 12 nt UMI space after deduplication
+            assert nextflow_log.contains("UMI saturation in sample '${sample}'")
+            assert nextflow_log.contains('(GCAGCACGTAAATATTGG)')
+        }
+    }
+
+    test("-profile test_umi -stub with deprecated UMI parameters") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir = "$outputDir"
+                skip_umi_extract_before_dedup = false
+                umi_discard_read = 1
+            }
+        }
+
+        then {
+            // WARN lines are not always shown on stdout, so read them from the Nextflow log
+            def nextflow_log = new File("${metaDir}/nextflow.log").text
+            assert workflow.success
+            assert nextflow_log.contains("'--skip_umi_extract_before_dedup' is deprecated and ignored")
+            assert nextflow_log.contains("'--umi_discard_read' is deprecated and ignored")
+        }
+    }
+
+    test("-profile test_umi without --umitools_bc_pattern") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                umitools_bc_pattern = null
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert (workflow.stdout + workflow.stderr).any { it.contains("'--with_umi' requires '--umitools_bc_pattern'") }
+        }
+    }
+}
