@@ -1,0 +1,51 @@
+nextflow_pipeline {
+
+    name "Test pipeline with --skip_mirtop and a species without a miRBase GFF3"
+    script "../main.nf"
+    profile "+ci"
+    tag "pipeline"
+    tag "skip_mirtop"
+
+    // Sheep (`oar`) is in the miRBase FASTA files and in miRTrace, but miRBase has no oar.gff3 (#533).
+    test("-profile test --mirtrace_species oar --skip_mirtop") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                mirtrace_species = 'oar'
+                skip_mirtop = true
+            }
+        }
+
+        then {
+            def task_names = workflow.trace.tasks().collect { task -> task.name }
+            assert workflow.success
+            // No mirtop task ran, and no mirtop output was published
+            assert !task_names.any { name -> name.contains('MIRTOP') }
+            assert !new File("$outputDir/mirna_quant/mirtop").exists()
+            // miRTrace ran with the sheep species, and the mature/hairpin quantification is still produced
+            assert task_names.any { name -> name.contains('MIRTRACE_QC') }
+            assert new File("$outputDir/mirna_quant/edger_qc/mature_counts.csv").exists()
+            assert new File("$outputDir/mirna_quant/edger_qc/hairpin_counts.csv").exists()
+            // The sheep miRNAs were selected from the miRBase FASTA files
+            assert path("$outputDir/mirna_quant/edger_qc/mature_counts.csv").text.contains('oar-')
+        }
+    }
+
+    test("-profile test --mirtrace_species without a miRBase GFF3") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                // A species code without a miRBase GFF3 file
+                mirtrace_species = 'zzz'
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert (workflow.stdout + workflow.stderr).any { line -> line.contains("The miRBase GFF3 file for --mirtrace_species 'zzz' could not be found") }
+            assert (workflow.stdout + workflow.stderr).any { line -> line.contains("--skip_mirtop") }
+        }
+    }
+}

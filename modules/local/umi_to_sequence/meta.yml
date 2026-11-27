@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "umi/to_sequence"
+description: Move the UMI from the read name (umi_tools extract format, `<name>_<UMI>`) to the start of the read sequence, so that UMICollapse in FastQ mode deduplicates on UMI + insert.
+keywords:
+  - umi
+  - deduplication
+  - fastq
+tools:
+  - "gawk":
+      description: "GNU awk is a utility for text processing and data extraction."
+      homepage: "https://www.gnu.org/software/gawk/"
+      documentation: "https://www.gnu.org/software/gawk/manual/"
+      tool_dev_url: "https://git.savannah.gnu.org/cgit/gawk.git"
+      licence: ["GPL-3.0-or-later"]
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information.
+        e.g. [ id:'test', single_end:true ]
+  - reads:
+      type: file
+      description: Reads after umi_tools extract, with the UMI at the end of the read name.
+      pattern: "*.{fastq.gz,fq.gz}"
+output:
+  - reads:
+      type: file
+      description: Reads with the UMI prepended to the sequence (quality 'I' for the UMI bases).
+      pattern: "*.umi_in_sequence.fastq.gz"
+authors:
+  - "apeltzer"
+maintainers:
+  - "apeltzer"

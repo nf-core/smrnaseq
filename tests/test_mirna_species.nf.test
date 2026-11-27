@@ -10,8 +10,12 @@ nextflow_pipeline {
     def task_dirs_of = { work_dir, String process_name ->
         def dirs = []
         new File("${work_dir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
-            if (file.name == '.command.run' && file.text.contains("### name: \"${process_name}")) {
-                dirs.add(file.parentFile)
+            if (file.name == '.command.run') {
+                // The task name is in single quotes with Nextflow 26.04 and in double quotes with 26.10
+                def name = (file.text =~ /(?m)^### name: ["']([^ "']+)/)
+                if (name.find() && name.group(1) == process_name) {
+                    dirs.add(file.parentFile)
+                }
             }
         }
         dirs
@@ -148,6 +152,49 @@ nextflow_pipeline {
         then {
             assert workflow.failed
             assert (workflow.stdout + workflow.stderr).any { it.contains("--mirna_species 'hsa,mmu' selects several miRBase species. Please provide a GFF3 file") }
+        }
+    }
+
+    test("-profile test --mirna_species hsa,mmu --skip_mirtop -stub: no --mirna_gtf needed") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir = "$outputDir"
+                mirna_species = 'hsa,mmu'
+                skip_mirtop = true
+            }
+        }
+
+        then {
+            // The GFF3 is only used by mirtop, so several species do not need --mirna_gtf when mirtop is skipped
+            assert workflow.success
+            assert scripts_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_HAIRPIN').size() == 1
+            assert task_dirs_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:BAM_STATS_MIRNA_MIRTOP:MIRTOP_GFF').size() == 0
+        }
+    }
+
+    test("-profile test --mirtrace_species mmu --mirna_species hsa -stub: GFF3 of --mirna_species") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir = "$outputDir"
+                mirtrace_species = 'mmu'
+                mirna_species = 'hsa'
+            }
+        }
+
+        then {
+            // Without --mirna_gtf, the miRBase GFF3 is taken for the species the references are filtered to
+            // (--mirna_species), which is the species mirtop runs with, and not for --mirtrace_species
+            def mirtop_dirs = task_dirs_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:BAM_STATS_MIRNA_MIRTOP:MIRTOP_GFF')
+            assert workflow.success
+            assert mirtop_dirs.size() > 0
+            assert mirtop_dirs.every { dir -> new File(dir, '.command.run').text.contains('hsa.gff3') }
+            assert mirtop_dirs.every { dir -> !new File(dir, '.command.run').text.contains('mmu.gff3') }
         }
     }
 

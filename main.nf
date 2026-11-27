@@ -43,7 +43,7 @@ params {
     with_umi:                      Boolean
     umitools_extract_method:       String
     umitools_method:               String
-    skip_umi_extract_before_dedup: Boolean
+    skip_umi_extract_before_dedup: Boolean?
     umitools_bc_pattern:           String?
     umi_discard_read:              Integer?
     save_umi_intermeds:            Boolean
@@ -59,10 +59,12 @@ params {
     mirgenedb_gff:                 String?
     mature:                        String?
     mirgenedb_mature:              String?
+    mirgenedb_star:                String?
     hairpin:                       String?
     mirgenedb_hairpin:             String?
     bowtie_index:                  String?
     bowtie_align_args:             String?
+    mirna_forward_only:            Boolean
     save_reference:                Boolean
     igenomes_base:                 String
     igenomes_ignore:               Boolean
@@ -92,6 +94,7 @@ params {
     // Skipping pipeline steps
     skip_fastqc:                   Boolean
     skip_mirdeep:                  Boolean
+    skip_mirtop:                   Boolean
     skip_multiqc:                  Boolean
     skip_fastp:                    Boolean
 
@@ -214,9 +217,7 @@ workflow {
     umi_extract_logs     = NFCORE_SMRNASEQ.out.umi_extract_logs
     umi_extract_reads    = NFCORE_SMRNASEQ.out.umi_extract_reads
     umi_dedup            = NFCORE_SMRNASEQ.out.umi_dedup
-    umi_fastp_reports    = NFCORE_SMRNASEQ.out.umi_fastp_reports
-    umi_fastp_logs       = NFCORE_SMRNASEQ.out.umi_fastp_logs
-    umi_fastp_reads_fail = NFCORE_SMRNASEQ.out.umi_fastp_reads_fail
+    umi_saturation       = NFCORE_SMRNASEQ.out.umi_saturation
     mirtrace             = NFCORE_SMRNASEQ.out.mirtrace
     contaminant_filter   = NFCORE_SMRNASEQ.out.contaminant_filter
     contaminant_index    = NFCORE_SMRNASEQ.out.contaminant_index
@@ -229,6 +230,7 @@ workflow {
     mirna_seqcluster     = NFCORE_SMRNASEQ.out.mirna_seqcluster
     mirna_edger_qc       = NFCORE_SMRNASEQ.out.mirna_edger_qc
     mirna_mirtop         = NFCORE_SMRNASEQ.out.mirna_mirtop
+    mirna_ids            = NFCORE_SMRNASEQ.out.mirna_ids
     genome_quant_stats   = NFCORE_SMRNASEQ.out.genome_quant_stats
     genome_quant_bam     = NFCORE_SMRNASEQ.out.genome_quant_bam
     mirdeep2             = NFCORE_SMRNASEQ.out.mirdeep2
@@ -302,18 +304,11 @@ output {
         enabled params.save_umi_intermeds
     }
     umi_dedup {
-        path 'umi_dedup/bam_deduplicated'
+        path 'umi_dedup/fastq_deduplicated'
         enabled params.save_umi_intermeds
     }
-    umi_fastp_reports {
-        path 'fastp/on_umi_extracted'
-    }
-    umi_fastp_logs {
-        path 'fastp/on_umi_extracted/log'
-    }
-    umi_fastp_reads_fail {
-        path 'fastp/on_umi_extracted'
-        enabled params.save_trimmed_fail
+    umi_saturation {
+        path 'umi_dedup/saturation'
     }
 
     // miRNA QC
@@ -365,6 +360,9 @@ output {
     }
     mirna_mirtop {
         path 'mirna_quant/mirtop'
+    }
+    mirna_ids {
+        path 'mirna_quant'
     }
 
     // Genome quantification
