@@ -60,6 +60,11 @@
                         "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",
                         "installed_by": ["fastq_fastqc_umitools_fastp"]
                     },
+                    "fgumi/copyumi": {
+                        "branch": "master",
+                        "git_sha": "c104aa46b61d752c839d73194c3be7bd9c31804a",
+                        "installed_by": ["modules"]
+                    },
                     "fgumi/dedup": {
                         "branch": "master",
                         "git_sha": "afdd1fb41a3f90edf93b841b60da300905eaa6fd",
