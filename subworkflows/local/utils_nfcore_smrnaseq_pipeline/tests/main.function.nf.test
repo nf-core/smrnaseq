@@ -295,6 +295,114 @@ nextflow_function {
         }
     }
 
+    // multiqcMethodsDescriptionError inputs: multiqc_methods_description, skip_multiqc
+
+    test("Test Function multiqcMethodsDescriptionError - not set") {
+
+        function "multiqcMethodsDescriptionError"
+
+        when {
+            function {
+                """
+                input[0] = null
+                input[1] = false
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null }
+            )
+        }
+    }
+
+    test("Test Function multiqcMethodsDescriptionError - local file") {
+
+        function "multiqcMethodsDescriptionError"
+
+        when {
+            function {
+                """
+                input[0] = 'assets/methods_description_template.yml'
+                input[1] = false
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null }
+            )
+        }
+    }
+
+    test("Test Function multiqcMethodsDescriptionError - file URI") {
+
+        function "multiqcMethodsDescriptionError"
+
+        when {
+            function {
+                """
+                input[0] = 'file:///data/methods_description.yml'
+                input[1] = false
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null }
+            )
+        }
+    }
+
+    test("Test Function multiqcMethodsDescriptionError - remote file") {
+
+        function "multiqcMethodsDescriptionError"
+
+        when {
+            function {
+                """
+                input[0] = 's3://bucket/methods_description.yml'
+                input[1] = false
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result.contains("'--multiqc_methods_description s3://bucket/methods_description.yml' is a remote file") },
+                { assert function.result.contains("must be a local file") }
+            )
+        }
+    }
+
+    test("Test Function multiqcMethodsDescriptionError - remote file with --skip_multiqc") {
+
+        function "multiqcMethodsDescriptionError"
+
+        when {
+            function {
+                """
+                input[0] = 'https://example.com/methods_description.yml'
+                input[1] = true
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null }
+            )
+        }
+    }
+
     // umiSaturationWarning input: the UMI_FROM_SEQUENCE statistics TSV as text
 
     test("Test Function umiSaturationWarning - saturated") {

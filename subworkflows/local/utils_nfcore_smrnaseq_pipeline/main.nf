@@ -286,6 +286,28 @@ def validateInputParameters() {
     if (umi_dedup_method_warning) {
         log.warn(umi_dedup_method_warning)
     }
+
+    // Validate the custom MultiQC methods description
+    def methods_description_error = multiqcMethodsDescriptionError(params.multiqc_methods_description, params.skip_multiqc)
+    if (methods_description_error) {
+        error(methods_description_error)
+    }
+}
+
+//
+// Error for a remote `--multiqc_methods_description` (s3://, https://, ...). nf-core-utils 0.7.0 reads
+// the template as a local file, so a remote one would only fail just before MultiQC, after all other
+// steps have run. Returns an error message, or null for a local file, no file, or `--skip_multiqc`.
+//
+def multiqcMethodsDescriptionError(multiqc_methods_description, skip_multiqc) {
+    if (!multiqc_methods_description || skip_multiqc) {
+        return null
+    }
+    def scheme = (multiqc_methods_description.toString() =~ /^([a-zA-Z][a-zA-Z0-9+.-]*):\/\//)
+    if (!scheme.find() || scheme.group(1).toLowerCase() == 'file') {
+        return null
+    }
+    return "'--multiqc_methods_description ${multiqc_methods_description}' is a remote file, which is not supported yet: the methods description template must be a local file. Download it and give the local path."
 }
 
 //

@@ -807,6 +807,9 @@ co2footprint {
 
 The plugin documentation lists further options, such as the power usage effectiveness (PUE) of your data centre and the power draw of your CPUs.
 
+> [!NOTE]
+> With a remote `--outdir` such as `s3://` (cloud runs, Seqera Platform), the `co2footprint_*` files are not written to `pipeline_info/`. nf-co2footprint 1.4.1 only writes to local paths ([nf-co2footprint#309](https://github.com/nextflow-io/nf-co2footprint/issues/309)), so the files end up in the launch directory of the Nextflow head job instead. To keep them, either point the plugin's `file` options to a local path and copy the files yourself, or turn the reports off (see [Turning plugin reports off](#turning-plugin-reports-off)).
+
 ### Provenance reports
 
 [nf-prov](https://github.com/nextflow-io/nf-prov) writes a BioCompute Object (`pipeline_info/manifest_<timestamp>.bco.json`) at the end of every run. It can also write a [Workflow Run RO-Crate](https://www.researchobject.org/workflow-run-crate/), which describes the run together with its inputs and published results. The crate is not written by default:

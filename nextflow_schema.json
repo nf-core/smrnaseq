@@ -544,6 +544,7 @@
                 "multiqc_methods_description": {
                     "type": "string",
                     "description": "Custom MultiQC yaml file containing HTML including a methods description.",
+                    "help_text": "The file must be a local path. A remote file (`s3://`, `https://`, ...) is not supported yet and stops the pipeline at start-up.",
                     "fa_icon": "fas fa-cog"
                 },
                 "validate_params": {
