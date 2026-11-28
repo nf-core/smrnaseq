@@ -37,7 +37,8 @@ workflow MIRNA_QUANT {
 
     main:
     ch_versions = channel.empty()
-    ch_parse_species_input = params.mirgenedb ? channel.value(params.mirgenedb_species) : ch_mirtrace_species
+    // miRBase references are filtered by --mirna_species (one or more comma-separated species) if set, else by --mirtrace_species
+    ch_parse_species_input = params.mirgenedb ? channel.value(params.mirgenedb_species) : (params.mirna_species ? channel.value(params.mirna_species) : ch_mirtrace_species)
 
     // MirGeneDB mature FASTA files only contain the dominant arm; star arms (named with a
     // trailing `*`, as in the MirGeneDB GFF used by mirtop) come from a separate download.
