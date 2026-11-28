@@ -95,7 +95,7 @@ Different parameters can be set for the two supported databases. By default `miR
 
 #### Species without a miRBase GFF3 file
 
-miRBase only provides GFF3 files for species whose miRNAs are mapped to a genome assembly. For many species in miRBase, such as sheep (`oar`) or rabbit (`ocu`), the file `https://mirbase.org/download/${params.mirtrace_species}.gff3` does not exist and the pipeline stops with an error that the miRBase GFF3 file could not be found. These species can still be analysed: their miRNAs are in the miRBase `mature` and `hairpin` FASTA files, and miRTrace supports them (`mirtrace --list-species` lists the supported species codes).
+miRBase only provides GFF3 files for species whose miRNAs are mapped to a genome assembly. For many species in miRBase, such as sheep (`oar`) or rabbit (`ocu`), the file `https://mirbase.org/download/<species>.gff3` (for `--mirna_species`, or `--mirtrace_species` if it is not set) does not exist and the pipeline stops with an error that the miRBase GFF3 file could not be found. These species can still be analysed: their miRNAs are in the miRBase `mature` and `hairpin` FASTA files, and miRTrace supports them (`mirtrace --list-species` lists the supported species codes).
 
 The GFF3 file is only used by mirtop for the isomiR annotation (`mirna_quant/mirtop/`). You can either:
 

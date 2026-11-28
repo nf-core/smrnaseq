@@ -48,4 +48,20 @@ nextflow_pipeline {
             assert (workflow.stdout + workflow.stderr).any { line -> line.contains("--skip_mirtop") }
         }
     }
+
+    test("-profile test --mirna_species without a miRBase GFF3") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                // The GFF3 is looked up for --mirna_species, not for --mirtrace_species (hsa in the test profile)
+                mirna_species = 'zzz'
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert (workflow.stdout + workflow.stderr).any { line -> line.contains("The miRBase GFF3 file for --mirna_species 'zzz' could not be found") }
+        }
+    }
 }

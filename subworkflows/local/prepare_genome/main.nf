@@ -56,10 +56,11 @@ def mirtopSpecies(species) {
 }
 
 //
-// Error message when the miRBase GFF3 derived from --mirtrace_species cannot be found
+// Error message when the miRBase GFF3 derived from --mirna_species or --mirtrace_species cannot be found.
+// `param` is the name of the parameter the species came from.
 //
-def mirbaseGffMissingMessage(species, url) {
-    return "The miRBase GFF3 file for species '${species}' (--mirna_species, or --mirtrace_species if it is not set) could not be found at ${url}. " +
+def mirbaseGffMissingMessage(species, url, param = 'mirtrace_species') {
+    return "The miRBase GFF3 file for --${param} '${species}' could not be found at ${url}. " +
         "miRBase only provides GFF3 files for species with genome coordinates, so it is missing for many species (e.g. sheep, 'oar'), " +
         "or miRBase may be temporarily unavailable. The GFF3 file is only needed for the mirtop isomiR annotation. " +
         "Either provide a miRBase-style GFF3 file via '--mirna_gtf', or run with '--skip_mirtop' to skip mirtop " +
@@ -132,7 +133,7 @@ workflow PREPARE_GENOME {
     mirna_gtf_species         = (mirna_species_list.size() == 1 && val_mirtop_species != '-') ? mirna_species_list[0] : null
     mirna_gtf_from_species    = (!val_mirna_gtf && !params.skip_mirtop && !params.mirgenedb) ? getMirbaseGffUrl(mirna_gtf_species) : null
     if (mirna_gtf_from_species && !file(mirna_gtf_from_species).exists()) {
-        error(mirbaseGffMissingMessage(mirna_gtf_species, mirna_gtf_from_species))
+        error(mirbaseGffMissingMessage(mirna_gtf_species, mirna_gtf_from_species, params.mirna_species ? 'mirna_species' : 'mirtrace_species'))
     }
     ch_mirna_gtf              = params.skip_mirtop            ? channel.empty() : ( val_mirna_gtf ? channel.fromPath(val_mirna_gtf, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : ( mirna_gtf_from_species ? channel.fromPath(mirna_gtf_from_species, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() :  channel.empty() ) )
 
