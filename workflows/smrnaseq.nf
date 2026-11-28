@@ -6,11 +6,9 @@
 // nf-core modules
 include { CAT_FASTQ                        } from '../modules/nf-core/cat/fastq/main'
 include { FASTQC                           } from '../modules/nf-core/fastqc/main'
-include { FASTP as FASTP_LENGTH_FILTER     } from '../modules/nf-core/fastp'
 include { FASTP as FASTP3                  } from '../modules/nf-core/fastp'
 include { MULTIQC                          } from '../modules/nf-core/multiqc/main'
 include { UMICOLLAPSE as UMICOLLAPSE_FASTQ } from '../modules/nf-core/umicollapse/main'
-include { UMITOOLS_EXTRACT                 } from '../modules/nf-core/umitools/extract/main'
 include { MIRTRACE_QC                      } from '../modules/nf-core/mirtrace/qc/main'
 // nf-core subworkflows
 include { FASTQ_FASTQC_UMITOOLS_FASTP      } from '../subworkflows/nf-core/fastq_fastqc_umitools_fastp'
@@ -19,8 +17,14 @@ include { FASTQ_FIND_MIRNA_MIRDEEP2        } from '../subworkflows/nf-core/fastq
 include { CONTAMINANT_FILTER               } from '../subworkflows/local/contaminant_filter/main'
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant/main'
 include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant/main'
+include { MIRDEEP2_CONSENSUS               } from '../subworkflows/local/mirdeep2_consensus/main'
+// local modules
+include { UMI_TO_SEQUENCE                  } from '../modules/local/umi_to_sequence/main'
+include { UMI_FROM_SEQUENCE                } from '../modules/local/umi_from_sequence/main'
 include { mirtraceConfigLine               } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 include { mirtraceAdapterWarning           } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
+include { umiSaturationWarning             } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
+include { MIRNA_REFERENCE_VERSIONS         } from '../subworkflows/local/utils_nfcore_smrnaseq_pipeline'
 // plugins
 include { citationsOnTheFly                } from 'plugin/nf-core-utils'
 include { collectVersions                  } from 'plugin/nf-core-utils'
@@ -67,9 +71,7 @@ workflow NFCORE_SMRNASEQ {
     def ch_umi_extract_logs   = channel.empty()
     def ch_umi_extract_reads  = channel.empty()
     def ch_umi_dedup          = channel.empty()
-    def ch_umi_fastp_reports  = channel.empty()
-    def ch_umi_fastp_logs     = channel.empty()
-    def ch_umi_fastp_fail     = channel.empty()
+    def ch_umi_saturation     = channel.empty()
     def ch_mirtrace           = channel.empty()
     def ch_contaminant_filter = channel.empty()
     def ch_contaminant_index  = channel.empty()
@@ -112,12 +114,15 @@ workflow NFCORE_SMRNASEQ {
         ch_cat_fastq = ch_cat_fastq.combine(ch_mirna_adapters)
     }
 
+    // With --with_umi, the subworkflow runs umi_tools extract on the raw reads first: the UMI moves
+    // into the read name and the kit sequences around it are removed, so fastp then filters and
+    // clips the inserts only (https://github.com/nf-core/smrnaseq/issues/560)
     FASTQ_FASTQC_UMITOOLS_FASTP (
         ch_cat_fastq,
         params.skip_fastqc,
         params.with_umi,
-        params.skip_umi_extract_before_dedup,
-        params.umi_discard_read,
+        false, // skip_umi_extract: the UMI is always extracted first
+        0,     // umi_discard_read: only read 1 is used
         params.skip_fastp,
         params.save_trimmed_fail,
         params.save_merged,
@@ -143,32 +148,29 @@ workflow NFCORE_SMRNASEQ {
         ch_fastp_logs       = ch_fastp_logs.mix(FASTP3.out.log)
     }
 
-    // UMI Dedup for fastq input
-    // This involves running on the sequencing adapter trimmed remnants of the entire reads
-    // consisting of sequence + common sequence "miRNA adapter" + UMI
-    // once collapsing happened, we will use umitools extract to get rid of the common miRNA sequence + the UMI to have only plain collapsed reads without any other clutter
+    //
+    // UMI deduplication on UMI + insert: UMICollapse (FastQ mode) compares whole read sequences
+    // and cannot read the UMI from the read name, so the UMI is moved to the start of the sequence
+    // for deduplication and removed again afterwards
+    //
     if (params.with_umi) {
-        ch_fastq = channel.value('fastq')
-        ch_input_for_collapse = ch_reads_for_mirna.map{ meta, reads -> [meta, reads, []]} //Needs to be done to add a []
-        UMICOLLAPSE_FASTQ(ch_input_for_collapse, ch_fastq)
-        UMITOOLS_EXTRACT(UMICOLLAPSE_FASTQ.out.fastq)
-
-        // Filter out sequences smaller than params.fastp_min_length
-        FASTP_LENGTH_FILTER (
-            UMITOOLS_EXTRACT.out.reads.map {meta, reads -> [meta, reads, []] },
-            false,
-            params.save_trimmed_fail,
-            params.save_merged
+        UMI_TO_SEQUENCE(ch_reads_for_mirna)
+        UMICOLLAPSE_FASTQ(
+            UMI_TO_SEQUENCE.out.reads.map { meta, reads -> [meta, reads, []] },
+            channel.value('fastq')
         )
+        UMI_FROM_SEQUENCE(UMICOLLAPSE_FASTQ.out.fastq)
 
-        ch_reads_for_mirna = FASTP_LENGTH_FILTER.out.reads
+        ch_reads_for_mirna = UMI_FROM_SEQUENCE.out.reads
+        ch_umi_dedup       = UMI_FROM_SEQUENCE.out.reads
+        ch_umi_saturation  = UMI_FROM_SEQUENCE.out.saturation
 
-        ch_umi_dedup         = UMICOLLAPSE_FASTQ.out.bam.mix(UMICOLLAPSE_FASTQ.out.fastq)
-        ch_umi_extract_logs  = ch_umi_extract_logs.mix(UMITOOLS_EXTRACT.out.log)
-        ch_umi_extract_reads = ch_umi_extract_reads.mix(UMITOOLS_EXTRACT.out.reads)
-        ch_umi_fastp_reports = FASTP_LENGTH_FILTER.out.json.mix(FASTP_LENGTH_FILTER.out.html)
-        ch_umi_fastp_logs    = FASTP_LENGTH_FILTER.out.log
-        ch_umi_fastp_fail    = FASTP_LENGTH_FILTER.out.reads_fail
+        // Warn when the most frequent insert sequence uses a large part of the UMI space: one-mismatch
+        // UMI clustering then merges distinct molecules (see the UMI section of the usage docs)
+        UMI_FROM_SEQUENCE.out.saturation
+            .map { _meta, tsv -> umiSaturationWarning(tsv.text) }
+            .filter { message -> message }
+            .subscribe { message -> log.warn(message) }
     }
 
     //
@@ -250,7 +252,9 @@ workflow NFCORE_SMRNASEQ {
     // GENOME
     //
     genome_stats = channel.empty()
-    if (has_fasta){
+    // Check the FASTA param itself: has_fasta arrives here as a channel, so an `if` on it is always true.
+    // Without a genome FASTA, a given --bowtie_index is ignored (see warnMissingGenomeFasta).
+    if (params.fasta){
         GENOME_QUANT (
             ch_bowtie_index,
             ch_fasta,
@@ -279,17 +283,36 @@ workflow NFCORE_SMRNASEQ {
                         ch_mature_hairpin,
                 )
                 ch_mirdeep2 = FASTQ_FIND_MIRNA_MIRDEEP2.out.outputs
+
+                if (params.mirdeep2_consensus_min_samples > 0) {
+                        MIRDEEP2_CONSENSUS (
+                                ch_mirdeep2,
+                                params.mirdeep2_consensus_min_samples,
+                                params.mirdeep2_consensus_min_probability,
+                        )
+                        ch_mirdeep2 = ch_mirdeep2.mix(MIRDEEP2_CONSENSUS.out.bed, MIRDEEP2_CONSENSUS.out.tsv)
+                }
         }
     }
 
     //
     // Collate and save software versions
     //
-    // All versions arrive as [process, tool, version] tuples: from the `versions` topic, and from the
-    // aliased miRNA FASTA modules that report outside the topic (see MIRNA_QUANT). collectVersions()
-    // merges them by process and adds the workflow and Nextflow versions.
+    // miRBase/MirGeneDB version and genome build from the miRNA GFF3 header
+    // (or, without a GFF3, from the database and the mature/hairpin FASTA files)
+    MIRNA_REFERENCE_VERSIONS (
+        ch_mirna_gtf,
+        params.mirgenedb,
+        params.mirgenedb ? params.mirgenedb_mature  : params.mature,
+        params.mirgenedb ? params.mirgenedb_hairpin : params.hairpin
+    )
+
+    // All versions arrive as [process, tool, version] tuples: from the `versions` topic, from the
+    // aliased miRNA FASTA modules that report outside the topic (see MIRNA_QUANT), and the miRNA
+    // reference database entries (MIRNA_REFERENCE). collectVersions() merges them by process and
+    // adds the workflow and Nextflow versions.
     def ch_versions_list = channel.topic("versions")
-        .mix(MIRNA_QUANT.out.versions_tuples, ch_versions)
+        .mix(MIRNA_QUANT.out.versions_tuples, MIRNA_REFERENCE_VERSIONS.out.versions, ch_versions)
         .toList()
 
     def ch_collated_versions = ch_versions_list
@@ -320,11 +343,12 @@ workflow NFCORE_SMRNASEQ {
             file("$projectDir/assets/methods_description_template.yml", checkIfExists: true)
         def citation_files = files("${projectDir}/modules/**/meta.yml").collect { meta_yml -> meta_yml.toString() } +
             [ "${projectDir}/assets/tool_citations.yml".toString() ]
-        // Shell utilities and base R packages that report a version but are not cited
+        // Shell utilities and base R packages that report a version but are not cited.
+        // The MIRNA_REFERENCE entries (database version, genome build, file names) are not tools either.
         def uncited_tools = ['cat', 'gawk', 'GNU coreutils', 'gzip', 'methods', 'pigz', 'untar']
         def ch_methods_description = ch_versions_list
             .map { versions ->
-                def cited_versions = versions.findAll { entry -> !(entry instanceof List && entry[1].toString() in uncited_tools) }
+                def cited_versions = versions.findAll { entry -> !(entry instanceof List && (entry[1].toString() in uncited_tools || entry[0].toString() == 'MIRNA_REFERENCE')) }
                 methodsDescriptionText(
                     methods_description_template.toString(),
                     citationsOnTheFly(cited_versions, citation_files, ['multiqc'])
@@ -403,9 +427,7 @@ workflow NFCORE_SMRNASEQ {
     umi_extract_logs      = ch_umi_extract_logs
     umi_extract_reads     = ch_umi_extract_reads
     umi_dedup             = ch_umi_dedup
-    umi_fastp_reports     = ch_umi_fastp_reports
-    umi_fastp_logs        = ch_umi_fastp_logs
-    umi_fastp_reads_fail  = ch_umi_fastp_fail
+    umi_saturation        = ch_umi_saturation
     mirtrace              = ch_mirtrace
     contaminant_filter    = ch_contaminant_filter
     contaminant_index     = ch_contaminant_index
@@ -418,6 +440,7 @@ workflow NFCORE_SMRNASEQ {
     mirna_seqcluster      = MIRNA_QUANT.out.seqcluster
     mirna_edger_qc        = MIRNA_QUANT.out.edger_qc
     mirna_mirtop          = MIRNA_QUANT.out.mirtop
+    mirna_ids             = MIRNA_QUANT.out.mirna_ids
     genome_quant_stats    = ch_genome_quant_stats
     genome_quant_bam      = ch_genome_quant_bam
     mirdeep2              = ch_mirdeep2

@@ -1,0 +1,55 @@
+nextflow_pipeline {
+
+    name "Test pipeline with a single-sample samplesheet"
+    script "../main.nf"
+    profile "test,ci"
+    tag "pipeline"
+    tag "single_sample"
+
+    // Regression test for https://github.com/nf-core/smrnaseq/issues/249: with only one sample in the
+    // samplesheet, miRTrace failed with "Cannot cast object '<file>.fastq.gz' with class
+    // 'nextflow.processor.TaskPath' to class 'java.util.List'".
+    test("-profile test with one sample") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                input  = "${projectDir}/tests/samplesheets/samplesheet_single_sample.csv"
+            }
+        }
+
+        then {
+            def succeeded = workflow.trace.succeeded().collect { task -> task.name }
+            def mirtrace_files = new File("$outputDir/mirtrace/Control_N3").listFiles()?.collect { file -> file.name } ?: []
+            assert workflow.success
+            // miRTrace ran once, on the single sample, and its report was published
+            assert succeeded.count { name -> name.contains(':MIRTRACE_QC') } == 1
+            assert mirtrace_files.any { name -> name.endsWith('.html') }
+            assert mirtrace_files.any { name -> name.endsWith('.tsv') }
+            // Quantification, edgeR QC and MultiQC also cope with a single sample
+            assert succeeded.any { name -> name.contains(':MIRNA_QUANT:') }
+            assert succeeded.any { name -> name.contains('EDGER_QC') }
+            assert path("$outputDir/multiqc/multiqc_report.html").exists()
+        }
+    }
+
+    test("-profile test with one sample -stub") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir = "$outputDir"
+                input  = "${projectDir}/tests/samplesheets/samplesheet_single_sample.csv"
+            }
+        }
+
+        then {
+            def succeeded = workflow.trace.succeeded().collect { task -> task.name }
+            assert workflow.success
+            assert succeeded.count { name -> name.contains(':MIRTRACE_QC') } == 1
+            assert succeeded.any { name -> name.contains('EDGER_QC') }
+            assert path("$outputDir/mirtrace/Control_N3").exists()
+        }
+    }
+}
