@@ -33,6 +33,57 @@ def extractFirstIndexPrefix(files_path) {
     return index_file_name.substring(0, index_file_name.lastIndexOf(".1.ebwt"))
 }
 
+//
+// Split a species parameter (one species code, a comma-separated list, or 'all') into a list of species codes
+//
+def splitMirnaSpecies(value, param_name) {
+    def species = value ? value.toString().tokenize(',')*.trim().findAll { sp -> sp } : []
+    if (species.size() > 1 && species.any { sp -> sp.equalsIgnoreCase('all') }) {
+        error("--${param_name} 'all' cannot be combined with other species: '${value}'")
+    }
+    return species
+}
+
+//
+// Value passed to `mirtop --sps`, which keeps the hairpins whose name contains it. The hairpins are already
+// filtered by species in MIRNA_QUANT, so for several species or 'all' pass '-', which every miRNA name contains.
+//
+def mirtopSpecies(species) {
+    if (!species) {
+        return 'unknown'
+    }
+    return (species.size() == 1 && !species[0].equalsIgnoreCase('all')) ? species[0] : '-'
+}
+
+//
+// Error message when the miRBase GFF3 derived from --mirna_species or --mirtrace_species cannot be found.
+// `param` is the name of the parameter the species came from.
+//
+def mirbaseGffMissingMessage(species, url, param = 'mirtrace_species') {
+    return "The miRBase GFF3 file for --${param} '${species}' could not be found at ${url}. " +
+        "miRBase only provides GFF3 files for species with genome coordinates, so it is missing for many species (e.g. sheep, 'oar'), " +
+        "or miRBase may be temporarily unavailable. The GFF3 file is only needed for the mirtop isomiR annotation. " +
+        "Either provide a miRBase-style GFF3 file via '--mirna_gtf', or run with '--skip_mirtop' to skip mirtop " +
+        "and keep the mature and hairpin miRNA quantification. See https://nf-co.re/smrnaseq/usage#species-without-a-mirbase-gff3-file"
+}
+
+//
+// URL of the miRBase GFF3 file used when `--mirna_gtf` is not provided.
+// Uses the raw `https://mirbase.org/download/<species>.gff3` endpoint: the
+// `https://mirbase.org/download/CURRENT/genomes/<species>.gff3` page serves the file
+// wrapped in HTML (`<p>##gff-version 3<br>...`), so mirtop cannot find the
+// `# microRNAs: miRBase vXX` header line and fails with "Database not found" (#284).
+//
+def getMirbaseGffUrl(species) {
+    if (!species) {
+        return null
+    }
+    if (species == 'hsa') {
+        return "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3"
+    }
+    return "https://mirbase.org/download/${species}.gff3"
+}
+
 
 workflow PREPARE_GENOME {
     take:
@@ -61,12 +112,34 @@ workflow PREPARE_GENOME {
     bool_has_fasta            = val_fasta                     ? true : false
 
     ch_mirtrace_species       = val_mirtrace_species          ? channel.value(val_mirtrace_species) : channel.empty()
-    mirna_gtf_from_species    = val_mirtrace_species          ? (val_mirtrace_species == 'hsa' ? "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3" : "https://mirbase.org/download/CURRENT/genomes/${val_mirtrace_species}.gff3") : false
-    ch_mirna_gtf              = val_mirna_gtf                 ? channel.fromPath(val_mirna_gtf, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : ( mirna_gtf_from_species ? channel.fromPath(mirna_gtf_from_species, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() :  channel.empty() )
+
+    // Species used to filter the miRBase references: --mirna_species (comma-separated list or 'all') if set, else --mirtrace_species.
+    // --mirna_species is not used with --mirgenedb, which filters by --mirgenedb_species.
+    if (params.mirgenedb && params.mirna_species) {
+        log.warn("--mirna_species is ignored with --mirgenedb. The MirGeneDB references are filtered by --mirgenedb_species.")
+    }
+    val_mirna_species         = (!params.mirgenedb && params.mirna_species) ? params.mirna_species : val_mirtrace_species
+    mirna_species_list        = splitMirnaSpecies(val_mirna_species, 'mirna_species')
+    val_mirtop_species        = mirtopSpecies(mirna_species_list)
+    // miRBase provides one GFF3 file per species, so several species or 'all' need a user-provided GFF3.
+    // The GFF3 is only used by mirtop, so it is not needed with --skip_mirtop.
+    if (!params.mirgenedb && !params.skip_mirtop && val_mirtop_species == '-' && !val_mirna_gtf) {
+        error("--mirna_species '${val_mirna_species}' selects several miRBase species. Please provide a GFF3 file with the miRNA coordinates of these species via --mirna_gtf, e.g. the miRBase GFF3 files of the species concatenated into one file, or skip mirtop with --skip_mirtop.")
+    }
+
+    // The miRNA GFF3 is only used by mirtop: it is not downloaded from miRBase with --skip_mirtop, --mirna_gtf or --mirgenedb.
+    // It is downloaded for the species the references are filtered to (--mirna_species if set, else --mirtrace_species),
+    // which is the species mirtop runs with.
+    mirna_gtf_species         = (mirna_species_list.size() == 1 && val_mirtop_species != '-') ? mirna_species_list[0] : null
+    mirna_gtf_from_species    = (!val_mirna_gtf && !params.skip_mirtop && !params.mirgenedb) ? getMirbaseGffUrl(mirna_gtf_species) : null
+    if (mirna_gtf_from_species && !file(mirna_gtf_from_species).exists()) {
+        error(mirbaseGffMissingMessage(mirna_gtf_species, mirna_gtf_from_species, params.mirna_species ? 'mirna_species' : 'mirtrace_species'))
+    }
+    ch_mirna_gtf              = params.skip_mirtop            ? channel.empty() : ( val_mirna_gtf ? channel.fromPath(val_mirna_gtf, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : ( mirna_gtf_from_species ? channel.fromPath(mirna_gtf_from_species, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() :  channel.empty() ) )
 
     // Add species of the gtf in the meta
     ch_mirna_gtf = ch_mirna_gtf
-        .combine(ch_mirtrace_species.ifEmpty('unknown'))
+        .combine(channel.value(val_mirtop_species))
         .map { meta, gtf, species ->
             def new_meta = meta.clone() + [species: species]
             [new_meta, gtf]
@@ -121,8 +194,8 @@ workflow PREPARE_GENOME {
 
     //Config checks
     // Check optional parameters
-    if (!params.mirgenedb && !val_mirtrace_species && !(params.help || params.help_full)) {
-            error("Reference species for miRTrace is not defined via the --mirtrace_species parameter.")
+    if (!params.mirgenedb && !val_mirtrace_species && !params.mirna_species && !(params.help || params.help_full)) {
+            error("Reference species is not defined via the --mirtrace_species parameter. Set it to the miRBase species code (e.g. 'hsa', 'mmu', 'oar'), which is used to select the species' miRNAs from --mature and --hairpin, for miRTrace and for the miRBase GFF3 download. To select the miRNAs of other or several species, use --mirna_species.")
         }
 
     // Genome options
@@ -135,10 +208,10 @@ workflow PREPARE_GENOME {
         }
         ch_reference_mature  = params.mirgenedb_mature  ? channel.fromPath(params.mirgenedb_mature, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()  : error("Specify a mirgenedb Mature miRNA fasta file via '--mirgenedb_mature'")
         ch_reference_hairpin = params.mirgenedb_hairpin ? channel.fromPath(params.mirgenedb_hairpin, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : error("Specify a mirgenedb Hairpin miRNA fasta file via '--mirgenedb_hairpin'")
-        ch_mirna_gtf         = params.mirgenedb_gff     ? channel.fromPath(params.mirgenedb_gff, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect()     : error("Specify a MirGeneDB gff file via '--mirgenedb_gff'")
+        ch_mirna_gtf         = params.skip_mirtop       ? channel.empty() : ( params.mirgenedb_gff ? channel.fromPath(params.mirgenedb_gff, checkIfExists: true).map{ it -> [ [id:it.baseName], it ] }.collect() : error("Specify a MirGeneDB gff file via '--mirgenedb_gff', or skip mirtop with '--skip_mirtop'") )
 
-        // Create a channel for mirgenedb_species
-        ch_mirgenedb_species = channel.value(params.mirgenedb_species)
+        // Create a channel for mirgenedb_species (one species, a comma-separated list or 'all')
+        ch_mirgenedb_species = channel.value(mirtopSpecies(splitMirnaSpecies(params.mirgenedb_species, 'mirgenedb_species')))
 
         // Add species of the gtf
         // When mirgenedb workflow is not indicated, species defaults to val_mirtrace_species.
