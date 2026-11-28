@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [[#603]](https://github.com/nf-core/smrnaseq/pull/603) - Document what the pipeline offers for small RNA biotypes other than miRNAs (contamination filter totals, miRTrace RNA types, genome alignments) and how to count them per feature ([#548](https://github.com/nf-core/smrnaseq/issues/548)).
 - [[#606]](https://github.com/nf-core/smrnaseq/pull/606) - Document that samplesheets with a single sample are supported and add a single-sample pipeline test; the miRTrace `Cannot cast object ... TaskPath ... to class 'java.util.List'` error only affected v2.3.1 and earlier ([#249](https://github.com/nf-core/smrnaseq/issues/249)).
 - [[#610]](https://github.com/nf-core/smrnaseq/pull/610) - Document why UMI deduplication with UMICollapse needs a lot of memory for deep samples and how to raise it, and the trade-offs of sequence-based and alignment-based UMI deduplication, with a workaround for alignment-based deduplication ([#530](https://github.com/nf-core/smrnaseq/issues/530)).
+- [[#620]](https://github.com/nf-core/smrnaseq/pull/620) - Remove the `invalid input values: --modules_testdata_base_path` warning from nf-test runs by ignoring this test-only parameter in the validation of `tests/nextflow.config`.
 
 ## v2.4.1 - 2026-01-08 - Red Zinc Spaniel
 
