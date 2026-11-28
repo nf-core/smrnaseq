@@ -13,6 +13,14 @@ tools:
       documentation: "https://tidyr.tidyverse.org/reference/"
       tool_dev_url: "https://github.com/tidyverse/tidyr"
       licence: ["MIT"]
+  - "r-base":
+      description: "R: a language and environment for statistical computing and graphics."
+      homepage: "https://www.r-project.org/"
+      licence: ["GPL-2.0-or-later"]
+  - "optparse":
+      description: "R package for command line option parsing."
+      homepage: "https://cran.r-project.org/package=optparse"
+      licence: ["GPL-2.0-or-later"]
 input:
   - meta:
       type: map

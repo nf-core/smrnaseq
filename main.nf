@@ -113,6 +113,7 @@ params {
     publish_dir_mode:              String
     email_on_fail:                 String?
     plaintext_email:               Boolean
+    force_completion_email:        Boolean
     max_multiqc_email_size:        String
     monochrome_logs:               Boolean
     multiqc_config:                String?

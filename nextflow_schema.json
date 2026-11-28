@@ -499,6 +499,13 @@
                     "fa_icon": "fas fa-remove-format",
                     "hidden": true
                 },
+                "force_completion_email": {
+                    "type": "boolean",
+                    "description": "Send the completion email also for runs launched from Seqera Platform.",
+                    "help_text": "By default, nf-core-utils does not send the pipeline's summary email when the run was launched from Seqera Platform, which has its own notifications. Set this to send it anyway (requires `--email` or `--email_on_fail`).",
+                    "fa_icon": "fas fa-envelope",
+                    "hidden": true
+                },
                 "max_multiqc_email_size": {
                     "type": "string",
                     "description": "File size limit when attaching MultiQC reports to summary emails.",

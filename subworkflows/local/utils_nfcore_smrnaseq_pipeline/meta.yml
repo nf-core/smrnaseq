@@ -7,12 +7,6 @@ keywords:
   - initialisation
   - completion
   - samplesheet
-components:
-  - utils_nfschema_plugin
-  - utils_nfcore_pipeline
-  - utils_nextflow_pipeline
-  - completionsummary
-  - completionemail
 input:
   - version:
       type: boolean

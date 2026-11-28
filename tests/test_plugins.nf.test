@@ -1,0 +1,139 @@
+nextflow_pipeline {
+
+    name "Test pipeline plugins and start-up handling"
+    script "../main.nf"
+    profile "+ci"
+    tag "pipeline"
+    tag "plugins"
+
+    // nf-co2footprint, nf-prov and nf-core-utils are loaded from nextflow.config. `-stub` keeps the
+    // runs cheap: the reports are written by the plugins at the end of every run, stub or not.
+    // log.info/log.warn always go to the Nextflow log; the console only shows them outside agent log mode.
+
+    test("-profile test -stub: plugin reports, params JSON and versions file") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            def pipeline_info = new File("$outputDir/pipeline_info")
+            def info_files    = { String pattern -> pipeline_info.listFiles().findAll { file -> file.name ==~ pattern } }
+            def json          = new groovy.json.JsonSlurper()
+            def bco           = info_files(/manifest_.*\.bco\.json/)
+            def co2_report    = info_files(/co2footprint_report_.*\.html/)
+            def co2_summary   = info_files(/co2footprint_summary_.*\.txt/)
+            def co2_trace     = info_files(/co2footprint_trace_.*\.txt/)
+            def co2_prov      = info_files(/co2footprint_provenance_.*\.json/)
+            def params_json   = info_files(/params_.*\.json/)
+            def versions      = new org.yaml.snakeyaml.Yaml().load(new File("$outputDir/pipeline_info/nf_core_smrnaseq_software_mqc_versions.yml").text)
+            assertAll(
+                { assert workflow.success },
+                // nf-prov: BioCompute Object with the pipeline as its provenance domain
+                { assert bco.size() == 1 },
+                { assert json.parse(bco[0]).provenance_domain.name == 'nf-core/smrnaseq' },
+                // nf-co2footprint: report, summary, per-task trace and provenance
+                { assert co2_report.size() == 1 && co2_report[0].text.contains('<html') },
+                { assert co2_summary.size() == 1 && co2_summary[0].text.contains('Energy consumption') },
+                { assert co2_trace.size() == 1 && co2_trace[0].readLines().size() > 1 },
+                { assert co2_prov.size() == 1 && json.parse(co2_prov[0]) instanceof Map },
+                // nf-core-utils dumpParametersToJSON()
+                { assert params_json.size() == 1 && json.parse(params_json[0]).outdir == "$outputDir".toString() },
+                // nf-core-utils collectVersions(): versions topic, aliased miRNA FASTA modules and workflow block
+                { assert versions.Workflow['nf-core/smrnaseq'].toString().startsWith('v') },
+                { assert versions.Workflow.Nextflow },
+                { assert versions.PARSE_MATURE.seqkit && versions.FORMAT_HAIRPIN.fastx_toolkit },
+                { assert versions.FASTP.fastp && versions.MIRTRACE_QC.mirtrace }
+            )
+        }
+    }
+
+    test("-profile test -stub with a Workflow Run RO-Crate") {
+
+        options "-stub -c ${baseDir}/tests/config/ro-crate.config"
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            def crate = new groovy.json.JsonSlurper().parse(new File("$outputDir/ro-crate-metadata.json"))
+            def ids   = crate['@graph'].collect { entity -> entity['@id'] }
+            assertAll(
+                { assert workflow.success },
+                { assert ids.contains('./') && ids.contains('main.nf') },
+                // published results are part of the crate
+                { assert ids.any { id -> id.toString().startsWith('multiqc/') } },
+                // the BioCompute Object is still written
+                { assert new File("$outputDir/pipeline_info").listFiles().any { file -> file.name ==~ /manifest_.*\.bco\.json/ } }
+            )
+        }
+    }
+
+    test("--version prints the version and exits") {
+
+        when {
+            params {
+                outdir  = "$outputDir"
+                version = true
+            }
+        }
+
+        then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert log_text =~ /nf-core\/smrnaseq v\d+\.\d+/ }
+            )
+        }
+    }
+
+    // `help` is a typed String param (`--help` or `--help <param>` on the command line), so the
+    // Boolean `--help_full` is used here; the params file nf-test writes cannot pass a bare flag.
+    test("--help_full prints the help and exits") {
+
+        when {
+            params {
+                outdir    = "$outputDir"
+                help_full = true
+            }
+        }
+
+        then {
+            def log_text = new File("${launchDir}/meta/nextflow.log").text
+            assertAll(
+                { assert workflow.success },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert log_text.contains('--mirtrace_species') },
+                { assert log_text.contains('nextflow run nf-core/smrnaseq -profile <docker/singularity/.../institute> --input samplesheet.csv --outdir <OUTDIR>') }
+            )
+        }
+    }
+
+    test("invalid parameter value fails schema validation") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                email  = 'not-an-email-address'
+            }
+        }
+
+        then {
+            def output = workflow.stdout + workflow.stderr + new File("${launchDir}/meta/nextflow.log").readLines()
+            assertAll(
+                { assert workflow.failed },
+                { assert workflow.trace.tasks().size() == 0 },
+                { assert output.any { line -> line.contains('Validation of pipeline parameters failed') } },
+                { assert output.any { line -> line.contains('--email (not-an-email-address)') } }
+            )
+        }
+    }
+}
