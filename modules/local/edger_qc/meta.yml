@@ -13,6 +13,38 @@ tools:
       documentation: "https://bioconductor.org/packages/release/bioc/manuals/edgeR/man/edgeR.pdf"
       doi: "10.1093/bioinformatics/btp616"
       licence: ["GPL-2.0-or-later"]
+  - "r-base":
+      description: "R: a language and environment for statistical computing and graphics."
+      homepage: "https://www.r-project.org/"
+      licence: ["GPL-2.0-or-later"]
+  - "limma":
+      description: "Bioconductor package for linear models and differential expression of microarray and RNA-seq data."
+      homepage: "https://bioconductor.org/packages/release/bioc/html/limma.html"
+      doi: "10.1093/nar/gkv007"
+      publication:
+        author: "Ritchie, M. E., Phipson, B., Wu, D., Hu, Y., Law, C. W., Shi, W. & Smyth, G. K."
+        year: 2015
+        title: "limma powers differential expression analyses for RNA-sequencing and microarray studies"
+        source: "Nucleic Acids Research"
+      licence: ["GPL-2.0-or-later"]
+  - "statmod":
+      description: "R package for statistical modelling, used by edgeR and limma."
+      homepage: "https://cran.r-project.org/package=statmod"
+      doi: "10.32614/RJ-2016-008"
+      publication:
+        author: "Giner, G. & Smyth, G. K."
+        year: 2016
+        title: "statmod: probability calculations for the inverse Gaussian distribution"
+        source: "The R Journal"
+      licence: ["GPL-2.0-or-later"]
+  - "gplots":
+      description: "R package with various programming tools for plotting data."
+      homepage: "https://cran.r-project.org/package=gplots"
+      licence: ["GPL-2.0-only"]
+  - "data.table":
+      description: "R package for fast aggregation and manipulation of tabular data."
+      homepage: "https://r-datatable.com/"
+      licence: ["MPL-2.0"]
 input:
   - input_files:
       type: file

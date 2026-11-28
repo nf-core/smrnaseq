@@ -42,6 +42,22 @@
 
 - [Bioconductor](https://www.bioconductor.org/) and [R](https://cran.r-project.org/)
 
+## Nextflow plugins
+
+- [nf-co2footprint](https://doi.org/10.5281/zenodo.14622304)
+
+  > Carl J, Volkmann N, Mir-Pedrol J, Ewels P, Nahnsen S, Krakau S. nextflow-io/nf-co2footprint - A Nextflow plugin to estimate the CO2e footprint of pipeline runs. Zenodo. doi: 10.5281/zenodo.14622304.
+
+- [Green Algorithms](https://doi.org/10.1002/advs.202100707)
+
+  > Lannelongue L, Grealey J, Inouye M. Green Algorithms: Quantifying the Carbon Footprint of Computation. Adv Sci. 2021;8(12):2100707. doi: 10.1002/advs.202100707.
+
+- [Electricity Maps](https://www.electricitymaps.com) carbon intensity data, used by nf-co2footprint under the [Open Database License](https://opendatacommons.org/licenses/odbl/1-0/)
+
+- [nf-prov](https://github.com/nextflow-io/nf-prov) and [BioCompute Objects](https://biocomputeobject.org/)
+
+- [nf-core-utils](https://github.com/nf-core/nf-core-utils)
+
 ## Software packaging/containerisation tools
 
 - [Anaconda](https://anaconda.com)

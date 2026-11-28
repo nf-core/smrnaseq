@@ -8,13 +8,18 @@
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 */
 
-include { UTILS_NFSCHEMA_PLUGIN     } from '../../nf-core/utils_nfschema_plugin'
-include { paramsSummaryMap          } from 'plugin/nf-schema'
-include { samplesheetToList         } from 'plugin/nf-schema'
-include { completionEmail           } from '../../nf-core/utils_nfcore_pipeline'
-include { completionSummary         } from '../../nf-core/utils_nfcore_pipeline'
-include { UTILS_NFCORE_PIPELINE     } from '../../nf-core/utils_nfcore_pipeline'
-include { UTILS_NEXTFLOW_PIPELINE   } from '../../nf-core/utils_nextflow_pipeline'
+include { paramsHelp           } from 'plugin/nf-schema'
+include { paramsSummaryLog     } from 'plugin/nf-schema'
+include { paramsSummaryMap     } from 'plugin/nf-schema'
+include { samplesheetToList    } from 'plugin/nf-schema'
+include { validateParameters   } from 'plugin/nf-schema'
+include { checkCondaChannels   } from 'plugin/nf-core-utils'
+include { checkConfigProvided  } from 'plugin/nf-core-utils'
+include { checkProfileProvided } from 'plugin/nf-core-utils'
+include { completionEmail      } from 'plugin/nf-core-utils'
+include { completionSummary    } from 'plugin/nf-core-utils'
+include { dumpParametersToJSON } from 'plugin/nf-core-utils'
+include { getWorkflowVersion   } from 'plugin/nf-core-utils'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -48,12 +53,16 @@ workflow PIPELINE_INITIALISATION {
     //
     // Print version and exit if required and dump pipeline parameters to JSON file
     //
-    UTILS_NEXTFLOW_PIPELINE (
-        version,
-        true,
-        outdir,
-        workflow.profile.tokenize(',').intersect(['conda', 'mamba']).size() >= 1
-    )
+    if (version) {
+        log.info("${workflow.manifest.name} ${getWorkflowVersion()}")
+        System.exit(0)
+    }
+    if (outdir) {
+        dumpParametersToJSON(outdir.toString(), params)
+    }
+    if (workflow.profile.tokenize(',').intersect(['conda', 'mamba'])) {
+        checkCondaChannels()
+    }
 
     //
     // Validate parameters and generate parameter summary to stdout
@@ -84,27 +93,28 @@ workflow PIPELINE_INITIALISATION {
 
     command = "nextflow run ${workflow.manifest.name} -profile <docker/singularity/.../institute> --input samplesheet.csv --outdir <OUTDIR>"
 
-    UTILS_NFSCHEMA_PLUGIN (
-        workflow,
-        validate_params,
-        null,
-        help,
-        help_full,
-        show_hidden,
-        before_text,
-        after_text,
-        command,
-        null
-    )
+    if (help || help_full) {
+        log.info(
+            paramsHelp(
+                [beforeText: before_text, afterText: after_text, command: command, showHidden: show_hidden, fullHelp: help_full],
+                (help instanceof String && help != 'true') ? help : ''
+            )
+        )
+        System.exit(0)
+    }
 
-
+    log.info(before_text)
+    log.info(paramsSummaryLog(workflow))
+    log.info(after_text)
+    if (validate_params) {
+        validateParameters()
+    }
 
     //
     // Check config provided to the pipeline
     //
-    UTILS_NFCORE_PIPELINE (
-        nextflow_cli_args
-    )
+    checkConfigProvided()
+    checkProfileProvided(nextflow_cli_args, monochrome_logs)
 
     //
     // Custom validation for pipeline parameters
@@ -115,6 +125,11 @@ workflow PIPELINE_INITIALISATION {
     // Validate the bowtie align arguments provided through params.bowtie_align_args
     //
     validateBowtieGenomeArgs()
+
+    //
+    // Warn if there is no genome FASTA, so genome quantification (and miRDeep2) are skipped
+    //
+    warnMissingGenomeFasta(params.bowtie_index, params.fasta, params.skip_mirdeep)
 
     //
     // Create channel from input file provided through params.input
@@ -193,6 +208,31 @@ workflow PIPELINE_COMPLETION {
     }
 }
 
+//
+// miRNA reference database version for the software versions YAML: read from the miRNA GFF3
+// header, or, when no GFF3 is used (e.g. mirtop is skipped and the GFF channel is empty),
+// derived from the database and the mature/hairpin FASTA files. Never fails the run for a
+// missing GFF3.
+//
+workflow MIRNA_REFERENCE_VERSIONS {
+
+    take:
+    ch_mirna_gff  // channel: [ val(meta), path(gff) ], may be empty
+    val_mirgenedb // boolean: MirGeneDB (true) or miRBase (false)
+    val_mature    //  string: mature miRNA FASTA path or URL
+    val_hairpin   //  string: hairpin miRNA FASTA path or URL
+
+    main:
+    def database = val_mirgenedb ? 'MirGeneDB' : 'miRBase'
+    def ch_versions = ch_mirna_gff
+        .map { _meta, gff -> mirnaReferenceVersions(gff) }
+        .ifEmpty { mirnaReferenceFallbackVersions(database, val_mature, val_hairpin) }
+        .flatMap { versions -> versions }
+
+    emit:
+    versions = ch_versions // channel: [ process, tool, version ]
+}
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -233,6 +273,64 @@ def validateInputParameters() {
             error("You specified to be using MirGeneDB, but the GFF file is not found. Please provide the file using the `--mirgenedb_gff` parameter.")
         }
     }
+
+    // Validate UMI parameters
+    def umi_error = umiParameterError(params.with_umi, params.umitools_bc_pattern)
+    if (umi_error) {
+        error(umi_error)
+    }
+    umiDeprecationWarnings(params.skip_umi_extract_before_dedup, params.umi_discard_read).each { message ->
+        log.warn(message)
+    }
+}
+
+//
+// Check UMI parameter combinations that cannot work. Returns an error message, or null if the
+// combination is valid (or `--with_umi` is not set).
+//
+def umiParameterError(with_umi, bc_pattern) {
+    if (with_umi && !bc_pattern) {
+        return "'--with_umi' requires '--umitools_bc_pattern' to describe where the UMI is in the read (-profile qiaseq sets it for QIAseq miRNA libraries). See https://nf-co.re/smrnaseq/usage#umi-handling"
+    }
+    return null
+}
+
+//
+// Warnings for deprecated UMI parameters that are set (they are ignored). Returns a list of messages.
+//
+def umiDeprecationWarnings(skip_umi_extract_before_dedup, umi_discard_read) {
+    def messages = []
+    if (skip_umi_extract_before_dedup != null) {
+        messages << "'--skip_umi_extract_before_dedup' is deprecated and ignored: with '--with_umi', the UMI is always extracted before deduplication. It will be removed in a future release."
+    }
+    if (umi_discard_read != null) {
+        messages << "'--umi_discard_read' is deprecated and ignored: the pipeline only uses read 1. It will be removed in a future release."
+    }
+    return messages
+}
+
+//
+// Warning for UMI saturation, from the statistics TSV written by UMI_FROM_SEQUENCE (header line and
+// one line per sample). One-mismatch UMI clustering (UMICollapse `dir`, `adj` or `cc`) merges distinct
+// molecules once one insert sequence uses more than about 0.5% of all possible UMIs (4^UMI length),
+// so its count is underestimated. Returns a warning message, or null.
+//
+def umiSaturationWarning(stats_text) {
+    def threshold = 0.005
+    def lines = stats_text.readLines().findAll { line -> line.trim() }
+    if (lines.size() < 2) {
+        return null
+    }
+    def header = lines[0].split('\t') as List
+    def values = lines[1].split('\t') as List
+    def row = [header, values].transpose().collectEntries()
+    def fraction = row.top_sequence_umi_fraction as BigDecimal
+    if (fraction <= threshold) {
+        return null
+    }
+    // Not String.format: its decimal separator depends on the locale
+    def percent = (fraction * 100).setScale(2, BigDecimal.ROUND_HALF_UP).toPlainString()
+    return "UMI saturation in sample '${row.sample}': after deduplication, the most frequent sequence (${row.top_sequence}) has ${row.top_sequence_reads} reads, ${percent}% of all ${row.umi_space} possible ${row.umi_length} nt UMIs (warning threshold 0.5%). One-mismatch UMI clustering then merges distinct molecules, so the counts of the most abundant miRNAs are underestimated. Consider exact UMI matching (UMICollapse '-k 0'). See https://nf-co.re/smrnaseq/usage#choosing-a-umi-strategy"
 }
 
 // Validate channels from input samplesheet
@@ -279,7 +377,8 @@ def validateBowtieGenomeArgs() {
         '-l'           : 'int',
         '--seedlen'    : 'int',
         '-k'           : 'int_min_2',
-        '-m'           : 'int',
+        '-m'           : 'int_min_1',
+        '-M'           : 'int_min_1',
         '--maxbts'     : 'int',
         '--chunkmbs'   : 'int',
         '--seed'       : 'int',
@@ -329,6 +428,10 @@ def validateBowtieGenomeArgs() {
     if (seen.contains('-v') && (seen.contains('-n') || seen.contains('--seedmms'))) {
         error("[bowtie_align_args] '-v' and '-n'/'--seedmms' are mutually exclusive.")
     }
+    // Bowtie accepts both, but '-M' then wins and the last value of either sets the ceiling
+    if (seen.contains('-m') && seen.contains('-M')) {
+        error("[bowtie_align_args] '-m' and '-M' are mutually exclusive.")
+    }
 }
 //
 // Check the value given to a bowtie flag that takes an integer
@@ -340,22 +443,13 @@ def validateBowtieArgValue(flag, expectedType, value) {
     if (expectedType == 'int_0_3' && !(value ==~ /0*[0-3]/)) {
         error("[bowtie_align_args] Argument '${flag}' must be between 0 and 3, got '${value}'.")
     }
+    if (expectedType == 'int_min_1' && !(value ==~ /0*[1-9]\d*/)) {
+        error("[bowtie_align_args] Argument '${flag}' must be at least 1, got '${value}'.")
+    }
     if (expectedType == 'int_min_2' && !(value ==~ /0*([2-9]|[1-9]\d+)/)) {
-        error("[bowtie_align_args] Argument '${flag}' must be at least 2, got '${value}'. The default genome mapping arguments include '--strata', which Bowtie only accepts with '-k' above 1. To report a single alignment per read, override ext.args for 'NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME' instead: https://nf-co.re/smrnaseq/dev/docs/usage#custom-tool-arguments")
+        error("[bowtie_align_args] Argument '${flag}' must be at least 2, got '${value}'. The default genome mapping arguments include '--strata', which Bowtie only accepts with '-k' above 1. To report a single alignment per read, use '-M 1' instead, which reports one random best alignment for reads with more than one.")
     }
 }
-//
-// Get attribute from genome config file e.g. fasta
-//
-def getGenomeAttribute(attribute) {
-    if (params.genomes && params.genome && params.genomes.containsKey(params.genome)) {
-        if (params.genomes[ params.genome ].containsKey(attribute)) {
-            return params.genomes[ params.genome ][ attribute ]
-        }
-    }
-    return null
-}
-
 //
 // Build one line of the miRTrace config file: <reads>,<display name>,<adapter>,<PHRED offset>
 // miRTrace (1.0.1) cannot auto-detect adapters, and an empty adapter field means no adapter trimming.
@@ -378,6 +472,108 @@ def mirtraceAdapterWarning(adapter, mirtrace_species) {
 }
 
 //
+// Warn when there is no genome FASTA. Genome quantification and miRDeep2 only run with a FASTA
+// (`--fasta`, or `--genome` with an iGenomes entry), so without one they are skipped. A given
+// genome Bowtie index is then ignored, which gets its own message. miRDeep2 is only mentioned
+// when it would otherwise run. Logs at most one warning and returns it, or null if there is none.
+//
+def warnMissingGenomeFasta(bowtie_index, fasta, skip_mirdeep) {
+    if (fasta) {
+        return null
+    }
+    def skipped = skip_mirdeep ? 'genome quantification is skipped' : 'genome quantification and miRDeep2 are skipped'
+    def pronoun = skip_mirdeep ? 'it' : 'them'
+    def how     = "use '--genome' with an iGenomes reference that provides a FASTA."
+    def message = bowtie_index
+        ? "A genome Bowtie index was given with '--bowtie_index', but no genome FASTA. The index is ignored, and ${skipped}. " +
+            "To run ${pronoun}, also provide the FASTA the index was built from with '--fasta', or ${how}"
+        : "No genome FASTA was given, so ${skipped}. To run ${pronoun}, provide a genome FASTA with '--fasta', or ${how}"
+    log.warn(message.toString())
+    return message.toString()
+}
+
+//
+// First lines of a text file, transparently decompressing gzip (detected by its magic bytes)
+//
+def readFirstLines(file_path, n_lines) {
+    return file_path.withInputStream { raw ->
+        def input = new java.io.BufferedInputStream(raw)
+        input.mark(2)
+        def is_gzip = input.read() == 0x1f && input.read() == 0x8b
+        input.reset()
+        def stream = is_gzip ? new java.util.zip.GZIPInputStream(input) : input
+        def reader = new java.io.BufferedReader(new java.io.InputStreamReader(stream, 'UTF-8'))
+        reader.iterator().take(n_lines).toList()
+    }
+}
+
+//
+// Version of the miRNA reference database and its genome build, read from the comment header
+// of the miRNA GFF3 (--mirna_gtf, --mirgenedb_gff or the GFF3 downloaded for --mirtrace_species).
+// miRBase and MirGeneDB GFF3 files start with lines such as:
+//   # microRNAs:               miRBase v22
+//   # genome-build-id:         GRCh38
+// Returns [ process, tool, version ] tuples for the software versions YAML. The database
+// version is "unknown" when the header has no "microRNAs:" line.
+//
+// Also checks the file: a GFF that is an HTML page (e.g. the miRBase website serving
+// <p>##gff-version 3<br>... instead of the plain file) stops the run, since mirtop cannot read
+// it. A file that does not start with the "##gff-version" pragma only gives a warning, as
+// custom GFF files may lack it. Gzipped files are decompressed before these checks.
+//
+def mirnaReferenceVersions(gff) {
+    def lines = readFirstLines(gff, 200)
+    def first_line = lines.find { line -> line.trim() }?.trim() ?: ''
+    def first_line_lower = first_line.toLowerCase()
+    def is_html = first_line.startsWith('<') ||
+        ['<html', '<!doctype', '<p>', '<br'].any { tag -> first_line_lower.contains(tag) }
+    if (is_html) {
+        error("The miRNA GFF file '${gff.toUriString()}' is an HTML page, not a GFF3 file (it starts with '${first_line.take(40)}'). " +
+            "If it was downloaded from the miRBase website, download the plain GFF3 from https://mirbase.org/download/<species>.gff3 " +
+            "(e.g. https://mirbase.org/download/mmu.gff3) and pass the local file with '--mirna_gtf' (or '--mirgenedb_gff' with '--mirgenedb').")
+    }
+    if (!first_line.startsWith('##gff-version')) {
+        log.warn "The miRNA GFF file '${gff.toUriString()}' does not start with a '##gff-version' line. Please check that it is a GFF3 file with miRNA coordinates."
+    }
+    def header = lines.takeWhile { line -> line.startsWith('#') }
+    def database = header.findResult { line ->
+        def match = line =~ /^#+\s*microRNAs:\s*(\S+)\s+(\S+)/
+        match.find() ? [match.group(1), match.group(2)] : null
+    }
+    def genome_build = header.findResult { line ->
+        def match = line =~ /^#+\s*genome-build-id:\s*(\S+)/
+        match.find() ? match.group(1) : null
+    }
+    def versions = database
+        ? [['MIRNA_REFERENCE', database[0], database[1]]]
+        : [['MIRNA_REFERENCE', 'mirna_gff', "unknown (${gff.name})".toString()]]
+    if (genome_build) {
+        versions << ['MIRNA_REFERENCE', 'genome_build', genome_build]
+    }
+    return versions
+}
+
+//
+// miRNA reference entries for the software versions YAML when no miRNA GFF3 is available.
+// The mature/hairpin FASTA headers carry no release, so the version is only known if the
+// directory of the mature or hairpin file is a release number, e.g.
+// https://mirbase.org/download_version_files/22.1/mature.fa. The file names are reported as well.
+//
+def mirnaReferenceFallbackVersions(database, mature, hairpin) {
+    def release = [mature, hairpin].findResult { fasta ->
+        def match = fasta ? (fasta.toString() =~ /(?:^|\/)v?(\d+(?:\.\d+)*)\/[^\/]+$/) : null
+        match?.find() ? match.group(1) : null
+    }
+    def version = release ? "v${release} (from file path)".toString() : 'unknown (no GFF)'
+    def file_names = [mature, hairpin].collect { fasta -> fasta ? fasta.toString().tokenize('/').last() : 'none' }
+    return [
+        ['MIRNA_REFERENCE', database, version],
+        ['MIRNA_REFERENCE', 'mature', file_names[0]],
+        ['MIRNA_REFERENCE', 'hairpin', file_names[1]]
+    ]
+}
+
+//
 // Exit pipeline if incorrect --genome key provided
 //
 def genomeExistsError() {
@@ -389,93 +585,4 @@ def genomeExistsError() {
             "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         error(error_string)
     }
-}
-//
-// Generate methods description for MultiQC
-//
-def toolCitationText() {
-    // Can use ternary operators to dynamically construct based conditions, e.g. params["run_xyz"] ? "Tool (Foo et al. 2023)" : "",
-    // Uncomment function in methodsDescriptionText to render in MultiQC report
-    def citation_text = [
-            "Tools used in the workflow included:",
-            !params.skip_fastqc          ? "FastQC (Andrews 2010)," : "",
-            !params.skip_multiqc         ? "MultiQC (Ewels et al. 2016)," : "",
-            !params.skip_fastp           ? "fastp (Chen et al. 2018)," : "",
-            !params.skip_mirdeep         ? "MiRDeep2 (Friedländer et al. 2012)," : "",
-            params.filter_contamination ? "Contamination filtering tools: BLAT (Kent 2002), Bowtie2 (Langmead and Salzberg 2012)," : "",
-            params.mirtrace_species      ? "miRTrace (Kang et al. 2018)," : "",
-            "UMI-tools (Smith et al. 2017),",
-            "Bowtie (Langmead et al. 2009),",
-            "SAMtools (Li et al. 2009),",
-            "EdgeR (Robinson et al. 2010),",
-            "Mirtop (Desvignes et al. 2019),",
-            "SeqKit (Shen et al. 2016),",
-            "UMICollapse (Liu 2020),",
-            "Seqcluster (Pantano et al. 2011)",
-            "."
-    ].join(' ').trim()
-
-    return citation_text
-}
-
-def toolBibliographyText() {
-    // Can use ternary operators to dynamically construct based conditions, e.g. params["run_xyz"] ? "<li>Author (2023) Pub name, Journal, DOI</li>" : "",
-    // Uncomment function in methodsDescriptionText to render in MultiQC report
-    def reference_text = [
-            "<li>Andrews S, (2010) FastQC, URL: https://www.bioinformatics.babraham.ac.uk/projects/fastqc/).</li>",
-            "<li>Ewels, P., Magnusson, M., Lundin, S., & Käller, M. (2016). MultiQC: summarize analysis results for multiple tools and samples in a single report. Bioinformatics , 32(19), 3047–3048. doi: /10.1093/bioinformatics/btw354</li>",
-            "<li>Smith, T., Heger, A., & Sudbery, I. (2017). UMI-tools: Modelling sequencing errors in Unique Molecular Identifiers to improve quantification accuracy. PeerJ, 5, e8275. doi: 10.7717/peerj.8275</li>",
-            "<li>Chen, S., Zhou, Y., Chen, Y., & Gu, J. (2018). fastp: an ultra-fast all-in-one FASTQ preprocessor. Bioinformatics, 34(17), i884–i890. doi: 10.1093/bioinformatics/bty560</li>",
-            "<li>Kang, W., Eldfjell, Y., Fromm, B., et al. (2018). miRTrace reveals the organismal origins of microRNA sequencing data. Genome Biology, 19(1), 213. doi: 10.1186/s13059-018-1588-9</li>",
-            "<li>Langmead, B., Trapnell, C., Pop, M., & Salzberg, S. L. (2009). Ultrafast and memory-efficient alignment of short DNA sequences to the human genome. Genome Biology, 10(3), R25. doi: 10.1186/gb-2009-10-3-r25</li>",
-            "<li>Langmead, B., & Salzberg, S. L. (2012). Fast gapped-read alignment with Bowtie 2. Nature Methods, 9(4), 357–359. doi: 10.1038/nmeth.1923</li>",
-            "<li>Li, H., Handsaker, B., Wysoker, A., et al. (2009). The Sequence Alignment/Map format and SAMtools. Bioinformatics, 25(16), 2078–2079. doi: 10.1093/bioinformatics/btp352</li>",
-            "<li>Robinson, M. D., McCarthy, D. J., & Smyth, G. K. (2010). edgeR: a Bioconductor package for differential expression analysis of digital gene expression data. Bioinformatics, 26(1), 139–140. doi: 10.1093/bioinformatics/btp616</li>",
-            "<li>Desvignes, T., Loher, P., Eilbeck, K., et al. (2019). Unification of miRNA and isomiR research: the mirGFF3 format and the mirtop API. Bioinformatics, 36(3), 698–703. doi: 10.1093/bioinformatics/btz675</li>",
-            "<li>Friedländer, M. R., Mackowiak, S. D., Li, N., Chen, W., & Rajewsky, N. (2012). miRDeep2 accurately identifies known and hundreds of novel microRNA genes in seven animal clades. Nucleic Acids Research, 40(1), 37–52. doi: 10.1093/nar/gkr688</li>",
-            "<li>Shen, W., Le, S., Li, Y., & Hu, F. (2016). SeqKit: A cross-platform and ultrafast toolkit for FASTA/Q file manipulation. PLoS ONE, 11(10), e0163962. doi: 10.1371/journal.pone.0163962</li>",
-            "<li>Liu, D. (2020). Algorithms for efficiently collapsing reads with Unique Molecular Identifiers. PeerJ, 8, e9583. doi: 10.7717/peerj.9583</li>",
-            "<li>Kent, W. J. (2002). BLAT—the BLAST-like alignment tool. Genome Research, 12(4), 656–664. doi: 10.1101/gr.229202</li>",
-            "<li>Pantano, L., Estivill, X., & Martí, E. (2011). A non-biased framework for the annotation and classification of the non-miRNA small RNA transcriptome. Bioinformatics, 27(22), 3202–3203. doi: 10.1093/bioinformatics/btr527</li>",
-            "<li>Bioawk, URL: https://github.com/lh3/bioawk</li>",
-            "<li>csvtk, URL: https://github.com/shenwei356/csvtk</li>"
-        ].join(' ').trim()
-
-    return reference_text
-}
-
-def methodsDescriptionText(mqc_methods_yaml) {
-    // Convert  to a named map so can be used as with familiar NXF ${workflow} variable syntax in the MultiQC YML file
-    def meta = [:]
-    meta.workflow = workflow.toMap()
-    meta["manifest_map"] = workflow.manifest.toMap()
-
-    // Pipeline DOI
-    if (meta.manifest_map.doi) {
-        // Using a loop to handle multiple DOIs
-        // Removing `https://doi.org/` to handle pipelines using DOIs vs DOI resolvers
-        // Removing ` ` since the manifest.doi is a string and not a proper list
-        def temp_doi_ref = ""
-        def manifest_doi = meta.manifest_map.doi.tokenize(",")
-        manifest_doi.each { doi_ref ->
-            temp_doi_ref += "(doi: <a href=\'https://doi.org/${doi_ref.replace("https://doi.org/", "").replace(" ", "")}\'>${doi_ref.replace("https://doi.org/", "").replace(" ", "")}</a>), "
-        }
-        meta["doi_text"] = temp_doi_ref.substring(0, temp_doi_ref.length() - 2)
-    } else meta["doi_text"] = ""
-    meta["nodoi_text"] = meta.manifest_map.doi ? "" : "<li>If available, make sure to update the text to include the Zenodo DOI of version of the pipeline used. </li>"
-
-    // Tool references
-    meta["tool_citations"] = ""
-    meta["tool_bibliography"] = ""
-
-    meta["tool_citations"] = toolCitationText().replaceAll(", \\.", ".").replaceAll("\\. \\.", ".").replaceAll(", \\.", ".")
-    meta["tool_bibliography"] = toolBibliographyText()
-
-
-    def methods_text = mqc_methods_yaml.text
-
-    def engine =  new groovy.text.SimpleTemplateEngine()
-    def description_html = engine.createTemplate(methods_text).make(meta)
-
-    return description_html.toString()
 }

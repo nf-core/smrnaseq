@@ -28,12 +28,24 @@ nextflow_pipeline {
                     // All files with stable contents
                     stable_content
                 ).match() },
+                // MultiQC methods description: citations (nf-core-utils citationsOnTheFly) for the tools that ran,
+                // MultiQC itself, and none for tools that did not run (no UMI handling in -profile test)
+                { def report = new File("$outputDir/multiqc/multiqc_report.html").text
+                    assert report.contains('nf-core/smrnaseq Methods Description')
+                    assert report.contains('Tools used in the workflow included')
+                    // fastp (publication in its nf-core meta.yml) and limma (local EDGER_QC meta.yml)
+                    ['Chen <em>et al.</em> (2018)', '10.1093/nar/gkv007'].each { citation -> assert report.contains(citation) }
+                    assert !report.contains('UMI-tools: modeling sequencing errors')
+                },
                 // miRTrace must run on the untrimmed reads (#544): it sees every raw read, not only those kept by fastp
                 { new File("$outputDir/mirtrace").listFiles().findAll { it.isDirectory() }.each { dir ->
                     def mirtrace_reads = new File(dir, 'mirtrace-stats-qcstatus.tsv').readLines().drop(1).sum { line -> line.split('\t')[1] as long }
                     def fastp_json     = new groovy.json.JsonSlurper().parse(new File("$outputDir/fastp/on_raw/${dir.name}.fastp.json"))
                     assert mirtrace_reads == fastp_json.summary.before_filtering.total_reads
-                } }
+                } },
+                // mirna_ids.tsv lists every miRNA name used in the edgeR and mirtop outputs, with its accession (#357)
+                { assert MirnaIds.missing(params.outdir) == [] },
+                { assert MirnaIds.table(params.outdir).find { row -> row[0] == 'hsa-let-7a-5p' && row[2] == 'mature' }[1] == 'MIMAT0000062' }
             )
         }
     }

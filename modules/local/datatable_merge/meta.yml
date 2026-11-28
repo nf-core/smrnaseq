@@ -11,6 +11,10 @@ tools:
       description: "R package for fast aggregation and manipulation of tabular data."
       homepage: "https://r-datatable.com/"
       licence: ["MPL-2.0"]
+  - "r-base":
+      description: "R: a language and environment for statistical computing and graphics."
+      homepage: "https://www.r-project.org/"
+      licence: ["GPL-2.0-or-later"]
 input:
   - meta:
       type: map

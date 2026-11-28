@@ -1,0 +1,75 @@
+nextflow_process {
+
+    name "Test Process UMI_FROM_SEQUENCE"
+    script "../main.nf"
+    process "UMI_FROM_SEQUENCE"
+    tag "modules"
+    tag "modules_local"
+    tag "umi_from_sequence"
+
+    test("Round trip with UMI_TO_SEQUENCE restores reads and qualities") {
+
+        setup {
+            run("UMI_TO_SEQUENCE") {
+                script "../../umi_to_sequence/main.nf"
+                process {
+                    """
+                    input[0] = [ [ id:'test', single_end:true ], file("${projectDir}/modules/local/umi_to_sequence/tests/fixtures/extracted.fastq.gz", checkIfExists: true) ]
+                    """
+                }
+            }
+        }
+
+        when {
+            process {
+                """
+                input[0] = UMI_TO_SEQUENCE.out.reads
+                """
+            }
+        }
+
+        then {
+            def original = path("${projectDir}/modules/local/umi_to_sequence/tests/fixtures/extracted.fastq.gz").linesGzip
+            def restored = path(process.out.reads.get(0).get(1)).linesGzip
+            def stats = path(process.out.saturation.get(0).get(1)).readLines()
+            def header = stats[0].split('\t') as List
+            def values = stats[1].split('\t') as List
+            def row = [header, values].transpose().collectEntries()
+            assertAll(
+                { assert process.success },
+                // Names, sequences and quality strings are identical to the input of UMI_TO_SEQUENCE
+                { assert restored == original },
+                { assert stats.size() == 2 },
+                { assert row.sample == 'test' },
+                { assert row.umi_length == '12' },
+                { assert row.reads == '5' },
+                { assert row.distinct_sequences == '3' },
+                { assert row.top_sequence == 'TAGCAGCACGTAAATATTGGCG' },
+                { assert row.top_sequence_reads == '3' },
+                { assert row.umi_space == '16777216' },
+                { assert row.top_sequence_umi_fraction == '0.000000' },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+
+    test("Round trip - stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [ [ id:'test', single_end:true ], file("${projectDir}/modules/local/umi_to_sequence/tests/fixtures/extracted.fastq.gz", checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert snapshot(process.out).match() }
+            )
+        }
+    }
+}

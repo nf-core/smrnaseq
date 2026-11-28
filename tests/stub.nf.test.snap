@@ -1,30 +1,30 @@
 {
     "-profile test -stub": {
         "content": [
-            244,
+            245,
             {
                 "BOWTIE_MAP_GENOME": {
                     "bowtie": "1.3.1",
-                    "gzip": 1.12,
-                    "samtools": 1.21
+                    "gzip": "1.12",
+                    "samtools": "1.21"
                 },
                 "BOWTIE_MAP_HAIRPIN": {
                     "bowtie": "1.3.1",
-                    "gzip": 1.12,
-                    "samtools": 1.21
+                    "gzip": "1.12",
+                    "samtools": "1.21"
                 },
                 "BOWTIE_MAP_MATURE": {
                     "bowtie": "1.3.1",
-                    "gzip": 1.12,
-                    "samtools": 1.21
+                    "gzip": "1.12",
+                    "samtools": "1.21"
                 },
                 "BOWTIE_MAP_SEQCLUSTER": {
                     "bowtie": "1.3.1",
-                    "gzip": 1.12,
-                    "samtools": 1.21
+                    "gzip": "1.12",
+                    "samtools": "1.21"
                 },
                 "CLEAN_FASTA": {
-                    "bioawk": 1.0
+                    "bioawk": "1.0"
                 },
                 "DATATABLE_MERGE": {
                     "r-base": "3.6.2"
@@ -58,6 +58,13 @@
                 },
                 "INDEX_MATURE": {
                     "bowtie": "1.3.1"
+                },
+                "MIRNA_IDS": {
+                    "r-base": "3.6.2"
+                },
+                "MIRNA_REFERENCE": {
+                    "genome_build": "GRCh38",
+                    "miRBase": "v22"
                 },
                 "MIRTOP_COUNTS": {
                     "mirtop": "0.4.30"
@@ -93,25 +100,25 @@
                     "vroom": "1.6.5"
                 },
                 "SAMTOOLS_FLAGSTAT": {
-                    "samtools": 1.25
+                    "samtools": "1.25"
                 },
                 "SAMTOOLS_IDXSTATS": {
-                    "samtools": 1.25
+                    "samtools": "1.25"
                 },
                 "SAMTOOLS_INDEX": {
-                    "samtools": 1.25
+                    "samtools": "1.25"
                 },
                 "SAMTOOLS_SORT": {
-                    "samtools": 1.25
+                    "samtools": "1.25"
                 },
                 "SAMTOOLS_STATS": {
-                    "samtools": 1.25
+                    "samtools": "1.25"
                 },
                 "SEQCLUSTER_COLLAPSE": {
                     "seqcluster": "1.2.9"
                 },
                 "UNTAR_BOWTIE_INDEX": {
-                    "untar": 1.34
+                    "untar": "1.34"
                 }
             },
             [
@@ -194,6 +201,7 @@
                 "mirna_quant/edger_qc/mature_logtpm.txt",
                 "mirna_quant/edger_qc/mature_normalized_CPM.txt",
                 "mirna_quant/edger_qc/mature_unmapped_read_counts.txt",
+                "mirna_quant/mirna_ids.tsv",
                 "mirna_quant/mirtop",
                 "mirna_quant/mirtop/gff",
                 "mirna_quant/mirtop/gff/mirtop",
