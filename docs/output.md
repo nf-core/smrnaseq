@@ -20,7 +20,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [FastP](#fastp) - adapter trimming
 - [Bowtie2](#bowtie2) - contamination filtering
 - [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
-- [SAMtools](#samtools) - alignment result processing and feature counting
+- [SAMtools](#samtools) - alignment result processing and read counts per reference sequence
 - [edgeR](#edger) - normalization, MDS plot and sample pairwise distance heatmap
 - [Bowtie](#bowtie) - alignment against reference genome for QC purpose (genome quantification, only with `--fasta` or `--genome`)
 - [mirtop](#mirtop) - miRNA and isomiR annotation
@@ -141,9 +141,18 @@ If `top_sequence_umi_fraction` is above 0.005 (0.5% of all possible UMIs), the p
 
 ## Bowtie2
 
-[Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) is used to align the reads to user-defined databases and to build indexes for `--filter_contaminant` files.
+<details markdown="1">
+<summary>Output files</summary>
 
-MultiQC reports the number of reads that were removed by each of the contaminant databases.
+- `contaminant_filter/filter/` (only with `--filter_contamination` and `--save_intermediates`)
+  - `*.filtered.fastq.gz`: Reads that did not align to any of the contaminant databases. These reads are used for miRNA quantification, genome mapping and miRDeep2.
+  - `*.contamination_mqc.yaml`: Number of reads removed per contaminant class (rRNA, tRNA, cDNA, ncRNA, piRNA, other) and number of remaining reads. These files feed the "Contamination Filtering" plot in MultiQC.
+
+</details>
+
+[Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) is used to build indices for the `--filter_contamination` databases (`--rrna`, `--trna`, `--cdna`, `--ncrna`, `--pirna`, `--other_contamination`) and to align the reads to them, one database after the other.
+
+MultiQC reports the number of reads that were removed by each of the contaminant databases. The reads that align to a database are discarded: the pipeline keeps only their total per class, not alignments or counts per sequence. See [the usage documentation](https://nf-co.re/smrnaseq/usage#contamination-filtering) for details, and [Small RNA biotypes other than miRNAs](https://nf-co.re/smrnaseq/usage#small-rna-biotypes-other-than-mirnas) for what the pipeline offers for tRNA, piRNA and other small RNAs.
 
 ## Bowtie
 
@@ -154,7 +163,7 @@ MultiQC reports the number of reads that were removed by each of the contaminant
 - `bowtie_index/`
   - `mirna_hairpin/bowtie`: hairpin.fa bowtie index files (saved to `genome/index/mirna_hairpin/bowtie` instead with `--save_reference`).
   - `mirna_mature/bowtie`: mature.fa bowtie index files (saved to `genome/index/mirna_mature/bowtie` instead with `--save_reference`).
-- `genome_quant/bam/` (only when a genome FASTA is given with `--fasta` or `--genome`; see [genome quantification](https://nf-co.re/smrnaseq/usage#genome-quantification-and-mirdeep2)): alignment against the genome of the reads that did not align to the mature miRNAs or hairpins. Up to 50 alignments are reported per read. The pipeline does not count these reads against a genome annotation; see [the usage documentation](https://nf-co.re/smrnaseq/usage#other-small-rnas-genome-wide-quantification) for how to do this. Only with `--save_intermediates`:
+- `genome_quant/bam/` (only when a genome FASTA is given with `--fasta` or `--genome`; see [genome quantification](https://nf-co.re/smrnaseq/usage#genome-quantification-and-mirdeep2)): alignment against the genome of the reads that did not align to the mature miRNAs or hairpins. Up to 50 alignments are reported per read. The pipeline does not count these reads against a genome annotation; see [the usage documentation](https://nf-co.re/smrnaseq/usage#other-small-rnas-genome-wide-quantification) for how to do this, and [Small RNA biotypes other than miRNAs](https://nf-co.re/smrnaseq/usage#small-rna-biotypes-other-than-mirnas) for an overview of what the pipeline offers for other small RNAs. Only with `--save_intermediates`:
   - `{sample.id}_mature_hairpin_genome.bam`: Unsorted Bowtie alignment against the genome.
   - `{sample.id}_mature_hairpin_genome.sorted.bam` and `.sorted.bam.csi`: Sorted and indexed alignment.
   - `{sample.id}_mature_hairpin_genome.out`: Bowtie log.
@@ -167,7 +176,7 @@ If `--save_intermediates` is specified, these files will be placed in this direc
 
 ## SAMtools
 
-[SAMtools](http://samtools.sourceforge.net/) is used for sorting and indexing the output BAM files from Bowtie. In addition, the numbers of features are counted with the `idxstats` option.
+[SAMtools](http://samtools.sourceforge.net/) is used for sorting and indexing the output BAM files from Bowtie. In addition, the number of reads per reference sequence is counted with `idxstats`: per mature miRNA or hairpin for `mirna_quant/`, and per chromosome (not per gene) for `genome_quant/`.
 
 **Output directory: `results/{genome_quant,mirna_quant}/bam`**
 
