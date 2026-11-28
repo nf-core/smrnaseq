@@ -296,6 +296,20 @@ miRDeep2 runs only when a genome FASTA is given (`--fasta` or `--genome`), and c
 - `mirdeep2/result_{sample.id}.bed` File with the known and novel miRNAs in bed format.
 - `mirdeep2/result_{sample.id}.csv` File with an overview of all detected miRNAs (known and novel) in csv format.
 - `mirdeep2/result_{sample.id}.html` A HTML report with an overview of all detected miRNAs (known and novel) in html format.
+- `mirdeep2/mirdeep2_consensus.bed` and `mirdeep2/mirdeep2_consensus.tsv` (only with `--mirdeep2_consensus_min_samples` of 1 or more): Cross-sample consensus of the per-sample BED files, see [below](#cross-sample-consensus-of-mirdeep2-loci).
+
+### Cross-sample consensus of miRDeep2 loci
+
+With `--mirdeep2_consensus_min_samples` of 1 or more, the loci of the per-sample miRDeep2 BED files are combined across samples. With `--mirdeep2_consensus_min_probability`, entries with a lower estimated true-positive probability, or without one, are removed from each sample first. Loci that overlap by at least one base on the same strand are then merged into one locus that spans them. Loci that only touch (one ends where the next starts) or that are on opposite strands are not merged. Loci found in fewer than `--mirdeep2_consensus_min_samples` samples are removed. Coordinates are taken from the miRDeep2 BED files unchanged. Two files are written, with one line per locus in the same order:
+
+- `mirdeep2/mirdeep2_consensus.bed`: a standard six-column BED file without a header, which can be loaded in a genome browser or used with tools such as BEDTools. The columns are `chrom`, `start`, `end`, `name`, `score` and `strand`. The `name` is `known:consensus_<n>` if any sample reported a known miRBase miRNA at the locus, otherwise `novel:consensus_<n>`. The `score` is the number of samples that support the locus (at most 1000, the highest score that BED allows), not the miRDeep2 score. The file is empty if no locus is left.
+- `mirdeep2/mirdeep2_consensus.tsv`: a tab-separated table with a header line and the support of each locus. The `name` column links it to the BED file. The columns are:
+  - `name`, `chrom`, `start`, `end`, `strand`: as in the BED file.
+  - `n_samples`: number of samples that reported the locus.
+  - `samples`: comma-separated list of these samples.
+  - `score`: highest miRDeep2 score across the samples.
+  - `probability`: highest estimated true-positive probability in percent across the samples, or `-` if miRDeep2 gave none (this only occurs without `--mirdeep2_consensus_min_probability`).
+  - `mirdeep2_ids`: the per-sample miRDeep2 IDs as `<sample>:<known|novel>:<id>`, which link back to the `result_{sample.id}.csv` files.
 
 ## miRTrace
 

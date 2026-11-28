@@ -5,6 +5,16 @@
         "https://github.com/nf-core/modules.git": {
             "modules": {
                 "nf-core": {
+                    "bedtools/merge": {
+                        "branch": "master",
+                        "git_sha": "be3c61e25408f7f388ae00408cff73077e04f98c",
+                        "installed_by": ["modules"]
+                    },
+                    "bedtools/sort": {
+                        "branch": "master",
+                        "git_sha": "be3c61e25408f7f388ae00408cff73077e04f98c",
+                        "installed_by": ["modules"]
+                    },
                     "bioawk": {
                         "branch": "master",
                         "git_sha": "7b3452a23773f687ededb4befd037920e5a51341",

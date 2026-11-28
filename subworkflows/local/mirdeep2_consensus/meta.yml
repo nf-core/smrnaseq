@@ -1,0 +1,51 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "mirdeep2_consensus"
+description: Merge the per-sample miRDeep2 BED files into a consensus BED6 file and a support table (TSV) of the loci found in a minimum number of samples.
+keywords:
+  - mirdeep2
+  - mirna
+  - consensus
+  - bed
+components:
+  - gawk
+  - bedtools/sort
+  - bedtools/merge
+input:
+  - ch_mirdeep2:
+      type: file
+      description: |
+        Channel containing the miRDeep2 results of each sample. The BED files give the loci,
+        the CSV files the true-positive probabilities (optional, the HTML files are not used).
+        Structure: [ val(meta), [ path(bed), path(csv), path(html) ] ]
+      pattern: "result_*.{bed,csv,html}"
+  - min_samples:
+      type: integer
+      description: |
+        Minimum number of samples that must report a locus. Loci of different samples count as the
+        same locus when they overlap by at least 1 bp on the same strand (book-ended loci do not).
+  - min_probability:
+      type: integer
+      description: |
+        Minimum miRDeep2 estimated true-positive probability in percent (0 disables the filter).
+        When it is above 0, entries without a probability ("-") are removed too.
+output:
+  - bed:
+      type: file
+      description: |
+        Channel containing the consensus BED file: standard BED6 without a header
+        (chrom, start, end, name, score, strand), with the number of supporting samples as score.
+        Empty if no locus is left.
+        Structure: [ val(meta), path(bed) ]
+      pattern: "mirdeep2_consensus.bed"
+  - tsv:
+      type: file
+      description: |
+        Channel containing the support table of the consensus loci, with a header line and the columns
+        name, chrom, start, end, strand, n_samples, samples, score (highest miRDeep2 score),
+        probability and mirdeep2_ids. The name column links it to the BED file.
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "mirdeep2_consensus.tsv"
+authors:
+  - "@apeltzer"
+maintainers:
+  - "@apeltzer"

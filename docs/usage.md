@@ -264,6 +264,12 @@ If the software encounters an error with exit status 255, it will be ignored, an
 
 Error 255 is typically related to the core algorithm of miRDeep generating empty output files. This often happens when the reads being processed do not correspond to putative mature miRNA sequences, or if the provided precursors do not meet the criteria for valid miRNA precursors, both of which may stem from the input reads used. A common cause of this error is running the pipeline with a small subset of the input reads.
 
+### Cross-sample consensus of miRDeep2 loci
+
+miRDeep2 reports known and novel miRNAs for each sample separately, and the provisional IDs of novel miRNAs differ between samples. To get one set of loci across samples, use `--mirdeep2_consensus_min_samples <N>`: loci of the per-sample BED files that overlap by at least one base on the same strand are merged, and loci reported by at least `N` samples are kept (for example `1` for the union, or the number of samples for loci found in all of them). Loci that only touch, without sharing a base, are not merged. The result is written to `mirdeep2/mirdeep2_consensus.bed`, a standard six-column BED file for genome browsers, and to `mirdeep2/mirdeep2_consensus.tsv`, which lists the samples, the highest miRDeep2 score and probability and the per-sample miRDeep2 IDs of each locus (see [the output documentation](https://nf-co.re/smrnaseq/output#cross-sample-consensus-of-mirdeep2-loci)). The default `0` disables this step.
+
+Add `--mirdeep2_consensus_min_probability <P>` to use only miRNAs whose estimated true-positive probability in the per-sample `result_{sample.id}.csv` is at least `P` percent (for example `75`; `91 +/- 2%` counts as 91). Entries below the threshold are removed in each sample before the samples are merged, so they do not count towards `--mirdeep2_consensus_min_samples`. miRDeep2 gives no probability (`-`) for known miRBase miRNAs in a sample in which it found no novel miRNA candidates. Such entries are removed when the filter is on, as they have no estimate that reaches the threshold. The default `0` disables the filter and keeps all entries. The per-sample miRDeep2 output files are not changed.
+
 ### UMI handling
 
 With `--with_umi`, the pipeline removes PCR duplicates using unique molecular identifiers (UMIs) before any alignment. The steps run in this order:
