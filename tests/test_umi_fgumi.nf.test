@@ -1,0 +1,136 @@
+nextflow_pipeline {
+
+    name "Test pipeline with --umi_dedup_method fgumi (experimental)"
+    script "../main.nf"
+    profile "test_umi,ci"
+    tag "pipeline"
+    tag "umi"
+    tag "umi_fgumi"
+
+    // Assertions instead of a snapshot of all results: the method is experimental and its counts may change
+    test("-profile test_umi --umi_dedup_method fgumi") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                umi_dedup_method = 'fgumi'
+            }
+        }
+
+        then {
+            def task_names = workflow.trace.tasks().collect { task -> task.name }
+            def has_task = { String process -> task_names.any { name -> name.contains(process) } }
+            def nextflow_log = new File("${metaDir}/nextflow.log").text
+            def metrics_files = new File("$outputDir/umi_dedup/fgumi").listFiles().findAll { file -> file.name.endsWith('.umi_dedup.metrics.txt') }
+            def windows = path("$outputDir/umi_dedup/reference/umi_dedup_windows.fa").readLines()
+
+            assert workflow.success
+
+            // The experimental method is announced at start-up
+            assert nextflow_log.contains("'--umi_dedup_method fgumi' is experimental")
+
+            // UMI extraction and fastp run as in the default UMI path, then the fgumi steps replace UMICollapse
+            assert has_task('FASTQ_FASTQC_UMITOOLS_FASTP:UMITOOLS_EXTRACT')
+            assert has_task('FASTQ_FASTQC_UMITOOLS_FASTP:FASTP')
+            assert has_task('UMI_DEDUP_REFERENCE:UMI_DEDUP_WINDOWS')
+            assert has_task('UMI_DEDUP_REFERENCE:INDEX_UMI_DEDUP')
+            assert has_task('UMI_DEDUP_FGUMI:BOWTIE_MAP_UMI_DEDUP')
+            assert has_task('UMI_DEDUP_FGUMI:FGUMI_COPYUMI')
+            assert has_task('UMI_DEDUP_FGUMI:FGUMI_SORT')
+            assert has_task('UMI_DEDUP_FGUMI:FGUMI_DEDUP')
+            assert has_task('UMI_DEDUP_FGUMI:FGUMI_FASTQ')
+            assert !has_task('UMICOLLAPSE_FASTQ')
+            assert !has_task('UMI_TO_SEQUENCE')
+            assert !has_task('UMI_FROM_SEQUENCE')
+
+            // Deduplication reference: one window per distinct mature hsa miRNA sequence
+            assert windows.count { line -> line.startsWith('>hsa-') } > 2000
+            assert new File("$outputDir/umi_dedup/reference/umi_dedup_windows.tsv").exists()
+
+            // The saturation statistics belong to the UMICollapse path
+            assert !new File("$outputDir/umi_dedup/saturation").exists()
+
+            // One metrics file per sample, with duplicates removed and the remaining reads written to FASTQ
+            assert metrics_files.size() == 2
+            metrics_files.each { metrics_file ->
+                def sample  = metrics_file.name - '.umi_dedup.metrics.txt'
+                def lines   = metrics_file.readLines()
+                def header  = lines[0].split('\t') as List
+                def total   = lines[1].split('\t')
+                def value   = { String col -> total[header.indexOf(col)] as long }
+                def deduplicated = path("$outputDir/umi_dedup/fastq_deduplicated/${sample}.umi_dedup.fastq.gz").linesGzip.size() / 4
+                def input_reads  = value('total_templates') + value('filtered_templates')
+
+                assert new File("$outputDir/umi_dedup/fgumi/${sample}.umi_dedup.family_size_histogram.txt").exists()
+                assert new File("$outputDir/umi_dedup/fgumi/${sample}.umi_dedup_windows.out").exists()
+                assert deduplicated > 0
+                assert deduplicated < input_reads
+                assert deduplicated == value('unique_templates')
+                assert value('duplicate_templates') > 0
+                // Reads that do not align to the windows reference are passed through
+                assert value('passthrough_templates') > 0
+                assert value('filtered_unmapped') == 0
+            }
+
+            // All later steps ran on the deduplicated reads
+            assert has_task('MIRNA_QUANT:BOWTIE_MAP_MATURE')
+            assert has_task('MIRNA_QUANT:EDGER_QC')
+            assert has_task('MIRTOP_COUNTS')
+            assert has_task('GENOME_QUANT:BOWTIE_MAP_GENOME')
+            assert path("$outputDir/mirna_quant/edger_qc/mature_counts.csv").text.contains('hsa-miR-16-5p')
+            assert new File("$outputDir/mirna_quant/mirtop/mirna.tsv").exists()
+            assert new File("$outputDir/multiqc/multiqc_report.html").exists()
+            // fgumi is in the collated software versions
+            assert path("$outputDir/pipeline_info/nf_core_smrnaseq_software_mqc_versions.yml").text.contains('fgumi')
+        }
+    }
+
+    test("-profile test_umi --umi_dedup_method fgumi -stub") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir = "$outputDir"
+                umi_dedup_method = 'fgumi'
+            }
+        }
+
+        then {
+            def task_names = workflow.trace.tasks().collect { task -> task.name }
+            def has_task = { String process -> task_names.any { name -> name.contains(process) } }
+
+            assert workflow.success
+            assert has_task('UMI_DEDUP_REFERENCE:UMI_DEDUP_WINDOWS')
+            assert has_task('UMI_DEDUP_REFERENCE:INDEX_UMI_DEDUP')
+            assert has_task('UMI_DEDUP_FGUMI:BOWTIE_MAP_UMI_DEDUP')
+            assert has_task('UMI_DEDUP_FGUMI:FGUMI_COPYUMI')
+            assert has_task('UMI_DEDUP_FGUMI:FGUMI_SORT')
+            assert has_task('UMI_DEDUP_FGUMI:FGUMI_DEDUP')
+            assert has_task('UMI_DEDUP_FGUMI:FGUMI_FASTQ')
+            assert !has_task('UMICOLLAPSE_FASTQ')
+            assert has_task('MIRNA_QUANT:BOWTIE_MAP_MATURE')
+            assert has_task('MULTIQC')
+            assert new File("$outputDir/umi_dedup/reference/umi_dedup_windows.fa").exists()
+            assert new File("$outputDir/umi_dedup/fgumi").listFiles().count { file -> file.name.endsWith('.umi_dedup.metrics.txt') } == 2
+            assert new File("$outputDir/umi_dedup/fgumi").listFiles().count { file -> file.name.endsWith('.umi_dedup.family_size_histogram.txt') } == 2
+            assert new File("$outputDir/umi_dedup/fastq_deduplicated").listFiles().count { file -> file.name.endsWith('.umi_dedup.fastq.gz') } == 2
+            assert !new File("$outputDir/umi_dedup/saturation").exists()
+        }
+    }
+
+    test("-profile test_umi --umi_dedup_method invalid") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                umi_dedup_method = 'umitools'
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert (workflow.stdout + workflow.stderr).any { it.contains('--umi_dedup_method') && it.contains('umitools') }
+        }
+    }
+}

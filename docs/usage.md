@@ -343,6 +343,8 @@ With `--with_umi`, the pipeline removes PCR duplicates using unique molecular id
 
 The deduplicated inserts are then used for all later steps; the UMI stays in the read name. miRTrace QC runs on the raw reads as without UMIs.
 
+Step 3 can be replaced by an experimental alignment-based deduplication with `--umi_dedup_method fgumi` (see [Experimental: alignment-based deduplication with fgumi](#experimental-alignment-based-deduplication-with-fgumi)). The default, `--umi_dedup_method umicollapse`, is the workflow described above.
+
 > [!NOTE]
 > Before nf-core/smrnaseq 2.5.0, UMICollapse ran on the adapter-trimmed reads before UMI extraction, so it compared insert, kit adapter and UMI together, and `umi_tools extract` ran afterwards. Extracting the UMI first removes sequencing errors in the kit adapter and in sequence after the UMI from the comparison ([#560](https://github.com/nf-core/smrnaseq/issues/560)). `-profile qiaseq` now also works with `--with_umi`.
 
@@ -376,7 +378,8 @@ For other kits, set `--umitools_extract_method` and `--umitools_bc_pattern` so t
 - `--with_umi`: enable UMI deduplication. Requires `--umitools_bc_pattern` (set by `-profile qiaseq`).
 - `--umitools_extract_method`: `string` (default) or `regex`, passed to `umi_tools extract --extract-method`.
 - `--umitools_bc_pattern`: the UMI pattern, passed to `umi_tools extract --bc-pattern`.
-- `--umitools_method`: despite its name, this sets the UMICollapse deduplication algorithm (`--algo`): `dir` (directional, default), `adj` (adjacency) or `cc` (connected components). All three merge UMIs that differ by one substitution. See [UMI deduplication algorithm](#umi-deduplication-algorithm).
+- `--umitools_method`: despite its name, this sets the UMICollapse deduplication algorithm (`--algo`): `dir` (directional, default), `adj` (adjacency) or `cc` (connected components). All three merge UMIs that differ by one substitution. See [UMI deduplication algorithm](#umi-deduplication-algorithm). It is not used with `--umi_dedup_method fgumi`.
+- `--umi_dedup_method`: `umicollapse` (default) or `fgumi` (experimental). See [Experimental: alignment-based deduplication with fgumi](#experimental-alignment-based-deduplication-with-fgumi).
 - `--save_umi_intermeds`: save the reads after `umi_tools extract` and after deduplication (see the [output documentation](https://nf-co.re/smrnaseq/output#umi-tools-extract)).
 - `--skip_umi_extract_before_dedup` and `--umi_discard_read`: deprecated and ignored. The UMI is always extracted before deduplication, and only read 1 is used. The pipeline prints a warning if they are set.
 
@@ -421,16 +424,59 @@ process {
 
 #### Sequence-based and alignment-based UMI deduplication
 
-Many UMI workflows for mRNA deduplicate after alignment instead: reads are grouped by alignment position (reference, strand and 5' start), and only the UMIs of reads at the same position are compared (e.g. `umi_tools dedup` or UMICollapse BAM mode). The pipeline does not offer this mode yet (see the plans at the end of [Choosing a UMI strategy](#choosing-a-umi-strategy)). Neither approach is wrong for small RNA, but they define a duplicate differently:
+Many UMI workflows for mRNA deduplicate after alignment instead: reads are grouped by alignment position (reference, strand and 5' start), and only the UMIs of reads at the same position are compared (e.g. `umi_tools dedup`, UMICollapse BAM mode or `fgumi dedup`). The pipeline offers this as an experimental option, `--umi_dedup_method fgumi` (see [Experimental: alignment-based deduplication with fgumi](#experimental-alignment-based-deduplication-with-fgumi)). Neither approach is wrong for small RNA, but they define a duplicate differently:
 
 - **Sequence-based (pipeline default)**: needs no reference and keeps isomiRs apart. Because each insert sequence and length is its own group, abundant miRNAs are split over several groups, which reduces UMI saturation (see [Choosing a UMI strategy](#choosing-a-umi-strategy)). The one allowed substitution (default `-k 1`) covers the UMI and the insert together: a read with a single sequencing error, in the UMI or in the insert, is still collapsed with its duplicate. Only reads with two or more errors (for example one in the UMI and one in the insert) are kept as separate molecules, and reads of different length are never compared.
-- **Alignment-based**: sequencing errors in the insert do not matter, and memory use is lower because only the reads at one position are compared. However, almost all reads of a miRNA start at the same position, so all its 3' isomiRs are pooled and told apart by their UMI alone. For highly expressed miRNAs this increases UMI saturation and can compress their counts. The pipeline maps with `-k 50`, so reads that align to several miRNAs or loci are deduplicated separately at each position, and the same read can be kept at one locus and removed at another.
+- **Alignment-based**: sequencing errors in the insert do not matter, and memory use is lower because only the reads at one position are compared. However, almost all reads of a miRNA start at the same position, so all its 3' isomiRs are pooled and told apart by their UMI alone. For highly expressed miRNAs this increases UMI saturation and can compress their counts when UMIs that differ by one base are merged. The pipeline's quantification alignments use `-k 50`, so deduplicating them directly would treat reads that align to several miRNAs or loci separately at each position, and the same read could be kept at one locus and removed at another. `--umi_dedup_method fgumi` therefore uses its own alignment with one record per read.
 
-To deduplicate by alignment position instead, you can extract the UMIs before running the pipeline (with `umi_tools extract` and the same `--bc-pattern`, which moves the UMI to the read name and removes the kit sequences around it), run the pipeline without `--with_umi` and with `--save_intermediates`, and then deduplicate the `*.sorted.bam` files in `mirna_quant/bam/` and `genome_quant/bam/` with `umi_tools dedup` or `umicollapse bam`, followed by `samtools idxstats` for counts. Note that the mirtop, edgeR and miRDeep2 results of such a run are not deduplicated.
+To deduplicate the pipeline's own alignments by position instead, you can extract the UMIs before running the pipeline (with `umi_tools extract` and the same `--bc-pattern`, which moves the UMI to the read name and removes the kit sequences around it), run the pipeline without `--with_umi` and with `--save_intermediates`, and then deduplicate the `*.sorted.bam` files in `mirna_quant/bam/` and `genome_quant/bam/` with `umi_tools dedup` or `umicollapse bam`, followed by `samtools idxstats` for counts. Note that the mirtop, edgeR and miRDeep2 results of such a run are not deduplicated.
+
+#### Experimental: alignment-based deduplication with fgumi
+
+> [!WARNING]
+> `--umi_dedup_method fgumi` is experimental. It is opt-in, the pipeline prints a warning at start-up when it is used, and its behaviour, defaults and output files may change in a future release. The default UMI workflow (`--umi_dedup_method umicollapse`) is not affected.
+
+With `--with_umi --umi_dedup_method fgumi`, steps 1 and 2 of the UMI workflow stay the same, and step 3 (UMICollapse) is replaced by a deduplication by alignment position with [fgumi](https://github.com/fulcrumgenomics/fgumi):
+
+1. The extracted and filtered inserts are aligned with Bowtie 1 (`-k 1 --best`, plus `--norc` with `--mirna_forward_only`) to a dedicated deduplication reference (see below). Each read gets at most one alignment.
+2. `fgumi copy-umi` copies the UMI from the read name into the `RX` tag, and `fgumi sort` sorts the alignments in template-coordinate order.
+3. `fgumi dedup --strategy identity --remove-duplicates --include-unmapped` keeps one read (the one with the highest base qualities) for each group of reads with the same reference sequence, 5' position, strand and **identical UMI**.
+4. `fgumi fastq` writes the remaining reads back to FASTQ, in their original orientation and with the UMI still in the read name. These reads are used for all later steps (contamination filter, mature and hairpin quantification, mirtop, genome quantification, miRDeep2), exactly like the UMICollapse output.
+
+```bash
+nextflow run nf-core/smrnaseq \
+    -profile docker,qiaseq \
+    --input samplesheet.csv \
+    --outdir results \
+    --genome GRCh38 \
+    --mirtrace_species hsa \
+    --with_umi \
+    --umi_dedup_method fgumi
+```
+
+**Deduplication reference ("windows").** The reference is built from the mature and hairpin FASTA files of the selected species (miRBase or MirGeneDB, after the same species filter as for quantification, including `--mirgenedb_star`). It has one record per distinct mature miRNA sequence: the mature sequence plus 5 nt on each side, taken from the first hairpin in the hairpin FASTA that contains it. The flanks are shortened at the ends of the hairpin, and a mature sequence that is found in no hairpin is used without flanks. Mature miRNAs with the same sequence (for example hsa-let-7a-5p, which comes from let-7a-1, let-7a-2 and let-7a-3) share one record. The reference and a table of its records are saved to `umi_dedup/reference/`. This design follows the benchmark in [#535](https://github.com/nf-core/smrnaseq/issues/535#issuecomment-7086624082):
+
+- With the hairpins as reference, identical reads are distributed at random over paralogous hairpins and escape deduplication, which inflated the counts of multi-copy miRNAs by 10–60% on real data.
+- With the mature sequences as reference, isomiRs that are longer than the mature sequence do not align and are not deduplicated (15–21% count error in simulation).
+
+The number of flanking nucleotides can be changed with `ext.args = '-v flank=<n>'` for the `UMI_DEDUP_WINDOWS` process.
+
+**What you should know before using it:**
+
+- **Reads that do not align to the windows reference are not deduplicated.** They are passed through unchanged, so that they are still available for the later steps. This affects everything that is not a known miRNA of the selected species: other small RNAs, novel miRNAs and reads with many mismatches. The hairpin, genome quantification and miRDeep2 results are therefore only partly deduplicated. `passthrough_templates` in the metrics file reports how many reads this concerns.
+- **IsomiRs with the same 5' start and the same UMI are pooled.** Reads are grouped by position and strand, not by sequence: two different molecules of one miRNA (for example two 3' isomiRs) that carry the same UMI by chance are counted once. This matters for the most abundant miRNAs, where a large part of all possible UMIs is in use.
+- **UMIs are matched exactly** (`--strategy identity`). A read with a PCR or sequencing error in its UMI is counted as a separate molecule: a near-uniform overcount of about 5–9% in the benchmark. In return, distinct molecules with similar UMIs are not merged at highly expressed miRNAs (see [Choosing a UMI strategy](#choosing-a-umi-strategy)). `--umitools_method` only sets the UMICollapse algorithm and has no effect here, and no UMI saturation statistics or saturation warnings are produced.
+- **Reads whose UMI contains an `N` are removed** by `fgumi dedup` (`filtered_ns_in_umi` in the metrics file).
+- **Accuracy.** In the benchmark, the per-miRNA count error was 0.6–1.1% for the default UMICollapse workflow and 1.3–2.5% for fgumi with a windows reference. The benchmark used a prototype of the reference; the figures were not measured again with the implementation in the pipeline.
+- **Cost.** The method adds one Bowtie 1 alignment of all reads to a small reference and four fgumi steps for each sample. `fgumi dedup` itself is fast and its memory use is bounded (5–23 s CPU for 4.5M reads in the benchmark, compared with about 440 s for UMICollapse `dir`), so the method can help for deep samples where UMICollapse needs a lot of memory ([#530](https://github.com/nf-core/smrnaseq/issues/530)). Most of the remaining time is `umi_tools extract`.
+- **`umi_tools extract` is still used** to extract the UMI. `fgumi extract` describes reads with positional read structures and cannot search for a kit sequence, which the QIAseq read structure needs (the UMI follows a variable-length insert and the kit adapter).
+- MultiQC does not show the fgumi metrics yet. They are saved to `umi_dedup/fgumi/` (see the [output documentation](https://nf-co.re/smrnaseq/output#fgumi-deduplicate-experimental)).
+
+The fgumi and Bowtie options are set with `ext.args` in `conf/modules.config` (processes `BOWTIE_MAP_UMI_DEDUP`, `FGUMI_COPYUMI`, `FGUMI_SORT`, `FGUMI_DEDUP`) and can be changed in a custom config (see [Custom Tool Arguments](#custom-tool-arguments)). Keep `-k 1` for Bowtie: `fgumi dedup` needs one record per read.
 
 ### Choosing a UMI strategy
 
-UMI deduplication has to decide when two reads come from the same molecule. Reads with the same insert and UMI are duplicates. Reads whose UMIs differ by one base can be duplicates with a PCR or sequencing error in the UMI, or two different molecules whose UMIs happen to be similar. The pipeline offers two strategies:
+UMI deduplication has to decide when two reads come from the same molecule. Reads with the same insert and UMI are duplicates. Reads whose UMIs differ by one base can be duplicates with a PCR or sequencing error in the UMI, or two different molecules whose UMIs happen to be similar. The default UMI workflow (`--umi_dedup_method umicollapse`) offers two strategies:
 
 - **One-mismatch clustering (default):** UMICollapse `--algo dir` (directional) merges a read into a more abundant read whose UMI + insert differs by one substitution. This corrects UMI errors, but once a single insert sequence has been seen with a large part of all possible UMIs, distinct molecules have neighbouring UMIs by chance and are merged as well (_saturation_). The counts of the most abundant miRNAs are then underestimated, and more so the deeper the library is sequenced.
 - **Exact UMI matching:** only reads with identical UMI + insert are merged. This is not affected by saturation, but reads with a UMI error are counted as separate molecules: a near-uniform overcount of a few percent, which mostly cancels in library-size normalisation. Set it with a custom config (see [Custom Tool Arguments](#custom-tool-arguments)):
@@ -464,7 +510,9 @@ How to choose:
 
 **Runtime and memory.** UMICollapse holds all reads of a sample in memory and its one-mismatch search slows down at saturated sequences, so it is the slowest step of the UMI path; give `UMICOLLAPSE_FASTQ` more memory for deep libraries. `umi_tools extract` is single-threaded (about 270 s CPU per 4.5M reads).
 
-**Planned.** A position-based deduplication backend using [fgumi](https://github.com/fulcrumgenomics/fgumi) after alignment, with [chelae](https://github.com/fulcrumgenomics/chelae) as an optional fast UMI extractor, is planned for nf-core/smrnaseq 2.6 ([#535](https://github.com/nf-core/smrnaseq/issues/535), [#530](https://github.com/nf-core/smrnaseq/issues/530)).
+**Alignment-based alternative (experimental).** `--umi_dedup_method fgumi` deduplicates by alignment position with [fgumi](https://github.com/fulcrumgenomics/fgumi) and exact UMI matching (see [Experimental: alignment-based deduplication with fgumi](#experimental-alignment-based-deduplication-with-fgumi)).
+
+**Planned.** [chelae](https://github.com/fulcrumgenomics/chelae) as an optional fast UMI extractor and the fgumi metrics in MultiQC (which needs a MultiQC release with the fgumi module) are planned for a later release ([#535](https://github.com/nf-core/smrnaseq/issues/535)). An alignment-based mode for UMICollapse (BAM mode) is proposed in [#619](https://github.com/nf-core/smrnaseq/issues/619).
 
 ## Samplesheet input
 
@@ -758,6 +806,9 @@ co2footprint {
 ```
 
 The plugin documentation lists further options, such as the power usage effectiveness (PUE) of your data centre and the power draw of your CPUs.
+
+> [!NOTE]
+> With a remote `--outdir` such as `s3://` (cloud runs, Seqera Platform), the `co2footprint_*` files are not written to `pipeline_info/`. nf-co2footprint 1.4.1 only writes to local paths ([nf-co2footprint#309](https://github.com/nextflow-io/nf-co2footprint/issues/309)), so the files end up in the launch directory of the Nextflow head job instead. To keep them, either point the plugin's `file` options to a local path and copy the files yourself, or turn the reports off (see [Turning plugin reports off](#turning-plugin-reports-off)).
 
 ### Provenance reports
 

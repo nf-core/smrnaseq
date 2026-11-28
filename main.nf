@@ -43,6 +43,7 @@ params {
     with_umi:                      Boolean
     umitools_extract_method:       String
     umitools_method:               String
+    umi_dedup_method:              String
     skip_umi_extract_before_dedup: Boolean?
     umitools_bc_pattern:           String?
     umi_discard_read:              Integer?
@@ -221,6 +222,8 @@ workflow {
     umi_extract_reads    = NFCORE_SMRNASEQ.out.umi_extract_reads
     umi_dedup            = NFCORE_SMRNASEQ.out.umi_dedup
     umi_saturation       = NFCORE_SMRNASEQ.out.umi_saturation
+    umi_dedup_fgumi      = NFCORE_SMRNASEQ.out.umi_dedup_fgumi
+    umi_dedup_reference  = NFCORE_SMRNASEQ.out.umi_dedup_reference
     mirtrace             = NFCORE_SMRNASEQ.out.mirtrace
     contaminant_filter   = NFCORE_SMRNASEQ.out.contaminant_filter
     contaminant_index    = NFCORE_SMRNASEQ.out.contaminant_index
@@ -312,6 +315,13 @@ output {
     }
     umi_saturation {
         path 'umi_dedup/saturation'
+    }
+    // Only with --umi_dedup_method fgumi (experimental)
+    umi_dedup_fgumi {
+        path 'umi_dedup/fgumi'
+    }
+    umi_dedup_reference {
+        path 'umi_dedup/reference'
     }
 
     // miRNA QC

@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "umi_dedup_reference"
+description: |
+  Build the reference for the experimental alignment-based UMI deduplication: parse and format the
+  mature and hairpin miRNA FASTA files of the selected species, cut one window per distinct mature
+  sequence (mature sequence plus flanking hairpin nucleotides) and build its Bowtie 1 index.
+keywords:
+  - umi
+  - deduplication
+  - mirna
+  - reference
+  - bowtie
+components:
+  - parse/fasta/mirna
+  - format/fasta/mirna
+  - umi/dedup/windows
+  - bowtie/build
+input:
+  - ch_reference_mature:
+      type: file
+      description: |
+        Channel containing the mature miRNA FASTA file (miRBase or MirGeneDB).
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
+  - ch_reference_hairpin:
+      type: file
+      description: |
+        Channel containing the hairpin miRNA FASTA file (miRBase or MirGeneDB).
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
+  - ch_mirtrace_species:
+      type: string
+      description: |
+        Channel containing the miRTrace species, used to filter the miRBase FASTA files when
+        `--mirna_species` is not set (MirGeneDB uses `--mirgenedb_species`).
+output:
+  - index:
+      type: directory
+      description: |
+        Channel containing the Bowtie 1 index of the windows reference.
+        Structure: [ val(meta), path(index) ]
+  - fasta:
+      type: file
+      description: |
+        Channel containing the windows reference.
+        Structure: [ val(meta), path(fasta) ]
+      pattern: "*.fa"
+  - windows:
+      type: file
+      description: |
+        Channel containing the table of the windows (record name, mature miRNAs, hairpin, position, length).
+        Structure: [ val(meta), path(tsv) ]
+      pattern: "*.tsv"
+  - versions_tuples:
+      type: list
+      description: |
+        Channel containing the versions of the FASTA parsing and formatting modules, which do not
+        report to the `versions` topic.
+        Structure: [ val(process), val(tool), val(version) ]
+authors:
+  - "@apeltzer"
+maintainers:
+  - "@apeltzer"
