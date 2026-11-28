@@ -1,0 +1,128 @@
+nextflow_process {
+
+    name "Test Process UMI_DEDUP_WINDOWS"
+    script "../main.nf"
+    process "UMI_DEDUP_WINDOWS"
+    tag "modules"
+    tag "modules_local"
+    tag "umi_dedup_windows"
+
+    test("Windows from mature and hairpin fixtures") {
+
+        when {
+            process {
+                """
+                input[0] = [ [ id:'mature' ], file("${projectDir}/modules/local/umi_dedup_windows/tests/fixtures/mature.fa", checkIfExists: true) ]
+                input[1] = [ [ id:'hairpin' ], file("${projectDir}/modules/local/umi_dedup_windows/tests/fixtures/hairpin.fa", checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            def fasta = path(process.out.fasta.get(0).get(1)).readLines()
+            def rows  = path(process.out.windows.get(0).get(1)).readLines()*.split('\t', -1)*.toList()
+            assertAll(
+                { assert process.success },
+                { assert rows[0] == ['window', 'mature', 'hairpin', 'start', 'end', 'length'] },
+                // 5 nt flanks from the first hairpin that contains the mature sequence (hsa-mir-a-1, not its paralog
+                // hsa-mir-a-2); hsa-miR-a2-5p has the same sequence (lower case, U instead of T) and shares the window
+                { assert rows[1] == ['hsa-miR-a-5p', 'hsa-miR-a-5p,hsa-miR-a2-5p', 'hsa-mir-a-1', '6', '37', '32'] },
+                { assert rows[2] == ['hsa-miR-a-3p', 'hsa-miR-a-3p', 'hsa-mir-a-1', '42', '71', '30'] },
+                // Flanks are shortened at the start and at the end of the hairpin
+                { assert rows[3] == ['hsa-miR-b-5p', 'hsa-miR-b-5p', 'hsa-mir-b', '1', '27', '27'] },
+                { assert rows[4] == ['hsa-miR-b-3p', 'hsa-miR-b-3p', 'hsa-mir-b', '31', '66', '36'] },
+                // A mature sequence that is in no hairpin is kept without flanks
+                { assert rows[5] == ['hsa-miR-orphan', 'hsa-miR-orphan', 'NA', 'NA', 'NA', '22'] },
+                { assert rows.size() == 6 },
+                { assert fasta == [
+                    '>hsa-miR-a-5p', 'GGGGGAAAACCCCGGGGTTTTAAAACCCCACG',
+                    '>hsa-miR-a-3p', 'TACGTTTTTGGGGCCCCAAAATTTTCCCCC',
+                    '>hsa-miR-b-5p', 'ACGATCGATCGTAGCTAGCTAGCATCG',
+                    '>hsa-miR-b-3p', 'GACTAGCTAGCATCAGCTACGACTAGCATCGACTAC',
+                    '>hsa-miR-orphan', 'CCATGCCATGGCATGGCATGCA'
+                ] }
+            )
+        }
+    }
+
+    test("miRBase hsa: one window per distinct mature sequence") {
+
+        setup {
+            run("PARSE_FASTA_MIRNA", alias: "PARSE_MATURE") {
+                script "../../parse_fasta_mirna/main.nf"
+                process {
+                    """
+                    input[0] = channel.of([[id:'mature'], file(params.pipelines_testdata_base_path + 'miRBase/mature.fa', checkIfExists: true)])
+                    input[1] = 'hsa'
+                    input[2] = null
+                    """
+                }
+            }
+            run("PARSE_FASTA_MIRNA", alias: "PARSE_HAIRPIN") {
+                script "../../parse_fasta_mirna/main.nf"
+                process {
+                    """
+                    input[0] = channel.of([[id:'hairpin'], file(params.pipelines_testdata_base_path + 'miRBase/hairpin.fa', checkIfExists: true)])
+                    input[1] = 'hsa'
+                    input[2] = null
+                    """
+                }
+            }
+        }
+
+        when {
+            process {
+                """
+                input[0] = PARSE_MATURE.out.parsed_fasta
+                input[1] = PARSE_HAIRPIN.out.parsed_fasta
+                """
+            }
+        }
+
+        then {
+            def fasta   = path(process.out.fasta.get(0).get(1)).readLines()
+            def rows    = path(process.out.windows.get(0).get(1)).readLines()*.split('\t', -1)*.toList()
+            def names   = fasta.findAll { line -> line.startsWith('>') }
+            def seqs    = fasta.findAll { line -> !line.startsWith('>') }
+            def by_name = rows.drop(1).collectEntries { row -> [(row[0]): row] }
+            assertAll(
+                { assert process.success },
+                { assert names.size() > 2000 },
+                { assert names.size() == rows.size() - 1 },
+                // Record names and window sequences are unique, so a read has one best alignment per mature sequence
+                { assert names.toSet().size() == names.size() },
+                { assert seqs.toSet().size() == seqs.size() },
+                { assert seqs.every { seq -> seq ==~ /[ACGTN]+/ } },
+                // hsa-let-7a-5p comes from three hairpins (let-7a-1/-2/-3): one window, from the first of them
+                { assert by_name['hsa-let-7a-5p'][2] == 'hsa-let-7a-1' },
+                { assert names.count { name -> name.startsWith('>hsa-let-7a-5p') } == 1 },
+                // 22 nt mature sequence plus 5 nt on each side
+                { assert by_name['hsa-let-7a-5p'][5] == '32' },
+                { assert fasta[fasta.indexOf('>hsa-let-7a-5p') + 1].substring(5, 27) == 'TGAGGTAGTAGGTTGTATAGTT' },
+                { assert rows.drop(1).every { row -> (row[5] as int) <= 10 + 30 } }
+            )
+        }
+    }
+
+    test("stub") {
+
+        options "-stub"
+
+        when {
+            process {
+                """
+                input[0] = [ [ id:'mature' ], file("${projectDir}/modules/local/umi_dedup_windows/tests/fixtures/mature.fa", checkIfExists: true) ]
+                input[1] = [ [ id:'hairpin' ], file("${projectDir}/modules/local/umi_dedup_windows/tests/fixtures/hairpin.fa", checkIfExists: true) ]
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert process.success },
+                { assert process.out.fasta.size() == 1 },
+                { assert process.out.windows.size() == 1 }
+            )
+        }
+    }
+}

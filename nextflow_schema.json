@@ -57,7 +57,7 @@
                     "type": "boolean",
                     "fa_icon": "fas fa-barcode",
                     "description": "Enable UMI-based read deduplication.",
-                    "help_text": "The UMI is extracted from the raw reads with UMI-tools (see `--umitools_bc_pattern`), fastp filters and clips the inserts, and UMICollapse removes reads with the same UMI and insert sequence. `-profile qiaseq` sets the UMI pattern for QIAseq miRNA libraries."
+                    "help_text": "The UMI is extracted from the raw reads with UMI-tools (see `--umitools_bc_pattern`), fastp filters and clips the inserts, and UMICollapse removes reads with the same UMI and insert sequence. `-profile qiaseq` sets the UMI pattern for QIAseq miRNA libraries. `--umi_dedup_method` selects an experimental alternative deduplication method."
                 },
                 "umitools_extract_method": {
                     "type": "string",
@@ -72,8 +72,16 @@
                     "default": "dir",
                     "description": "UMICollapse deduplication algorithm: dir (directional), adj (adjacency) or cc (connected components).",
                     "fa_icon": "fas fa-layer-group",
-                    "help_text": "Passed to UMICollapse as `--algo`. All three merge UMIs that differ by one substitution; for exact UMI matching, see the UMI section of the usage documentation.",
+                    "help_text": "Passed to UMICollapse as `--algo`. All three merge UMIs that differ by one substitution; for exact UMI matching, see the UMI section of the usage documentation. Not used with `--umi_dedup_method fgumi`.",
                     "enum": ["dir", "adj", "cc"]
+                },
+                "umi_dedup_method": {
+                    "type": "string",
+                    "default": "umicollapse",
+                    "description": "UMI deduplication method: 'umicollapse' (default, on UMI + insert sequence) or 'fgumi' (experimental, after alignment).",
+                    "fa_icon": "fas fa-layer-group",
+                    "help_text": "`umicollapse` (default): UMICollapse removes reads with the same UMI and insert sequence, without alignment (see `--umitools_method`).\n\n`fgumi` is **experimental** and may change in future releases: the reads are aligned with Bowtie 1 to a reference of mature miRNA sequences with a few flanking nucleotides from the hairpin, and [fgumi](https://github.com/fulcrumgenomics/fgumi) removes reads with the same alignment position, strand and identical UMI. Reads that do not align to this reference are kept without deduplication. `--umitools_method` is not used with `fgumi`. See the [usage documentation](https://nf-co.re/smrnaseq/usage#experimental-alignment-based-deduplication-with-fgumi).",
+                    "enum": ["umicollapse", "fgumi"]
                 },
                 "skip_umi_extract_before_dedup": {
                     "type": "boolean",

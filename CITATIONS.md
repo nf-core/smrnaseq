@@ -42,6 +42,10 @@
 
 - [Bioconductor](https://www.bioconductor.org/) and [R](https://cran.r-project.org/)
 
+- [fgumi](https://github.com/fulcrumgenomics/fgumi) (only with the experimental `--umi_dedup_method fgumi`)
+
+  > Fulcrum Genomics. fgumi: high-performance tools for UMI-tagged sequencing data. Available online https://github.com/fulcrumgenomics/fgumi.
+
 ## Nextflow plugins
 
 - [nf-co2footprint](https://doi.org/10.5281/zenodo.14622304)

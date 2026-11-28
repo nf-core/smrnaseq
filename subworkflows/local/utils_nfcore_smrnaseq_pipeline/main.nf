@@ -282,6 +282,24 @@ def validateInputParameters() {
     umiDeprecationWarnings(params.skip_umi_extract_before_dedup, params.umi_discard_read).each { message ->
         log.warn(message)
     }
+    def umi_dedup_method_warning = umiDedupMethodWarning(params.with_umi, params.umi_dedup_method)
+    if (umi_dedup_method_warning) {
+        log.warn(umi_dedup_method_warning)
+    }
+}
+
+//
+// Warning for `--umi_dedup_method fgumi`: the method is experimental, and it has no effect without
+// `--with_umi`. Returns a warning message, or null for the default method.
+//
+def umiDedupMethodWarning(with_umi, umi_dedup_method) {
+    if (umi_dedup_method != 'fgumi') {
+        return null
+    }
+    if (!with_umi) {
+        return "'--umi_dedup_method fgumi' has no effect without '--with_umi': reads are not deduplicated."
+    }
+    return "'--umi_dedup_method fgumi' is experimental: UMI deduplication after alignment to a mature miRNA windows reference with fgumi (exact UMI matching). Reads that do not align to this reference are not deduplicated, '--umitools_method' is not used and no UMI saturation statistics are written. Its behaviour and outputs may change in future releases. See https://nf-co.re/smrnaseq/usage#experimental-alignment-based-deduplication-with-fgumi"
 }
 
 //

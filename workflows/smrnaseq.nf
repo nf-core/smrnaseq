@@ -18,6 +18,8 @@ include { CONTAMINANT_FILTER               } from '../subworkflows/local/contami
 include { GENOME_QUANT                     } from '../subworkflows/local/genome_quant/main'
 include { MIRNA_QUANT                      } from '../subworkflows/local/mirna_quant/main'
 include { MIRDEEP2_CONSENSUS               } from '../subworkflows/local/mirdeep2_consensus/main'
+include { UMI_DEDUP_REFERENCE              } from '../subworkflows/local/umi_dedup_reference/main'
+include { UMI_DEDUP_FGUMI                  } from '../subworkflows/local/umi_dedup_fgumi/main'
 // local modules
 include { UMI_TO_SEQUENCE                  } from '../modules/local/umi_to_sequence/main'
 include { UMI_FROM_SEQUENCE                } from '../modules/local/umi_from_sequence/main'
@@ -72,6 +74,9 @@ workflow NFCORE_SMRNASEQ {
     def ch_umi_extract_reads  = channel.empty()
     def ch_umi_dedup          = channel.empty()
     def ch_umi_saturation     = channel.empty()
+    def ch_umi_dedup_fgumi    = channel.empty()
+    def ch_umi_dedup_reference = channel.empty()
+    def ch_umi_dedup_versions = channel.empty()
     def ch_mirtrace           = channel.empty()
     def ch_contaminant_filter = channel.empty()
     def ch_contaminant_index  = channel.empty()
@@ -149,11 +154,39 @@ workflow NFCORE_SMRNASEQ {
     }
 
     //
-    // UMI deduplication on UMI + insert: UMICollapse (FastQ mode) compares whole read sequences
-    // and cannot read the UMI from the read name, so the UMI is moved to the start of the sequence
-    // for deduplication and removed again afterwards
+    // UMI deduplication
     //
-    if (params.with_umi) {
+    if (params.with_umi && params.umi_dedup_method == 'fgumi') {
+        //
+        // Experimental: alignment-based deduplication with fgumi. The reads (UMI in the read name) are
+        // aligned to the mature miRNA windows reference, and reads with the same position, strand and
+        // UMI are duplicates. Reads that do not align to this reference are passed through.
+        //
+        UMI_DEDUP_REFERENCE(
+            ch_reference_mature,
+            ch_reference_hairpin,
+            ch_mirtrace_species
+        )
+        UMI_DEDUP_FGUMI(
+            ch_reads_for_mirna,
+            UMI_DEDUP_REFERENCE.out.index
+        )
+
+        ch_reads_for_mirna     = UMI_DEDUP_FGUMI.out.reads
+        ch_umi_dedup           = UMI_DEDUP_FGUMI.out.reads
+        ch_umi_dedup_fgumi     = UMI_DEDUP_FGUMI.out.metrics.mix(
+            UMI_DEDUP_FGUMI.out.histogram,
+            UMI_DEDUP_FGUMI.out.align_log
+        )
+        ch_umi_dedup_reference = UMI_DEDUP_REFERENCE.out.fasta.mix(UMI_DEDUP_REFERENCE.out.windows)
+        ch_umi_dedup_versions  = UMI_DEDUP_REFERENCE.out.versions_tuples
+        // No UMI saturation statistics here: they describe one-mismatch clustering on UMI + insert (UMICollapse)
+    } else if (params.with_umi) {
+        //
+        // Default: UMICollapse (FastQ mode) on UMI + insert. It compares whole read sequences
+        // and cannot read the UMI from the read name, so the UMI is moved to the start of the sequence
+        // for deduplication and removed again afterwards
+        //
         UMI_TO_SEQUENCE(ch_reads_for_mirna)
         UMICOLLAPSE_FASTQ(
             UMI_TO_SEQUENCE.out.reads.map { meta, reads -> [meta, reads, []] },
@@ -312,7 +345,7 @@ workflow NFCORE_SMRNASEQ {
     // reference database entries (MIRNA_REFERENCE). collectVersions() merges them by process and
     // adds the workflow and Nextflow versions.
     def ch_versions_list = channel.topic("versions")
-        .mix(MIRNA_QUANT.out.versions_tuples, MIRNA_REFERENCE_VERSIONS.out.versions, ch_versions)
+        .mix(MIRNA_QUANT.out.versions_tuples, ch_umi_dedup_versions, MIRNA_REFERENCE_VERSIONS.out.versions, ch_versions)
         .toList()
 
     def ch_collated_versions = ch_versions_list
@@ -369,7 +402,7 @@ workflow NFCORE_SMRNASEQ {
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_raw_zip.collect { item -> item[1] }.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.fastqc_trim_zip.collect { item -> item[1] }.ifEmpty([]))
         ch_multiqc_files = ch_multiqc_files.mix(FASTQ_FASTQC_UMITOOLS_FASTP.out.trim_json.collect { item -> item[1] }.ifEmpty([]))
-        if(params.with_umi) {
+        if (params.with_umi && params.umi_dedup_method != 'fgumi') {
             ch_multiqc_files = ch_multiqc_files.mix(UMICOLLAPSE_FASTQ.out.log.collect { item -> item[1] }.ifEmpty([]))
         }
         ch_multiqc_files = ch_multiqc_files.mix(contamination_stats.collect().ifEmpty([]))
@@ -428,6 +461,8 @@ workflow NFCORE_SMRNASEQ {
     umi_extract_reads     = ch_umi_extract_reads
     umi_dedup             = ch_umi_dedup
     umi_saturation        = ch_umi_saturation
+    umi_dedup_fgumi       = ch_umi_dedup_fgumi
+    umi_dedup_reference   = ch_umi_dedup_reference
     mirtrace              = ch_mirtrace
     contaminant_filter    = ch_contaminant_filter
     contaminant_index     = ch_contaminant_index

@@ -1,0 +1,53 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "umi_dedup_windows"
+description: |
+  Build the reference for alignment-based UMI deduplication: one record per distinct mature miRNA
+  sequence, made of the mature sequence and a few flanking nucleotides taken from its hairpin.
+keywords:
+  - umi
+  - deduplication
+  - mirna
+  - reference
+tools:
+  - "gawk":
+      description: "GNU awk is a utility for text processing and data extraction."
+      homepage: "https://www.gnu.org/software/gawk/"
+      documentation: "https://www.gnu.org/software/gawk/manual/"
+      tool_dev_url: "https://git.savannah.gnu.org/cgit/gawk.git"
+      licence: ["GPL-3.0-or-later"]
+input:
+  - meta:
+      type: map
+      description: Groovy Map containing reference information.
+  - mature:
+      type: file
+      description: Mature miRNA FASTA file of the selected species (DNA alphabet).
+      pattern: "*.{fa,fasta}"
+  - meta2:
+      type: map
+      description: Groovy Map containing reference information.
+  - hairpin:
+      type: file
+      description: Hairpin (precursor) miRNA FASTA file of the selected species (DNA alphabet).
+      pattern: "*.{fa,fasta}"
+output:
+  - fasta:
+      type: file
+      description: |
+        FASTA file with one window per distinct mature miRNA sequence: the mature sequence plus
+        `flank` nucleotides (default 5, `ext.args = '-v flank=<n>'`) on each side from the first
+        hairpin that contains it, shortened at the hairpin ends. Mature sequences that are in no
+        hairpin are written without flanks. Records are named after the first mature miRNA with
+        that sequence.
+      pattern: "*.fa"
+  - windows:
+      type: file
+      description: |
+        Tab-separated table with one row per window: window (FASTA record name), mature (all mature
+        miRNAs with this window, comma-separated), hairpin, start and end (1-based position of the
+        window in the hairpin, or NA) and length.
+      pattern: "*.tsv"
+authors:
+  - "apeltzer"
+maintainers:
+  - "apeltzer"

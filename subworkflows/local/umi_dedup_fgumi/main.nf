@@ -1,15 +1,17 @@
 //
-// PROTOTYPE (#535): alignment-based UMI deduplication with fgumi.
+// Alignment-based UMI deduplication with fgumi (`--umi_dedup_method fgumi`, experimental, #535).
 //
 // Input reads must already carry the UMI in the read name (`umi_tools extract`, `<name>_<UMI>`).
-// Steps: bowtie1 (-k 1, one record per read, required by fgumi) -> fgumi copy-umi (name -> RX)
-//        -> fgumi sort (template-coordinate) -> fgumi dedup (--remove-duplicates) -> fgumi fastq.
+// Steps: Bowtie 1 (-k 1 --best: one record per read, required by fgumi) -> fgumi copy-umi (read name -> RX tag)
+//        -> fgumi sort (template-coordinate) -> fgumi dedup (exact UMI matching, duplicates removed,
+//        unaligned reads passed through) -> fgumi fastq.
 // The deduplicated FASTQ keeps the `_<UMI>` read-name suffix, so all downstream steps
-// (mirtrace, MIRNA_QUANT, GENOME_QUANT, miRDeep2) can consume it unchanged.
+// (contamination filter, MIRNA_QUANT, GENOME_QUANT, miRDeep2) can use it like the UMICollapse output.
+// The tool options are set in conf/modules.config.
 //
 
 include { BOWTIE_ALIGN as BOWTIE_MAP_UMI_DEDUP } from '../../../modules/nf-core/bowtie/align/main'
-include { FGUMI_COPYUMI                        } from '../../../modules/local/fgumi_copyumi/main'
+include { FGUMI_COPYUMI                        } from '../../../modules/nf-core/fgumi/copyumi/main'
 include { FGUMI_SORT                           } from '../../../modules/nf-core/fgumi/sort/main'
 include { FGUMI_DEDUP                          } from '../../../modules/nf-core/fgumi/dedup/main'
 include { FGUMI_FASTQ                          } from '../../../modules/nf-core/fgumi/fastq/main'
@@ -17,7 +19,7 @@ include { FGUMI_FASTQ                          } from '../../../modules/nf-core/
 workflow UMI_DEDUP_FGUMI {
     take:
     ch_reads        // channel: [ val(meta), path(reads) ]  UMI in read name
-    ch_bowtie_index // channel: [ val(meta2), path(index) ]  e.g. the formatted hairpin or mature index
+    ch_bowtie_index // channel: [ val(meta2), path(index) ]  index of the deduplication reference
 
     main:
     BOWTIE_MAP_UMI_DEDUP ( ch_reads, ch_bowtie_index.first(), false )
@@ -35,6 +37,6 @@ workflow UMI_DEDUP_FGUMI {
     bam       = FGUMI_DEDUP.out.bam          // channel: [ val(meta), path(bam) ]
     metrics   = FGUMI_DEDUP.out.metrics      // channel: [ val(meta), path(metrics.txt) ]
     histogram = FGUMI_DEDUP.out.histogram    // channel: [ val(meta), path(family_size_histogram.txt) ]
-    copy_umi  = FGUMI_COPYUMI.out.metrics    // channel: [ val(meta), path(copy_umi.tsv) ]
+    copy_umi  = FGUMI_COPYUMI.out.metrics    // channel: [ val(meta), path(metrics.txt) ]
     align_log = BOWTIE_MAP_UMI_DEDUP.out.log // channel: [ val(meta), path(out) ]
 }

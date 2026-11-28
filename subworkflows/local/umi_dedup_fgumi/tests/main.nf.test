@@ -1,6 +1,6 @@
 nextflow_workflow {
 
-    name "Test Workflow UMI_DEDUP_FGUMI (prototype #535)"
+    name "Test Workflow UMI_DEDUP_FGUMI"
     script "../main.nf"
     config "./nextflow.config"
     workflow "UMI_DEDUP_FGUMI"
@@ -8,21 +8,34 @@ nextflow_workflow {
     tag "subworkflows_local"
     tag "umi_dedup_fgumi"
 
+    // Deduplication reference: mature miRNA windows of hsa, built as in UMI_DEDUP_REFERENCE
     setup {
-        run("PARSE_FASTA_MIRNA") {
+        run("PARSE_FASTA_MIRNA", alias: "PARSE_MATURE") {
+            script "../../../../modules/local/parse_fasta_mirna/main.nf"
+            process {
+                """
+                input[0] = channel.of([[id:'mature'], file(params.pipelines_testdata_base_path + 'miRBase/mature.fa', checkIfExists: true)])
+                input[1] = 'hsa'
+                input[2] = null
+                """
+            }
+        }
+        run("PARSE_FASTA_MIRNA", alias: "PARSE_HAIRPIN") {
             script "../../../../modules/local/parse_fasta_mirna/main.nf"
             process {
                 """
                 input[0] = channel.of([[id:'hairpin'], file(params.pipelines_testdata_base_path + 'miRBase/hairpin.fa', checkIfExists: true)])
                 input[1] = 'hsa'
+                input[2] = null
                 """
             }
         }
-        run("FORMAT_FASTA_MIRNA") {
-            script "../../../../modules/local/format_fasta_mirna/main.nf"
+        run("UMI_DEDUP_WINDOWS") {
+            script "../../../../modules/local/umi_dedup_windows/main.nf"
             process {
                 """
-                input[0] = PARSE_FASTA_MIRNA.out.parsed_fasta
+                input[0] = PARSE_MATURE.out.parsed_fasta
+                input[1] = PARSE_HAIRPIN.out.parsed_fasta
                 """
             }
         }
@@ -30,7 +43,7 @@ nextflow_workflow {
             script "../../../../modules/nf-core/bowtie/build/main.nf"
             process {
                 """
-                input[0] = FORMAT_FASTA_MIRNA.out.formatted_fasta
+                input[0] = UMI_DEDUP_WINDOWS.out.fasta
                 """
             }
         }
@@ -44,7 +57,7 @@ nextflow_workflow {
         }
     }
 
-    test("QIAseq test_umi sample - fgumi adjacency dedup against the hsa hairpin index") {
+    test("QIAseq test_umi sample - fgumi identity dedup against the hsa windows index") {
 
         when {
             workflow {
@@ -63,7 +76,32 @@ nextflow_workflow {
             def fastq   = path(workflow.out.reads.get(0).get(1)).linesGzip
             def copyumi = path(workflow.out.copy_umi.get(0).get(1)).readLines()
 
+            // Scripts of the subworkflow tasks and the reads given to it, found in the work directory
+            def scripts = [:]
+            def extracted = null
+            new File("${workDir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
+                if (file.name == '.command.run') {
+                    def process = (file.text =~ /(?m)^### name: ["']([^ "']+)/)
+                    if (process.find()) {
+                        scripts[process.group(1).tokenize(':').last()] = new File(file.parentFile, '.command.sh').text
+                    }
+                }
+                if (file.name.endsWith('.umi_extract.fastq.gz') && file.parentFile.list().contains('.command.sh') && new File(file.parentFile, '.command.sh').text.contains('umi_tools')) {
+                    extracted = file
+                }
+            }
+            // Read name (first field) -> sequence and qualities
+            def records = { List<String> lines -> lines.collate(4).collectEntries { rec -> [(rec[0].tokenize(' ')[0]): [rec[1], rec[3]]] } }
+            def input_records  = records(path(extracted.toString()).linesGzip)
+            def output_records = records(fastq)
+
             assert workflow.success
+            // Options from conf/modules.config: one alignment per read, exact UMI matching, unaligned reads kept
+            assert scripts['BOWTIE_MAP_UMI_DEDUP'].contains('-k 1 --best')
+            assert !scripts['BOWTIE_MAP_UMI_DEDUP'].contains('--norc')
+            assert scripts['FGUMI_COPYUMI'].contains('--field-delimiter _')
+            assert scripts['FGUMI_SORT'].contains('--order template-coordinate')
+            assert scripts['FGUMI_DEDUP'].contains('--strategy identity --remove-duplicates --include-unmapped')
             // every input read got its RX tag from the umi_tools read-name suffix
             assert copyumi[1].split('\t')[0] == copyumi[1].split('\t')[1]
             // duplicates were found and removed; unmapped reads were passed through
@@ -74,8 +112,13 @@ nextflow_workflow {
             // FASTQ output = unique templates (mapped survivors + unmapped passthrough)
             assert fastq.size() / 4 == value('unique_templates')
             assert value('unique_templates') < value('total_templates')
+            assert output_records.size() == value('unique_templates')
+            assert output_records.size() < input_records.size()
             // the UMI stays in the read name for downstream tools
             assert fastq[0] ==~ /^@\S+_[ACGTN]{12}.*/
+            // every output read is an input read with the same sequence and qualities
+            // (reads aligned to the reverse strand are written in their original orientation)
+            assert output_records.every { name, record -> input_records[name] == record }
         }
     }
 
@@ -96,6 +139,7 @@ nextflow_workflow {
             assert workflow.success
             assert workflow.out.reads.size() == 1
             assert workflow.out.metrics.size() == 1
+            assert workflow.out.histogram.size() == 1
             assert workflow.out.copy_umi.size() == 1
         }
     }

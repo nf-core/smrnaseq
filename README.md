@@ -43,7 +43,7 @@ You can find numerous talks on the nf-core events page from various topics inclu
    3. 3' adapter trimming ([`fastp`](https://github.com/OpenGene/fastp))
    4. Read quality and length filter ([`fastp`](https://github.com/OpenGene/fastp))
    5. Trim read QC ([`FastQC`](https://www.bioinformatics.babraham.ac.uk/projects/fastqc/))
-2. UMI deduplication on UMI + insert sequence ([`UMICollapse`](https://github.com/Daniel-Liu-c0deb0t/UMICollapse)) (Optional)
+2. UMI deduplication on UMI + insert sequence ([`UMICollapse`](https://github.com/Daniel-Liu-c0deb0t/UMICollapse)) (Optional), or, as an experimental alternative, after alignment to a mature miRNA reference ([`fgumi`](https://github.com/fulcrumgenomics/fgumi), `--umi_dedup_method fgumi`)
 3. miRNA QC ([`miRTrace`](https://github.com/friedlanderlab/mirtrace))
 4. Contamination filtering ([`Bowtie2`](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)) (Optional)
    1. rRNA filtration

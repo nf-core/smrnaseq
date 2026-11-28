@@ -17,6 +17,7 @@ The pipeline is built using [Nextflow](https://www.nextflow.io/) and processes d
 - [FastQC](#fastqc) - read quality control
 - [UMI-tools extract](#umi-tools-extract) - UMI barcode extraction
 - [UMI-collapse deduplicate](#umi-collapse-deduplicate) - read deduplication
+- [fgumi deduplicate (experimental)](#fgumi-deduplicate-experimental) - alignment-based read deduplication with `--umi_dedup_method fgumi`
 - [FastP](#fastp) - adapter trimming
 - [Bowtie2](#bowtie2) - contamination filtering
 - [Bowtie](#bowtie) - alignment against mature miRNAs and miRNA precursors (hairpins)
@@ -103,7 +104,7 @@ If `--save_reference` is specified, the reference files and indices that the pip
 
 </details>
 
-With `--with_umi`, [UMI-tools](https://github.com/CGATOxford/UMI-tools) `extract` is the first step after read QC. It runs on the raw reads and uses `--umitools_bc_pattern` to move the UMI from the read sequence into the read name and to remove the kit sequences around it, so that only the insert remains. `fastp` then filters and clips the inserts (see [FastP](#fastp)), and they are deduplicated (see [UMI-collapse deduplicate](#umi-collapse-deduplicate)). The log reports how many reads matched the pattern. See the [UMI handling section of the usage documentation](https://nf-co.re/smrnaseq/usage#umi-handling) for the order of the steps and the recommended parameters.
+With `--with_umi`, [UMI-tools](https://github.com/CGATOxford/UMI-tools) `extract` is the first step after read QC. It runs on the raw reads and uses `--umitools_bc_pattern` to move the UMI from the read sequence into the read name and to remove the kit sequences around it, so that only the insert remains. `fastp` then filters and clips the inserts (see [FastP](#fastp)), and they are deduplicated (see [UMI-collapse deduplicate](#umi-collapse-deduplicate), or [fgumi deduplicate](#fgumi-deduplicate-experimental) with `--umi_dedup_method fgumi`). The log reports how many reads matched the pattern. See the [UMI handling section of the usage documentation](https://nf-co.re/smrnaseq/usage#umi-handling) for the order of the steps and the recommended parameters.
 
 ## FastP
 
@@ -135,9 +136,28 @@ With `--with_umi`, FastP runs on the inserts after [UMI-tools extract](#umi-tool
 
 </details>
 
-With `--with_umi`, [UMICollapse](https://github.com/Daniel-Liu-c0deb0t/UMICollapse) deduplicates the extracted inserts directly on the FastQ files, without mapping the reads first. The UMI is moved from the read name to the start of the sequence for this step, so that reads with the same UMI and insert sequence, up to one substitution by default, are collapsed into one read; it is removed from the sequence again afterwards. The deduplication algorithm is set with `--umitools_method`. MultiQC reports the number of reads before and after deduplication from the UMICollapse log.
+With `--with_umi` (and the default `--umi_dedup_method umicollapse`), [UMICollapse](https://github.com/Daniel-Liu-c0deb0t/UMICollapse) deduplicates the extracted inserts directly on the FastQ files, without mapping the reads first. The UMI is moved from the read name to the start of the sequence for this step, so that reads with the same UMI and insert sequence, up to one substitution by default, are collapsed into one read; it is removed from the sequence again afterwards. The deduplication algorithm is set with `--umitools_method`. MultiQC reports the number of reads before and after deduplication from the UMICollapse log.
 
 If `top_sequence_umi_fraction` is above 0.005 (0.5% of all possible UMIs), the pipeline prints a UMI saturation warning: one-mismatch deduplication then merges distinct molecules of the most abundant sequences. See [Choosing a UMI strategy](https://nf-co.re/smrnaseq/usage#choosing-a-umi-strategy).
+
+## fgumi deduplicate (experimental)
+
+<details markdown="1">
+<summary>Output files</summary>
+
+- `umi_dedup/fgumi/`
+  - `*.umi_dedup.metrics.txt`: `fgumi dedup` metrics for each sample (tab-separated), including the number of reads that passed the filters (`total_templates`), kept reads (`unique_templates`), removed duplicates (`duplicate_templates`), reads that did not align to the deduplication reference and were passed through (`passthrough_templates`) and reads removed because of an `N` in the UMI (`filtered_ns_in_umi`).
+  - `*.umi_dedup.family_size_histogram.txt`: number of UMI families (molecules) by number of reads.
+  - `*.umi_dedup_windows.out`: Bowtie 1 log of the alignment to the deduplication reference.
+- `umi_dedup/reference/`
+  - `umi_dedup_windows.fa`: the deduplication reference, with one record for each distinct mature miRNA sequence (mature sequence plus 5 nt on each side from the hairpin).
+  - `umi_dedup_windows.tsv`: table of the records: `window` (record name), `mature` (all mature miRNAs with this sequence), `hairpin`, `start` and `end` (position of the window in the hairpin, `NA` if the mature sequence is in no hairpin) and `length`.
+- `umi_dedup/fastq_deduplicated/`
+  - `*.umi_dedup.fastq.gz`: If `--save_umi_intermeds` is specified, the deduplicated reads (inserts, with the UMI in the read name). These are the reads used for miRNA quantification.
+
+</details>
+
+These files are only produced with `--with_umi --umi_dedup_method fgumi`, an **experimental** alternative to [UMI-collapse deduplicate](#umi-collapse-deduplicate). The reads are aligned to a reference of mature miRNA sequences with flanking nucleotides, and [fgumi](https://github.com/fulcrumgenomics/fgumi) removes reads with the same alignment position, strand and identical UMI. Reads that do not align to this reference are kept without deduplication. No UMI saturation statistics (`umi_dedup/saturation/`) are written, and the metrics are not shown in MultiQC. See [Experimental: alignment-based deduplication with fgumi](https://nf-co.re/smrnaseq/usage#experimental-alignment-based-deduplication-with-fgumi) in the usage documentation.
 
 ## Bowtie2
 

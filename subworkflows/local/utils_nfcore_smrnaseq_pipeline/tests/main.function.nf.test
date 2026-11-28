@@ -229,6 +229,72 @@ nextflow_function {
         }
     }
 
+    // umiDedupMethodWarning inputs: with_umi, umi_dedup_method
+
+    test("Test Function umiDedupMethodWarning - default method") {
+
+        function "umiDedupMethodWarning"
+
+        when {
+            function {
+                """
+                input[0] = true
+                input[1] = 'umicollapse'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result == null }
+            )
+        }
+    }
+
+    test("Test Function umiDedupMethodWarning - fgumi is experimental") {
+
+        function "umiDedupMethodWarning"
+
+        when {
+            function {
+                """
+                input[0] = true
+                input[1] = 'fgumi'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result.contains("'--umi_dedup_method fgumi' is experimental") },
+                { assert function.result.contains("'--umitools_method' is not used") }
+            )
+        }
+    }
+
+    test("Test Function umiDedupMethodWarning - fgumi without --with_umi") {
+
+        function "umiDedupMethodWarning"
+
+        when {
+            function {
+                """
+                input[0] = false
+                input[1] = 'fgumi'
+                """
+            }
+        }
+
+        then {
+            assertAll(
+                { assert function.success },
+                { assert function.result.contains("has no effect without '--with_umi'") }
+            )
+        }
+    }
+
     // umiSaturationWarning input: the UMI_FROM_SEQUENCE statistics TSV as text
 
     test("Test Function umiSaturationWarning - saturated") {

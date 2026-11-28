@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/subworkflows/yaml-schema.json
+name: "umi_dedup_fgumi"
+description: |
+  Experimental alignment-based UMI deduplication with fgumi: align reads that carry the UMI in the
+  read name to a deduplication reference with Bowtie 1 (one record per read), copy the UMI to the RX tag,
+  sort in template-coordinate order, remove duplicates and convert the remaining reads back to FASTQ.
+keywords:
+  - umi
+  - deduplication
+  - fgumi
+  - bowtie
+  - mirna
+components:
+  - bowtie/align
+  - fgumi/copyumi
+  - fgumi/sort
+  - fgumi/dedup
+  - fgumi/fastq
+input:
+  - ch_reads:
+      type: file
+      description: |
+        Channel containing single-end reads with the UMI at the end of the read name (`<name>_<UMI>`,
+        as written by `umi_tools extract`).
+        Structure: [ val(meta), path(fastq) ]
+      pattern: "*.{fastq.gz,fq.gz}"
+  - ch_bowtie_index:
+      type: directory
+      description: |
+        Channel containing the Bowtie 1 index of the deduplication reference (see `umi_dedup_reference`).
+        Structure: [ val(meta2), path(index) ]
+output:
+  - reads:
+      type: file
+      description: |
+        Channel containing the deduplicated reads, in their original orientation and with the UMI
+        in the read name. Reads that did not align to the reference are included.
+        Structure: [ val(meta), path(fastq) ]
+      pattern: "*.fastq.gz"
+  - bam:
+      type: file
+      description: |
+        Channel containing the deduplicated alignments.
+        Structure: [ val(meta), path(bam) ]
+      pattern: "*.bam"
+  - metrics:
+      type: file
+      description: |
+        Channel containing the `fgumi dedup` metrics.
+        Structure: [ val(meta), path(txt) ]
+      pattern: "*.metrics.txt"
+  - histogram:
+      type: file
+      description: |
+        Channel containing the UMI family size histogram of `fgumi dedup`.
+        Structure: [ val(meta), path(txt) ]
+      pattern: "*.family_size_histogram.txt"
+  - copy_umi:
+      type: file
+      description: |
+        Channel containing the `fgumi copy-umi` metrics.
+        Structure: [ val(meta), path(txt) ]
+      pattern: "*.metrics.txt"
+  - align_log:
+      type: file
+      description: |
+        Channel containing the Bowtie 1 log of the alignment to the deduplication reference.
+        Structure: [ val(meta), path(out) ]
+      pattern: "*.out"
+authors:
+  - "@apeltzer"
+maintainers:
+  - "@apeltzer"
