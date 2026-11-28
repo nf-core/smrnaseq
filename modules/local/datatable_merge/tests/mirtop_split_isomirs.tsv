@@ -1,0 +1,10 @@
+UID	Read	miRNA	Variant	iso_5p	iso_3p	iso_add3p	iso_snp	iso_5p_nt	iso_3p_nt	iso_add3p_nt	iso_snp_nt	ctrl-1	2-treated	3-treated
+iso-20-AAAA	TGGAAGACTAGTGATTTTGT	hsa-miR-X	iso_3p:-3	0	-3	0	0	0	ttg	0	0	5	0	0
+iso-20-AAAA	TGGAAGACTAGTGATTTTGT	hsa-miR-X	iso_3p:-3	0	-3	0	0	0	ttc	0	0	0	3	0
+iso-23-BBBB	TGGAAGACTAGTGATTTTGTTGT	hsa-miR-X	NA	0	0	0	0	0	0	0	0	1	1	1
+iso-22-EEEE	TAATGCCCCTAAAAATCCTTAA	hsa-miR-Y-a	NA	0	0	0	0	0	0	0	0	6	0	2
+iso-23-DDDD	TAATGCCCCTAAAAATCCTTATT	hsa-miR-Y-b	iso_add3p:1	0	0	1	0	0	0	T	0	2	0	1
+iso-22-CCCC	TAATGCCCCTAAAAATCCTTAT	hsa-miR-Y-a	NA	0	0	0	0	0	0	0	0	12	10	1
+iso-22-CCCC	TAATGCCCCTAAAAATCCTTAT	hsa-miR-Y-b	NA	0	0	0	0	0	0	0	0	12	10	1
+iso-21-FFFF	TGAGGTAGTAGGTTGTATAGT	hsa-miR-Z-a	NA	0	0	0	0	0	0	0	0	4	4	0
+iso-21-FFFF	TGAGGTAGTAGGTTGTATAGT	hsa-miR-Z-b	NA	0	0	0	0	0	0	0	0	4	4	0
