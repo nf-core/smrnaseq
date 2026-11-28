@@ -296,7 +296,30 @@ miRDeep2 runs only when a genome FASTA is given (`--fasta` or `--genome`), and c
 - `mirdeep2/result_{sample.id}.bed` File with the known and novel miRNAs in bed format.
 - `mirdeep2/result_{sample.id}.csv` File with an overview of all detected miRNAs (known and novel) in csv format.
 - `mirdeep2/result_{sample.id}.html` A HTML report with an overview of all detected miRNAs (known and novel) in html format.
+- `mirdeep2/pdfs_{sample.id}/` Only if you turn the PDFs on (see below): one PDF per miRNA, with its hairpin structure and the reads on it. The HTML report links to these files, so keep the folder next to the report.
 - `mirdeep2/mirdeep2_consensus.bed` and `mirdeep2/mirdeep2_consensus.tsv` (only with `--mirdeep2_consensus_min_samples` of 1 or more): Cross-sample consensus of the per-sample BED files, see [below](#cross-sample-consensus-of-mirdeep2-loci).
+
+miRDeep2 runs on each sample separately. The only files that combine samples are the optional [cross-sample consensus](#cross-sample-consensus-of-mirdeep2-loci) files. See [the usage documentation](https://nf-co.re/smrnaseq/usage#mirdeep2) for the inputs and options of miRDeep2.
+
+How to read the results:
+
+- The CSV file is tab-separated, even though its extension is `.csv`. It has these parts:
+  - A table of score cut-offs. For each miRDeep2 score, it lists the number of novel miRNAs reported, the estimated false and true positives among them, the number of known miRNAs detected, and the estimated signal-to-noise ratio. Use this table to choose a score cut-off for novel miRNAs.
+  - `novel miRNAs predicted by miRDeep2`: candidate precursors that do not match a known hairpin.
+  - `mature miRBase miRNAs detected by miRDeep2`: known miRNAs that miRDeep2 also finds in the data.
+  - `#miRBase miRNAs not detected by miRDeep2`: known miRNAs with reads in the sample that miRDeep2 does not report as precursors.
+- Important columns of the novel and detected tables:
+  - `miRDeep2 score`: higher is more likely to be a real miRNA.
+  - `estimated probability that the miRNA candidate is a true positive`: for a candidate with this score or higher.
+  - `rfam alert`: the hairpin is similar to an rRNA or tRNA. The miRDeep2 authors advise that this warning should overrule the probability.
+  - `total read count`, `mature read count`, `loop read count` and `star read count`: the reads on each part of the precursor.
+  - `significant randfold p-value`: whether the hairpin folds more stably than shuffled sequences.
+  - `example miRBase miRNA with the same seed`: a known miRNA with the same seed, if one exists.
+  - `consensus mature sequence`, `consensus star sequence` and `consensus precursor sequence`: the sequences of the candidate.
+  - `precursor coordinate`: the genome position as `chromosome:start..end:strand`.
+- The BED file holds the novel and detected known miRNAs from the CSV. Column 4 is `novel:<provisional id>` or `known:<provisional id>` and column 5 is the miRDeep2 score. The colour is red for the `+` strand and blue for the `-` strand. Scores and provisional IDs are specific to each sample, so you cannot compare them between samples directly. To get one set of loci for all samples, use the [cross-sample consensus](#cross-sample-consensus-of-mirdeep2-loci).
+- The HTML report shows the same tables. The ID in its first column links to the structure PDF of that miRNA in `pdfs_{sample.id}/`. By default, the pipeline runs miRDeep2 with `-d`, which skips the PDFs, so these links do not work. The PDFs are about 0.3 MB each, and there is one for every reported miRNA and every known miRNA with reads, which can add up to hundreds of MB per sample. To get them, leave out `-d` as described in [the usage documentation](https://nf-co.re/smrnaseq/usage#tuning-mirdeep2).
+- Novel miRNAs are not added to the miRNA count tables. See [the usage documentation](https://nf-co.re/smrnaseq/usage#mirdeep2) for how to count them in all samples.
 
 ### Cross-sample consensus of miRDeep2 loci
 

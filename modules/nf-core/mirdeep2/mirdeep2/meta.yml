@@ -68,11 +68,12 @@ output:
           type: map
           description: Groovy Map containing sample information e.g. `[
             id:'sample1', single_end:false ]`
-      - result*.{bed,csv,html}:
+      - "{result_*,pdfs_*}":
           type: file
           description: Output files, including BED, CSV, and HTML results files
-            with an overview of detected miRNAs.
-          pattern: "result*.{bed,csv,html}"
+            with an overview of detected miRNAs, and the per-miRNA structure
+            PDFs (pdfs_<prefix>/) unless -d is given.
+          pattern: "{result_*,pdfs_*}"
           ontologies:
             - edam: http://edamontology.org/format_3752 # CSV
   versions_mirdeep2:

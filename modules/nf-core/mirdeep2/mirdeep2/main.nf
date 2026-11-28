@@ -16,7 +16,7 @@ process MIRDEEP2_MIRDEEP2 {
     tuple val(meta3), path(mature), path(hairpin), path(mature_other_species)
 
     output:
-    tuple val(meta), path("result*.{bed,csv,html}")    , emit: outputs
+    tuple val(meta), path("{result_*,pdfs_*}")         , emit: outputs
     // WARN: Version information not provided by tool on CLI. Please update this string when bumping container versions.
     tuple val("${task.process}"), val('mirdeep2'), val("2.0.1"), emit: versions_mirdeep2, topic: versions
 
@@ -43,6 +43,14 @@ process MIRDEEP2_MIRDEEP2 {
     mv result_*.bed result_${prefix}.bed
     mv result_*.csv result_${prefix}.csv
     mv result_*.html result_${prefix}.html
+
+    # Give the per-miRNA structure PDFs a stable name and point the HTML report links to it
+    for pdf_dir in pdfs_*; do
+        if [ -d "\$pdf_dir" ] && [ "\$pdf_dir" != "pdfs_${prefix}" ]; then
+            mv "\$pdf_dir" pdfs_${prefix}
+            sed -i 's#href="pdfs_[^/"]*/#href="pdfs_${prefix}/#g' result_${prefix}.html
+        fi
+    done
     """
 
     stub:
