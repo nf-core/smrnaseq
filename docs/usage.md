@@ -36,19 +36,66 @@ miRTrace cannot auto-detect adapters. With `--three_prime_adapter auto-detect`, 
 
 It should point to the 3-letter species name used by [miRBase](https://www.mirbase.org/browse) or [MirGeneDB](https://www.mirgenedb.org/browse). Note the difference in case for the two databases.
 
-`mirtrace_species` is required when using miRBase (the default). Besides selecting the miRTrace species, it is used to select the miRNAs of your species from the `mature` and `hairpin` FASTA files and, unless `mirna_gtf` is given, to download the miRBase GFF3 file for mirtop (see below). Use the miRBase species code, e.g. `hsa`, `mmu` or `oar` for sheep. It cannot be set to a placeholder such as `none` to skip miRTrace, because the miRNA quantification would then find no miRNAs.
+`mirtrace_species` is required when using miRBase (the default), unless `mirna_species` is set (see below). Besides selecting the miRTrace species, it is used to select the miRNAs of your species from the `mature` and `hairpin` FASTA files and, unless `mirna_gtf` is given, to download the miRBase GFF3 file for mirtop (see below). Use the miRBase species code, e.g. `hsa`, `mmu` or `oar` for sheep. It cannot be set to a placeholder such as `none` to skip miRTrace, because the miRNA quantification would then find no miRNAs.
+
+### Quantify against several species or all species (`mirna_species`, `mirgenedb_species`)
+
+Use `--mirna_species` to filter the miRBase references to other species than `--mirtrace_species`, for example to annotate a non-model organism against several related species. It takes one species code, a comma-separated list of codes without spaces (e.g. `--mirna_species 'dre,fru,tni'`) or `all` to keep the references of all miRBase species. When it is not set, the references are filtered by `--mirtrace_species` as before. miRTrace still uses `--mirtrace_species`, which takes a single species. If `--mirtrace_species` is not set, miRTrace QC is skipped.
+
+With a single species, the miRBase GFF3 file of that species is downloaded for mirtop unless `--mirna_gtf` is given, also when it differs from `--mirtrace_species`. With more than one species or `all`, provide a GFF3 file with the miRNA coordinates of these species via `--mirna_gtf`, since miRBase provides one GFF3 file per species, or skip mirtop with `--skip_mirtop` (see [Species without a miRBase GFF3 file](#species-without-a-mirbase-gff3-file)). The miRBase GFF3 files of the species can be concatenated into one file:
+
+```bash
+for species in dre fru tni; do
+    curl -fsSL "https://mirbase.org/download/${species}.gff3"
+done > mirbase_dre_fru_tni.gff3
+```
+
+```bash
+nextflow run nf-core/smrnaseq \
+    -profile <docker/singularity/.../institute>,<protocol> \
+    --input samplesheet.csv \
+    --fasta <genome.fa> \
+    --mirtrace_species dre \
+    --mirna_species 'dre,fru,tni' \
+    --mirna_gtf mirbase_dre_fru_tni.gff3 \
+    --outdir <OUTDIR>
+```
+
+With `--mirgenedb`, `--mirgenedb_species` likewise takes one species, a comma-separated list (e.g. `Hsa,Mmu`, with MirGeneDB's capitalised codes) or `all`; `--mirna_species` is not used. `--mirgenedb_gff` must then contain the coordinates of all these species, for example the MirGeneDB GFF files of the species concatenated into one file or the GFF file for all species from [MirGeneDB](https://mirgenedb.org/download). The mature and precursor FASTA files can likewise be the files for all species, as they are filtered by `--mirgenedb_species`:
+
+```bash
+cat Hsa.gff Mmu.gff > mirgenedb_hsa_mmu.gff
+nextflow run nf-core/smrnaseq \
+    -profile <docker/singularity/.../institute>,<protocol> \
+    --input samplesheet.csv \
+    --mirgenedb \
+    --mirgenedb_species 'Hsa,Mmu' \
+    --mirgenedb_mature mirgenedb_all_mature.fa \
+    --mirgenedb_hairpin mirgenedb_all_precursor.fa \
+    --mirgenedb_gff mirgenedb_hsa_mmu.gff \
+    --outdir <OUTDIR>
+```
+
+When concatenating GFF files, the header lines of each file can be kept: `mirtop` reads the database name from the header of the first file and skips the other comment lines.
+
+Please note:
+
+- miRBase only provides GFF3 files for species with genome coordinates. Hairpins of species without entries in the GFF file are still used for the Bowtie alignments and the edgeR counts, but `mirtop` does not annotate reads on them.
+- Conserved miRNAs often have identical sequences in several species. Reads of such miRNAs align equally well to the entry of each species and are reported for each of them, so the mature and hairpin counts (edgeR) and the `mirtop` isomiR tables (`joined_samples_mirtop.tsv`, `export/`) contain the same reads under several names (e.g. `dre-miR-1` and `fru-miR-1`). The `mirtop/mirna.tsv` table counts each read sequence only once, under one of these names. Sum or pick these entries in downstream analyses as needed.
+- With `all`, this affects most reads of conserved miRNAs: in miRBase 22, the let-7a sequence is identical in 65 mature entries and contained in 173 hairpins. The miRNA alignments report at most 50 hits per read (`-k 50`), so for such reads only an arbitrary subset of the matching entries is counted. Prefer a list of related species over `all` where possible. The references themselves stay small (miRBase 22: about 38,600 hairpins and 48,900 mature sequences, a few MB), and building their Bowtie indices takes well under a minute. On the pipeline's test data, `all` made the hairpin alignments and `mirtop` about 2-3 times slower than a single species, raised the peak memory of `mirtop gff` to about 450 MB and of the edgeR step to about 1 GB, because of the many more multi-mapping hits and the larger count tables. The default resources cover this, but expect longer run times on full-size data.
+- miRDeep2 receives the filtered mature and hairpin sequences of all selected species as known miRNAs.
 
 ### miRNA related files
 
 Different parameters can be set for the two supported databases. By default `miRBase` will be used with the parameters below.
 
-- `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRBase: `https://mirbase.org/download/${params.mirtrace_species}.gff3`
+- `mirna_gtf`: If not supplied by the user, then `mirna_gtf` will point to the latest GFF3 file in miRBase: `https://mirbase.org/download/${params.mirtrace_species}.gff3` (the species given with `--mirna_species` if it is set to a single species). It is required when `--mirna_species` selects more than one species or `all`, unless mirtop is skipped with `--skip_mirtop`.
 - `mature`: points to the FASTA file of mature miRNA sequences. Default: `https://mirbase.org/download/mature.fa`
 - `hairpin`: points to the FASTA file of precursor miRNA sequences. Default: `https://mirbase.org/download/hairpin.fa`
 
 #### Species without a miRBase GFF3 file
 
-miRBase only provides GFF3 files for species whose miRNAs are mapped to a genome assembly. For many species in miRBase, such as sheep (`oar`) or rabbit (`ocu`), the file `https://mirbase.org/download/${params.mirtrace_species}.gff3` does not exist and the pipeline stops with an error that the miRBase GFF3 file could not be found. These species can still be analysed: their miRNAs are in the miRBase `mature` and `hairpin` FASTA files, and miRTrace supports them (`mirtrace --list-species` lists the supported species codes).
+miRBase only provides GFF3 files for species whose miRNAs are mapped to a genome assembly. For many species in miRBase, such as sheep (`oar`) or rabbit (`ocu`), the file `https://mirbase.org/download/<species>.gff3` (for `--mirna_species`, or `--mirtrace_species` if it is not set) does not exist and the pipeline stops with an error that the miRBase GFF3 file could not be found. These species can still be analysed: their miRNAs are in the miRBase `mature` and `hairpin` FASTA files, and miRTrace supports them (`mirtrace --list-species` lists the supported species codes).
 
 The GFF3 file is only used by mirtop for the isomiR annotation (`mirna_quant/mirtop/`). You can either:
 
@@ -72,7 +119,7 @@ Without `--genome`, set `--fasta` (or `--bowtie_index`) to a genome of your spec
 
 If MirGeneDB should be used instead it needs to be specified using `--mirgenedb` and use the parameters below.
 
-- `mirgenedb_gff`: The GFF file cannot be downloaded automatically due to the presence of short-term tokens in the URLs. Therefore, the user must manually provide the GFF file, either for their species of interest or for all species, by downloading it from [MirGeneDB](https://mirgenedb.org/download). The provided dataset will be automatically filtered based on the species specified with the `--mirgenedb_species` parameter.
+- `mirgenedb_gff`: The GFF file cannot be downloaded automatically due to the presence of short-term tokens in the URLs. Therefore, the user must manually provide the GFF file, either for their species of interest or for all species, by downloading it from [MirGeneDB](https://mirgenedb.org/download). The provided dataset will be automatically filtered based on the species specified with the `--mirgenedb_species` parameter, which can also be a comma-separated list of species or `all` (see [above](#quantify-against-several-species-or-all-species-mirna_species-mirgenedb_species)).
 - `mirgenedb_mature`: This parameter should point to the FASTA file containing mature miRNA sequences. The file can be manually downloaded from [MirGeneDB](https://mirgenedb.org/download).
 - `mirgenedb_hairpin`: This parameter should point to the FASTA file containing precursor miRNA sequences. Note that MirGeneDB does not offer a dedicated hairpin file, but the precursor sequences can be downloaded from [MirGeneDB](https://mirgenedb.org/download) and used instead.
 - `mirgenedb_star` (optional): This parameter can point to the FASTA file containing the star miRNA sequences ('Star sequences' on [MirGeneDB](https://mirgenedb.org/download)). The MirGeneDB mature FASTA only contains the dominant arm of each miRNA. With this file, the star arms (named with a trailing `*`, e.g. `Hsa-Mir-3613_3p*`) are also counted in the edgeR mature tables, under the same names as in the mirtop outputs. See [miRNA identifiers](https://nf-co.re/smrnaseq/output#mirna-identifiers).
