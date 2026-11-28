@@ -56,43 +56,47 @@
                 "with_umi": {
                     "type": "boolean",
                     "fa_icon": "fas fa-barcode",
-                    "description": "Enable UMI-based read deduplication."
+                    "description": "Enable UMI-based read deduplication.",
+                    "help_text": "The UMI is extracted from the raw reads with UMI-tools (see `--umitools_bc_pattern`), fastp filters and clips the inserts, and UMICollapse removes reads with the same UMI and insert sequence. `-profile qiaseq` sets the UMI pattern for QIAseq miRNA libraries."
                 },
                 "umitools_extract_method": {
                     "type": "string",
                     "default": "string",
                     "fa_icon": "fas fa-barcode",
                     "description": "UMI pattern to use. Can be either 'string' (default) or 'regex'.",
-                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).\n"
+                    "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).\n",
+                    "enum": ["string", "regex"]
                 },
                 "umitools_method": {
                     "type": "string",
                     "default": "dir",
-                    "description": "UMI grouping method",
+                    "description": "UMICollapse deduplication algorithm: dir (directional), adj (adjacency) or cc (connected components).",
                     "fa_icon": "fas fa-layer-group",
-                    "help_text": "Available options are dir, cc, adj"
+                    "help_text": "Passed to UMICollapse as `--algo`. All three merge UMIs that differ by one substitution; for exact UMI matching, see the UMI section of the usage documentation.",
+                    "enum": ["dir", "adj", "cc"]
                 },
                 "skip_umi_extract_before_dedup": {
                     "type": "boolean",
                     "fa_icon": "fas fa-compress-alt",
-                    "description": "Skip the UMI extraction from the reads before deduplication. Please note, if this parameter is set to false, the reads will be deduplicated solely on insert sequence. UMIs might be extracted after deduplication depending on the set umitools_bc_pattern nevertheless if with_umi is set to True.",
-                    "default": true
+                    "description": "Deprecated and ignored: with --with_umi, the UMI is always extracted before deduplication.",
+                    "hidden": true
                 },
                 "umitools_bc_pattern": {
                     "type": "string",
                     "fa_icon": "fas fa-barcode",
                     "help_text": "More details can be found in the [UMI-tools documentation](https://umi-tools.readthedocs.io/en/latest/reference/extract.html#extract-method).",
-                    "description": "The UMI barcode pattern to use e.g. 'NNNNNN' indicates that the first 6 nucleotides of the read are from the UMI."
+                    "description": "The UMI barcode pattern for UMI-tools extract, e.g. 'NNNNNN' for a 6 nt UMI at the start of the read. Set by -profile qiaseq."
                 },
                 "umi_discard_read": {
                     "type": "integer",
                     "fa_icon": "fas fa-barcode",
-                    "description": "After UMI barcode extraction discard either R1 or R2 by setting this parameter to 1 or 2, respectively."
+                    "description": "Deprecated and ignored: the pipeline only uses read 1.",
+                    "hidden": true
                 },
                 "save_umi_intermeds": {
                     "type": "boolean",
                     "fa_icon": "fas fa-save",
-                    "description": "If this option is specified, intermediate FastQ and BAM files produced by UMI-tools are also saved in the results directory."
+                    "description": "Save the reads after UMI extraction and after UMI deduplication to the results directory."
                 }
             },
             "fa_icon": "fas fa-barcode"
@@ -118,13 +122,21 @@
                 "mirtrace_species": {
                     "type": "string",
                     "description": "Species for miRTrace.",
-                    "help_text": "This is automatically set when using `--genome`. Example values: `hsa`, `mmu`...\n Note that mirTrace relies on miRBase for its species reference. See available references [here](https://www.mirbase.org/help/genome_summary.shtml).",
+                    "help_text": "This is automatically set when using `--genome`. Example values: `hsa`, `mmu`...\n Note that mirTrace relies on miRBase for its species reference. See available references [here](https://www.mirbase.org/help/genome_summary.shtml). The value is also used to select the species' miRNAs from `--mature` and `--hairpin` and to download the miRBase GFF3 file for mirtop.",
                     "fa_icon": "fas fa-journal-whills"
                 },
                 "mirgenedb_species": {
                     "type": "string",
-                    "description": "Species of MirGeneDB.",
-                    "help_text": "This replaces the value of `--mirtrace_species` if `--mirgenedb` is used. \n Note the difference in case for species names used in MirGeneDB and miRBase. See https://www.mirgenedb.org/browse for more information.",
+                    "pattern": "^[A-Za-z0-9]+(,[A-Za-z0-9]+)*$",
+                    "description": "Species of MirGeneDB. One species, a comma-separated list of species (e.g. `Hsa,Mmu`) or `all`.",
+                    "help_text": "This replaces the value of `--mirtrace_species` if `--mirgenedb` is used. \n Note the difference in case for species names used in MirGeneDB and miRBase. See https://www.mirgenedb.org/browse for more information. With several species or `all`, `--mirgenedb_gff` must contain the coordinates of these species, e.g. the MirGeneDB GFF files of the species concatenated into one file or the MirGeneDB GFF file for all species.",
+                    "fa_icon": "fas fa-microscope"
+                },
+                "mirna_species": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9]+(,[A-Za-z0-9]+)*$",
+                    "description": "miRBase species used to filter the mature and hairpin references: one species, a comma-separated list (e.g. `dre,fru,tni`) or `all`. Defaults to `--mirtrace_species`.",
+                    "help_text": "By default the miRBase mature and hairpin references are filtered to the species given with `--mirtrace_species`. Use this parameter to quantify against one or more other species, e.g. related species for a non-model organism, without changing the species used by miRTrace. `all` keeps the references of all miRBase species. With a single species, the miRBase GFF3 file of that species is downloaded for mirtop unless `--mirna_gtf` is given. With more than one species or `all`, `--mirna_gtf` is required, unless mirtop is skipped with `--skip_mirtop`, and must contain the miRBase coordinates of the species (e.g. their miRBase GFF3 files concatenated into one file). Not used with `--mirgenedb`, see `--mirgenedb_species` instead. See the usage documentation for details and caveats.",
                     "fa_icon": "fas fa-microscope"
                 },
                 "fasta": {
@@ -140,7 +152,7 @@
                 "mirna_gtf": {
                     "type": "string",
                     "description": "GFF/GTF file with coordinates positions of precursor and miRNAs.",
-                    "help_text": "miRBase `.gff3` file, typically downloaded from [`https://mirbase.org/download/CURRENT/genomes/`](https://mirbase.org/download/CURRENT/genomes/)\n\nIf using iGenomes with `--genome` this file will be downloaded from miRBase automatically during the pipeline run.\n\n",
+                    "help_text": "miRBase `.gff3` file, typically downloaded from `https://mirbase.org/download/<species>.gff3` (e.g. `https://mirbase.org/download/mmu.gff3`). Do not use the `https://mirbase.org/download/CURRENT/genomes/` URLs to download the file, as they serve it wrapped in HTML, which mirtop cannot parse. The file must keep the miRBase header comments (e.g. `# microRNAs: miRBase v22.1`), from which mirtop reads the database name.\n\nIf `--mirtrace_species` is set (e.g. via `--genome`) and this parameter is not provided, the file will be downloaded from miRBase automatically during the pipeline run. miRBase does not provide this file for all species (e.g. sheep, `oar`); in that case provide one here or use `--skip_mirtop`. It is only used by mirtop.\n\n",
                     "fa_icon": "fas fa-address-book"
                 },
                 "mirgenedb_gff": {
@@ -160,6 +172,12 @@
                     "type": "string",
                     "description": "Path to FASTA file with MirGeneDB mature miRNAs.",
                     "help_text": "This file needs to be downloaded from [`https://mirgenedb.org/download`]. Can be given either as a plain text `.fa` file or a compressed `.gz` file.",
+                    "fa_icon": "fas fa-file-alt"
+                },
+                "mirgenedb_star": {
+                    "type": "string",
+                    "description": "Optional path to FASTA file with MirGeneDB star miRNAs, added to `--mirgenedb_mature`.",
+                    "help_text": "MirGeneDB mature FASTA files only contain the dominant arm of each miRNA. The star arms (named with a trailing `*`, e.g. `Hsa-Mir-3613_3p*`) are a separate 'Star sequences' download from [`https://mirgenedb.org/download`]. mirtop always reports star arms, because it uses the hairpin FASTA and the GFF. Provide this file so that star arms are also counted in the edgeR mature tables, under the same names as in mirtop. Only used with `--mirgenedb`. Can be given either as a plain text `.fa` file or a compressed `.gz` file.",
                     "fa_icon": "fas fa-file-alt"
                 },
                 "hairpin": {
@@ -186,6 +204,12 @@
                     "description": "Additional arguments to pass to Bowtie alignment.",
                     "help_text": "These flags are passed to Bowtie 1 for the genome mapping, e.g. `--bowtie_align_args '-v 1 --best'`. Use with caution as some flags may conflict with pipeline-managed options. They do not affect the mature miRNA, hairpin or seqcluster alignments; to change Bowtie options for those steps, set `ext.args` in a custom config (see the Custom Tool Arguments section of the usage docs).",
                     "fa_icon": "fas fa-terminal"
+                },
+                "mirna_forward_only": {
+                    "type": "boolean",
+                    "description": "Align reads only to the forward strand of mature and hairpin miRNA references.",
+                    "help_text": "Adds Bowtie 1 `--norc` to the mature, hairpin and seqcluster-to-hairpin alignments, so that reads are not assigned to the reverse complement of a miRNA reference. Use it for libraries whose trimmed reads have the same 5' to 3' orientation as the miRNA, which is the case for all built-in protocols (`illumina`, `nextflex`, `nextflex_v4`, `qiaseq`, `cats`). Enabled by the `qiaseq` profile; set `--mirna_forward_only false` to restore both-strand miRNA alignment. Genome, miRDeep2 and contaminant alignments are not affected.",
+                    "fa_icon": "fas fa-directions"
                 },
                 "save_reference": {
                     "type": "boolean",
@@ -347,6 +371,12 @@
                     "fa_icon": "fas fa-fast-forward",
                     "description": "Skip miRDeep"
                 },
+                "skip_mirtop": {
+                    "type": "boolean",
+                    "fa_icon": "fas fa-fast-forward",
+                    "description": "Skip the mirtop isomiR annotation.",
+                    "help_text": "mirtop needs a miRNA GFF3 file (`--mirna_gtf` or `--mirgenedb_gff`). With `--skip_mirtop`, no GFF3 file is required or downloaded, which allows running the pipeline for species without a miRBase GFF3 file (e.g. sheep, `oar`). The mature and hairpin miRNA quantification (`mirna_quant/edger_qc/`) is still produced."
+                },
                 "skip_multiqc": {
                     "type": "boolean",
                     "fa_icon": "fas fa-fast-forward",
@@ -356,6 +386,31 @@
                     "type": "boolean",
                     "description": "Skip FastP",
                     "fa_icon": "fas fa-forward"
+                }
+            }
+        },
+        "mirdeep2_options": {
+            "title": "miRDeep2 options",
+            "type": "object",
+            "description": "Options for the miRDeep2 known and novel miRNA detection.",
+            "fa_icon": "fas fa-search",
+            "properties": {
+                "mirdeep2_consensus_min_samples": {
+                    "type": "integer",
+                    "default": 0,
+                    "minimum": 0,
+                    "description": "Write a cross-sample consensus (BED and TSV) of the miRDeep2 miRNAs found in at least this many samples. 0 disables it.",
+                    "help_text": "When set to 1 or more, the per-sample miRDeep2 BED files (known and novel miRNAs) are merged into `mirdeep2/mirdeep2_consensus.bed` (standard six-column BED, with the number of supporting samples as score) and `mirdeep2/mirdeep2_consensus.tsv` (samples, highest miRDeep2 score and probability, and per-sample miRDeep2 IDs of each locus). Loci that overlap by at least one base on the same strand are merged with `bedtools merge -s -d -1` (loci that only touch are not merged), and only loci reported by at least this many samples are kept. Use 1 for the union of all samples, or the number of samples for loci found in every sample. Samples where miRDeep2 failed (exit status 255) do not count. miRDeep2 must not be skipped (`--skip_mirdeep false`).",
+                    "fa_icon": "fas fa-object-group"
+                },
+                "mirdeep2_consensus_min_probability": {
+                    "type": "integer",
+                    "default": 0,
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Only use miRDeep2 miRNAs with an estimated true-positive probability of at least this many percent for the consensus files. 0 disables the filter.",
+                    "help_text": "Only used when `--mirdeep2_consensus_min_samples` is 1 or more. The probability is the column 'estimated probability that the miRNA (candidate) is a true positive' of the per-sample `result_{sample.id}.csv` (for example `91 +/- 2%` counts as 91). Entries below the threshold are removed in each sample before the samples are merged, so they do not count towards `--mirdeep2_consensus_min_samples`. miRDeep2 gives no probability (`-`) for known miRBase miRNAs in a sample in which it found no novel miRNA candidates; such entries are removed as well when this is above 0. The per-sample miRDeep2 output files are not changed.",
+                    "fa_icon": "fas fa-percent"
                 }
             }
         },
@@ -528,6 +583,9 @@
         },
         {
             "$ref": "#/$defs/skipping_pipeline_steps"
+        },
+        {
+            "$ref": "#/$defs/mirdeep2_options"
         },
         {
             "$ref": "#/$defs/institutional_config_options"

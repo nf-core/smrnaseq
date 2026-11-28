@@ -1,0 +1,32 @@
+nextflow_pipeline {
+    name 'Test QIAseq miRNA reference orientation'
+    script './strand_orientation/main.nf'
+    profile '+qiaseq'
+    tag 'pipeline'
+    tag 'mirna_forward_only'
+
+    test('QIAseq defaults to forward-only RNA alignments') {
+        when {
+            params {
+                outdir = "${outputDir}"
+            }
+        }
+        then {
+            assert workflow.success
+            STRAND.assertAlignments(workDir, outputDir, true)
+        }
+    }
+
+    test('CLI false overrides the QIAseq default') {
+        options '--mirna_forward_only false'
+        when {
+            params {
+                outdir = "${outputDir}"
+            }
+        }
+        then {
+            assert workflow.success
+            STRAND.assertAlignments(workDir, outputDir, false)
+        }
+    }
+}

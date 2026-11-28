@@ -27,6 +27,12 @@ input:
   - filter_species:
       type: string
       description: miRBase-style species identifier used to filter FASTA records.
+  - extra_fasta:
+      type: file
+      description: |
+        Optional FASTA file (may be null) whose records are added to `fasta` before parsing,
+        e.g. MirGeneDB star sequences. The output keeps the name of `fasta`.
+      pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
 output:
   - parsed_fasta:
       type: file

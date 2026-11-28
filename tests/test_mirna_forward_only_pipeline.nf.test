@@ -1,0 +1,60 @@
+nextflow_pipeline {
+
+    name "Test pipeline with the qiaseq profile and --mirna_forward_only"
+    script "../main.nf"
+    profile "+ci,qiaseq"
+    tag "pipeline"
+    tag "mirna_forward_only"
+
+    test("-profile test,qiaseq adds --norc to the miRNA alignments only") {
+        // The qiaseq profile enables mirna_forward_only. Keep the Illumina adapter of the
+        // test data so that the reads are trimmed as with -profile test.
+        when {
+            params {
+                outdir              = "$outputDir"
+                three_prime_adapter = 'TGGAATTCTCGGGTGCCAAGG'
+            }
+        }
+        then {
+            def scripts = [:].withDefault { [] }
+            new File("${workDir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
+                if (file.name == '.command.run') {
+                    def name = (file.text =~ /NFCORE_SMRNASEQ:\w+:BOWTIE_MAP_\w+/).findAll()[0]
+                    if (name) { scripts[name.tokenize(':').last()].add(new File(file.parentFile, '.command.sh').text) }
+                }
+            }
+            assert workflow.success
+            ['BOWTIE_MAP_MATURE', 'BOWTIE_MAP_HAIRPIN', 'BOWTIE_MAP_SEQCLUSTER'].each { name ->
+                assert scripts[name].size() > 0
+                assert scripts[name].every { it.contains('--norc') }
+            }
+            assert scripts['BOWTIE_MAP_GENOME'].size() > 0
+            assert scripts['BOWTIE_MAP_GENOME'].every { !it.contains('--norc') }
+        }
+    }
+
+    test("-profile test,qiaseq --mirna_forward_only false restores both-strand alignment") {
+        // Given on the command line: the value is only a Boolean if the typed params block casts it
+        options "--mirna_forward_only false"
+        when {
+            params {
+                outdir              = "$outputDir"
+                three_prime_adapter = 'TGGAATTCTCGGGTGCCAAGG'
+            }
+        }
+        then {
+            def scripts = [:].withDefault { [] }
+            new File("${workDir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
+                if (file.name == '.command.run') {
+                    def name = (file.text =~ /NFCORE_SMRNASEQ:\w+:BOWTIE_MAP_\w+/).findAll()[0]
+                    if (name) { scripts[name.tokenize(':').last()].add(new File(file.parentFile, '.command.sh').text) }
+                }
+            }
+            assert workflow.success
+            ['BOWTIE_MAP_MATURE', 'BOWTIE_MAP_HAIRPIN', 'BOWTIE_MAP_SEQCLUSTER', 'BOWTIE_MAP_GENOME'].each { name ->
+                assert scripts[name].size() > 0
+                assert scripts[name].every { !it.contains('--norc') }
+            }
+        }
+    }
+}

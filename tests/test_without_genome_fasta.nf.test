@@ -1,0 +1,90 @@
+nextflow_pipeline {
+
+    name "Test pipeline with and without a genome FASTA"
+    script "../main.nf"
+    profile "test,ci"
+    tag "pipeline"
+    tag "without_genome_fasta"
+
+    // `-profile test` sets both `fasta` and `bowtie_index`. Without `fasta`, genome quantification
+    // and miRDeep2 are skipped (and a given `bowtie_index` is ignored), with one warning at start-up.
+    // `-stub` keeps this cheap, as only the parameter handling and channel wiring are tested.
+    // log.warn always goes to .nextflow.log; the console only shows it outside agent log mode.
+
+    test("-profile test --bowtie_index without --fasta -stub") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir       = "$outputDir"
+                fasta        = null
+                skip_mirdeep = false
+            }
+        }
+
+        then {
+            def warnings = new File("${launchDir}/meta/nextflow.log").readLines().findAll { line ->
+                line.contains("WARN  nextflow.Nextflow - ") && line.contains("genome FASTA")
+            }
+            assertAll(
+                { assert workflow.success },
+                { assert warnings.size() == 1 },
+                { assert warnings[0].contains("A genome Bowtie index was given with '--bowtie_index', but no genome FASTA. The index is ignored, and genome quantification and miRDeep2 are skipped.") },
+                { assert !workflow.trace.tasks().any { task -> task.name.contains('GENOME_QUANT') || task.name.contains('MIRDEEP2') } },
+                { assert !new File("${outputDir}/genome_quant").exists() },
+                { assert !new File("${outputDir}/mirdeep2").exists() }
+            )
+        }
+    }
+
+    test("-profile test without --fasta and --bowtie_index -stub") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir       = "$outputDir"
+                fasta        = null
+                bowtie_index = null
+                skip_mirdeep = false
+            }
+        }
+
+        then {
+            def warnings = new File("${launchDir}/meta/nextflow.log").readLines().findAll { line ->
+                line.contains("WARN  nextflow.Nextflow - ") && line.contains("genome FASTA")
+            }
+            assertAll(
+                { assert workflow.success },
+                { assert warnings.size() == 1 },
+                { assert warnings[0].contains("No genome FASTA was given, so genome quantification and miRDeep2 are skipped.") },
+                { assert !workflow.trace.tasks().any { task -> task.name.contains('GENOME_QUANT') || task.name.contains('MIRDEEP2') } },
+                { assert !new File("${outputDir}/genome_quant").exists() },
+                { assert !new File("${outputDir}/mirdeep2").exists() }
+            )
+        }
+    }
+
+    test("-profile test --bowtie_index with --fasta -stub") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir = "$outputDir"
+            }
+        }
+
+        then {
+            def warnings = new File("${launchDir}/meta/nextflow.log").readLines().findAll { line ->
+                line.contains("WARN  nextflow.Nextflow - ") && line.contains("genome FASTA")
+            }
+            assertAll(
+                { assert workflow.success },
+                { assert warnings.isEmpty() },
+                { assert workflow.trace.tasks().any { task -> task.name.contains('GENOME_QUANT:BOWTIE_MAP_GENOME') } }
+            )
+        }
+    }
+}

@@ -1,0 +1,231 @@
+nextflow_pipeline {
+
+    name "Test pipeline with --mirna_species and --mirgenedb_species"
+    script "../main.nf"
+    profile "+ci"
+    tag "pipeline"
+    tag "mirna_species"
+
+    // Task directories of a process, found through their .command.run
+    def task_dirs_of = { work_dir, String process_name ->
+        def dirs = []
+        new File("${work_dir}").eachFileRecurse(groovy.io.FileType.FILES) { file ->
+            if (file.name == '.command.run') {
+                // The task name is in single quotes with Nextflow 26.04 and in double quotes with 26.10
+                def name = (file.text =~ /(?m)^### name: ["']([^ "']+)/)
+                if (name.find() && name.group(1) == process_name) {
+                    dirs.add(file.parentFile)
+                }
+            }
+        }
+        dirs
+    }
+    def scripts_of = { work_dir, String process_name ->
+        task_dirs_of(work_dir, process_name).collect { dir -> new File(dir, '.command.sh').text }
+    }
+    // Species prefixes of the sequences in the parsed FASTA of a PARSE_FASTA_MIRNA task
+    def parsed_species_of = { work_dir, String process_name ->
+        def dirs = task_dirs_of(work_dir, process_name)
+        assert dirs.size() == 1
+        def fasta = dirs[0].listFiles().find { file -> file.name.endsWith('_igenome.fa') }
+        fasta.readLines().findAll { line -> line.startsWith('>') }.collect { line -> line.substring(1).tokenize('-')[0] }.toSet()
+    }
+
+    test("-profile test --mirna_species hsa,mmu") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                mirna_species = 'hsa,mmu'
+                // Only human coordinates: mouse hairpins are aligned to but not annotated by mirtop
+                mirna_gtf = "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3"
+            }
+        }
+
+        then {
+            def parse_scripts    = scripts_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_HAIRPIN')
+            def mirtop_scripts   = scripts_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:BAM_STATS_MIRNA_MIRTOP:MIRTOP_GFF')
+            def mirtrace_scripts = scripts_of(workDir, 'NFCORE_SMRNASEQ:MIRTRACE_QC')
+            def hairpin_counts   = new File("$outputDir/mirna_quant/edger_qc/hairpin_normalized_CPM.txt").readLines().drop(1)
+            def mirna_counts     = new File("$outputDir/mirna_quant/mirtop/mirna.tsv").readLines().drop(1)
+
+            assert workflow.success
+            // The references are filtered to both species
+            assert parse_scripts.size() == 1
+            assert parse_scripts[0].contains('seqkit grep -r --pattern ".*hsa-.*" --pattern ".*mmu-.*"')
+            assert parsed_species_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_HAIRPIN') == ['hsa', 'mmu'] as Set
+            assert parsed_species_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_MATURE') == ['hsa', 'mmu'] as Set
+            // Reads are counted on the hairpins of both species
+            assert hairpin_counts.any { line -> line.startsWith('hsa-') }
+            assert hairpin_counts.any { line -> line.startsWith('mmu-') }
+            // mirtop keeps all (already filtered) hairpins and annotates the miRNAs in --mirna_gtf (human only here)
+            assert mirtop_scripts.size() > 0
+            assert mirtop_scripts.every { script -> script.contains('--sps -') }
+            assert mirna_counts.any { line -> line.startsWith('hsa-') }
+            // miRTrace still uses --mirtrace_species
+            assert mirtrace_scripts.size() > 0
+            assert mirtrace_scripts.every { script -> script.contains('--species hsa') }
+        }
+    }
+
+    test("-profile test --mirna_species all") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                mirna_species = 'all'
+                mirna_gtf = "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3"
+            }
+        }
+
+        then {
+            def parse_scripts  = scripts_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_HAIRPIN')
+            def mirtop_scripts = scripts_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:BAM_STATS_MIRNA_MIRTOP:MIRTOP_GFF')
+            def mirna_counts   = new File("$outputDir/mirna_quant/mirtop/mirna.tsv").readLines().drop(1)
+
+            assert workflow.success
+            // No species filter: the references keep all miRBase species (271 in the test hairpin.fa)
+            assert parse_scripts.size() == 1
+            assert !parse_scripts[0].contains('seqkit grep')
+            assert parsed_species_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_HAIRPIN').size() > 200
+            assert parsed_species_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_MATURE').size() > 200
+            assert mirtop_scripts.size() > 0
+            assert mirtop_scripts.every { script -> script.contains('--sps -') }
+            assert mirna_counts.any { line -> line.startsWith('hsa-') }
+        }
+    }
+
+    test("-profile test --mirgenedb --mirgenedb_species Hsa,Mmu") {
+
+        when {
+            params {
+                // MirGeneDB references of three species, built from the human test data: Mmu and Ptr are
+                // renamed copies of Hsa. The GFF holds the per-species files of Hsa and Mmu concatenated.
+                def base    = 'https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/MirGeneDB'
+                def fixture = new File("${outputDir}/../mirgenedb_fixture")
+                fixture.mkdirs()
+                def hairpin = new URL("${base}/mirgenedb_hsa_hairpin.fa").text
+                def mature  = new URL("${base}/mirgenedb_hsa_mature.fa").text
+                def gff     = new URL("${base}/mirgenedb_hsa.gff").text
+                new File(fixture, 'hairpin.fa').text = ['Hsa', 'Mmu', 'Ptr'].collect { sp -> hairpin.replace('>Hsa-', ">${sp}-") }.join('')
+                new File(fixture, 'mature.fa').text  = ['Hsa', 'Mmu', 'Ptr'].collect { sp -> mature.replace('>Hsa-', ">${sp}-") }.join('')
+                new File(fixture, 'mirgenedb.gff').text = gff + gff.replace('ID=Hsa-', 'ID=Mmu-')
+
+                outdir            = "$outputDir"
+                input             = 'https://github.com/nf-core/test-datasets/raw/smrnaseq/samplesheet/v2.0/samplesheet_test_short.csv'
+                mirgenedb         = true
+                mirgenedb_species = 'Hsa,Mmu'
+                mirgenedb_hairpin = "${fixture}/hairpin.fa"
+                mirgenedb_mature  = "${fixture}/mature.fa"
+                mirgenedb_gff     = "${fixture}/mirgenedb.gff"
+            }
+        }
+
+        then {
+            def parse_scripts  = scripts_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_HAIRPIN')
+            def mirtop_scripts = scripts_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:BAM_STATS_MIRNA_MIRTOP:MIRTOP_GFF')
+            def isomirs        = new File("$outputDir/mirna_quant/mirtop/joined_samples_mirtop.tsv").readLines().drop(1)
+
+            assert workflow.success
+            // The references are filtered to Hsa and Mmu, Ptr is removed
+            assert parse_scripts.size() == 1
+            assert parse_scripts[0].contains('seqkit grep -r --pattern ".*Hsa-.*" --pattern ".*Mmu-.*"')
+            assert parsed_species_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_HAIRPIN') == ['Hsa', 'Mmu'] as Set
+            assert parsed_species_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_MATURE') == ['Hsa', 'Mmu'] as Set
+            // mirtop reads the concatenated MirGeneDB GFF and annotates both species. Checked in the joined
+            // isomiR table: mirna.tsv counts each sequence once, and the Mmu copies have the Hsa sequences.
+            assert mirtop_scripts.size() > 0
+            assert mirtop_scripts.every { script -> script.contains('--sps -') && script.contains('--database MirGeneDB') }
+            assert isomirs.collect { line -> line.tokenize('\t')[2].tokenize('-')[0] }.toSet() == ['Hsa', 'Mmu'] as Set
+        }
+    }
+
+    test("-profile test --mirna_species with several species requires --mirna_gtf") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                mirna_species = 'hsa,mmu'
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert (workflow.stdout + workflow.stderr).any { it.contains("--mirna_species 'hsa,mmu' selects several miRBase species. Please provide a GFF3 file") }
+        }
+    }
+
+    test("-profile test --mirna_species hsa,mmu --skip_mirtop -stub: no --mirna_gtf needed") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir = "$outputDir"
+                mirna_species = 'hsa,mmu'
+                skip_mirtop = true
+            }
+        }
+
+        then {
+            // The GFF3 is only used by mirtop, so several species do not need --mirna_gtf when mirtop is skipped
+            assert workflow.success
+            assert scripts_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:PARSE_HAIRPIN').size() == 1
+            assert task_dirs_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:BAM_STATS_MIRNA_MIRTOP:MIRTOP_GFF').size() == 0
+        }
+    }
+
+    test("-profile test --mirtrace_species mmu --mirna_species hsa -stub: GFF3 of --mirna_species") {
+
+        options "-stub"
+
+        when {
+            params {
+                outdir = "$outputDir"
+                mirtrace_species = 'mmu'
+                mirna_species = 'hsa'
+            }
+        }
+
+        then {
+            // Without --mirna_gtf, the miRBase GFF3 is taken for the species the references are filtered to
+            // (--mirna_species), which is the species mirtop runs with, and not for --mirtrace_species
+            def mirtop_dirs = task_dirs_of(workDir, 'NFCORE_SMRNASEQ:MIRNA_QUANT:BAM_STATS_MIRNA_MIRTOP:MIRTOP_GFF')
+            assert workflow.success
+            assert mirtop_dirs.size() > 0
+            assert mirtop_dirs.every { dir -> new File(dir, '.command.run').text.contains('hsa.gff3') }
+            assert mirtop_dirs.every { dir -> !new File(dir, '.command.run').text.contains('mmu.gff3') }
+        }
+    }
+
+    test("-profile test --mirna_species all requires --mirna_gtf") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                mirna_species = 'all'
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert (workflow.stdout + workflow.stderr).any { it.contains("--mirna_species 'all' selects several miRBase species. Please provide a GFF3 file") }
+        }
+    }
+
+    test("-profile test --mirna_species all cannot be combined with other species") {
+
+        when {
+            params {
+                outdir = "$outputDir"
+                mirna_species = 'all,hsa'
+                mirna_gtf = "https://raw.githubusercontent.com/nf-core/test-datasets/smrnaseq/reference/hsa.gff3"
+            }
+        }
+
+        then {
+            assert workflow.failed
+            assert (workflow.stdout + workflow.stderr).any { it.contains("--mirna_species 'all' cannot be combined with other species: 'all,hsa'") }
+        }
+    }
+}

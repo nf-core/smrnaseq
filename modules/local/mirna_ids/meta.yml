@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/nf-core/modules/master/modules/meta-schema.json
+name: "mirna_ids"
+description: |
+  Build a table that maps the miRNA names reported by edgeR and mirtop to miRBase
+  accessions (MIMAT/MI) and precursors, from the miRBase or MirGeneDB GFF used for the run.
+keywords:
+  - mirna
+  - mirbase
+  - mirgenedb
+  - identifiers
+tools:
+  - "R":
+      description: "R is a free software environment for statistical computing and graphics."
+      homepage: "https://www.r-project.org/"
+      licence: ["GPL-2.0-or-later"]
+input:
+  - gff:
+      type: list
+      description: |
+        miRBase GFF3 or MirGeneDB GFF file used for the run, as a list with one file.
+        An empty list builds the table from the FASTA files only (precursor columns empty).
+      pattern: "*.{gff,gff3,gff.gz,gff3.gz}"
+  - meta2:
+      type: map
+      description: Groovy Map containing reference information.
+  - mature:
+      type: file
+      description: Mature miRNA FASTA file used for quantification.
+      pattern: "*.{fa,fasta}"
+  - meta3:
+      type: map
+      description: Groovy Map containing reference information.
+  - hairpin:
+      type: file
+      description: Hairpin (precursor) miRNA FASTA file used for quantification.
+      pattern: "*.{fa,fasta}"
+  - mature_reference:
+      type: list
+      description: |
+        Raw mature reference FASTA file(s) given to the pipeline (plus the MirGeneDB star FASTA, if any).
+        Accessions are read from their headers when there is no GFF.
+      pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
+  - hairpin_reference:
+      type: file
+      description: Raw hairpin reference FASTA file given to the pipeline.
+      pattern: "*.{fa,fasta,fa.gz,fasta.gz}"
+  - species:
+      type: string
+      description: Species prefix used to filter records, e.g. 'hsa' (miRBase) or 'Hsa' (MirGeneDB).
+  - database:
+      type: string
+      description: Name of the source database written to the `database` column, e.g. 'miRBase' or 'MirGeneDB'.
+output:
+  - mirna_ids:
+      type: file
+      description: |
+        Tab-separated table with the columns name, accession, type (mature or hairpin),
+        precursor, precursor_accession, database and source (gff or fasta).
+      pattern: "mirna_ids.tsv"
+authors:
+  - "@apeltzer"
+maintainers:
+  - "@apeltzer"
