@@ -622,7 +622,7 @@ The pipeline runs this module in four Bowtie alignment steps. Each is configured
 | Hairpin alignment of the collapsed reads, used by mirtop                      | `NFCORE_SMRNASEQ:MIRNA_QUANT:BOWTIE_MAP_SEQCLUSTER` |
 | Genome alignment of the reads that did not align to mature miRNAs or hairpins | `NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME`    |
 
-All four steps use the same basic Bowtie defaults: `-t -k 50 --best --strata -e 99999 --chunkmbs 2048`. With `--mirna_forward_only`, which `-profile qiaseq` sets, the mature, hairpin and seqcluster steps also get `--norc`. For genome mapping only, you can append options with the [`bowtie_align_args`](#genome) parameter instead of a custom config. Setting `ext.args` replaces the pipeline's defaults for that step, including any options added there by pipeline parameters, so repeat any you want to keep.
+All four steps use the same basic Bowtie defaults: `-t -k 50 --best --strata -e 99999 --chunkmbs 2048`. With [`--mirna_forward_only`](#mirna-reference-orientation), which `-profile qiaseq` sets, the mature, hairpin and seqcluster steps also get `--norc`. For genome mapping only, you can append options with the [`bowtie_align_args`](#genome) parameter instead of a custom config. Setting `ext.args` replaces the pipeline's defaults for that step, including any options added there by pipeline parameters, so repeat any you want to keep.
 
 For example, to allow at most one mismatch in the mature miRNA and hairpin alignments and add example options for SAMtools, create `tool_args.config`:
 
