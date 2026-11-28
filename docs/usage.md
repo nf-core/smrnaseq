@@ -179,6 +179,7 @@ Do not use `--mirna_forward_only` for reads in antisense orientation, for exampl
   - These flags are appended after the pipeline's defaults for genome mapping (`-t -k 50 --best --strata -e 99999 --chunkmbs 2048`). When a flag is repeated, Bowtie uses the last value, so for example `--bowtie_align_args '-k 10'` replaces `-k 50`.
   - `-k` must be at least 2, because the defaults include `--strata`, which Bowtie only accepts with `-k` above 1. To report a single alignment per read, use `-M 1` instead.
   - `-M <n>` (at least 1) reports a read that has more than `n` alignments in the best stratum once, at a random one of them, with a MAPQ of 0. Reads with up to `n` alignments keep all of them (up to the `-k` limit), so `-M 1` gives exactly one alignment per aligned read. `-M` cannot be combined with `-m`, which drops such reads instead.
+  - `bowtie_align_args` only changes genome mapping. To change Bowtie options, such as the number of allowed mismatches, for the mature miRNA, hairpin or seqcluster alignments, use `ext.args` in a custom config instead (see [Custom Tool Arguments](#custom-tool-arguments)).
 
 > [!NOTE]
 > if the FASTA file in `fasta` is not the same file used to generate the `bowtie` indices, then the pipeline will fail.
@@ -255,8 +256,36 @@ Contamination filtering of the sequencing reads is optional and can be invoked u
 - `trna`: Used to supply a FASTA file containing tRNA contamination sequence. e.g. `http://gtrnadb.ucsc.edu/genomes/eukaryota/Hsapi38/hg38-tRNAs.fa`
 - `cdna`: Used to supply a FASTA file containing cDNA contamination sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/cdna/Homo_sapiens.GRCh38.cdna.all.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 - `ncrna`: Used to supply a FASTA file containing ncRNA contamination sequence. e.g. `ftp://ftp.ensembl.org/pub/release-86/fasta/homo_sapiens/ncrna/Homo_sapiens.GRCh38.ncrna.fa.gz` The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
-- `pirna`: Used to supply a FASTA file containing piRNA contamination sequence. e.g. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+- `pirna`: Used to supply a FASTA file containing piRNA contamination sequence, e.g. from [piRBase](http://bigdata.ibp.ac.cn/piRBase/) or [piRNAdb](https://www.pirnadb.org/). The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
 - `other_contamination`: Used to supply an additional filtering set. The FASTA file is first compared to the available miRNA sequences and overlaps are removed.
+
+How the filter works:
+
+- The adapter-trimmed reads are aligned with Bowtie2 (`--very-sensitive-local -k 1`) to each database in turn, in the fixed order rRNA, tRNA, cDNA, ncRNA, piRNA, other. Only the reads that do not align are passed on to the next database, so each read is counted for the first class it aligns to. The order matters when databases overlap (for example, rRNA and tRNA sequences are also part of the Ensembl ncRNA FASTA).
+- Before aligning, the cDNA, ncRNA, piRNA and other databases are compared to the miRNA hairpins with BLAT, and every entry with a significant hit (e-value < 1e-5) is removed from the database, so that miRNA reads are not filtered out. The rRNA and tRNA databases are used as given.
+- The reads that align to a database are removed from the analysis, and only their number is kept: their alignments and sequences are not saved to the output directory. The remaining reads are used for miRNA quantification, genome mapping and miRDeep2.
+- The number of reads removed per class is shown in the "Contamination Filtering" plot of the MultiQC report. With `--save_intermediates`, the per-sample numbers (`*.contamination_mqc.yaml`) and the filtered reads (`*.filtered.fastq.gz`) are also saved to `contaminant_filter/filter/` (see [the output documentation](https://nf-co.re/smrnaseq/output#bowtie2)).
+
+### Small RNA biotypes other than miRNAs
+
+nf-core/smrnaseq quantifies miRNAs: it produces count tables per mature miRNA, per hairpin and per isomiR. It does not produce count tables per tRNA, tRNA fragment, piRNA, rRNA, snoRNA or other small RNA. Data for these biotypes is available at the following levels:
+
+| What                                                                           | Where                                                                                                                                      | Parameters                                                       |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
+| Fraction of reads that are miRNA, rRNA, tRNA, artifacts or unknown (QC)        | miRTrace "RNA type" plot in MultiQC, `mirtrace/<sample>/`                                                                                  | `--mirtrace_species` (species supported by miRTrace)             |
+| Number of reads per database (rRNA, tRNA, cDNA, ncRNA, piRNA, other)           | "Contamination Filtering" plot in MultiQC, `contaminant_filter/filter/*.contamination_mqc.yaml`                                            | `--filter_contamination` plus one or more of the databases above |
+| Genome alignments of all reads that did not align to a mature miRNA or hairpin | `genome_quant/bam/*.sorted.bam` (BAM files only with `--save_intermediates`); samtools `stats`, `flagstat` and `idxstats` are always saved | `--fasta` (and optionally `--bowtie_index`)                      |
+
+The contamination filter reports one total per database, not counts per sequence. The `idxstats` files of the genome mapping count reads per chromosome, not per gene.
+
+To get counts per small RNA (for example per tRNA gene or per piRNA locus), count the genome alignments against an annotation of your choice, outside the pipeline. [Other small RNAs: genome-wide quantification](#other-small-rnas-genome-wide-quantification) describes how to do this with featureCounts, including how to handle multi-mapping reads. In addition:
+
+- Do not set `--filter_contamination`, or at least do not set the databases of the biotypes you want to count: reads removed by the filter are not mapped to the genome.
+- Use an annotation that matches your genome assembly, for example the [GENCODE](https://www.gencodegenes.org/) or [Ensembl](https://www.ensembl.org/) GTF (snoRNA, snRNA, rRNA, misc_RNA and more, see the `gene_type`/`gene_biotype` attribute), [GtRNAdb](http://gtrnadb.ucsc.edu/) (tRNA genes), [piRBase](http://bigdata.ibp.ac.cn/piRBase/) (piRNAs) or [RNAcentral](https://rnacentral.org/) (genome coordinates of many ncRNA databases). featureCounts reads GTF/GFF or its own SAF format, so convert BED annotations (as offered by GtRNAdb) to SAF first.
+- Reads that align to a mature miRNA or hairpin are not part of the genome BAM files: take miRNA counts from `mirna_quant/`.
+- Mature tRNAs carry a non-templated 3' `CCA` and lack their introns, and tRNA-derived fragments are short. Genome alignment misses many of these reads. Dedicated tools that align against mature tRNA sequences give better tRNA and tRNA fragment counts.
+
+If you need full annotation and quantification of all small RNA classes, consider using a dedicated tool on the adapter-trimmed reads (saved to `fastp/fastq/` with `--save_merged`), such as [unitas](https://www.smallrnagroup.uni-mainz.de/software.html), [SPORTS](https://github.com/junchaoshi/sports1.1), [exceRpt](https://github.com/gersteinlab/exceRpt) or, for tRNA fragments, [MINTmap](https://github.com/TJU-CMC-Org/MINTmap). Support for further biotypes in the pipeline is discussed in [#548](https://github.com/nf-core/smrnaseq/issues/548).
 
 ## mirDeep2
 
@@ -377,6 +406,28 @@ process {
 
 See the [UMICollapse documentation](https://github.com/Daniel-Liu-c0deb0t/UMICollapse#command-line-arguments) for all options.
 
+#### Memory use of UMI deduplication
+
+In `fastq` mode, UMICollapse reads the whole FASTQ file of a sample into memory before it collapses reads. As the UMI makes most reads distinct, memory use and run time grow with the sequencing depth of a sample. The `UMICOLLAPSE_FASTQ` process requests 200 GB of memory by default (within your [maximum resources](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#set-max-resources)), and the Java heap is set to 90% of the memory of the task. A Java `OutOfMemoryError` is not retried automatically. For very deep samples, give this process more memory and time in a custom config passed with `-c`:
+
+```groovy
+process {
+    withName: '.*:UMICOLLAPSE_FASTQ' {
+        memory = 300.GB
+        time   = 48.h
+    }
+}
+```
+
+#### Sequence-based and alignment-based UMI deduplication
+
+Many UMI workflows for mRNA deduplicate after alignment instead: reads are grouped by alignment position (reference, strand and 5' start), and only the UMIs of reads at the same position are compared (e.g. `umi_tools dedup` or UMICollapse BAM mode). The pipeline does not offer this mode yet (see the plans at the end of [Choosing a UMI strategy](#choosing-a-umi-strategy)). Neither approach is wrong for small RNA, but they define a duplicate differently:
+
+- **Sequence-based (pipeline default)**: needs no reference and keeps isomiRs apart. Because each insert sequence and length is its own group, abundant miRNAs are split over several groups, which reduces UMI saturation (see [Choosing a UMI strategy](#choosing-a-umi-strategy)). The one allowed substitution (default `-k 1`) covers the UMI and the insert together: a read with a single sequencing error, in the UMI or in the insert, is still collapsed with its duplicate. Only reads with two or more errors (for example one in the UMI and one in the insert) are kept as separate molecules, and reads of different length are never compared.
+- **Alignment-based**: sequencing errors in the insert do not matter, and memory use is lower because only the reads at one position are compared. However, almost all reads of a miRNA start at the same position, so all its 3' isomiRs are pooled and told apart by their UMI alone. For highly expressed miRNAs this increases UMI saturation and can compress their counts. The pipeline maps with `-k 50`, so reads that align to several miRNAs or loci are deduplicated separately at each position, and the same read can be kept at one locus and removed at another.
+
+To deduplicate by alignment position instead, you can extract the UMIs before running the pipeline (with `umi_tools extract` and the same `--bc-pattern`, which moves the UMI to the read name and removes the kit sequences around it), run the pipeline without `--with_umi` and with `--save_intermediates`, and then deduplicate the `*.sorted.bam` files in `mirna_quant/bam/` and `genome_quant/bam/` with `umi_tools dedup` or `umicollapse bam`, followed by `samtools idxstats` for counts. Note that the mirtop, edgeR and miRDeep2 results of such a run are not deduplicated.
+
 ### Choosing a UMI strategy
 
 UMI deduplication has to decide when two reads come from the same molecule. Reads with the same insert and UMI are duplicates. Reads whose UMIs differ by one base can be duplicates with a PCR or sequencing error in the UMI, or two different molecules whose UMIs happen to be similar. The pipeline offers two strategies:
@@ -425,6 +476,16 @@ If a second fastq file is provided using another column, the extra data are igno
 --input '[path to samplesheet file]'
 ```
 
+A samplesheet with a single sample is supported, for example for a first test run:
+
+```console
+sample,fastq_1
+SAMPLE1,/path/to/SAMPLE1.fastq.gz
+```
+
+> [!NOTE]
+> nf-core/smrnaseq v2.3.1 and earlier failed in miRTrace with `Cannot cast object '<file>.fastq.gz' with class 'nextflow.processor.TaskPath' to class 'java.util.List'` when the samplesheet contained only one sample ([#249](https://github.com/nf-core/smrnaseq/issues/249)). If you see this error, update to the latest release, or add a second sample to the samplesheet.
+
 ### Multiple runs of the same sample
 
 The `sample` identifiers should match between runs of resequenced samples. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
@@ -438,7 +499,7 @@ CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz
 
 ### Full samplesheet
 
-The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet must have at least 2 columns (`sample` and `fastq1`). A third column can be added if the sample is paired-end (`fastq2`).
+The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet must have at least 2 columns (`sample` and `fastq_1`). A third column can be added if the sample is paired-end (`fastq_2`).
 
 > [!NOTE]
 > Most of the tools used can't accommodate paired end reads, so whenever paired-end samples are used as inputs, only the R1 files are used by the pipeline.
@@ -456,11 +517,11 @@ TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz
 TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz
 ```
 
-| Column    | Description                                                                                                                                                                            | Requirement |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). | Mandatory   |
-| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             | Mandatory   |
-| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             | Optional    |
+| Column    | Description                                                                                                                                       | Requirement |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Sample names cannot contain spaces. | Mandatory   |
+| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                        | Mandatory   |
+| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                        | Optional    |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
@@ -612,15 +673,29 @@ A pipeline might not expose every command-line option of every tool as a pipelin
 
 For this pipeline, the alignment module is named `BOWTIE_ALIGN`. It runs both Bowtie and `samtools view`: set `ext.args` for Bowtie options and `ext.args2` for `samtools view` options. For the separate sorting step, use `ext.args` on `SAMTOOLS_SORT`.
 
-Genome mapping runs this module as `BOWTIE_MAP_GENOME`, and the pipeline configures it with a fully qualified selector, so a shorter selector such as `BOWTIE_ALIGN` has no effect on that step. Setting `ext.args` replaces the pipeline's defaults, so repeat any you want to keep.
+The pipeline runs this module in four Bowtie alignment steps. Each is configured with a fully qualified selector, so a shorter selector such as `BOWTIE_ALIGN` has no effect on them; use the selector of the step you want to change:
 
-For example, create `tool_args.config`:
+| Step                                                                          | Selector                                            |
+| ----------------------------------------------------------------------------- | --------------------------------------------------- |
+| Mature miRNA alignment                                                        | `NFCORE_SMRNASEQ:MIRNA_QUANT:BOWTIE_MAP_MATURE`     |
+| Hairpin alignment of the reads that did not align to mature miRNAs            | `NFCORE_SMRNASEQ:MIRNA_QUANT:BOWTIE_MAP_HAIRPIN`    |
+| Hairpin alignment of the collapsed reads, used by mirtop                      | `NFCORE_SMRNASEQ:MIRNA_QUANT:BOWTIE_MAP_SEQCLUSTER` |
+| Genome alignment of the reads that did not align to mature miRNAs or hairpins | `NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME`    |
+
+All four steps use the same basic Bowtie defaults: `-t -k 50 --best --strata -e 99999 --chunkmbs 2048`. With [`--mirna_forward_only`](#mirna-reference-orientation), which `-profile qiaseq` sets, the mature, hairpin and seqcluster steps also get `--norc`. For genome mapping only, you can append options with the [`bowtie_align_args`](#genome) parameter instead of a custom config. Setting `ext.args` replaces the pipeline's defaults for that step, including any options added there by pipeline parameters, so repeat any you want to keep.
+
+For example, to allow at most one mismatch in the mature miRNA and hairpin alignments and add example options for SAMtools, create `tool_args.config`:
 
 ```nextflow
 process {
-    withName: 'NFCORE_SMRNASEQ:GENOME_QUANT:BOWTIE_MAP_GENOME' {
-        ext.args  = '-t -k 50 --best --strata -e 99999 --chunkmbs 2048 -n 0' // Bowtie: pipeline defaults, plus zero mismatches in the seed
+    withName: 'NFCORE_SMRNASEQ:MIRNA_QUANT:BOWTIE_MAP_MATURE' {
+        ext.args  = '-t -k 50 --best --strata --chunkmbs 2048 -v 1' // Bowtie: pipeline defaults, but at most 1 mismatch in the whole read
+        // With --mirna_forward_only or -profile qiaseq, add --norc here as well, e.g. '... -v 1 --norc'
         ext.args2 = '--no-PG'    // samtools view: example additional option
+    }
+
+    withName: 'NFCORE_SMRNASEQ:MIRNA_QUANT:BOWTIE_MAP_HAIRPIN' {
+        ext.args  = '-t -k 50 --best --strata --chunkmbs 2048 -v 1' // add --norc with --mirna_forward_only or -profile qiaseq
     }
 
     withName: SAMTOOLS_SORT {
@@ -640,7 +715,9 @@ nextflow run nf-core/smrnaseq \
     --genome GRCh37
 ```
 
-The Bowtie example sets its seed mismatch limit to zero; choose options that match your analysis and the tool's own documentation. `ext.args` values are inserted into the module command, so check the module's command and tool help before adding options that duplicate settings the pipeline already supplies. The applicable process names and argument slots can be checked in the module code; for modules running multiple tools, `ext.args`, `ext.args2`, etc. correspond to the tools in command order. See nf-core's documentation on [ext arguments](https://nf-co.re/docs/contributing/components/ext_args) and [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) for more details.
+This example replaces the whole `ext.args` of the two steps, so it also drops the `--norc` that `--mirna_forward_only` (set by `-profile qiaseq`) adds there: without `--norc` in your `ext.args`, reads are again aligned to both strands of the miRNA references. If you use `--mirna_forward_only` or `-profile qiaseq`, append `--norc` to the `ext.args` of every mature, hairpin and seqcluster step you override.
+
+Bowtie 1 has two alignment modes. In the default [`-n` mode](https://bowtie-bio.sourceforge.net/manual.shtml#the--n-alignment-mode), `-n` limits the mismatches in the seed at the start of the read (default 2 in the first `-l` 28 bases), and `-e` caps the sum of the base qualities at all mismatched positions. The pipeline sets `-e 99999`, so mismatches after the seed are effectively unlimited. In [`-v` mode](https://bowtie-bio.sourceforge.net/manual.shtml#the--v-alignment-mode), Bowtie allows at most that many mismatches over the whole read and ignores `-l`, `-e` and base qualities, so the example leaves out `-e 99999`. `-v` cannot be combined with `-n`. Stricter settings in an earlier step pass more reads on to the next one (mature, then hairpin, then genome), so they can change downstream counts too. Choose options that match your analysis and the tool's own documentation. `ext.args` values are inserted into the module command, so check the module's command and tool help before adding options that duplicate settings the pipeline already supplies. The applicable process names and argument slots can be checked in the module code; for modules running multiple tools, `ext.args`, `ext.args2`, etc. correspond to the tools in command order. See nf-core's documentation on [ext arguments](https://nf-co.re/docs/contributing/components/ext_args) and [customising tool arguments](https://nf-co.re/docs/running/configuration/nextflow-for-your-system#modifying-tool-arguments) for more details.
 
 ### nf-core/configs
 
