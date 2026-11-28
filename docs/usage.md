@@ -454,6 +454,16 @@ If a second fastq file is provided using another column, the extra data are igno
 --input '[path to samplesheet file]'
 ```
 
+A samplesheet with a single sample is supported, for example for a first test run:
+
+```console
+sample,fastq_1
+SAMPLE1,/path/to/SAMPLE1.fastq.gz
+```
+
+> [!NOTE]
+> nf-core/smrnaseq v2.3.1 and earlier failed in miRTrace with `Cannot cast object '<file>.fastq.gz' with class 'nextflow.processor.TaskPath' to class 'java.util.List'` when the samplesheet contained only one sample ([#249](https://github.com/nf-core/smrnaseq/issues/249)). If you see this error, update to the latest release, or add a second sample to the samplesheet.
+
 ### Multiple runs of the same sample
 
 The `sample` identifiers should match between runs of resequenced samples. The pipeline will concatenate the raw reads before performing any downstream analysis. Below is an example for the same sample sequenced across 3 lanes:
@@ -467,7 +477,7 @@ CONTROL_REP1,AEG588A1_S1_L004_R1_001.fastq.gz
 
 ### Full samplesheet
 
-The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet must have at least 2 columns (`sample` and `fastq1`). A third column can be added if the sample is paired-end (`fastq2`).
+The pipeline will auto-detect whether a sample is single- or paired-end using the information provided in the samplesheet. The samplesheet must have at least 2 columns (`sample` and `fastq_1`). A third column can be added if the sample is paired-end (`fastq_2`).
 
 > [!NOTE]
 > Most of the tools used can't accommodate paired end reads, so whenever paired-end samples are used as inputs, only the R1 files are used by the pipeline.
@@ -485,11 +495,11 @@ TREATMENT_REP3,AEG588A6_S6_L003_R1_001.fastq.gz
 TREATMENT_REP3,AEG588A6_S6_L004_R1_001.fastq.gz
 ```
 
-| Column    | Description                                                                                                                                                                            | Requirement |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Spaces in sample names are automatically converted to underscores (`_`). | Mandatory   |
-| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             | Mandatory   |
-| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                                                             | Optional    |
+| Column    | Description                                                                                                                                       | Requirement |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| `sample`  | Custom sample name. This entry will be identical for multiple sequencing libraries/runs from the same sample. Sample names cannot contain spaces. | Mandatory   |
+| `fastq_1` | Full path to FastQ file for Illumina short reads 1. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                        | Mandatory   |
+| `fastq_2` | Full path to FastQ file for Illumina short reads 2. File has to be gzipped and have the extension ".fastq.gz" or ".fq.gz".                        | Optional    |
 
 An [example samplesheet](../assets/samplesheet.csv) has been provided with the pipeline.
 
